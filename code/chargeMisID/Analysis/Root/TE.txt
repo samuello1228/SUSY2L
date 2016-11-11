@@ -1,0 +1,440 @@
+/////// About TwoElectrons.cxx ///////
+/* Written by Gabriel Gallardo, The University of Hong Kong
+ *
+ * June 2015
+ * 
+ * This algorithm extracts electrons from a given set of events and places relevant info
+ * in EEEvent and Electron classes.
+ *
+ * Only basic selection is performed on the electrons:
+ * eta < 2.5; Pt > 20
+ * 
+ * If there are more than two electrons in one event, the electrons with the highest Pt
+ * are selected.
+ *
+ * Information from AsgElectronLikelihoodTool are saved in the electron class
+ *
+ *
+ * TO DO:
+ * - Implement good runs list selection
+ * - Perform basic selection for Z->ee?
+ *
+ */
+
+
+#include <EventLoop/Job.h>
+#include <EventLoop/StatusCode.h>
+#include <EventLoop/Worker.h>
+#include <Analysis/TwoElectrons.h>
+#include "xAODRootAccess/Init.h"
+#include "xAODRootAccess/TEvent.h"
+#include "xAODRootAccess/tools/Message.h"
+#include "xAODEgamma/ElectronContainer.h"
+#include "xAODEgamma/Egamma.h"
+#include <Analysis/EEEvent.h>
+#include <iostream>
+#include "xAODTruth/TruthParticleContainer.h"
+#include "xAODEventInfo/EventInfo.h"
+#include <TSystem.h>
+
+#define EL_RETURN_CHECK( CONTEXT, EXP )                     \
+   do {                                                     \
+      if( ! EXP.isSuccess() ) {                             \
+         Error( CONTEXT,                                    \
+                XAOD_MESSAGE( "Failed to execute: %s" ),    \
+                #EXP );                                     \
+         return EL::StatusCode::FAILURE;                    \
+      }                                                     \
+   } while( false )
+
+
+// this is needed to distribute the algorithm to the workers
+ClassImp(TwoElectrons)
+
+
+
+
+typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
+static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
+static SG::AuxElement::Accessor< int > acc_truthType("truthType");
+static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
+
+TwoElectrons :: TwoElectrons ()
+{
+   // Here you put any code for the base initialization of variables,
+   // e.g. initialize all pointers to 0.  Note that you should only put
+   // the most basic initialization here, since this method will be
+   // called on both the submission and the worker node.  Most of your
+   // initialization code will go into histInitialize() and
+   // initialize().
+   elec1 = new Electron();
+   elec2 = new Electron();
+   ev = new EEEvent();
+   
+   tEv = new EEEvent();
+   tElec1 = new Electron();
+   tElec2 = new Electron();
+   
+   n_TotalEventCount = 0;
+   d_HighestPt =0;
+   n_InterestingEventCount = 0;
+   n_SSEventCount = 0;
+   n_OSEventCount = 0;
+}
+
+
+
+EL::StatusCode TwoElectrons :: setupJob (EL::Job& job)
+{
+  // Here you put code that sets up the job on the submission object
+  // so that it is ready to work with your algorithm, e.g. you can
+  // request the D3PDReader service or add output files.  Any code you
+  // put here could instead also go into the submission script.  The
+  // sole advantage of putting it here is that it gets automatically
+  // activated/deactivated when you add/remove the algorithm from your
+  // job, which may or may not be of value to you.
+  job.useXAOD();
+  EL_RETURN_CHECK( "setupJob()", xAOD::Init() );
+  
+  return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: histInitialize ()
+{
+   // Here you do everything that needs to be done at the very
+   // beginning on each worker node, e.g. create histograms and output
+   // trees.  This method gets called before any input files are
+   // connected.
+
+   // Initialize TTree
+   t_data = new TTree("data", "Electron event data");
+   t_data->Branch("Event", "EEEvent", ev);
+   wk()->addOutput(t_data);
+   return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: fileExecute ()
+{
+   // Here you do everything that needs to be done exactly once for every
+   // single file, e.g. collect a list of all lumi-blocks processed
+   return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: changeInput (bool firstFile)
+{
+   // Here you do everything you need to do when we change input files,
+   // e.g. resetting branch addresses on trees.  If you are using
+   // D3PDReader or a similar service this method is not needed.
+   return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: initialize ()
+{
+   // Here you do everything that you need to do after the first input
+   // file has been connected and before the first event is processed,
+   // e.g. create additional histograms based on which variables are
+   // available in the input files.  You can also create all of your
+   // histograms and trees in here, but be aware that this method
+   // doesn't get called if no events are processed.  So any objects
+   // you create here won't be available in the output if you have no
+   // input events.
+   //xAOD::TEvent* event = wk()->xaodEvent();
+
+#ifdef GRL 
+   // === GOOD RUNS LIST INITIALIZATION ===
+   m_grl = new GoodRunsListSelectionTool("GoodRunsListSelectionTool");
+   const char* GRLFilePath = "$ALRB_TutorialData/data12_8TeV.periodAllYear_DetStatus-v61-pro14-02_DQDefects-00-01-00_PHYS_StandardGRL_All_Good.xml";
+   const char* fullGRLFilePath = gSystem->ExpandPathName (GRLFilePath);
+   std::vector<std::string> vecStringGRL;
+   vecStringGRL.push_back(fullGRLFilePath);
+   EL_RETURN_CHECK("initialize()",m_grl->setProperty( "GoodRunsListVec", vecStringGRL));
+   EL_RETURN_CHECK("initialize()",m_grl->setProperty("PassThrough", false)); // if true (default) will ignore result of GRL and will just pass all events
+   EL_RETURN_CHECK("initialize()",m_grl->initialize());
+#endif
+
+   // === ELECTRON SELECTION TOOLS INITIALIZATION ===
+   m_LHToolTight2015  = new AsgElectronLikelihoodTool ("m_LHToolTight2015");
+   m_LHToolMedium2015 = new AsgElectronLikelihoodTool ("m_LHToolMedium2015"); 
+   m_LHToolLoose2015  = new AsgElectronLikelihoodTool ("m_LHToolLoose2015");
+
+   // initialize the primary vertex container for the tool to have access to the number of vertices used to adapt cuts based on the pileup
+   EL_RETURN_CHECK("initialize()", m_LHToolTight2015->setProperty("primaryVertexContainer","PrimaryVertices"));
+   EL_RETURN_CHECK("initialize()", m_LHToolMedium2015->setProperty("primaryVertexContainer","PrimaryVertices"));
+   EL_RETURN_CHECK("initialize()", m_LHToolLoose2015->setProperty("primaryVertexContainer","PrimaryVertices"));
+   EL_RETURN_CHECK("initialize()", m_LHToolLoose2015->setProperty("primaryVertexContainer","PrimaryVertices"));
+
+   // define the config files
+   std::string confDir = "ElectronPhotonSelectorTools/offline/mc15_20150408/";
+   EL_RETURN_CHECK("initialize()", m_LHToolTight2015->setProperty("ConfigFile",confDir+"ElectronLikelihoodTightOfflineConfig2015.conf"));
+   EL_RETURN_CHECK("initialize()", m_LHToolMedium2015->setProperty("ConfigFile",confDir+"ElectronLikelihoodMediumOfflineConfig2015.conf"));
+   EL_RETURN_CHECK("initialize()", m_LHToolLoose2015->setProperty("ConfigFile",confDir+"ElectronLikelihoodLooseOfflineConfig2015.conf"));
+
+   EL_RETURN_CHECK("initialize()", m_LHToolTight2015->initialize());
+   EL_RETURN_CHECK("initialize()", m_LHToolMedium2015->initialize());
+   EL_RETURN_CHECK("initialize()", m_LHToolLoose2015->initialize());
+
+   
+   return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: execute ()
+{
+   // Here you do everything that needs to be done on every single
+   // events, e.g. read input variables, apply cuts, and fill
+   // histograms and trees.  This is where most of your actual analysis
+   // code will go.
+   xAOD::TEvent* event = wk()->xaodEvent();
+   n_TotalEventCount++;
+   const xAOD::ElectronContainer* electrons = 0;
+   EL_RETURN_CHECK( "execute()", event->retrieve( electrons, "Electrons" ));
+
+   // Check if event is MC data
+   const xAOD::EventInfo* eventInfo = 0;
+   EL_RETURN_CHECK("execute",event->retrieve( eventInfo, "EventInfo"));  
+   bool isMC = false;
+   if(eventInfo->eventType( xAOD::EventInfo::IS_SIMULATION ) ) isMC = true; 
+   
+#ifdef GRL
+   if(!isMC){ 
+      if(!m_grl->passRunLB(*eventInfo)){
+         return EL::StatusCode::SUCCESS; 
+      }
+   } 
+#endif
+
+   // Count of electrons meeting the selection criteria
+   Int_t electronCount = 0;
+
+   // Temporary pointers for electron selection
+   xAOD::Electron* e1 = 0;
+   xAOD::Electron* e2 = 0;
+
+   // Loop over each electron in the event
+   for(auto e : *electrons){
+      Double_t d_PtElectron = e->pt()*0.001;
+      Double_t d_EtaElectron = e->eta();
+
+      if(d_PtElectron < 20 || d_EtaElectron > 2.5 || d_EtaElectron < -2.5) continue;
+      electronCount++;
+      if(d_PtElectron > d_HighestPt) d_HighestPt = d_PtElectron;  
+    
+      // Save pointers. For cases where more than 2 meet the criteria, the ones with the highest pt are selected
+      if(electronCount == 1) e1 = const_cast<xAOD::Electron*>(e); 
+      else if(electronCount == 2) e2 = const_cast<xAOD::Electron*>(e);
+      else {
+         if(e1->pt() < e2->pt()) e1 = const_cast<xAOD::Electron*>(e);
+         else e2 = const_cast<xAOD::Electron*>(e) ;
+      }
+      
+   }
+
+   if(electronCount < 2){ // Nothing to do if less that 2 eligible electrons were found
+      return EL::StatusCode::SUCCESS;
+   }
+   else{
+      // Calculate SS flag, charge, mass, dPhi, eta, pt
+      Bool_t SSevent;
+      if (e1->charge() == e2->charge()) SSevent = true; 
+      else SSevent = false;
+
+      xAOD::Egamma::FourMom_t v_pe1 = e1->p4();
+      xAOD::Egamma::FourMom_t v_pe2 = e2->p4();
+      xAOD::Egamma::FourMom_t v_totalP4 = v_pe1 + v_pe2;
+      Double_t InvMass = v_totalP4.M() / 1000;                         
+
+      Double_t dPhi = v_pe1.DeltaPhi(v_pe2);
+
+      Double_t eta1 = e1->eta(); 
+      Double_t pt1 = e1->pt()*0.001;
+      Double_t eta2 = e2->eta(); 
+      Double_t pt2 = e2->pt()*0.001;
+      
+      // Electron objects to store charge, eta, pt
+      elec1->Set(e1->charge(), eta1, pt1);
+      elec2->Set(e2->charge(), eta2, pt2);
+      
+      // Save electron pass-cut info
+      elec1->SetPassCut(m_LHToolLoose2015->accept(e1), m_LHToolMedium2015->accept(e1), m_LHToolTight2015->accept(e1));
+      elec2->SetPassCut(m_LHToolLoose2015->accept(e2), m_LHToolMedium2015->accept(e2), m_LHToolTight2015->accept(e2));
+      
+      
+      // Save Tag-and-probe information
+      SaveTagProbeInfo(e1, elec1);
+      SaveTagProbeInfo(e2, elec2);
+
+      ev->Set(*elec1, *elec2, InvMass, dPhi, SSevent); // Save event info 
+      ev->TagProbe(); // Mark tags
+      
+      // Save MC truth info
+      if (isMC) SaveMCInfo(ev, e1, e2, tElec1, tElec2);
+      else ev->SetTruth(false);
+      
+      // Fill tree
+      t_data->Fill();
+      
+      // Update statistics
+      if (InvMass > d_HighestMass) d_HighestMass = InvMass;
+      n_InterestingEventCount++;
+      if(SSevent) n_SSEventCount++;
+      else n_OSEventCount++;
+
+      // Print results
+      std::cout << "#" << n_TotalEventCount << ": " << "\t"
+              << "Electron count: " << electronCount << std::endl;
+
+      ev->PrintInfo();
+      std::cout << std::endl;
+
+   }
+   return EL::StatusCode::SUCCESS;
+}
+
+
+EL::StatusCode TwoElectrons :: postExecute ()
+{
+   // Here you do everything that needs to be done after the main event
+   // processing.  This is typically very rare, particularly in user
+   // code.  It is mainly used in implementing the NTupleSvc.
+   return EL::StatusCode::SUCCESS;
+}
+
+
+
+EL::StatusCode TwoElectrons :: finalize ()
+{
+   // This method is the mirror image of initialize(), meaning it gets
+   // called after the last event has been processed on the worker node
+   // and allows you to finish up any objects you created in
+   // initialize() before they are written to disk.  This is actually
+   // fairly rare, since this happens separately for each worker node.
+   // Most of the time you want to do your post-processing on the
+   // submission node after all your histogram outputs have been
+   // merged.  This is different from histFinalize() in that it only
+   // gets called on worker nodes that processed input events.
+   //xAOD::TEvent* event = wk()->xaodEvent();
+   std::cout << "Highest recorded pt = " << d_HighestPt << "GeV" << std::endl 
+            << "Highest recorded mass = " << d_HighestMass << "GeV" << std::endl
+            << "No. of events printed = " << n_InterestingEventCount <<" / " << n_TotalEventCount << std::endl
+            << "SS events: " << n_SSEventCount << "\tOSevents: " << n_OSEventCount << std::endl
+            <<"MisID rate: " << n_SSEventCount/ (double) n_InterestingEventCount * 100.0 << "% " << std::endl << std::endl;
+            
+   
+   // Cleanup 
+   if (elec1) { delete elec1; elec1 = 0; }
+   if (elec2) { delete elec2; elec2 = 0; }
+   if (ev) { delete ev; ev = 0; }
+   if (tEv) { delete tEv; tEv = 0; }
+   if (tElec1) { delete tElec1; tElec1 = 0; }
+   if (tElec2) { delete tElec2; tElec2 = 0; }
+#ifdef GRL
+   if (m_grl) { delete m_grl;  m_grl = 0; }
+#endif
+
+   return EL::StatusCode::SUCCESS;
+}
+
+
+EL::StatusCode TwoElectrons :: histFinalize ()
+{
+   // This method is the mirror image of histInitialize(), meaning it
+   // gets called after the last event has been processed on the worker
+   // node and allows you to finish up any objects you created in
+   // histInitialize() before they are written to disk.  This is
+   // actually fairly rare, since this happens separately for each
+   // worker node.  Most of the time you want to do your
+   // post-processing on the submission node after all your histogram
+   // outputs have been merged.  This is different from finalize() in
+   // that it gets called on all worker nodes regardless of whether
+   // they processed input events.
+
+   return EL::StatusCode::SUCCESS;
+}
+
+
+void TwoElectrons :: SaveTagProbeInfo(xAOD::Electron* e1, Electron *elec1)
+{
+   // Calculate additional values of electron for Tag/Probe analysis
+   const xAOD::TrackParticle* trk1 = e1->trackParticle(); // TriggerMatched condition?
+   if (trk1){
+      Double_t d0 = trk1->d0();
+      xAOD::ParametersCovMatrix_t cov = trk1->definingParametersCovMatrix();
+      Double_t d0error = sqrt(cov(0,0));
+      uint8_t BHits = 0;
+      trk1->summaryValue(BHits,xAOD::numberOfBLayerHits);
+      uint8_t SiHits = 0;
+      trk1->summaryValue(SiHits, xAOD::numberOfSCTHits);
+      elec1->SetInfo(d0, d0error, SiHits, BHits, true); 
+   }
+}
+
+
+
+void TwoElectrons :: SaveMCInfo(EEEvent *ev, const xAOD::Electron* e1, const xAOD::Electron* e2, Electron *tElec1, Electron *tElec2){
+   
+   Bool_t isZevent = true;
+   
+   auto tE1 = acc_truthLink(*e1);
+   if(tE1.isValid()){
+      Double_t charge = (*tE1)->charge();
+      Double_t eta = (*tE1)->eta();
+      Double_t pt = (*tE1)->pt() / 1000;
+      Bool_t isElectron = ((*tE1)->absPdgId() == 11);
+      Int_t partOrig = acc_truthOrig(*e1);
+      Int_t partType = acc_truthType(*e1);
+      
+      if(partOrig != 13) isZevent = false;
+      tElec1->Set(charge, eta, pt);
+      tElec1->SetTruth(isElectron, partType, partOrig);
+   } 
+   else { 
+      tElec1->Set(); 
+      isZevent = false;
+   }
+    
+   auto tE2 = acc_truthLink(*e2);
+   if(tE2.isValid()){
+      Double_t charge = (*tE2)->charge();
+      Double_t eta = (*tE2)->eta();
+      Double_t pt = (*tE2)->pt() / 1000;
+      Bool_t isElectron = ((*tE2)->absPdgId() == 11);
+      Int_t partOrig = acc_truthOrig(*e2);
+      Int_t partType = acc_truthType(*e2);
+
+      if(partOrig != 13) isZevent = false;
+      tElec2->Set(charge, eta, pt);
+      tElec2->SetTruth(isElectron, partType, partOrig);
+   }
+   else {
+      tElec2->Set();
+      isZevent = false;
+   }
+   
+   
+   Bool_t SSevent = 0;
+   Double_t InvMass = 0;
+   Double_t dPhi = 0;
+   
+   if(tE1.isValid() && tE2.isValid()){
+      if ((*tE1)->charge() == (*tE2)->charge()) SSevent = true; 
+      else SSevent = false;
+
+      xAOD::Egamma::FourMom_t v_pe1 = (*tE1)->p4();
+      xAOD::Egamma::FourMom_t v_pe2 = (*tE2)->p4();
+      xAOD::Egamma::FourMom_t v_totalP4 = v_pe1 + v_pe2;
+      InvMass = v_totalP4.M() / 1000;                         
+
+      dPhi = v_pe1.DeltaPhi(v_pe2);
+   }
+   
+   ev->SetTruth(*tElec1, *tElec2, InvMass, dPhi, SSevent, isZevent);
+}

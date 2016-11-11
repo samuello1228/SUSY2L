@@ -1,0 +1,54 @@
+\subsection{Object Definition}
+The definition of all objects goes here.
+
+\subsubsection{Electron}
+The electron passing following selections are called ``Baseline electron'';
+\begin{itemize}
+  \item $\pt>10\GeV$, $|\eta|<2.47$
+  \item \verb+LooseAndBLayerLLH+ ID
+\end{itemize}
+
+The baseline electron is considered as ``Signal electron'' if it furthermore satisfy following requirements:
+\begin{itemize}
+  \item \verb+TightLH+ ID
+  \item $|d_0/\sigma(d_0)|<5$, $|z_0/\sigma(z_0)|<0.5$
+  \item \verb+GradientLoose+ isolation
+\end{itemize}
+
+\subsubsection{Muon}
+The baseline muon is defined as
+\begin{itemize}
+  \item $\pt>10\GeV$, $|\eta|<2.7$
+\end{itemize}
+
+Signal muon is defined as
+\begin{itemize}
+  \item \verb+Medium+ ID
+  \item $|d_0/\sigma(d_0)|<3$, $|z_0/\sigma(z_0)|<0.5$
+  \item \verb+GradientLoose+ isolation
+  \item Cosmic mouon veto: $z_0<1$~mm, $d_0<0.2$~mm
+  \item Bad muon veto: $\sigma(q/p)/(q/p)<0.2$
+\end{itemize}
+
+\subsubsection{Photon}
+
+\subsubsection{$\tau$ lepton}
+In the signal sample, $\tau$ final states are also included. Probalby we also need to select $\tau$ for
+\begin{enumerate}
+  \item $\tau$ veto
+  \item Overlap removal
+\end{enumerate}
+
+
+\subsubsection{Jet}
+\begin{itemize}
+  \item \verb+EMTopo+ Jets
+  \item $\pt>20\GeV$, $|\eta|<2.8$
+  \item \verb+JVT+$>0.64$ for jets with $|\eta|<2.4$
+  \item Bad jet veto for $\pt<50\GeV$ jets: not \verb+LooseBad+, not pileup jet (\verb+JVT+$<0.64$, $|\eta|<2.4$, $\pt<50\GeV$)
+\end{itemize}
+
+{\bf Central jets}
+
+{\bf $b$-jets}
+

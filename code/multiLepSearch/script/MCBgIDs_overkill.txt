@@ -1,0 +1,62 @@
+#Bkg IDs as tabulated in
+#https://twiki.cern.ch/twiki/bin/view/AtlasProtected/SUSYEWKMultileptonRun2?sortcol=3;table=6;up=0#Background
+#as retrieved at 11 July 2016
+#
+#Type		Process			Generator(Nominal) 	id
+Diboson		ZZ->llll		Sherpa			361063
+Diboson		ZZ->lllljj(EW6)		Sherpa			361072
+Diboson		ZZ->llll(gg)		Sherpa			361073
+Diboson		ZZ->qqll		Sherpa			361086
+Diboson		ZZ->2l2v(gg)		Sherpa			343233
+Diboson		WZ->lllv		Sherpa			361064-361067
+Diboson		WZ->lllvjj(EW6) 	Sherpa			361071
+Diboson		WZ->qqll		Sherpa			361084 	  	
+Diboson		WW->llvv		Sherpa			361068
+Diboson		WW->llvvjj(ss_EW6)	Sherpa			361070
+Diboson		WW->llvv(gg)		Sherpa			361077
+Diboson		Z(ee)+gamma		Sherpa			301535,301899-301901
+Diboson		Z(mm)+gamma		Sherpa			301536,301902-301904
+Diboson		Z(tt)+gamma		Sherpa			301905-301907 	
+Diboson		W+gamma			Sherpa			301890-301898
+#
+Triboson	WWW->lllvvv		Sherpa			361620
+Triboson	WWZ->4l2v		Sherpa			361621
+Triboson	WWZ->2l4v		Sherpa			361622
+Triboson	WZZ->5l1v		Sherpa			361623
+Triboson	WZZ->3l3v		Sherpa			361624 	 
+Triboson	ZZZ->6l0v		Sherpa			361625
+Triboson	ZZZ->4l2v		Sherpa			361626
+Triboson	ZZZ->2l4v		Sherpa			361627
+#
+Top+X		ttbar+W(0-2p) 		MadGraph		410066-410068 	  	 
+Top+X		ttbar+Z(0-1p) 		MadGraph		410069-410070
+Top+X		ttbar+DY(0-1p) 		MadGraph		410111-410116
+Top+X		3top			MadGraph		304014
+Top+X		tttt			MadGraph		410080
+Top+X		tt+gamma		MadGraph		410082-410089
+Top+X		ttbar+WW		MadGraph		410081
+Top+X		t+Z			MG+Pythia6		410050
+#
+Top		ttbar			PowhegPythia8EvtGen	410000,407012
+Top		Wt(DiagramRemoval)	PowhegPythia8EvtGen	410015,410016 
+Top		Wt(DiagramSubtraction) 	PowhegPythia8EvtGen	410064,410065
+Top		single_t(t-channel) 	PowhegPythia8EvtGen	410011,410012
+Top		single_t(s-channel) 	PowhegPythia8EvtGen	410025-410026
+#
+Boson+jets	W+jets;enu		Sherpa			361300-361323
+Boson+jets	W+jets;munu		Sherpa			361324-361347
+Boson+jets	W+jets;taunu		Sherpa			361348-361371
+Boson+jets	Z+jets;ee		Sherpa			361372-361395
+Boson+jets	Z+jets;mumu		Sherpa			361396-361419
+Boson+jets	Z+jets;tautau		Sherpa			361420-361443
+Boson+jets	Z+jets;nunu		Sherpa			361444-361467
+#
+Higgs		H->WW->lnulnu		PowhegPythia8EvtGen 	341079,341080
+Higgs		H->ZZ->llnunu		PowhegPythia8EvtGen 	341974
+Higgs		H->ZZ->llll		PowhegPythia8EvtGen 	341471,341488,341964,341947
+Higgs		H->tautau,incl.		PowhegPythia8EvtGen 	341225,341254,342170
+Higgs		ttH,H->incl.		aMcAtNloHerwigppEvtGen 	341177,341270,341271
+#
+LowMass		Drell-Yan10<mll<40;ee	Sherpa			361468-361475
+LowMass		Drell-Yan10<mll<40;mumu	Sherpa			361476-361479
+LowMass		Drell-Yan10<mll<40;tt	Sherpa			361480-361484

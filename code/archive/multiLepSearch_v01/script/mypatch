@@ -1,0 +1,34 @@
+Index: Root/EventShapeCopier.cxx
+===================================================================
+78,80c78,80
+<     kt4copier.setProperty("InputEventShape", "LCTopoEventShape");
+<     kt4copier.setProperty("OutputEventShape", "Kt4LCTopoEventShape");
+<     kt4copier.setProperty("EventDensityName", "DensityForJetsR4");
+---
+>     kt4copier.setProperty("InputEventShape", "LCTopoEventShape").ignore();
+>     kt4copier.setProperty("OutputEventShape", "Kt4LCTopoEventShape").ignore();
+>     kt4copier.setProperty("EventDensityName", "DensityForJetsR4").ignore();
+82,84c82,83
+<     kt6copier.setProperty("InputEventShape", "LCTopoEventShape");
+<     kt6copier.setProperty("OutputEventShape", "Kt6LCTopoEventShape");
+<     kt6copier.setProperty("EventDensityName", "DensityForJetsR6");    
+---
+>     kt6copier.setProperty("InputEventShape", "LCTopoEventShape").ignore();
+>     kt6copier.setProperty("OutputEventShape", "Kt6LCTopoEventShape").ignore();
+87,88c86,98
+<   kt4copier.fillEventShape();
+<   kt6copier.fillEventShape();
+---
+>   kt4copier.fillEventShape().ignore();
+>   kt6copier.fillEventShape().ignore();
+> //     kt4copier.setProperty("InputEventShape", "LCTopoEventShape");
+> //     kt4copier.setProperty("OutputEventShape", "Kt4LCTopoEventShape");
+> //     kt4copier.setProperty("EventDensityName", "DensityForJetsR4");
+> // 
+> //     kt6copier.setProperty("InputEventShape", "LCTopoEventShape");
+> //     kt6copier.setProperty("OutputEventShape", "Kt6LCTopoEventShape");
+> //     kt6copier.setProperty("EventDensityName", "DensityForJetsR6");    
+> //     needinit = false;
+> //   }
+> //   kt4copier.fillEventShape();
+> //   kt6copier.fillEventShape();

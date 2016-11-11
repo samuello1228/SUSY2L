@@ -1,0 +1,4 @@
+#Sig IDs
+#
+#Type		Process			Generator(Nominal)	id
+Slep		C1N2_0p95massSplit	MadGraphPythia		392825-392890

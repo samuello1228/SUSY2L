@@ -1,0 +1,11 @@
+#branch name unit nbin min max log(0=linear,1=log)
+z_pt Pt_mumu GeV 50 0 100 0
+z_eta Eta_mumu / 50 -5 5 0
+lep_pt Pt_lepton GeV 5 20 80 0
+lep_eta Eta_lepton / 5 -3 3 0
+lep_z_dphi dphi(lepton,z) / 50 0 3.2 0
+mu_mu_dphi dphi(mu,mu) / 50 0 3.2 0
+z_m Mass_mumu GeV 50 0 120 0
+MET MET GeV 50 0 100 0
+averageMu averageMu / 12 8 20 0 
+Mt Mt GeV 50 0 120 0

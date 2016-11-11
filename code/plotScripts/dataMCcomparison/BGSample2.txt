@@ -1,0 +1,6 @@
+361106  PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee            1901.2  1.026   1.      0.05
+361107  PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zmumu          1901.2  1.026   1.      0.05
+361108  PowhegPythia8EvtGen_AZNLOCTEQ6L1_Ztautau        1901.2  1.026   1.      0.05
+410000  PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad                     696.11  1.1949  0.543           1.
+410015  PowhegPythiaEvtGen_P2012_Wt_dilepton_top                                3.5835  1.054   1.              1.
+410016  PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop                            3.5814  1.054   1.              1.

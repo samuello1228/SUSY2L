@@ -1,0 +1,10 @@
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000001.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000002.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000003.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000004.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000005.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000006.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000007.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000008.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000009.myOutput.root
+/afs/cern.ch/work/g/ggallard/NTuples/user.clo.v7.1.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.clo.8907010._000010.myOutput.root

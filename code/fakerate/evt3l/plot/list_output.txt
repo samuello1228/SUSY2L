@@ -1,0 +1,3 @@
+../output/skim_000000_3l_data.root
+../output/skim_361601.PowhegPy8EG_CT10nloME_AZNLOCTEQ6L1_WZlvll_mll4_myOutput.root
+../output/skim_361603.PowhegPy8EG_CT10nloME_AZNLOCTEQ6L1_ZZllll_mll4_myOutput.root

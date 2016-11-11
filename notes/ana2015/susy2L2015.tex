@@ -1,0 +1,202 @@
+%-------------------------------------------------------------------------------
+% This file provides a skeleton ATLAS document
+%-------------------------------------------------------------------------------
+\documentclass[UKenglish,texlive=2015]{latex/atlasdoc}
+% The language of the document must be set: usually UKenglish or USenglish
+% british and american also work!
+% Selected options:
+%  texlive=YYYY          Specify TeX Live version (2013 is default)
+%  atlasstyle=true|false Use ATLAS style for document (default)
+%  coverpage             Create ATLAS draft cover page for collaboration circulation
+%                        See atlas-draft-cover.tex for a list of variables that should be defined.
+%  cernpreprint          Create front page for a CERN preprint
+%                        See atlas-preprint-cover.tex for a list of variables that should be defined.
+%  PAPER                 The document is an ATLAS paper (draft)
+%  CONF                  The document is a CONF note (only useful together with coverpage)
+%  PUB                   The document is a PUB note (only useful together with coverpage)
+%  txfonts=true|false    Use txfonts rather than the default newtx - needed for arXiv submission
+%  paper=a4|letter       Set paper size to A4 (default) or letter
+%  maketitle=true|false  Run or do not run \maketitle from the class
+
+%-------------------------------------------------------------------------------
+% Extra packages:
+\usepackage[backend=biber]{latex/atlaspackage}
+% Selected options:
+%  biblatex=true|false   Use biblatex (default) or bibtex for the bibliography
+%  backend=biber         Use the biber backend rather than bibtex
+%  minimal               Minimal set of packages
+%  default               Standard set of packages
+%  full                  Full set of packages
+% Style file with biblatex options for ATLAS documents
+\usepackage{latex/atlasbiblatex}
+
+% Package for creating list of authors and contributors to the analysis
+\usepackage{latex/atlascontribute}
+
+% Useful macros
+\usepackage{latex/atlasphysics}
+\usepackage{latex/atlasbsm}
+% See doc/atlas-physics.pdf for a list of the defined symbols
+% Default options are 
+%   true:  journal, misc, particle, unit, xref
+%   false: bsm, hion, math, process, other, texmf
+% See the package for details on the options
+
+% Files with references for use with biblatex
+% Note that biber gives an error if it finds empty bib files
+\addbibresource{susy2L2015.bib}
+% \addbibresource{bibtex/bib/ATLAS.bib}
+% \addbibresource{bibtex/bib/PubNotes.bib}
+% \addbibresource{bibtex/bib/ConfNotes.bib}
+
+% Paths for figures - do not forget the / at the end of the directory name
+\graphicspath{{logos/}{figures/}}
+
+% Add you own definitions here (file susy2L2015-defs.sty)
+\usepackage{susy2L2015-defs}
+\usepackage{rotating}
+\usepackage{adjustbox} % To trim images
+\usepackage{placeins} % For \FloatBarrier
+%-------------------------------------------------------------------------------
+% Generic document information
+%-------------------------------------------------------------------------------
+
+% Author and title for the PDF file
+\hypersetup{pdftitle={ATLAS draft},pdfauthor={The ATLAS Collaboration}}
+% Title, abstract and document 
+\input{susy2L2015-metadata}
+
+% \input{definitions}
+%-------------------------------------------------------------------------------
+% Content
+%-------------------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% List of contributors - print here or after the Bibliography
+%\AtlasPrintContribute{0.3}
+
+
+%-------------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+ \input{chapters/susy2lSS-intro}
+%-------------------------------------------------------------------------------
+
+\clearpage
+%-------------------------------------------------------------------------------
+\section{Samples}
+\label{sec:samples}
+ \input{chapters/susy2lSS-samples}
+%-------------------------------------------------------------------------------
+
+\clearpage
+%-------------------------------------------------------------------------------
+\section{Event Selection}
+\label{sec:selection}
+\input{chapters/susy2lSS-objDef}
+\input{chapters/susy2lSS-SR}
+%-------------------------------------------------------------------------------
+
+\clearpage
+%-------------------------------------------------------------------------------
+\section{Background}
+\label{sec:bkg}
+\input{chapters/susy2lSS-ewBkg}
+\input{chapters/susy2lSS-fakeBkg}
+\input{chapters/susy2lSS-chargeMisID}
+\input{chapters/susy2lSS-bkgSummay}
+%-------------------------------------------------------------------------------
+
+\clearpage
+%-------------------------------------------------------------------------------
+\section{Control Region}
+\label{sec:CR}
+\input{chapters/susy2lSS-CR}
+%-------------------------------------------------------------------------------
+
+\clearpage
+%-------------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
+%\input{chapters/susy2lSS-results}
+\input{chapters/susy2lSS-testSM}
+\input{chapters/susy2lSS-limits}
+%-------------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+%  \input{chapters/susy2lSS-conclusion}
+%-------------------------------------------------------------------------------
+Place your conclusion here.
+
+
+%-------------------------------------------------------------------------------
+\section*{Acknowledgements}
+%-------------------------------------------------------------------------------
+
+%\input{acknowledgements/Acknowledgements}
+
+The \texttt{atlaslatex} package contains the acknowledgements that were valid 
+at the time of the release you are using. These can be found in the
+\texttt{acknowledgements} subdirectory.
+When your ATLAS papers or CONF note is ready to be published,
+download the latest set of acknowledgements from:\\
+\url{https://twiki.cern.ch/twiki/bin/view/AtlasProtected/PubComAcknowledgements}
+
+The supporting notes for the analysis should also contain a list of contributors.
+This information should usually be included in \texttt{mydocument-metadata.tex}.
+The list should be printed either here or before the table of contents.
+
+
+%-------------------------------------------------------------------------------
+\clearpage
+\appendix
+\part*{Appendix}
+\addcontentsline{toc}{part}{Appendix}
+\input{chapters/app_AF2_fullSimu_iso}
+\input{chapters/app_optSR_cutBased}
+\input{chapters/app_mva}
+%-------------------------------------------------------------------------------
+
+% In a paper, an appendix is used for technical details that would otherwise disturb the flow of the paper.
+% Such an appendix should be printed before the Bibliography.
+\clearpage
+
+%-------------------------------------------------------------------------------
+% If you use biblatex and either biber or bibtex to process the bibliography 
+% just say \printbibliography here
+\printbibliography
+% If you want to use the traditional BibTeX you need to use the syntax below.
+% \bibliographystyle{bibtex/bst/atlasBibStyleWoTitle}
+% \bibliography{susy2L2015,bibtex/bib/atlas-paper}
+%-------------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------------
+% Print the list of contributors to the analysis
+% The argument gives the fraction of the text width used for the names
+%-------------------------------------------------------------------------------
+\clearpage
+\PrintAtlasContribute{0.30}
+
+%-------------------------------------------------------------------------------
+\clearpage
+\appendix
+\part*{Auxiliary material}
+\addcontentsline{toc}{part}{Auxiliary material}
+%-------------------------------------------------------------------------------
+
+In an ATLAS paper, auxiliary plots and tables that are supposed to be made public 
+should be collected in an appendix that has the title \enquote{Auxiliary material}.
+This appendix should be printed after the Bibliography.
+At the end of the paper approval procedure, this information can be split into a separate document
+-- see \texttt{atlas-auxmat.tex}.
+
+In an ATLAS note, use the appendices to include all the technical details of your work
+that are relevant for the ATLAS Collaboration only (e.g.\ dataset details, software release used).
+This information should be printed after the Bibliography.
+
+\end{document}

@@ -1,0 +1,124 @@
+flip_rates.cxx, ll.py, rutil.py for binnng and charge mis-identification rates extraction --> made by 
+
+TUAN M. NGUYEN 
+Universite de Montreal
+tuan.nguyen.manh@cern.ch
+
+runningCode_*.sh, makePlots.py, buildRatesFile.py for plotting + some modifications from the original version --> made by
+
+GIULIA GONELLA
+Albert-Ludwig-Universitaet Freiburg
+giulia.gonella@cern.ch
+
+Adapted to run on converted UM/HK SUSY Ntuples --> done by
+
+GABRIEL GALLARDO
+The University of Hong Kong
+gabriel.gallardo@cern.ch
+
+
+#########################################################################################################################
+
+
+#************************************************************* 
+BRIEF DESCRIPTION OF FILES FOR CHARGE MIS-ID RATES EXTRACTION
+#************************************************************* 
+
+Original Tuan's Files contained in this folder:
+
+- flip_rates.cxx  ---> the binning is done. Output is a text file containing all the names of the files that contain the binning
+- llh.py          ---> the likelihood is done. Feed it with the output above as input, together with the name of the text file you want to have the result of this recorded (the results are rates and errors of the llh estimation)
+- rutil.py        ---> contains helper functions
+
+
+[ NOTE: The original format was slightly modified to accept the variables in the Ziso ntuples, and to allow the easy switching between DATA-MC]
+
+
+#************************************************************* 
+IMPORTANT: HOW TO RUN THE CODE
+#************************************************************* 
+
+###### What to change in the .cxx file:
+
+- bool m_DT ---> this has to be set true/false to run on data/mc
+- eta,pt binning
+
+###### What to change in the llh.py file:
+
+- eta,pt binning ---> to be the same as in flip_rates.cxx
+
+###### RUNNING: THE USUAL WAY
+
+1- compile with ---> g++ -O3 -Wall -Wextra -std=c++11 -o flip_rates flip_rates.cxx `root-config --cflags --glibs`
+2- run the binning file with ---> ./flip_rates <name of the input tree> <name of the output .txt file> <path/to/input.root>
+   ( Examples for data ntuples: ./flip_rates ZeeCandidate binsDATA.txt data/data.root )
+3- python llh.py binsMC.txt ratesMC.txt (binsDATA.txt ratesDATA.txt)
+
+
+
+###### RUNNING: AN EASY WAY: 
+
+Two extra scripts are present in this folder:
+
+- runningCode_MC.sh, runningCode_DATA.sh ---> they contain the compile line and the running lines already set to MC or DATA
+
+# To run:
+
+- REMEMBER: CHANGE THE BOOL for DATA/MC in flip_rates.cxx (and binning eventually)
+- RUN runningCode_*.sh
+
+#************************************************************* 
+A TYPICAL OUTPUT 
+#************************************************************* 
+
+THREE files:
+
+EX. of naming ( * can be "DATA" or "MC"): 
+
+80.000000_100.000000_0.000000_0.000000_*_rates.txt  ----> mZleft_mZright_sidebandRangeLeft_sidebandRangeRight_*_rates.txt  --> ChMisID rates in txt file
+80.000000_100.000000_0.000000_0.000000_*_errors.txt ----> mZleft_mZright_sidebandRangeLeft_sidebandRangeRight_*_errors.txt --> ChMisID rates errors in txt file
+80.000000_100.000000_0.000000_0.000000_*.root       ----> mZleft_mZright_sidebandRangeLeft_sidebandRangeRight_*.root       --> ChMisID rates in TH2 histos
+
+***!!!!!!!!! CAVEAT !!!!!!!!!*** 
+
+If you want to use the results as input for the ElectronChargeCorrectionTool (svn.cern.ch/reps/atlasoff/PhysicsAnalysis/ElectronPhotonID/ElectronChargeCorrectionTool/tags/ElectronChargeCorrectionTool-00-00-0*) you have to arrange the output as the axis in the TH2 from this code are opposite wrt what the Tool gets (pt:X, eta:Y)
+There is a macro for that (SEE BELOW)
+
+#***************************************************************** 
+BRIEF DESCRIPTION OF MACROS FOR PLOTS EXTRACTION AND NICE PLOTTING
+#*****************************************************************
+
+
+- makePlots.py ----> getting the rates results, changing axis, plotting as TH2 and plotting separately for each pt bin as function of eta. Save everything separately in a root file for further plotting
+
+
+# WHAT TO CHANEG INSIDE:
+  "tag"      -> for DATA/MC switching
+  "low","up" -> for mass window limits
+  "bl"."br"  -> for sidebands ranges
+   binning    -> in case you used a different binning already in flip_rates.cxx and llh.py
+
+
+# OUTPUT:
+
+- 2 pdf: TH2 rates with correct axis for the tool 
+         TH1 rates for different pt bins, plotted as function of eta
+- .root file: TH2 and every TH1 for every pt bin are saved separately to be eventually used later for different plottig or comparison
+
+
+
+- buildRatesFile.py ---> builds the root file that will be the input for ElectronChargeCorrectionTool
+
+# WHAT TO CHANEG INSIDE:
+  name for the DATA and MC input files (output of makePlots.py)
+  eventually name of the histos (if changed in the makePlots.py)
+  
+# OUTPUT:
+
+- root file with TH2 histos for DATA and MC
+
+
+
+
+
+

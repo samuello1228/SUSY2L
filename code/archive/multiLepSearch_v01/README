@@ -1,0 +1,50 @@
+Usage
+====
+
+## Seclection cuts
+The selections cuts are applied in Root/evtSelection.cxx
+
+## run
+### Python
+using run_2l_selection.py
+
+### C++
+#### run the selection
+use `run_selection` command. `run_selection -h` to see definition of the arguments.
+
+#### run on grid
+use `grid_run` command. Run it without arguments will show you the argumment list.
+
+*Note*:
+  * One can set the optGridNFiles to a small number in run_2l_selection.py for testing 
+## Ntuple analysis
+### TTree Draw
+Either C++ macro or pyROOT macro should work.
+
+### Compile C++ code
+#### Standalone
+See example in test/test_run_over_ntuple.C. Use `make` to compile it, the `PKGIDR` varaible in `Makefile` should be replace with the path of the package in your disk.
+
+#### Within RootCore
+See util/test_run_over_ntuple.cxx for example. Will be compiled automatically during `rc compile`. 
+
+### pyROOT loopping
+See example test/loop_tree.py 
+
+## Using GRL
+Put your grl into multiLepSearch/data and add option like this:
+`--grl multiLepSearch/data15_13TeV.periodAllYear_DetStatus-v63-pro18-01_DQDefects-00-01-02_PHYS_StandardGRL_All_Good.xml`
+Note that you do not need `data` there.
+
+## Tagging
+svn cp . svn+ssh://dzhang@svn.cern.ch/reps/atlasinst/Institutes/Michigan/SUSY/code/archive/multiLepSearch_v01 -m "test tagging" 
+
+## To do
+* Add truth info
+
+
+## Other
+### Create a new package
+rc make_skeleton MyAnalysis
+### Create a new class
+$ROOTCOREBIN/user_scripts/EventLoop/make_skeleton multiLepSearch MyxAODAnalysis

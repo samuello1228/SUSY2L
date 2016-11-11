@@ -1,0 +1,436 @@
+2016-09-26 Samuel Lo
+	* sort jets
+	* updated cutflow
+	* updated evt.flag
+	* updated the variables for the two leptons
+
+2016-08-11 Gabriel Gallardo
+	* Added GetCorrectedPt() functions in ChargeFlipBkgTool
+
+2016-08-10 Gabriel Gallardo
+	* Added ChargeFlipTool in ChangeFlipBkg code package
+		* Provides interfaces to access chargeMisID rates and 
+			corrected pt of charge flipped electrons
+
+2016-08-08 Gabriel Gallardo
+	* Updated chargeMisID root files. Saved to data/root_files.
+	* Added dPT histograms for pt correction
+
+2016-08-07 YL Chan
+	* "ss" study's event selection is edited to the following: For events with
+		* 3+ sigLeptons : reject
+		* =2 sigLeptons: all accept (both SS and OS)
+		* =1 sigLeptons: only accept if there's a baseline lep it can form SS pair with
+		* =0 sigLeptons: only accept if any two of the baseline lep can form a SS pair
+
+2016-07-28 Gabriel Gallardo
+	* Delete old chargeMisID code
+	* Add new ChargeFlipBkg code package
+		* For documentation see README files in the directory
+		* Or visit: <https://gitlab.cern.ch/ggallard/ChargeFlipBkg>
+		* Feel free to ask for permission to access the git repo
+
+2016-07-25 Samuel Lo
+	* update Zmumu sample
+
+2016-07-22 Samuel Lo
+	* submit MCSig
+
+2016-07-21 Samuel Lo
+	* submit data
+	* submit MCBG
+
+2016-07-20 Samuel Lo
+	* use treatAsYear() only for MC samples
+	* finish cutflow for data
+	* calculate the sum of weight in the cutflow
+	* scale factor for leptons
+
+2016-07-19 Samuel Lo
+	* use AOD in prw_submit.sh
+
+2016-07-16 YL Chan
+	* add doSys functionality to run_ss_selection.py
+
+2016-07-09 Samuel Lo
+	* complete cutflow for trigger matching
+
+2016-07-04 Samuel Lo
+	* use AnalysisBase,2.4.13
+	* having primary vertex before overlap removal
+
+2016-06-30 Samuel Lo
+	* multiple GRL files
+	* add new GRL and prw file for data
+	* ApplyPRWTool()
+
+2016-06-27 Samuel Lo
+	* add variable: cross section(Xsec), pileup weight(pwt), BtagSF 
+
+2016-06-26 Samuel Lo
+	* select baseline and passOR leptons and jets
+	* trigger matching
+	* finish cutflow for mc
+
+2016-06-21 Samuel Lo
+	* simplify the study "3l"
+	* remove evt.cuts because it is trivial: evt.cuts = 1
+	* delete some unused code in fillLepton
+
+2016-06-20 Samuel Lo
+	* select two leading leptons
+	* cutflow
+
+2016-06-17 Samuel Lo
+	* better indentation in ssEvtSelection.cxx
+	* remove some muons flags because some are trivial: IS_BAD = 0,
+	MU_COSMIC = 0
+	* remove some jets flags because some are trivial: IS_BASELINE = 1,
+	IS_PASSOR = 1, IS_BAD = 0, IS_SIGNAL = 1
+	* For ss study, only select events with at least 2 baseline leptons
+	* select two leading signal leptons
+	* some preparation for lepton SF 
+
+2016-06-16 Samuel Lo
+	* fill unused variables with zero
+	* calculate MET with photons
+	* remove the duplicated triggers
+	* some progress for cutfolw of mc sample
+
+2016-06-14 Samuel Lo
+	* do cutflow for data	
+
+2016-06-13 Samuel Lo
+	* add back data
+	* use AnalysisBase,2.4.9
+	* CF_mT2_m0 = 0
+	* do the cutflow
+
+2016-06-10 Dongliang Zhang
+	* Update to Base,2.4.9 for 20.7 sample processing
+	* Remove data direcotry to use the AFS shared directory. See README
+	for details
+
+2016-05-28 Samuel Lo
+	* CF_mT2_m0 = 0.001
+	* disable eventInfo->mcEventWeight()
+
+2016-04-12 Gabriel Gallardo
+	* Updated chargeMisID.C:
+		- Added configuration options from function call (See README.txt for details)
+		- Deleted and cleaned up old code
+	* Updated chargeMisID/compareDataMC.C
+		- Added option whether to draw legends
+		- Changed range of y-axis on some plots for better visibility
+		- Fixed bug when drawing MCLH plot
+	* Updated ssEvtSelection: Added dR and MCTruthClassifier truth matching for electrons
+		- dR matching: Look in container of truth particles, match with particle with smallest dR < 0.1
+		- MCTruthClassifier:
+			+ Added MCTruthClassifier tool: variable m_truthClassifier
+			+ Match with m_truthClassifier->getGenPart()
+		- Made return type of fillLepton() to EL::StatusCode. For dR matching to work properly.
+		- Altered indentation of some lines of code (no function changed, purely aesthetic)
+	* Added option in run_ss_selection.py
+		- --mcMatch. Options: MCTC, dR, TruthLink. Default: TruthLink
+	* Added chargeMisID/draw.sh to automate producing plots with chargeMisID.C and compareDataMC.C for different cases (loose vs signal; subtraction vs no subtraction etc)
+	* Updated chargeMisID/README.txt with appropriate documentation
+
+
+2016-03-09 Gabriel Gallardo
+	* Updated compareDataMC.C to compare data (likelihood, with vs w/o subtraction) and MC (likelihood vs truth)
+	* Added README.txt for chargeMisID.C and compareDataMC.C
+
+2016-03-02 Wenhao Xu
+	* add a new flag -study to run_ss_selection.py to indicate different
+	studies
+	* update data prw files with tag003
+	* update obj_def.h ssEvtSelection.cxx to include the fake rate study
+	(3 leptons selection)
+	* add group mc15b prw files
+
+2016-03-01 Samuel Lo
+	* use run_ss_selection.py instead of run_2l_selection.py
+	* add working point for JVTEfficiencyTool in SUSYTools config file 
+	* delete APP_NAME
+	* add data/root_files/chargeMisID_Zee_MC_looseBaseline.root
+	* delete old GRL and prw config files for data
+	* avoid using dq2 to submit grid jobs
+
+2016-02-26 Samuel Lo
+	* Events without primary vertices are not stored in ntuple, in order to avoid error in OverlapRemoval
+	* use rucio to find sample list
+	* avoid using dq2 to submit grid jobs
+	* update the prw config file for data
+
+2016-02-25 Dongliang Zhang
+	* Add HT valiable
+	* Update ssEvtSelection - move cut flow out (problem in merge)
+
+2016-02-23 Gabriel Gallardo
+	* Added chargeMisID.C and compareDataMC.C in multiLepSeach/chargeMisID
+	* - chargeMisID measures chargeMisID rates on group's NTuples
+	* - compareDataMC.C comapares rates from data (likelihood) and MC truth
+
+2016-02-23 Dongliang Zhang
+	* Add z0*sinTheta and d0Sig in the ntuple variable list
+	* In ssEvtSelection, use z0*sinTheta and d0Sig from SUSYTools,
+	configurable m0 in mT2 calculation. 
+
+2016-02-15 Dongliang Zhang
+	* Update ssEvtSelection
+	* - Add event sumWeight and DAOD statistics in cut flow
+	* - Move the cut flow histogram to UserInfo of the tree
+	* Add evt.qFwt for charge flip rate event weight
+
+2016-02-15 YL Chan
+	* Add ChargeFlipBkgTool, for future implementation of bkg weight
+	* Add FakeLepBkgTool, for future implementation of bkg weight
+	* Add dilepEvts.cxx/h dilep_objDef.h, for easy ntup output 
+	* Update dilepSelection.cxx/h to output sys-error weight
+
+2016-02-01 Dongliang Zhang
+	* Works in SUSY,2.3.41
+	* Add ssEvtSelection algo, conf in data/sel_conf/SS_selection.conf
+	* update mCHECK, APP_NAME not needed any more 
+
+2016-01-19 Dongliang Zhang
+	* Make it works in AnalysisSUSY/2.3.39
+	* Adapt to avoid not supported errorcheck
+	* Caution! Some added cuts values are just place holders at the moment
+
+2015-12-12 Samuel Lo
+	* classify different files in "multiLepSearch/data"
+	* add prw config file for MadGraph Z+jets samples
+	* add script for submitting jobs for generating prw config files
+
+2015-12-11 Samuel Lo
+	* add MadGraph Z+jets samples
+
+2015-11-26 Samuel Lo
+	* averageMu is float
+	* weight and scale factor for data is 1
+
+2015-11-25 YL Chan
+	* Add dilepSelection
+
+2015-11-25 Samuel Lo
+	* Add new data PRW file for new data
+	* Add sample list for Z+jets
+
+2015-11-24 Samuel Lo
+	* update simple_setup.sh
+
+2015-11-16 Dongliang Zhang
+	* Fix memory leak problem
+
+2015-11-15 Wenhao Xu
+	* updat prw to ljetselection
+
+2015-11-12 Samuel Lo
+	* update the grl
+	* add script to find the sample name
+
+2015-10-27 Samuel Lo
+	* update the prw config file for mc
+	* add new variable "nVtx"
+	* recover the trigger "elemuonTrigLH"
+	* add scale factor for reco., iso. and trigger
+
+2015-10-27 YL Chan
+	* Update evtSelection.cxx, can now do systematics, off by default
+	* Added -s(--doSys) flag to run_2l_selection.py
+	* Output in nominal tree "evt2l" should be 100% identical
+
+2015-10-26 YL Chan
+	* Update evtSelection.cxx
+	* It now use trigDecTool abd prwTool as provided by SusyTool
+	* Cosmetic change in code spacing
+	* Output should be 100% identical
+
+2015-10-13 Dongliang Zhang
+	* Update README
+	* Tagging multiLepSearch_v01 
+
+2015-10-12 Samuel Lo
+	* Add new dataPRW file for new data 
+
+2015-10-10 Wenhao Xu
+	* Add new good run list in ljetSelection
+
+2015-10-08 Dongliang Zhang
+	* Bug fix for evtSelection
+
+2015-10-07 Dongliang Zhang
+	* Update the pileup reweigting tool in evtSelection. Allow configuration from script
+	and add scale factor
+
+2015-10-03 Wenhao Xu
+	* Add variable: energy of jet
+	* Add total SF for loose and tight electron: SF_Tight, SF_Loose
+	* Works in SUSY,2.3.28,  but not in 2.3.30  
+
+2015-09-23 Dongliang Zhang
+	* Add ljetSelection, add both SF for loose and tight electron: wt1,wt2
+	* Add anaHelper to avoid multiple include of mT2.h
+	* Update run_1l1j_selection.py to use ljetSelection
+	* Works in SUSY,3.2.28
+
+2015-09-01 Wenhao Xu
+	* Add Scale Factor Information
+	* Remove Tau information
+	* Update to SUSY-2.3.24a
+	* Add 3lepton-verify for the python selection code (select at least 2
+	leptons)
+
+2015-08-25 Samuel Lo
+	* signal jet must not be "not bad jet".
+
+2015-08-21 Samuel Lo
+	* Romove some unused code in evtSelection.cxx
+
+2015-08-19 Samuel Lo
+	* Added cuts for signal objects in python codes
+	* remove unused files in util
+	* Update to SUSY-2.3.23
+
+2015-08-14 Wenhao Xu
+	* Add muon quality
+	* Remove # of jets requirements for 3 leptons
+
+2015-08-12 Wenhao Xu
+	* fix the condor setup problem
+
+2015-08-10 Wenhao Xu
+	* add MetX and MetY for the missing ET
+	* jets stored are now changed to signal jets
+	* selection cuts changed for leptons and jets to study fake rate
+	* modify run selection files based on run_2l_selection.py
+	* add selection for 3 leptons python file util/run_3l_selection.py
+
+2015-07-30 Samuel Lo
+	* added trigger for run_2l_selection.py
+	* added pileup reweighting
+	* updated flags of jets
+	* fixed bad muons
+
+2015-07-29 Dongliang Zhang
+	* Update run_2l_selection.py to add test flag, and LSF driver. Small fix of the -w flag.
+
+2015-07-29 Samuel Lo
+	* change "run_job.py" to "run_2l_selection.py
+
+2015-07-27 Dongliang Zhang
+	* Add util/run_1l1j_selection.py for fake study
+	* Moving trigger list to python JO
+	* Add histogram to count number events passed each trigger
+	* Allow object multiplicity cuts from JO
+	* Add optGridNFiles for grid job testing, README updated 
+	* Restore lepton selection cuts
+
+2015-07-27 Wenhao Xu
+	* add another variable trigCode in sig to record the trigger
+	information
+	* comment two functions in fillLepton which call quality
+	* the selection rules are for fake rate study
+
+2015-07-22 Samuel Lo
+	* update script for submitting GRID job
+
+2015-07-23 Dongliang Zhang
+	* Make it easier to using GRL on grid
+	* And mute the error from IncompleteCutBookkeepers. (See July 16
+	discussion in hn-atlas-pathelp@cern.ch)
+
+2015-07-22 Dongliang Zhang
+	* Add code to save number events of orignal AOD to cut flow histogram
+
+2015-07-22 Samuel Lo
+	* fixed cosmic muons
+
+2015-07-21 Samuel Lo
+	* comment out electron track information: "nPixHoles" and "nSCTHoles"
+	* add "lumiBlock", "averageMu" and "actualMu"
+	* fixed bad jets, signal jets and b-jets 
+	* add flag "bjet_loose"
+	* add script for submitting Data sample
+
+2015-07-21 Wenhao Xu
+	* Add trigger information
+
+2015-07-16 Dongliang Zhang
+	* Update to SUSY-2.3.18b
+	* Restore truth info
+
+2015-07-01 Dongliang Zhang
+	* Update for SUSY-2.3.15a or Base-2.3.16
+
+2015-06-28 Samuel Lo
+	* update the simple_setup.sh
+	* add submit.sh and sample_list.txt
+
+2015-06-28 Samuel Lo
+	* comment out all truth information
+	* add overlap removal cut
+	* add file path for good run list
+	* add option for print level both for ROOT and SUSYTools
+	* add option for submitting job (number of jobs per task, number of
+	files per job)
+	* update the d0 cut
+	* update MT2.h
+
+2015-06-26 Samuel Lo
+	* Add the information "truthProb" back
+
+2015-06-03 Samuel Lo
+	* Change from LooseLLH to MediumLLH
+	* Add "IsoWP"
+
+2015-06-02 Samuel Lo
+	* line 234: typo: change "Electrons" to "Muons"
+	* try to use AnalysisSUSY 2.3.12
+	* line 465: change to "xAOD::Muon::CombinedTrackParticle"
+	* comment out "truthProb"
+
+2015-05-22 Samuel Lo
+	* update SUSYTool-05-00-31
+
+2015-05-15 Dongliang Zhang
+	* Add more truth information
+	* Add condor driver
+
+2015-04-28 Dongliang Zhang
+	* Add truth objects
+	* New python script for job submission
+	* Memory leak fix
+	* SUSYTool-05-00-29 and AnalysisBase 2.1.31
+
+2015-04-15 Dongliang Zhang
+	* Update to SUSYTool-05-00-26
+	* Add more variables
+
+2015-04-02 Dongliang Zhang
+	* Update to use vector to save objects
+	* Add pyROOT looping example
+	* Add README file
+
+2015-03-23 Dongliang Zhang
+	* Update scripts 
+	* Add grid support
+
+2015-03-17 Dongliang Zhang
+	* Update to SUSYTool-05-00-24
+	* Isolaiton varaibles use GeV unit
+
+2015-03-16 Dongliang Zhang
+	* Update to SUSYTool-05-00-21
+	* Add variables
+	* Bug fixes
+
+2015-03-04 Dongliang Zhang
+	* Update to SUSYTool-05-00-20
+	* Fill more varaibles
+	* Bug fixes
+
+2015-02-26 Dongliang Zhang
+	* Add changeLog
+	* Add test
