@@ -1,0 +1,31 @@
+There are two steps:
+optWithTMVA       : train the BDT tree from samples
+optWithHistFitter : find the best working point for the trained BDT
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+due to root version conflict the two steps have to be done on separate terminal shell
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+for optWithTMVA use following commands:
+. setupOptTMVA.sh
+python optWithTMVA.py -b bkgList.txt -s sigList_WZ_dM50.txt -o WZ_dM100_trainResult.root
+
+
+for optWithHistFitter.sh:
+. setupOptHistFitter.sh
+python optWithHistFitter.py WZ_dM50_trainResult.root WZ_dM50_pValues.root 100 10000
+
+
+--------------------------------
+files description:
+
+MyRepeatSUSY_UpperLimitAnalysis_SS.py : 
+HistFitter steering script, defines a fit for HistFitter to perform
+
+optWithHistFitter.py : 
+Repeatly call HistFitter to run MyRepeatSUSY_UpperLimitAnalysis_SS.py at each BDT working point
+
+optWithTMVA.py : 
+Feed NTUP in input file list to TMVA to train a BDT classifier
+
+bkgList.txt / sigList_WZ_dM50.txt : 
+example input file list
