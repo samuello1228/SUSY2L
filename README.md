@@ -1,16 +1,25 @@
-*Basic instructions about how to submit updates*
+## Basic instructions about how to submit updates
 
-*1. Create a branch from the master*
+### 0. Configure git on your computer
+```sh
+git config --global user.name "Your name"
+git config --global user.email "Your email"
+```
+
+### 1. Create a branch from the master
 
 ```sh
-git clone ssh://git@gitlab.cern.ch:7999/hku/SUSY2L.git # takes the master
+# Clone the repository to your computer
+git clone ssh://git@gitlab.cern.ch:7999/hku/SUSY2L.git # via ssh
+git clone https://:@gitlab.cern.ch:8443/hku/SUSY2L.git/ # via Kerberos # do kinit user@CERN.CH first
 
-git checkout -b "the name of your branch" # switches locally to a branch
+# Make a new branch and switch to it
+git checkout -b "the name of your branch"
 
 git push -u origin "the name of your branch" # pushed the branch on GitLab
 ```
 
-*2. Develop on your branch*
+### 2. Develop on your branch
 
 (Here you can do whatever you want and updated the package as you wish)
 ```sh
@@ -22,14 +31,15 @@ git status # (you have to check you are on your branch)
 
 git push # this puts the commits on the web in your branch only (the master is unaffected)
 ```
-*3. Make your tests*
 
-*4. Request a merge into the master*
+### 3. Make your tests
+
+### 4. Request a merge into the master
 
 Assign it to somebody that will check your changes and make independent tests
 
-(Done via web interface or terminal commands)
+(Done via [web interface](https://gitlab.cern.ch/hku/SUSY2L/branches) or terminal commands)
 
-*5. Then you can tag this master*
+### 5. Then you can tag this master
 
 (Done via web interface or terminal commands)
