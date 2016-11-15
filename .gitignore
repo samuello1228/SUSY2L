@@ -1,3 +1,11 @@
+*eps-converted-to.pdf
+*.bbl
+*.bcf
+*.blg
+*.fls
+*.out
+*.run.xml
+*.synctex.gz
 .svn
 ._*
 AutoDict*
