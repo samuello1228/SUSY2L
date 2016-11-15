@@ -1,5 +1,4 @@
 \subsection{Lepton charge mis-identification}
-
 \subsubsection*{Mechanisms}
 The misidentification rate of leptons is governed by \\
 \begin{align}
@@ -58,8 +57,7 @@ The most likely rate of charge misidentification is determined by extremizing a 
 $Z\rightarrow ee$ events were selected by imposing the following cuts:
 \begin{itemize}
 \item Events with two electrons
-\item $75\ GeV < m_{ee} < 100\ GeV$
-\item $\Delta \phi > 2$
+\item $80\ GeV < m_{ee} < 100\ GeV$
 \item Both same-sign and opposite-sign events are selected
 \end{itemize}
 
@@ -68,7 +66,7 @@ The probability of observing a same sign event is:
 p = P(e_1 \text{ correct sign})P(e_2 \text{ wrong sign}) + P(e_1 \text{ wrong sign})P(e_2 \text{ correct sign})
 \end{equation}
 
-Each electron is assigned a bin which depends on its $\eta$ and $p_T$. For events where one electron falls into bin $i$ and the other electron falls into bin $j$, the probability of observing a same-sign event is: 
+Each electron is assigned a bin which depends on its $|\eta|$ and $p_T$. For events where one electron falls into bin $i$ and the other electron falls into bin $j$, the probability of observing a same-sign event is: 
 \begin{equation}
 p =(1-\epsilon_i)\epsilon_j + (1-\epsilon_j)\epsilon_i
 \end{equation}
@@ -99,7 +97,7 @@ For the likelihood across all combinations of bins $i,j$,
 \mathcal{L} = \prod\nolimits_{i,j} L(\epsilon_i, \epsilon_j)
 \end{equation}
 
-By maxmizing the likelihood function, the most probable $\epsilon_i$, $\epsilon_j$ can be found for a given $nss$ observed same sign events. To simplify calculation, the logarithm function is applied to $\mathcal{L}$. To take advantage of the minimizer in ROOT, the negative of the function is minimized. 
+By maximizing the likelihood function, the most probable $\epsilon_i$, $\epsilon_j$ can be found for a given $nss$ observed same sign events. To simplify calculation, the logarithm function is applied to $\mathcal{L}$. To take advantage of the minimizer in ROOT, the negative of the function is minimized. 
 
 The final function to be minimized is 
 
@@ -122,11 +120,9 @@ $p_T$ (GeV) &  20, 30, 40, 50, 60, 80, 120, 1000
 \end{table}
 
 \subsubsection*{Validation with Monte Carlo}
-A Monte Carlo (MC) sample of simulated $Z \rightarrow ee$ events was used to develop and validate the likelihood algorithm. The information saved in the MC sample includes the \textit{truth} information of the simulated events, and the reconstructed event information produced from a detector simulator. 
+A Monte Carlo (MC) sample of simulated $Z \rightarrow ee$ events\footnote{MC sample used: \texttt{mc15\_13TeV.361106.PowhegPythia8EvtGen\_AZNLOCTEQ6L1\_Zee.merge.DAOD\_SUSY2. e3601\_s2576\_s2132\_r7725\_r7676\_p2666}}  was used to develop and validate the likelihood algorithm. The information saved in the MC sample includes the \textit{truth} information of the simulated events, and the reconstructed event information produced from a detector simulator. 
 
-\footnote{MC sample used: \texttt{mc15\_13TeV.361106.PowhegPythia8EvtGen\_AZNLOCTEQ6L1\_Zee.merge.DAOD\_SUSY2. e3601\_s2576\_s2132\_r7725\_r7676\_p2666}} 
-
-For every reconstructed electron selected by the aforementioned conditions, an attempt was made to find the charge of the original daughter electron of Z. A reconstructed electron was first matched to a truth particle with the smallest $\Delta R = \sqrt{\Delta \phi^2 + \Delta \eta^2} < 0.1$ separation from the reconstructed electron. The truth particle was rejected if it was not an electron.\footnote{It could be the case that a hadron was misidentified as an electron \cite{ElectronReco2011}.} The decay path was then traversed upwards to find the original daughter electron of a Z boson. The truth particle was rejected if no Z boson was found in the path, or if the daughter particle of Z was not an electron.\footnote{It was found that sometimes the algorithm would match to a final-state radiation photon from Z.} An example of this algorithm is shown in Figure \ref{fig:find-daughter-electron}.
+For every reconstructed electron selected by the aforementioned conditions, an attempt was made to find the charge of the original daughter electron of Z. A reconstructed electron was first matched to a truth particle with the smallest $\Delta R = \sqrt{\Delta \phi^2 + \Delta \eta^2} < 0.1$ separation from the reconstructed electron. The truth particle was rejected if it was not an electron.\footnote{It could be the case that a hadron was misidentified as an electron \cite{ElectronReco2011}.} The decay path was then traversed upwards to find the original daughter electron of a Z boson. The truth particle was rejected if no Z boson was found in the path, or if the daughter particle of Z was not an electron.\footnote{It was found that sometimes the algorithm would match to a final-state radiation photon from Z.} An example of this algorithm is shown in Figure \ref{fig:find-daughter-electron}. This algorithm does not work on \textsc{Sherpa} samples because information about the Z is not saved. The sample used for this study was generated by\textsc{Poweheg}. 
 
 \begin{figure}[h!]
 \centering
@@ -141,198 +137,249 @@ If the original electron daughter of Z was found, then it was considered to be t
 \epsilon_{\text{MC}} = \frac{\text{Number of reconstructed electrons with charge opposite to its matched electron}}{\text{Total number of matched electrons}}
 \end{equation}
 
-The rates obtained in MC from the likelihood method and the truth are compared in figure \ref{fig:MCrates}.
+The rates obtained in MC from the likelihood method and the truth are compared in figure \ref{fig:MCrates}. See figure \ref{fig:2DMC} for full 2D histograms.
 
 \begin{figure}[h]
 \centering
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=2,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=3,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=4,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=5,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=6,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}}
-}
+\includegraphics[page=1,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}
+\includegraphics[page=2,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}\\
+\includegraphics[page=3,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}
+\includegraphics[page=4,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}\\
+\includegraphics[page=5,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}
+\includegraphics[page=6,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}
 \end{figure}
 
 \begin{figure}[h]
 \ContinuedFloat
 \centering
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.35]{ChargeMisID/1007-MC-comparison/PtEta.pdf}}
-}
+\includegraphics[page=7,scale=0.35]{ChargeMisID/1007-MC-comparison/EtaPt.pdf}
 \caption{Comparison of rates in MC obtained from truth and likelihood method for signal electrons}
 \label{fig:MCrates}
 \end{figure}
 
-\subsubsection*{$p_T$ correction}
+\begin{figure}[h]
+\begin{subfigure}[t]{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{ChargeMisID/dataRates/MCLH}
+\caption{Rates from likelihood method}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[h]
+\ContinuedFloat
+\centering
+\begin{subfigure}[t]{\textwidth}
+\centering
+\includegraphics[width=\textwidth]{ChargeMisID/dataRates/MCtruth}
+\caption{Rates from MC truth}
+\end{subfigure}
+\caption{Rates from $Z\rightarrow ee$ MC}
+\label{fig:2DMC}
+\end{figure}
+
+\FloatBarrier
+\subsubsection*{\pT correction}
 In the $Z\rightarrow ee$ MC sample, the same-sign distributions can be estimated from the opposite-sign distributions by applying the weight $w$ defined below.
 
 $$p =(1-\epsilon_i)\epsilon_j + (1-\epsilon_j)\epsilon_i$$
 $$w = \frac{p}{1-p}$$
 
-Upon doing so, the following distributions are obtained:
-
-\subsubsection*{Charge misID rates}
-The charge misidentification rates of both LooseBaseline and Signal electrons were computed in bins of $|\eta|$ and $p_T$ (bin edges defined in Table \ref{table:binning}) by:
-\begin{itemize}
-\item the likelihood method on $3.2\  \text{fb}^{-1}$ of $pp$ collision data collected by ATLAS in 2015 (labeled in the plots as \textit{Data}),
-\item the likelihood method on a $Z\rightarrow ee$ MC sample (labeled in the plots as \textit{MC LH}), and
-\item extracting the true rates from the same MC sample (labeled in the plots as \textit{MC truth}).
-\end{itemize}
-
-\begin{figure}[h!]
-\centering
-\subfloat[][Comparison of rates for LooseBaseline electrons]{\includegraphics[scale=0.39]{ChargeMisID/WoSub_loose/Pt.pdf}}
-\subfloat[][Comparison of rates for Signal electrons]{
-\includegraphics[scale=0.39]{ChargeMisID/WoSub_signal/Pt.pdf}}
-\caption{Comparison of electron charge misidentification rates as a function of $p_T$}
-\label{fig:rates-pt}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\subfloat[][Comparison of rates for LooseBaseline electrons]{\includegraphics[scale=0.39]{ChargeMisID/WoSub_loose/Eta.pdf}}
-\subfloat[][Comparison of rates for Signal electrons]{
-\includegraphics[scale=0.39]{ChargeMisID/WoSub_signal/Eta.pdf}}
-\caption{Comparison of electron charge misidentification rates as a function of $|\eta|$}
-\label{fig:rates-eta}
-\end{figure}
-
-
-
-Figures \ref{fig:rates-eta} and \ref{fig:rates-pt} compare the rates  obtained by the above methods for all $p_T$ ranges over $|\eta|$ and for all $|\eta|$ ranges over $p_T$ respectively. The full two-dimensional histograms showing the rates obtained by each method are figures \ref{fig:ChargeMisID-loose} and \ref{fig:ChargeMisID-signal} while plots showing the comparison of rates in each bin are figures \ref{fig:chargeMisID-CompareLoose} and \ref{fig:chargeMisID-CompareSignal}.
-
-In general, the rates measured on data increase with $|\eta|$, which is as expected because the material budget of the detector increases with $|\eta|$ (Figure \ref{fig:material-budget}). 
-
-The rates also rise gradually with $p_T$, which corresponds to electrons having straighter tracks, and thus a higher probability of being reconstructed with the wrong direction of curvature. There is an exception to this trend at $p_T\sim45$ GeV.
-
-The rates obtained by the likelihood method on data and MC follow the same trends and generally agree with each other within reasonable limits. The differences can be attributed to the differences between the MC simulation and actual conditions inside the detector.
-
-Figures \ref{fig:rates-eta} and \ref{fig:rates-pt} seem to suggest that the agreement between the MC truth and likelihood on MC do not agree well in all bins, especially at low $p_T$. However, further investigation into the comparisons in individual $|\eta|$ and $p_T$ bins show that they do, in fact, agree within reasonable limits. Thus the likelihood-based algorithm developed is shown to operate reasonably well and  provides reliable measurements when applied to data.
-
-\newcommand{\TwoD}[2]{
-  \makebox[\textwidth][c]{
-  \begin{minipage}{1.15\textwidth}
-  \subfloat[][#2]{\adjustbox{trim={0.02\width} {0.01\height} 0 {0.06\height},clip}%
-    {\includegraphics[width=\textwidth]{#1}}
-    }
-  \end{minipage}} 
-}
+Upon doing so, the distributions in figure \ref{fig:MCdistNoPT} are obtained.
 
 \begin{figure}[h]
 \centering
-\TwoD{ChargeMisID/WoSub_loose/hData.pdf}{Rates from likelihood on data}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hMass.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hPhi.pdf}\\
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hLeadingPt.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hSubleadingPt.pdf}\\
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hLeadingEta.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCNoPtCorr/hSubleadingEta.pdf}
+\caption{Observed vs predicted same-sign distributions in MC}
+\label{fig:MCdistNoPT}
+\end{figure}
+
+Note that the predicted and observed invariant mass distributions are shifted relative to one another. This is because charge misidentified electrons tend to have lower reconstructed energy due to the trident bremsstrahlung process in figure \ref{fig:brem}. 
+
+To correct for this, $p_T$ correction was implemented as follows:
+
+$$\Delta p_T \equiv p_T^{\text{reco}} - p_T^{\text{orig}}$$
+
+where $p_T^{\text{reco}}$ is the reconstructed $p_T$ and $p_T^{\text{orig}}$ is the $p_T$ of the truth electron matched during MC validation. $\Delta p_T$ is measured for every electron in bins of $|\eta|$ and $p_T^{\text{reco}}$ (same as charge misID bins, defined in table \ref{table:binning}). The distributions of $\Delta p_T$ for all electrons, charge ok electrons, and charge flipped electrons are shown in figure \ref{fig:dPtDistributions}.
+
+
+The average $\Delta p_T$ in each bin ($\overline{\Delta p_T}$) is calculated and shown in figure \ref{fig:AvgDPTdist}.
+
+\newcommand{\DPT}[3]{%
+  \begin{subfigure}[t]{\textwidth}%
+  \centering%
+  \includegraphics[page=#2,width=0.8\textwidth]{#1}%
+  \caption{#3}%
+  \end{subfigure}
+}
+
+\begin{figure}[h]
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{1}{$20 < p_T < 30$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\ContinuedFloat
-\centering
-\TwoD{ChargeMisID/WoSub_loose/hMCLH.pdf}{Rates from likelihood on MC}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{2}{$30 < p_T < 40$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\ContinuedFloat
-\centering
-\TwoD{ChargeMisID/WoSub_loose/hMC.pdf}{Rates from MC truth}
-\caption{Charge misidentification rates for LooseBaseline electrons}
-\label{fig:ChargeMisID-loose}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{3}{$40 < p_T < 50$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\centering
-\TwoD{ChargeMisID/WoSub_signal/hData.pdf}{Rates from likelihood on data}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{4}{$50 < p_T < 60$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\ContinuedFloat
-\centering
-\TwoD{ChargeMisID/WoSub_signal/hMCLH.pdf}{Rates from likelihood on MC}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{5}{$60 < p_T < 80$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\ContinuedFloat
-\centering
-\TwoD{ChargeMisID/WoSub_signal/hMC.pdf}{Rates from MC truth}
-\caption{Charge misidentification rates for Signal electrons}
-\label{fig:ChargeMisID-signal}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{6}{$80 < p_T < 120$ GeV}
 \end{figure}
 
 \begin{figure}[h]
-\centering
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=2,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=3,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=4,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=5,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=6,scale=0.25]{ChargeMisID/WoSub_loose/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-  \subfloat{\includegraphics[page=2,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-  \subfloat{\includegraphics[page=3,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=5,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-  \subfloat{\includegraphics[page=6,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-  \subfloat{\includegraphics[page=7,scale=0.25]{ChargeMisID/WoSub_loose/PtEta.pdf}}
-}
-\caption[Comparison of charge misidentification rates for LooseBaseline electrons]{Comparison of charge misidentification rates for LooseBaseline electrons}
-\label{fig:chargeMisID-CompareLoose}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=2,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=3,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=4,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=5,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-  \subfloat{\includegraphics[page=6,scale=0.25]{ChargeMisID/WoSub_signal/EtaPt.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=1,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-  \subfloat{\includegraphics[page=2,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-  \subfloat{\includegraphics[page=3,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-}
-
-\subfloat{
-  \subfloat{\includegraphics[page=5,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-  \subfloat{\includegraphics[page=6,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-  \subfloat{\includegraphics[page=7,scale=0.25]{ChargeMisID/WoSub_signal/PtEta.pdf}}
-}
-\caption[Comparison of charge misidentification rates for Signal electrons]{Comparison of charge misidentification rates for Signal electrons}
-\label{fig:chargeMisID-CompareSignal}
+\ContinuedFloat 
+\DPT{ChargeMisID/ptcorr/dPT.pdf}{7}{$120 < p_T < 1000$ GeV}
+\caption{$\Delta p_T$ distributions}
+\label{fig:dPtDistributions}
 \end{figure}
 
 \FloatBarrier
 
-\subsubsection*{$p_T$ correction}
-Upon reweighting opposite sign events with the weight $w$ as defined below,
-\begin{equation}
-p =(1-\epsilon_i)\epsilon_j + (1-\epsilon_j)\epsilon_i
-\end{equation}
-\begin{equation}
-w = \frac{p}{1-p}
-\end{equation}
+\begin{figure}[h]
+\DPT{ChargeMisID/ptcorr/hDPT.pdf}{1}{$\overline{\Delta p_T}$ for all electrons}
+\end{figure}
 
-then we obtain the following distributions for observed same-sign events vs predicted same-sign events: 
+\begin{figure}[h]
+\ContinuedFloat
+\DPT{ChargeMisID/ptcorr/hDPTok.pdf}{1}{$\overline{\Delta p_T}$ for charge ok electrons}
+\end{figure}
+
+\begin{figure}[h]
+\ContinuedFloat
+\DPT{ChargeMisID/ptcorr/hDPTflipped.pdf}{1}{$\overline{\Delta p_T}$ for charge flipped electrons}
+\caption{$\overline{\Delta p_T}$ distributions}
+\label{fig:AvgDPTdist}
+\end{figure}
+
+\FloatBarrier
+
+Then for every opposite sign electron pair, the electron which is most likely to charge flip is given a $p_T$ correction defined below.
+
+$$p_T^{\text{corr}} = p_T^{\text{reco}} - \overline{\Delta p_T^{\text{flipped}}} + \overline{\Delta p_T^{\text{ok}}}$$
+
+Applying this correction alters the distributions from figure \ref{fig:MCdistNoPT} to give figure \ref{fig:MCdistWPT}. The agreement of the invariant mass distribution is much better now. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hMass.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hPhi.pdf}\\
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hLeadingPt.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hSubleadingPt.pdf}\\
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hLeadingEta.pdf}
+\includegraphics[scale=0.35]{ChargeMisID/1115-MCPtCorr/hSubleadingEta.pdf}
+\caption{Observed vs predicted same-sign distributions in MC with $p_T$ correction}
+\label{fig:MCdistWPT}
+\end{figure}
+\FloatBarrier
+
+\subsubsection*{Charge misID rates in data}
+For measurement of rates on data, there is the added challenge of eliminating non $Z\rightarrow ee$ events from the selection. To do this, a simple sideband subtraction is implemented.
+
+Opposite-sign (same-sign) di-electron events are counted in sidebands around the Z mass window. This number is then subtracted from the number of opposite-sign (same--sign) di-electron events within the Z mass window. These subtracted numbers are then fed into the likelihood algorithm to obtain the charge misID rates. 
+
+$$N = n_C - \frac{w_C}{w_L + w_R} \times (n_L + n_R)$$
+
+The charge misidentification rates of Signal electrons were computed in bins of $|\eta|$ and $p_T$ (bin edges defined in Table \ref{table:binning}) with the likelihood method on $10.6\  \text{fb}^{-1}$ of $pp$ collision data collected by ATLAS in 2016. There are some variations to the selection of the Z mass window and the sidebands, shown in table \ref{table:DataSelection}.
+
+\begin{table}
+\centering
+\begin{tabular}{p{5cm} c c}
+\textbf{Measurement} & \textbf{Mass window (GeV)} & \textbf{Sideband width (GeV)}\\
+\hline
+\textbf{Nominal}         & {$\mathbf{80 < m_{ee} < 100}$} & \textbf{20} \\
+No sidebands             & $80 < m_{ee} < 100$            & 0           \\
+Wide sidebands           & $80 < m_{ee} < 100$            & 25          \\
+Narrow sidebands         & $80 < m_{ee} < 100$            & 15          \\
+Down-shifted mass window & $75 < m_{ee} < 100$            & 20          \\
+Wide mass window         & $75 < m_{ee} < 105$            & 20          \\
+\end{tabular}
+\caption{Z mass window selection and sideband width for charge misID measurement on data}
+\label{table:DataSelection}
+\end{table}
+
+The rates obtained from each of the variations are shown in figure \ref{fig:DataRates}.
+
+While the 2D histograms of the nominal measurement are shown in figure \ref{fig:DataRates2D}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=1,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}
+\includegraphics[page=2,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}\\
+\includegraphics[page=3,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}
+\includegraphics[page=4,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}\\
+\includegraphics[page=5,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}
+\includegraphics[page=6,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}
+\phantomcaption
+\end{figure}
+
+\begin{figure}[h]
+\ContinuedFloat
+\centering
+\includegraphics[page=7,scale=0.35]{ChargeMisID/dataRates/EtaPt.pdf}
+\caption{Rates obtained in data with different Zmass window and sideband criteria}
+\label{fig:DataRates}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{ChargeMisID/DataRates/DataLH.pdf}{}
+\caption{Charge misidentification rates for Signal electrons in data with nominal Zmass window and sideband width}
+\label{fig:DataRates2D}
+\end{figure}
+
+\FloatBarrier
 
 \subsubsection*{Systematic uncertainties}
+
+There are two main contributions to the systematic uncertainties. They are
+
+\begin{enumerate}
+\item Method bias (see figure \ref{fig:MCrates}), and.
+\item selection of sidebands/Z mass window (figure \ref{fig:DataRates})
+\end{enumerate}
+
+For the first item, the uncertainty in each bin is taken to be the difference between the rates obtained in MC by the likelihood method and by MC truth. 
+
+For the second item, the uncertainty in each bin is taken to be the difference between the nominal and the variation with the largest difference. 
+
+The pythagorean sum of all uncertainties (since they are uncorrelated) are shown in figure \ref{fig:DataRatesWErr}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[page=1,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}
+\includegraphics[page=2,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}\\
+\includegraphics[page=3,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}
+\includegraphics[page=4,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}\\
+\includegraphics[page=5,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}
+\includegraphics[page=6,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}
+\end{figure}
+
+\begin{figure}[h]
+\ContinuedFloat
+\centering
+\includegraphics[page=7,scale=0.35]{ChargeMisID/dataRates/EtaPtErr.pdf}
+\caption{Rates in data with all uncertainties}
+\label{fig:DataRatesWErr}
+\end{figure}
+
+\FloatBarrier
