@@ -1,6 +1,6 @@
 Setup:
 -------------------
-svn co svn+ssh://svn.cern.ch/reps/atlasinst/Institutes/Michigan/SUSY/notes/ana2015
+#svn co svn+ssh://svn.cern.ch/reps/atlasinst/Institutes/Michigan/SUSY/notes/ana2015
 
 cp ana2015/atlaslatex-01-07-09.tar.gz .
 tar -zxvf atlaslatex-01-07-09.tar.gz
