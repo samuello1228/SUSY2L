@@ -259,7 +259,7 @@ EL::StatusCode mcChecker :: execute ()
     /// save jets
     // Retrieve the truth jets
     const xAOD::JetContainer* truthJets = 0;
-    if(! event->retrieve(truthJets, "AntiKt4TruthJets").isSuccess()){
+    if(! wk()->xaodEvent()->retrieve(truthJets, "AntiKt4TruthJets").isSuccess()){
       Error("execute()", "Failed to retrieve event info collection. Exiting.");
      return EL::StatusCode::FAILURE;
      }
@@ -274,11 +274,11 @@ EL::StatusCode mcChecker :: execute ()
       jet1.eta = truthJet->eta();
       jet1.phi = truthJet->phi();
       jet1.MET_dPhi = metV.DeltaPhi(truthJet->p4());;
-      jet1.id = truthJet->auxdata<int>("PartonTruthLabelID") 
+      jet1.id = truthJet->auxdata<int>("PartonTruthLabelID"); 
     } // end loop over truth jets
 
     // Sort by Pt
-    std::sort(jets->begin(),jets->end(),SortByPt());
+//     std::sort(->begin(),jets->end(),SortByPt());
 
     tree->Fill();
   }
