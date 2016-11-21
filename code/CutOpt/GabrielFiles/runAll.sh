@@ -6,7 +6,9 @@ runJobs(){
 	for chan in $channels
 	do
 		for mass in $masses
-		{python CutOpt/optWithTMVA.py -b GabrielFiles/bkgFiles.txt -s GabrielFiles/sigFiles_$mass.txt -d GabrielFiles/dataFiles.txt -c $channel -o Channel_$chan_dm$mass.root};
+		do
+			python CutOpt/optWithTMVA.py -b GabrielFiles/bkgFiles.txt -s GabrielFiles/sigFiles_$mass.txt -d GabrielFiles/dataFiles.txt -c $channel -o Channel_$chan_dm$mass.root;
+		done
 	done
 }
 
