@@ -1,7 +1,7 @@
 #!/bin/bash
 
-channels="0" #1 2 10 11 12"
-masses="20" # 50 100 +"
+channels="0 1 2 10 11 12"
+masses="20 50 100 +"
 runJobs(){
 	for chan in $channels
 	do
