@@ -17,7 +17,7 @@ parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in i
 parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList samples. Affects weight ratio between MC & data driven bkg", 
 		  type="float", default=10064.3)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
-parser.add_option('-c', "--channel", help="set channel, options are: ISR", default="")
+parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR", default=None)
 
 (options, args) = parser.parse_args()
 
@@ -36,7 +36,8 @@ factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
 for (aVar, aFormula) in ssUtil.basicBDTVars:
   factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
-if ("ISR" in options.channel):
+useISR = True if options.channel % 10 else False
+if useISR:
   for (aVar, aFormula) in ssUtil.isrBDTVars:
     factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
@@ -101,9 +102,8 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-useISR = ("ISR" in options.channel)
-bkgCut = ROOT.TCut( ssUtil.getCut(useISR) )
-sigCut = ROOT.TCut( ssUtil.getCut(useISR) )
+bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
+sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     "nTrain_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:NormMode=EqualNumEvents:!V" )
