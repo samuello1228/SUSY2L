@@ -179,11 +179,11 @@ def getCut(ch):
     ch = ch%10
     if ch%3==0:
       lepSelection = eeCut
-    else if ch%3==1:
+    elif ch%3==1:
       lepSelection = emuCut
     else:
       lepSelection = mumuCut
-  else if type(ch) is bool:
+  elif type(ch) is bool:
     useISR = ch
 
   myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, sigLepSSWithDataBkgCut, lepSelection]])
