@@ -1,9 +1,13 @@
 #!/bin/bash
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_20.txt -d dataFiles.txt -c ISR -o BDT_ISR_dm20.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_50.txt -d dataFiles.txt -c ISR -o BDT_ISR_dm50.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_100.txt -d dataFiles.txt -c ISR -o BDT_ISR_dm100.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_+.txt -d dataFiles.txt -c ISR -o BDT_ISR_dm+.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_20.txt -d dataFiles.txt -o BDT_noISR_dm20.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_50.txt -d dataFiles.txt -o BDT_noISR_dm50.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_100.txt -d dataFiles.txt -o BDT_noISR_dm100.root
-python CutOpt/optWithTMVA.py -b bkgFiles.txt -s sigFiles_+.txt -d dataFiles.txt -o BDT_noISR_dm+.root
+
+channels="0 1 2 10 11 12"
+masses="20 50 100 +"
+runJobs(){
+	for chan in $channels
+	do
+		for mass in $masses
+		{python CutOpt/optWithTMVA.py -b GabrielFiles/bkgFiles.txt -s GabrielFiles/sigFiles_$mass.txt -d GabrielFiles/dataFiles.txt -c $channel -o Channel_$chan_dm$mass.root};
+	done
+}
+
+runJobs; echo "HEEYYYYYY All jobs finished!"
