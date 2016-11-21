@@ -17,7 +17,7 @@ parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in i
 parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList samples. Affects weight ratio between MC & data driven bkg", 
 		  type="float", default=10064.3)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
-parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR", default=None)
+parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR",type="int", default=None)
 
 (options, args) = parser.parse_args()
 
