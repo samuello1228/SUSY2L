@@ -113,7 +113,7 @@ factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
 methodOpt = "!H:!V:MaxDepth=2:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate"
-methodOpt = "%s:NTrees=%d:MinNodeSize=%d" % (methodOpt, options.NTrees, options.NodeSize)
+methodOpt = "%s:NTrees=%d:MinNodeSize=%d%%" % (methodOpt, options.NTrees, options.NodeSize)
 factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 
 factory.TrainAllMethods()
