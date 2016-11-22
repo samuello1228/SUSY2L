@@ -16,7 +16,7 @@ do
 		do
 		    outFile="Channel"$chan"_dm"$mass".root"
 		    sigFiles="CutOpt/GabrielFiles/sigFiles_"$mass".txt"
-		    python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c $chan -o $outFile&
+		    python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c $chan -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 		    echo "Submitted jobs for channel "$chan" dm="$mass
 		done
 		wait
@@ -27,7 +27,7 @@ do
 	do
 		outFile="Channel"0"_dm"$mass".root"
 		sigFiles="CutOpt/GabrielFiles/sigFiles_"$mass".txt"
-		python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile&
+		python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 	done
 	wait
 	dirName="Output_"$nTrees"_NodeSize"$nodeSize
