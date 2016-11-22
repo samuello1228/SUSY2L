@@ -2,7 +2,7 @@
 
 channels="1 2 10 11 12"
 masses="20 50 100 +"
-nTreesList="600 1000" # 400"
+nTreesList="400 600 1000"
 nodeSizeList"5 7 10"
 
 bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
