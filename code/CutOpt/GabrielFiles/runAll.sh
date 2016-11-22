@@ -1,17 +1,30 @@
 #!/bin/bash
 
-channels="0 1 2 10 11 12"
-#masses="20 50 100 +"
+channels="2 10 11 12"
+masses="20 50 100 +"
 
 bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
-sigFiles="CutOpt/GabrielFiles/sigFiles_"$1".txt"
 dataFiles="CutOpt/GabrielFiles/dataFiles.txt"
-runJobs(){
-	for chan in $channels
-	do
-        outFile="Channel"$chan"_dm"$1".root"
-    	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c $chan -o $outFile&
-	done
-}
 
-runJobs; echo "HEEYYYYYY All jobs finished!"
+for chan in $channels
+do
+	for mass in $masses
+	do
+	    outFile="Channel"$chan"_dm"$mass".root"
+	    sigFiles="CutOpt/GabrielFiles/sigFiles_"$mass".txt"
+	    python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c $chan -o $outFile&
+	    echo "Submitted jobs for channel "$chan" dm="$mass
+	done
+	wait
+done
+
+for mass in $masses
+do
+	outFile="Channel"0"_dm"$mass".root"
+	sigFiles="CutOpt/GabrielFiles/sigFiles_"$mass".txt"
+	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile&
+done
+
+wait
+
+echo "All done!"
