@@ -18,6 +18,8 @@ parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList 
 		  type="float", default=10064.3)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
 parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR",type="int", default=None)
+parser.add_option("--NodeSize", help="minimum node size (in %) of the trees", type="int", default=5)
+parser.add_option("--NTrees", help="number of trees in forest", type="int", default=400)
 
 (options, args) = parser.parse_args()
 
@@ -110,8 +112,8 @@ factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     #"nTrain_Signal=0:nTrain_Background=2000:SplitMode=Random:NormMode=EqualNumEvents:!V" )
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
-factory.BookMethod( TMVA.Types.kBDT, "BDTD",
-                    "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate" )
+methodOpt="!H:!V:NTrees=%d:MinNodeSize=%d%:MaxDepth=2:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate" % (options.NTrees, options.NodeSize)
+factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 
 factory.TrainAllMethods()
 factory.TestAllMethods()
