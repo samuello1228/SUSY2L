@@ -2,7 +2,7 @@
 
 print "Overtraining.py"
 
-import sys, math
+import sys, math, os
 
 import ROOT
 from ROOT import TMVA, TMath, TString
@@ -120,3 +120,8 @@ tTable.AppendPad()
 ## Print to EPS
 c.Print("plots/overtrain_BDTD.eps")
 # c.Print("plots/overtrain_BDTD.pdf")
+
+## Save to temp text file
+f = open("trainingtest.csv", 'w')
+f.write("%1.3f,%1.3f,%1.3f,%1.3f" % (kolS, kolB,chi2S,chi2B))
+f.close()
