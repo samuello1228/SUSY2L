@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+print "Overtraining.py"
+
 import sys, math
 
 import ROOT
@@ -86,16 +88,16 @@ bkg.Draw("samehist")
 bkgOv.Draw("e1 same")
 
 ## Tests
-kolS = kolB = 0
+kolS = kolB = -1
 if math.isnan(sig.ComputeIntegral(True)) or math.isnan(sigOv.ComputeIntegral(True)):
     kolS = -1
 else:
     kolS = sig.KolmogorovTest(sigOv, "X")
 
-# if bkg.ComputeIntegral(True) != QuietNan() and bkgOv.ComputeIntegral(True) != QuietNan():
-#     kolB = bkg.KolmogorovTest(bkgOv, "X");
-# else:
-#     kolB = -1
+if math.isnan(bkg.ComputeIntegral(True)) or math.isnan(bkgOv.ComputeIntegral(True)):
+    kolB = -1
+else:
+    kolB = bkg.KolmogorovTest(bkgOv, "X")
 
 print ("Kolmogorov-Smirnov test values for signal (background): %1.3f (%1.3f)" % (kolS, kolB))
 
@@ -109,7 +111,7 @@ tHeader.SetNDC()
 tHeader.SetTextSize(0.032)
 tHeader.AppendPad()
 
-tTableText = "#splitline{KS:\t%1.5f \t%1.5f}{#chi^{2}: \t\t%1.5f \t%1.5f}" % (kolS, kolB, chi2S, chi2B)
+tTableText = "#splitline{KS:\t%1.3f \t%1.3f}{#chi^{2}: \t\t%1.3f \t%1.3f}" % (kolS, kolB, chi2S, chi2B)
 tTable = ROOT.TLatex(0.12, 0.69, tTableText)
 tTable.SetNDC()
 tTable.SetTextSize(0.032)
