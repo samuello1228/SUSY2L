@@ -161,6 +161,9 @@ eeCut        = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) ==
 emuCut       = "((int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11))"
 mumuCut      = "(int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13)"
 
+# For diagnostics
+# isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
+
 sigLepCut    = "Sum$(leps.lFlag & 2)==4" # see obj_def.h in multilepSearch, IS_SIGNAL = 2th bit in lFlag
 ssCut = "((leps[0].ID>0) == (leps[1].ID>0))"
 
