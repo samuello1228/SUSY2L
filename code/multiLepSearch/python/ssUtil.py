@@ -177,7 +177,7 @@ def getCut(ch):
     # Channels:
     # noISR:  0=ee,  1=emu,  2=mumu
     #   ISR: 10=ee, 11=emu, 12=mumu
-    useISR = True if (ch%10==1) else False
+    useISR = True if int(ch/10)==1 else False
 
     ch = ch%10
     if ch%3==0:
