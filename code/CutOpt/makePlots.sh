@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "ISR,Flavor,dm,NTrees,NodeSize,SigKS,BkgKS,SigChi2,BkgChi2,nSig,nBkg,SigmaMax,BDTcut" > checks.csv
+echo "Channel,ISR,Flavor,dm,NTrees,NodeSize,SigKS,BkgKS,SigChi2,BkgChi2,nSig,nBkg,SigmaMax,BDTcut" > checks.csv
 
 for dir in $@
 do
@@ -25,10 +25,10 @@ do
 	    else
 	    	ISR="no"
 	    fi
-	    channel=$((channel%10))
-	    if [ $(($channel%3)) -eq "0" ]; then
+
+	    if [ $(((channel%10)%3)) -eq "0" ]; then
 	    	Flavor="ee"
-	    elif [ $(($channel%3)) -eq "1" ]; then
+	    elif [ $(((channel%10)%3)) -eq "1" ]; then
 	    	Flavor="eu"
 	    else 
 	    	Flavor="uu"
@@ -47,7 +47,7 @@ do
         # Compares overtraining 
 	    ./overtraining.py $dir/$file >> $dir/cutInfo.txt
 
-	   	printf "$ISR,$Flavor,$dm,$NTrees,$NodeSize," >> checks.csv
+	   	printf "$channel,$ISR,$Flavor,$dm,$NTrees,$NodeSize," >> checks.csv
 	   	printf `cat trainingtest.csv`","`cat effs.csv`"\n" >> checks.csv
 	    # echo >> checks.csv
         
