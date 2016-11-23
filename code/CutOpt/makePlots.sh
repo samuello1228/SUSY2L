@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "ISR,Flavor,dm,NTrees,NodeSize,SigKS,BkgKS,SigChi2,BkgChi2,nSig,nBkg,SigmaMax,BDTcut" > checks.csv
+
 for dir in $@
 do
 	if [ ! -d $dir ];then
@@ -12,8 +14,42 @@ do
 	do
 	    echo "## Now processing $dir/$file ##"
 
+	    ISR="";Flavor="";dm="";NTrees="";NodeSize="";
+
+	   	dm=`echo $file | grep -o -E "dm[0-9+]*" | sed 's/[^0-9+]*//g'`
+	    NodeSize=`echo $dir | grep -o -E "NodeSize[0-9]+" | grep -o -E [0-9]+`
+	    NTrees=`echo $dir | grep -o -E "_[0-9]*_" | sed 's/[^0-9]*//g'`
+	    channel=`echo $file | grep -o -E "Channel[0-9]*" | sed 's/[^0-9]*//g'`
+	    if [ $(($channel/10)) -eq "1" ]; then
+	    	ISR="yes"
+	    else
+	    	ISR="no"
+	    fi
+	    channel=$((channel%10))
+	    if [ $(($channel%3)) -eq "0" ]; then
+	    	Flavor="ee"
+	    elif [ $(($channel%3)) -eq "1" ]; then
+	    	Flavor="eu"
+	    else 
+	    	Flavor="uu"
+	    fi
+
+	    # if [ "$dm" != "+" ]; then
+	    # 	continue
+	    # fi
+
+	   	# echo "dm="$dm
+	    # echo "NodeSize="$NodeSize
+	    # echo "NTrees="$NTrees
+	    # echo "Channel="$channel
+	    # echo "ISR="$ISR", Flavor="$Flavor
+
         # Compares overtraining 
 	    ./overtraining.py $dir/$file >> $dir/cutInfo.txt
+
+	   	printf "$ISR,$Flavor,$dm,$NTrees,$NodeSize," >> checks.csv
+	   	printf `cat trainingtest.csv`","`cat effs.csv`"\n" >> checks.csv
+	    # echo >> checks.csv
         
         # Draws signal/background efficiency curves
 	    root -l -b -q "mvaeffs.cxx(\"$dir/$file\")" >> $dir/cutInfo.txt

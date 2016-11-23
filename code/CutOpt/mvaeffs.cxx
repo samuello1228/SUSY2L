@@ -1,6 +1,7 @@
 #include "TMVA/mvaeffs.h"
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 using std::cout;
 using std::endl;
 using std::setfill;
@@ -456,6 +457,13 @@ void TMVA::StatDialogMVAEffs::DrawHistograms()
          TMVAGlob::imgconv( c, Form("plots/mvaeffs_%s", info->methodTitle.Data()) ); 
       }
       countCanvas++;
+
+      // Save to temp file
+      ofstream tempFile("effs.csv");
+      char tmp[100];
+      sprintf(tmp, "%.0f,%.0f,%1.2f,%1.3f", fNSignal, fNBackground, info->maxSignificance, info->sSig->GetXaxis()->GetBinCenter(maxbin));
+      tempFile << tmp;
+      tempFile.close();
    }
 }
 
