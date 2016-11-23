@@ -24,5 +24,6 @@ do
 	    mv plots/overtrain_BDTD.eps $dir/plots/overtrain_$name.eps 
 	    #mv plots/overtrain_BDTD.png $dir/plots/overtrain_$name.png
 	    mv plots/mvaeffs_BDTD.eps $dir/plots/mvaeffs_$name.eps
+	    touch $dir/plots/overtrain_$name.eps $dir/plots/mvaeffs_$name.eps
 	done
 done
