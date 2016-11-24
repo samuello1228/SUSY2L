@@ -170,24 +170,29 @@ ssCut = "((leps[0].ID>0) == (leps[1].ID>0))"
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
 
 def getCut(ch):
-  lepSelection = "1"
-  useISR = True
+  lepFlav = "1"
+  whichISR = "1"
 
   if type(ch) is int:
     # Channels:
-    # noISR:  0=ee,  1=emu,  2=mumu
-    #   ISR: 10=ee, 11=emu, 12=mumu
-    useISR = True if int(ch/10)==1 else False
+    #   noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav
+    #     ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav
+    # combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav
+    # useISR = True if int(ch/10)==1 else False
 
-    ch = ch%10
-    if ch%3==0:
-      lepSelection = eeCut
-    elif ch%3==1:
-      lepSelection = emuCut
-    else:
-      lepSelection = mumuCut
+    if int(ch/10)==0:
+      whichISR=nonisrCut
+    elif int(ch/10)==1:
+      whichISR=isrCut
+
+    if ch%10==0:
+      lepFlav = eeCut
+    elif ch%10==1:
+      lepFlav = emuCut
+    elif ch%10==2:
+      lepFlav = mumuCut
   elif type(ch) is bool:
-    useISR = ch
+    whichISR = isrCut if ch else nonisrCut
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, sigLepSSWithDataBkgCut, lepSelection]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, lepFlav]])
   return myCut

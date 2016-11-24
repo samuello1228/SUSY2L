@@ -1,8 +1,8 @@
 #!/bin/bash
 
-channels="1 2 10 11 12"
-masses="20 50 100 +"
-nTreesList="200 400 600 800 1000"
+channels="1 2 3 10 11 12 13 20 21 22 23"
+masses="all 20 50 100 +"
+nTreesList="100 200 400 600 800 1000"
 nodeSizeList="5 7 10"
 
 bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
