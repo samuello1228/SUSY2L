@@ -2,7 +2,7 @@
 
 channels="1 2 10 11 12"
 masses="20 50 100 +"
-nTreesList="400 600 1000"
+nTreesList="200 400 600 800 1000"
 nodeSizeList="5 7 10"
 
 bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
@@ -22,6 +22,11 @@ do
 		wait
 	done
 
+    # For executing on selected channels only
+	#dirName="Output_"$nTrees"_NodeSize"$nodeSize
+	#mv Channel*.root $dirName
+    #continue
+
 	# Channel 0 
 	for mass in $masses
 	do
@@ -34,6 +39,7 @@ do
 	dirName="Output_"$nTrees"_NodeSize"$nodeSize
 	mkdir $dirName
 	mv Channel*.root $dirName
+    mv weights $dirName
 done; done
 
 echo "All done!"
