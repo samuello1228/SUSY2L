@@ -16,23 +16,25 @@ do
 
 	    ISR="";Flavor="";dm="";NTrees="";NodeSize="";
 
-	   	dm=`echo $file | grep -o -E "dm[0-9+]*" | sed 's/[^0-9+]*//g'`
+	   	dm=`echo $file | grep -o -E "dm[0-9+al]*" | sed 's/[^0-9+al]*//g'`
 	    NodeSize=`echo $dir | grep -o -E "NodeSize[0-9]+" | grep -o -E [0-9]+`
 	    NTrees=`echo $dir | grep -o -E "_[0-9]*_" | sed 's/[^0-9]*//g'`
 	    channel=`echo $file | grep -o -E "Channel[0-9]*" | sed 's/[^0-9]*//g'`
 	    if [ $(($channel/10)) -eq "1" ]; then
 	    	ISR="yes"
-	    else
+	    elif [ $(($channel/10)) -eq "0" ]; then
 	    	ISR="no"
-	    fi
+	    elif [ $(($channel/10)) -eq "2" ]; then
+	    	ISR="comb"
 
-	    if [ $(((channel%10)%3)) -eq "0" ]; then
+	    if [ $((channel%10)) -eq "0" ]; then
 	    	Flavor="ee"
-	    elif [ $(((channel%10)%3)) -eq "1" ]; then
+	    elif [ $((channel%10)) -eq "1" ]; then
 	    	Flavor="eu"
-	    else 
+	    elif [ $((channel%10)) -eq "2" ]; then
 	    	Flavor="uu"
-	    fi
+	    elif [ $((channel%10)) -eq "3" ]; then
+	    	Flavor="comb"
 
 	    # if [ "$dm" != "+" ]; then
 	    # 	continue
@@ -46,13 +48,14 @@ do
 
         # Compares overtraining 
 	    ./overtraining.py $dir/$file >> $dir/cutInfo.txt
+        
+        # Draws signal/background efficiency curves
+	    root -l -b -q "mvaeffs.cxx(\"$dir/$file\")" >> $dir/cutInfo.txt
 
 	   	printf "$channel,$ISR,$Flavor,$dm,$NTrees,$NodeSize," >> checks.csv
 	   	printf `cat trainingtest.csv`","`cat effs.csv`"\n" >> checks.csv
 	    # echo >> checks.csv
-        
-        # Draws signal/background efficiency curves
-	    root -l -b -q "mvaeffs.cxx(\"$dir/$file\")" >> $dir/cutInfo.txt
+
 	    name=${file%%.root}
 	    if [ ! -d "$dir/plots" ];then
 	    	mkdir $dir/plots
