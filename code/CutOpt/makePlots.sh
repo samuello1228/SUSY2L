@@ -26,6 +26,7 @@ do
 	    	ISR="no"
 	    elif [ $(($channel/10)) -eq "2" ]; then
 	    	ISR="comb"
+        fi
 
 	    if [ $((channel%10)) -eq "0" ]; then
 	    	Flavor="ee"
@@ -35,6 +36,7 @@ do
 	    	Flavor="uu"
 	    elif [ $((channel%10)) -eq "3" ]; then
 	    	Flavor="comb"
+        fi
 
 	    # if [ "$dm" != "+" ]; then
 	    # 	continue
