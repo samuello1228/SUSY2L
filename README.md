@@ -32,7 +32,11 @@ git status # (you have to check you are on your branch)
 git push # this puts the commits on the web in your branch only (the master is unaffected)
 ```
 
-### 3. Make your tests
+### 3. Get a existing branch from the origin
+
+```sh
+git checkout -b newBranch origin/oldBranch
+```
 
 ### 4. Request a merge into the master
 
