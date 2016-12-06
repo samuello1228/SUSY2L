@@ -54,6 +54,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     {
         TString fileName = SamplePath;
         fileName += "user.clo.";
+        //fileName += "user.ychan.";
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
@@ -486,20 +487,24 @@ void skimming()
 {
     TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
 
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     SamplePath += "AnalysisBase-02-04-17-419618/";
     
     //TString tag = "v7.8";
     TString tag = "v8.0";
+    //TString tag = "v7.11";
     
 
     std::vector<nEvent> nSS;
 
     //Data
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "data/";
+        //tag += "b.Data";
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
         GetSampleName(DataSampleName,"Data",1);
@@ -511,9 +516,11 @@ void skimming()
     }
     
     //Background
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "bkg/";
+        //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
@@ -525,9 +532,11 @@ void skimming()
     }
     
     //Signal
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "sig/";
+        //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,"Sig",4);
@@ -537,6 +546,7 @@ void skimming()
             skimming2(SamplePath,tag,SigSampleName[i],nSS);
         }
     }
+
     for(unsigned int i=0;i<nSS.size();i++)
     {
         cout<<nSS[i].name<<" "<<nSS[i].n<<" "<<nSS[i].nw<<" "<<nSS[i].nAOD<<endl;
