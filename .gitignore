@@ -28,3 +28,4 @@ RootCoreBin
 *.syntex.gz
 *.toc
 *.vrb
+code/plotScripts/dataMCcomparison/skimming/*.root
