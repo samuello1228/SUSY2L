@@ -227,7 +227,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //pt of leading lepton > 30 GeV
         if(!(evts->leps_pt[sigIndex[0]]>25))
         {
-            //continue;
+            continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -237,7 +237,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //pt of subleading lepton > 30 GeV
         if(!(evts->leps_pt[sigIndex[1]]>20))
         {
-            //continue;
+            continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -247,7 +247,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //mll > 60 GeV
         if(!(evts->l12_m>60))
         {
-            //continue;
+            continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -271,7 +271,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        //weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         averageMu = evts->evt_averageMu;
         nVtx = evts->sig_nVtx;
         
