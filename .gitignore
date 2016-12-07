@@ -1,4 +1,6 @@
 *eps-converted-to.pdf
+*.lof
+.DS_Store
 *.bbl
 *.bcf
 *.blg
@@ -26,3 +28,4 @@ RootCoreBin
 *.syntex.gz
 *.toc
 *.vrb
+code/plotScripts/dataMCcomparison/skimming/*.root

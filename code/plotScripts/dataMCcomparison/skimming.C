@@ -40,13 +40,21 @@ Double_t weight;
 Double_t averageMu;
 Int_t nVtx;
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName)
+struct nEvent
+{
+    TString name;
+    int n;
+    double nw;
+    double nAOD;
+};
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
     {
         TString fileName = SamplePath;
         fileName += "user.clo.";
+        //fileName += "user.ychan.";
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
@@ -165,14 +173,24 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             cout<<fileList->At(i)->GetTitle()<<endl;
             TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
             TH1F *h1 = (TH1F*) f1->Get("hCutFlow");
+            for(unsigned int j=1;j<30;j++)
+            {
+                //cout<<j<<" "<<h1->GetBinContent(j)<<endl;;
+            }
             for(unsigned int j=0;j<channel.size();j++)
             {
                 h2[j]->Fill("AOD",h1->GetBinContent(2));
-                h2[j]->Fill("ntuple",h1->GetBinContent(16));
+                h2[j]->Fill("ntuple",tree1->GetEntries());
             }
             delete f1;
         }
     }
+    
+    nEvent element;
+    element.name = SampleName;
+    element.n = 0;
+    element.nw = 0;
+    element.nAOD = h2[0]->GetBinContent(1);
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -253,7 +271,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        //weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         averageMu = evts->evt_averageMu;
         nVtx = evts->sig_nVtx;
         
@@ -386,6 +403,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             channelIndex += 3;
+            element.n++;
+            element.nw += weight;
         }
         
         if(hasISR) channelIndex += 6;
@@ -413,6 +432,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     cout<<endl;
     
+    cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
+    nSS.push_back(element);
     //delete
     delete evts;
     for(unsigned int j=0;j<channel.size();j++)
@@ -465,52 +486,68 @@ void skimming()
 {
     TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
 
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     SamplePath += "AnalysisBase-02-04-17-419618/";
     
     //TString tag = "v7.8";
     TString tag = "v8.0";
+    //TString tag = "v7.11";
     
+
+    std::vector<nEvent> nSS;
+
     //Data
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "data/";
+        //tag += "b.Data";
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
         GetSampleName(DataSampleName,"Data",1);
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i]);
+            skimming2(SamplePath,tag,DataSampleName[i],nSS);
         }
     }
     
     //Background
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "bkg/";
+        //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=75;i<=75;i++)
+        //for(unsigned int i=76;i<=77;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,BGSampleName[i]);
+            skimming2(SamplePath,tag,BGSampleName[i],nSS);
         }
     }
     
     //Signal
+    if(true)
+    //if(false)
     {
-        //SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-414981/";
-        //tag = "v7.8";
+        //SamplePath += "sig/";
+        //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,"Sig",4);
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<SigSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,SigSampleName[i]);
+            skimming2(SamplePath,tag,SigSampleName[i],nSS);
         }
+    }
+
+    for(unsigned int i=0;i<nSS.size();i++)
+    {
+        cout<<nSS[i].name<<" "<<nSS[i].n<<" "<<nSS[i].nw<<" "<<nSS[i].nAOD<<endl;
     }
 }
