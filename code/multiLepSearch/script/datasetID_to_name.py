@@ -3,7 +3,7 @@
 #source /afs/cern.ch/atlas/software/tools/pyAMI/setup.sh
 #
 #then:
-#python dataseID_to_name.py inputIDs.txt
+#python datasetID_to_name.py inputIDs.txt
 
 import sys
 
@@ -62,9 +62,9 @@ def MC15C_criteria(tags):
 #==============================================================
 #user specified options
 #==============================================================
-tagCriteria = MC15C_criteria
+#tagCriteria = MC15C_criteria
 #tagCriteria = Data15_criteria
-#tagCriteria = Data16_criteria
+tagCriteria = Data16_criteria
 inFile = open(sys.argv[1])
 
 #==============================================================
@@ -73,7 +73,8 @@ inFile = open(sys.argv[1])
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
-outputPath = "MCBG_sample_list.txt"
+#outputPath = "MCBG_sample_list.txt"
+outputPath = "Data_sample_list.txt"
 outputFile = open(outputPath,"w")
 
 for aLine in inFile:
