@@ -84,15 +84,21 @@ for aLine in inFile:
 
   #read the line
   elements = aLine.split()
-  if len(elements)!=4: 
+  if len(elements)==4: 
+    phyType   = elements[0]
+    phyProc   = elements[1]
+    generator = elements[2]
+    runIDs    = elements[3].split(",")
+  elif len(elements)==1:
+    phyType   = "Data"
+    phyProc   = "NA"
+    generator = "NA"
+    runIDs    = elements[0].split(",")
+  else:
     print "#cannont understand line:"
     print "#" + aLine
     continue
 
-  phyType   = elements[0]
-  phyProc   = elements[1]
-  generator = elements[2]
-  runIDs    = elements[3].split(",")
 
   #interpret and expand runIDs range
   tmp = []
