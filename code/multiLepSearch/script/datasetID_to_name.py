@@ -30,7 +30,8 @@ def Data16_criteria(tags):
   """
 
   #This DAOD tag is recommended for athena20.7
-  tarTags = ["p2667", "p2689"]
+  #tarTags = ["p2667", "p2689"]
+  tarTags = ["p2880"]
   if not any( [ t in tags for t in tarTags] ): return False
 
   return True
