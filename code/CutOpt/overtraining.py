@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-print "Overtraining.py"
-
 import sys, math, os
 
 import ROOT
 from ROOT import TMVA, TMath, TString
 from ROOT.TMVA import TMVAGlob
 from subprocess import call
+
+ROOT.gROOT.SetBatch(True) 
 
 def setTrainHistStyle(h, col):
     h.SetMarkerColor( col );
@@ -92,12 +92,12 @@ kolS = kolB = -1
 if math.isnan(sig.ComputeIntegral(True)) or math.isnan(sigOv.ComputeIntegral(True)):
     kolS = -1
 else:
-    kolS = sig.KolmogorovTest(sigOv, "X")
+    kolS = sig.KolmogorovTest(sigOv)
 
 if math.isnan(bkg.ComputeIntegral(True)) or math.isnan(bkgOv.ComputeIntegral(True)):
     kolB = -1
 else:
-    kolB = bkg.KolmogorovTest(bkgOv, "X")
+    kolB = bkg.KolmogorovTest(bkgOv)
 
 print ("Kolmogorov-Smirnov test values for signal (background): %1.3f (%1.3f)" % (kolS, kolB))
 
