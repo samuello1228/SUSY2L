@@ -108,6 +108,7 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
     ATH_MSG_DEBUG("1P: " << prob[0] );
     weight = prob[0];
   }
+  weight = weight/(1.-weight);
 
   if (sigma==0) return weight;
 

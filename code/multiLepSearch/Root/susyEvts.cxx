@@ -32,6 +32,33 @@ TTree* susyEvts::makeWeightOnlyTree(TString treename, susyEvts* parent)
   return tree2;
 }
 
+TTree* susyEvts::makePtCorrTree(TString treename, susyEvts* parent)
+{
+  // Make a Tree for Charge flip weight and PtCorrection
+  // "evt" for weight
+  // "leps" for the changed pt
+  // "l12" for the new l12.m as lepton pt changed
+  // "sig" for the new HT, mT2 var as lepton pt changed
+  // other branch contents are identical to the parent NominalTree
+  tree2 = new TTree(treename, "a angles tree");
+  tree2->Branch("evt", &evt, EVT_s.c_str());
+  tree2->Branch("leps", &vleps);
+  tree2->Branch("l12", &l12, R_PAR_s.c_str());
+  tree2->Branch("sig", &sig, SIGNATURE_s.c_str());
+
+  if      (parent->tree2){ 
+    tree2->SetDirectory(parent->tree2->GetDirectory());
+    tree2->AddFriend( parent->tree2 );
+  }
+  else if (parent->tree1){ 
+    //why tree1 and tree2...
+    tree2->SetDirectory(parent->tree1->GetDirectory());
+    tree2->AddFriend( parent->tree1 );
+  } 
+
+  return tree2;
+}
+
 TTree* susyEvts::makeKinematicsSysTree(TString treename, susyEvts* parent)
 {
   // Make a Tree with every field

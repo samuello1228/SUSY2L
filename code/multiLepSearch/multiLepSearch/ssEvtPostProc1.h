@@ -47,8 +47,10 @@ public:
   std::vector<susyEvts*> outSusyEvtsList                  ; //!
   std::vector<susyEvts*> outSusyEvtsList_CFLIP_SYS__1up   ; //!
   std::vector<susyEvts*> outSusyEvtsList_CFLIP_SYS__1dn   ; //!
-  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_SYS__1up; //!
-  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_SYS__1dn; //!
+  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_E_SYS__1up; //!
+  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_E_SYS__1dn; //!
+  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_U_SYS__1up; //!
+  std::vector<susyEvts*> outSusyEvtsList_FAKE_LEP_U_SYS__1dn; //!
 
 
 
@@ -58,6 +60,8 @@ public:
   int initialize ();
   int runLoop();
   int finalize ();
+
+  int recalPtRelatedVar (susyEvts* inTree);
 
  private:
 
