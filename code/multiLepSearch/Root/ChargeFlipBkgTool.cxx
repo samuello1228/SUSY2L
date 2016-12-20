@@ -129,11 +129,14 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
     }
   }
 
+  double ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   if(prob.size()>=2){
     // Uncertainty calc based on w = p0 + p1 - 2*p0*p1
-    uncertainty = sqrt(pow(unc[0]/prob[0],2)*(prob[0]*prob[0]+2)+pow(unc[1]/prob[1],2)*(prob[1]*prob[1]+2));
+    uncertainty = 1./pow(1.-ptot,2) * sqrt( pow((1.-2*prob[1])*unc[0],2) + pow((1.-2*prob[0])*unc[1],2) );
+    //ATH_MSG_ERROR("prob: " << prob[0] << " " << prob[1]);
+    //ATH_MSG_ERROR("unc: " << unc[0] << " " << unc[1] << " " << uncertainty);
   } else if(prob.size()==1) {
-    uncertainty = unc[0];
+    uncertainty = 1./pow(1.-ptot,2) * unc[0];
   }
 
   return weight + sigma*uncertainty;
