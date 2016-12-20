@@ -150,65 +150,65 @@ TMVA::StatDialogMVAEffs::~StatDialogMVAEffs()
    fMain = 0;
 }
 
-TMVA::StatDialogMVAEffs::StatDialogMVAEffs(const TGWindow* p, Float_t ns, Float_t nb) :
-   fNSignal(ns),
-   fNBackground(nb),
-   fFormula(""),
-   fInfoList(0),
-   fSigInput(0),
-   fBkgInput(0),
-   fButtons(0),
-   fDrawButton(0),
-   fCloseButton(0),
-   maxLenTitle(0)
-{
-   UInt_t totalWidth  = 500;
-   UInt_t totalHeight = 300;
+// TMVA::StatDialogMVAEffs::StatDialogMVAEffs(const TGWindow* p, Float_t ns, Float_t nb) :
+//    fNSignal(ns),
+//    fNBackground(nb),
+//    fFormula(""),
+//    fInfoList(0),
+//    fSigInput(0),
+//    fBkgInput(0),
+//    fButtons(0),
+//    fDrawButton(0),
+//    fCloseButton(0),
+//    maxLenTitle(0)
+// {
+//    UInt_t totalWidth  = 500;
+//    UInt_t totalHeight = 300;
 
-   // main frame
-   fMain = new TGMainFrame(p, totalWidth, totalHeight, kMainFrame | kVerticalFrame);
+//    // main frame
+//    fMain = new TGMainFrame(p, totalWidth, totalHeight, kMainFrame | kVerticalFrame);
 
-   TGLabel *sigLab = new TGLabel(fMain,"Signal events");
-   fMain->AddFrame(sigLab, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
+//    TGLabel *sigLab = new TGLabel(fMain,"Signal events");
+//    fMain->AddFrame(sigLab, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
 
-   fSigInput = new TGNumberEntry(fMain, (Double_t) fNSignal,5,-1,(TGNumberFormat::EStyle) 5);
-   fSigInput->SetLimits(TGNumberFormat::kNELLimitMin,0,1);
-   fMain->AddFrame(fSigInput, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
-   fSigInput->Resize(100,24);
+//    fSigInput = new TGNumberEntry(fMain, (Double_t) fNSignal,5,-1,(TGNumberFormat::EStyle) 5);
+//    fSigInput->SetLimits(TGNumberFormat::kNELLimitMin,0,1);
+//    fMain->AddFrame(fSigInput, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
+//    fSigInput->Resize(100,24);
 
-   TGLabel *bkgLab = new TGLabel(fMain, "Background events");
-   fMain->AddFrame(bkgLab, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
+//    TGLabel *bkgLab = new TGLabel(fMain, "Background events");
+//    fMain->AddFrame(bkgLab, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
 
-   fBkgInput = new TGNumberEntry(fMain, (Double_t) fNBackground,5,-1,(TGNumberFormat::EStyle) 5);
-   fBkgInput->SetLimits(TGNumberFormat::kNELLimitMin,0,1);
-   fMain->AddFrame(fBkgInput, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
-   fBkgInput->Resize(100,24);
+//    fBkgInput = new TGNumberEntry(fMain, (Double_t) fNBackground,5,-1,(TGNumberFormat::EStyle) 5);
+//    fBkgInput->SetLimits(TGNumberFormat::kNELLimitMin,0,1);
+//    fMain->AddFrame(fBkgInput, new TGLayoutHints(kLHintsLeft | kLHintsTop,5,5,5,5));
+//    fBkgInput->Resize(100,24);
 
-   fButtons = new TGHorizontalFrame(fMain, totalWidth,30);
+//    fButtons = new TGHorizontalFrame(fMain, totalWidth,30);
 
-   fCloseButton = new TGTextButton(fButtons,"&Close");
-   fButtons->AddFrame(fCloseButton, new TGLayoutHints(kLHintsLeft | kLHintsTop));
+//    fCloseButton = new TGTextButton(fButtons,"&Close");
+//    fButtons->AddFrame(fCloseButton, new TGLayoutHints(kLHintsLeft | kLHintsTop));
 
-   fDrawButton = new TGTextButton(fButtons,"&Draw");
-   fButtons->AddFrame(fDrawButton, new TGLayoutHints(kLHintsRight | kLHintsTop,15));
+//    fDrawButton = new TGTextButton(fButtons,"&Draw");
+//    fButtons->AddFrame(fDrawButton, new TGLayoutHints(kLHintsRight | kLHintsTop,15));
   
-   fMain->AddFrame(fButtons,new TGLayoutHints(kLHintsLeft | kLHintsBottom,5,5,5,5));
+//    fMain->AddFrame(fButtons,new TGLayoutHints(kLHintsLeft | kLHintsBottom,5,5,5,5));
 
-   fMain->SetWindowName("Significance");
-   fMain->SetWMPosition(0,0);
-   fMain->MapSubwindows();
-   fMain->Resize(fMain->GetDefaultSize());
-   fMain->MapWindow();
+//    fMain->SetWindowName("Significance");
+//    fMain->SetWMPosition(0,0);
+//    fMain->MapSubwindows();
+//    fMain->Resize(fMain->GetDefaultSize());
+//    fMain->MapWindow();
 
-   fSigInput->Connect("ValueSet(Long_t)","TMVA::StatDialogMVAEffs",this, "SetNSignal()");
-   fBkgInput->Connect("ValueSet(Long_t)","TMVA::StatDialogMVAEffs",this, "SetNBackground()");
+//    fSigInput->Connect("ValueSet(Long_t)","TMVA::StatDialogMVAEffs",this, "SetNSignal()");
+//    fBkgInput->Connect("ValueSet(Long_t)","TMVA::StatDialogMVAEffs",this, "SetNBackground()");
 
-   fDrawButton->Connect("Clicked()","TGNumberEntry",fSigInput, "ValueSet(Long_t)");
-   fDrawButton->Connect("Clicked()","TGNumberEntry",fBkgInput, "ValueSet(Long_t)");
-   fDrawButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Redraw()");   
+//    fDrawButton->Connect("Clicked()","TGNumberEntry",fSigInput, "ValueSet(Long_t)");
+//    fDrawButton->Connect("Clicked()","TGNumberEntry",fBkgInput, "ValueSet(Long_t)");
+//    fDrawButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Redraw()");   
 
-   fCloseButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Close()");
-}
+//    fCloseButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Close()");
+// }
 
 void TMVA::StatDialogMVAEffs::UpdateCanvases() 
 {
@@ -529,7 +529,7 @@ void mvaeffs( TString fin ,
    int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
    int nBkg = trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\"");
 
-   TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs(gClient->GetRoot(), nSig, nBkg);
+   TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
 
    gGui->ReadHistograms(file);
    gGui->SetFormula(formula);
