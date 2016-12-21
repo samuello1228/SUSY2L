@@ -44,10 +44,10 @@ def loadSampleDict( sampleListFile ):
   phyType phyProc generator runIDs
 
   eg.
-  #Type		Process			Generator(Nominal) 	id
-  #diboson	WZ->qqll		Sherpa			361084 	  	
-  diboson	WW->llvv(gg)		Sherpa			361077
-  diboson	Z(ee)+gamma		Sherpa			301535,301899-301901
+  #Type   Process     Generator(Nominal)  id
+  #diboson  WZ->qqll    Sherpa      361084      
+  diboson WW->llvv(gg)    Sherpa      361077
+  diboson Z(ee)+gamma   Sherpa      301535,301899-301901
   
   """
   outputDict = {}
@@ -81,9 +81,9 @@ def loadSampleDict( sampleListFile ):
 
     for runID in runIDs:
       outputDict[runID] = { "phyType"  : elements[0],
-		            "phyProc"  : elements[1],
-			    "generator": elements[2],
-			  }
+                "phyProc"  : elements[1],
+          "generator": elements[2],
+        }
   return outputDict
 
 def guessSampleType( filename ):
@@ -175,14 +175,15 @@ def getCut(ch):
 
   if type(ch) is int:
     # Channels:
-    #   noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav
-    #     ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav
-    # combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav
+    #    noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
+    #      ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
+    #  combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
+    # SFOSveto: +100
     # useISR = True if int(ch/10)==1 else False
 
-    if int(ch/10)==0:
+    if int(int(ch%100)/10)==0:
       whichISR=nonisrCut
-    elif int(ch/10)==1:
+    elif int(int(ch%100)/10)==1:
       whichISR=isrCut
 
     if ch%10==0:
@@ -191,8 +192,14 @@ def getCut(ch):
       lepFlav = emuCut
     elif ch%10==2:
       lepFlav = mumuCut
+    elif ch%10==4:
+      lepFlav = "%s || %s" % (eeCut, mumuCut)
+
+    if int(ch/100)==1:
+      lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
+
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, lepFlav]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepCut, lepFlav]])
   return myCut
