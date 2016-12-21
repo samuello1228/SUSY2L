@@ -25,6 +25,7 @@ ssEvtPostProc1 :: ssEvtPostProc1(string name):m_name(name){
   inputFile="dummy.root";
   norminalTreeName="evt2l";
   isData=true;
+  isFirstInit=true;
 
   //m_susyEvt = new susyEvts();
 }
@@ -35,13 +36,17 @@ ssEvtPostProc1 :: ~ssEvtPostProc1(){
 
 int ssEvtPostProc1 :: initialize ()
 {
-  // ChargeFlipBkgTool
-  CHECK(mChargeFlipBkgTool->initialize());
-  //mChargeFlipBkgTool->msg().setLevel( MSG::VERBOSE );
+  if (isFirstInit){
+    // ChargeFlipBkgTool
+    CHECK(mChargeFlipBkgTool->initialize());
+    //mChargeFlipBkgTool->msg().setLevel( MSG::VERBOSE );
 
-  // FakeLepBkgTool
-  CHECK(mFakeLepBkgTool->initialize());
-  //mFakeLepBkgTool->msg().setLevel( MSG::VERBOSE );
+    // FakeLepBkgTool
+    CHECK(mFakeLepBkgTool->initialize());
+    //mFakeLepBkgTool->msg().setLevel( MSG::VERBOSE );
+
+    isFirstInit = false;
+  }
 
   inF = new TFile(inputFile.c_str(), "UPDATE");
 
@@ -306,7 +311,7 @@ int ssEvtPostProc1 :: execute ()
   initialize();
   runLoop();
   finalize();
-  std::cout << "done" << endl;
+  std::cout << "done " << inputFile << endl;
   return 0;
 }
 
