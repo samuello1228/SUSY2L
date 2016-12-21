@@ -15,7 +15,7 @@ parser.add_option('-s', "--sigList" , help="list of SIG input ROOT file", defaul
 parser.add_option('-d', "--dataList", help="list of DATA input ROOT file", default=None)
 parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in input file", default="PP1_evt2l")
 parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList samples. Affects weight ratio between MC & data driven bkg", 
-		  type="float", default=10064.3)
+      type="float", default=10064.3)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
 parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR",type="int", default=None)
 parser.add_option("--NodeSize", help="minimum node size (in %) of the trees", type="int", default=5)
@@ -104,7 +104,7 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
+bkgCut = ROOT.TCut( "(%s) && (%s)" % (ssUtil.getCut(options.channel), "(leps[0].ID>0) == (leps[1].ID>0)") )
 sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
