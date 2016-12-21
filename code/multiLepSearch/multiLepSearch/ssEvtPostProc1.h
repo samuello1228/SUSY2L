@@ -41,6 +41,7 @@ public:
   SUSY::CrossSectionDB* m_XsecDB;  //!
   TFile* inF; //!
   TH1* mh_ElChargeFlip; //!
+  bool isFirstInit; //!
 
 
   std::vector<susyEvts*> rawSusyEvtsList                  ; //!
