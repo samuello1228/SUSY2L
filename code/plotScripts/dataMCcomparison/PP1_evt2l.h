@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov  6 20:55:43 2016 by ROOT version 6.04/14
-// from TTree evt2l/a angles tree
-// found on file: root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root
+// Tue Dec 20 12:20:57 2016 by ROOT version 6.04/14
+// from TTree PP1_evt2l/a angles tree
+// found on file: /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618-wt/user.clo.v8.0.00297730.physics_Main_myOutput.root/user.clo.9783036._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
-#ifndef evt2l_h
-#define evt2l_h
+#ifndef PP1_evt2l_h
+#define PP1_evt2l_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -16,10 +16,8 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 const Int_t kMaxleps = 30;
-const Int_t kMaxjets = 30;
-const Int_t kMaxtruths = 30;
 
-class evt2l {
+class PP1_evt2l {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -91,23 +89,6 @@ public :
    Float_t         l12_m;
    Float_t         l12_dPhi;
    Float_t         l12_dR;
-   Int_t           jets_;
-   Float_t         jets_pt[kMaxjets];   //[jets_]
-   Float_t         jets_eta[kMaxjets];   //[jets_]
-   Float_t         jets_phi[kMaxjets];   //[jets_]
-   Float_t         jets_MET_dPhi[kMaxjets];   //[jets_]
-   UInt_t          jets_jFlag[kMaxjets];   //[jets_]
-   Float_t         jets_e[kMaxjets];   //[jets_]
-   Int_t           truths_;
-   Float_t         truths_pt[kMaxtruths];   //[truths_]
-   Float_t         truths_eta[kMaxtruths];   //[truths_]
-   Float_t         truths_phi[kMaxtruths];   //[truths_]
-   Int_t           truths_pdgId[kMaxtruths];   //[truths_]
-   Int_t           truths_barcode[kMaxtruths];   //[truths_]
-   Int_t           truths_motherI[kMaxtruths];   //[truths_]
-   Int_t           truths_matchI[kMaxtruths];   //[truths_]
-   Int_t           truths_particleType[kMaxtruths];   //[truths_]
-   Int_t           truths_particleOrigin[kMaxtruths];   //[truths_]
    ULong64_t       sig_trigCode;
    Float_t         sig_Met;
    Float_t         sig_MetRel;
@@ -165,27 +146,10 @@ public :
    TBranch        *b_leps_nTRTHits;   //!
    TBranch        *b_leps_nTRTOutliers;   //!
    TBranch        *b_l12;   //!
-   TBranch        *b_jets_;   //!
-   TBranch        *b_jets_pt;   //!
-   TBranch        *b_jets_eta;   //!
-   TBranch        *b_jets_phi;   //!
-   TBranch        *b_jets_MET_dPhi;   //!
-   TBranch        *b_jets_jFlag;   //!
-   TBranch        *b_jets_e;   //!
-   TBranch        *b_truths_;   //!
-   TBranch        *b_truths_pt;   //!
-   TBranch        *b_truths_eta;   //!
-   TBranch        *b_truths_phi;   //!
-   TBranch        *b_truths_pdgId;   //!
-   TBranch        *b_truths_barcode;   //!
-   TBranch        *b_truths_motherI;   //!
-   TBranch        *b_truths_matchI;   //!
-   TBranch        *b_truths_particleType;   //!
-   TBranch        *b_truths_particleOrigin;   //!
    TBranch        *b_sig;   //!
 
-   evt2l(TTree *tree=0);
-   virtual ~evt2l();
+   PP1_evt2l(TTree *tree=0);
+   virtual ~PP1_evt2l();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -197,35 +161,35 @@ public :
 
 #endif
 
-#ifdef evt2l_cxx
-evt2l::evt2l(TTree *tree) : fChain(0) 
+#ifdef PP1_evt2l_cxx
+PP1_evt2l::PP1_evt2l(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618-wt/user.clo.v8.0.00297730.physics_Main_myOutput.root/user.clo.9783036._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root");
+         f = new TFile("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618-wt/user.clo.v8.0.00297730.physics_Main_myOutput.root/user.clo.9783036._000001.myOutput.root");
       }
-      f->GetObject("evt2l",tree);
+      f->GetObject("PP1_evt2l",tree);
 
    }
    Init(tree);
 }
 
-evt2l::~evt2l()
+PP1_evt2l::~PP1_evt2l()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t evt2l::GetEntry(Long64_t entry)
+Int_t PP1_evt2l::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t evt2l::LoadTree(Long64_t entry)
+Long64_t PP1_evt2l::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -238,7 +202,7 @@ Long64_t evt2l::LoadTree(Long64_t entry)
    return centry;
 }
 
-void evt2l::Init(TTree *tree)
+void PP1_evt2l::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -296,28 +260,11 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("leps.nTRTHits", leps_nTRTHits, &b_leps_nTRTHits);
    fChain->SetBranchAddress("leps.nTRTOutliers", leps_nTRTOutliers, &b_leps_nTRTOutliers);
    fChain->SetBranchAddress("l12", &l12_pt, &b_l12);
-   fChain->SetBranchAddress("jets", &jets_, &b_jets_);
-   fChain->SetBranchAddress("jets.pt", jets_pt, &b_jets_pt);
-   fChain->SetBranchAddress("jets.eta", jets_eta, &b_jets_eta);
-   fChain->SetBranchAddress("jets.phi", jets_phi, &b_jets_phi);
-   fChain->SetBranchAddress("jets.MET_dPhi", jets_MET_dPhi, &b_jets_MET_dPhi);
-   fChain->SetBranchAddress("jets.jFlag", jets_jFlag, &b_jets_jFlag);
-   fChain->SetBranchAddress("jets.e", jets_e, &b_jets_e);
-   fChain->SetBranchAddress("truths", &truths_, &b_truths_);
-   fChain->SetBranchAddress("truths.pt", truths_pt, &b_truths_pt);
-   fChain->SetBranchAddress("truths.eta", truths_eta, &b_truths_eta);
-   fChain->SetBranchAddress("truths.phi", truths_phi, &b_truths_phi);
-   fChain->SetBranchAddress("truths.pdgId", truths_pdgId, &b_truths_pdgId);
-   fChain->SetBranchAddress("truths.barcode", truths_barcode, &b_truths_barcode);
-   fChain->SetBranchAddress("truths.motherI", truths_motherI, &b_truths_motherI);
-   fChain->SetBranchAddress("truths.matchI", truths_matchI, &b_truths_matchI);
-   fChain->SetBranchAddress("truths.particleType", truths_particleType, &b_truths_particleType);
-   fChain->SetBranchAddress("truths.particleOrigin", truths_particleOrigin, &b_truths_particleOrigin);
    fChain->SetBranchAddress("sig", &sig_trigCode, &b_sig);
    Notify();
 }
 
-Bool_t evt2l::Notify()
+Bool_t PP1_evt2l::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -328,18 +275,18 @@ Bool_t evt2l::Notify()
    return kTRUE;
 }
 
-void evt2l::Show(Long64_t entry)
+void PP1_evt2l::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t evt2l::Cut(Long64_t entry)
+Int_t PP1_evt2l::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef evt2l_cxx
+#endif // #ifdef PP1_evt2l_cxx

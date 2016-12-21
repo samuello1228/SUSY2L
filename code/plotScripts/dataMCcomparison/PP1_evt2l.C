@@ -1,14 +1,14 @@
-#define evt2l_cxx
-#include "evt2l.h"
+#define PP1_evt2l_cxx
+#include "PP1_evt2l.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void evt2l::Loop()
+void PP1_evt2l::Loop()
 {
 //   In a ROOT session, you can do:
-//      root> .L evt2l.C
-//      root> evt2l t
+//      root> .L PP1_evt2l.C
+//      root> PP1_evt2l t
 //      root> t.GetEntry(12); // Fill t data members with entry number 12
 //      root> t.Show();       // Show values of entry 12
 //      root> t.Show(16);     // Read and show values of entry 16
