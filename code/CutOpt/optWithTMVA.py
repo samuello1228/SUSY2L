@@ -104,7 +104,7 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-bkgCut = ROOT.TCut( "(%s) && (%s)" % (ssUtil.getCut(options.channel), "(leps[0].ID>0) == (leps[1].ID>0)") )
+bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
 sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,

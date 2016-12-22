@@ -201,5 +201,5 @@ def getCut(ch):
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepCut, lepFlav]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, lepFlav]])
   return myCut

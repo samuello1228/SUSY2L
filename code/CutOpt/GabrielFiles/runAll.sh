@@ -22,7 +22,7 @@ do
 			else 
 				chan1=$chan
 			fi
-		    outFile="Channel"$chan1"_dm"$mass".root"
+		    outFile="dm"$mass"_Channel"$chan".root"
 		    sigFiles="CutOpt/GabrielFiles/sigFiles_"$mass".txt"
 		    python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c $chan1 -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 		    echo "Submitted jobs for channel "$chan1" dm="$mass" nTrees="$nTrees" nodeSize="$nodeSize
@@ -30,30 +30,27 @@ do
 		wait
 	done
 
-    # For executing on selected channels only
-	#dirName="Output_"$nTrees"_NodeSize"$nodeSize
-	#mv Channel*.root $dirName
-    #continue
-
 	# Channel 0 
-	outFile="Channel0_dm20.root"
+	outFile="dm20_Channel0.root"
 	sigFiles="CutOpt/GabrielFiles/sigFiles_20.txt"
 	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 	echo "Submitted jobs for channel 0 dm=20 nTrees="$nTrees" nodeSize="$nodeSize
 
-	outFile="Channel0_dm50.root"
+	outFile="dm50_Channel0_.root"
 	sigFiles="CutOpt/GabrielFiles/sigFiles_50.txt"
 	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 	echo "Submitted jobs for channel 0 dm=50 nTrees="$nTrees" nodeSize="$nodeSize
 
-	outFile="Channel0_dm100.root"
+	outFile="dm100_Channel100.root"
 	sigFiles="CutOpt/GabrielFiles/sigFiles_100.txt"
 	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 100 -o $outFile --NTrees $nTrees --NodeSize $nodeSize&
 	echo "Submitted jobs for channel 0 dm=100 nTrees="$nTrees" nodeSize="$nodeSize
 
+    wait
+
 	dirName="Output_"$nTrees"_NodeSize"$nodeSize
 	mkdir $dirName
-	mv Channel*.root $dirName
+	mv dm*.root $dirName
     mv weights $dirName
 done; done
 
