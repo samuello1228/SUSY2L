@@ -98,6 +98,15 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB
   // MCTC, TruthLink, dR
   mcTruthMatch = "MCTC"; 
 
+  // ElectronChargeIDSelector working points
+  // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
+  ECIDS_Loose95_OP=0.10083; 
+  ECIDS_Loose97_OP=-0.288961;
+  ECIDS_Medium95_OP=0.106639;
+  ECIDS_Medium97_OP=0.28087;
+  ECIDS_Tight95_OP=0.0670415;
+  ECIDS_Tight97_OP=-0.325856;
+  ECIDS_trainingFile="ECIDS_20161125for2017Moriond.root";
 }
 
 
@@ -321,6 +330,30 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
+
+  CHECK(ECIDS_Loose95->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Loose95->setProperty("CutOnBDT", ECIDS_Loose95_OP));
+  CHECK(ECIDS_Loose95->initialize());
+
+  CHECK(ECIDS_Loose97->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Loose97->setProperty("CutOnBDT", ECIDS_Loose97_OP));
+  CHECK(ECIDS_Loose97->initialize());
+
+  CHECK(ECIDS_Medium95->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Medium95->setProperty("CutOnBDT", ECIDS_Medium95_OP));
+  CHECK(ECIDS_Medium95->initialize());
+
+  CHECK(ECIDS_Medium97->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Medium97->setProperty("CutOnBDT", ECIDS_Medium97_OP));
+  CHECK(ECIDS_Medium97->initialize());
+
+  CHECK(ECIDS_Tight95->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Tight95->setProperty("CutOnBDT", ECIDS_Tight95_OP));
+  CHECK(ECIDS_Tight95->initialize());
+
+  CHECK(ECIDS_Tight97->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDS_Tight97->setProperty("CutOnBDT", ECIDS_Tight97_OP));
+  CHECK(ECIDS_Tight97->initialize());
 
   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
@@ -1209,6 +1242,15 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
   }
+
+  // ChargeIDSelector
+  l.ElChargeID = 0;
+  l.ElChargeID |=  !(ECIDS_Loose95 )? false : (bool) ECIDS_Loose95 ->accept(el);
+  l.ElChargeID |= (!(ECIDS_Loose97 )? false : (bool) ECIDS_Loose97 ->accept(el)) << 1;
+  l.ElChargeID |= (!(ECIDS_Medium95)? false : (bool) ECIDS_Medium95->accept(el)) << 2;
+  l.ElChargeID |= (!(ECIDS_Medium97)? false : (bool) ECIDS_Medium97->accept(el)) << 3;
+  l.ElChargeID |= (!(ECIDS_Tight95 )? false : (bool) ECIDS_Tight95 ->accept(el)) << 4;
+  l.ElChargeID |= (!(ECIDS_Tight97 )? false : (bool) ECIDS_Tight97 ->accept(el)) << 5;
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1266,6 +1308,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
+  l.ElChargeID = 63;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
