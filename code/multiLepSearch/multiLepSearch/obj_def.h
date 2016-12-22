@@ -51,6 +51,7 @@ struct L_PAR:PAR{
   int truthType;
   int truthOrig;
   int isTight;
+  unsigned int ElChargeID;
   unsigned int Q;
   unsigned int lFlag;
   unsigned int nBHits;
@@ -61,7 +62,7 @@ struct L_PAR:PAR{
   unsigned int nTRTHits;
   unsigned int nTRTOutliers;
 };
-const string L_PAR_s = PAR_s+":topoetcone20/F:topoetcone30:topoetcone40:ptcone20:ptcone30:ptcone40:mT:d0:d0Err:z0:z0Err:z0sinTheta:d0sig:truthProb:SF_Loose:SF_Medium:SF_Tight:wt1:wt2:wt3:ID/I:isTight/I:author/I:truthI/I:truthType:truthOrig:Q/i:lFlag/i:nBHits/i:nPixHits:nSCTHits:nPixHoles:nSCTHoles:nTRTHits:nTRTOutliers";
+const string L_PAR_s = PAR_s+":topoetcone20/F:topoetcone30:topoetcone40:ptcone20:ptcone30:ptcone40:mT:d0:d0Err:z0:z0Err:z0sinTheta:d0sig:truthProb:SF_Loose:SF_Medium:SF_Tight:wt1:wt2:wt3:ID/I:isTight/I:author/I:truthI/I:truthType:truthOrig:Q/i:lFlag/i:ElChargeID/i:nBHits/i:nPixHits:nSCTHits:nPixHoles:nSCTHoles:nTRTHits:nTRTOutliers";
 
 struct EL_Par:L_PAR{
   int elID;
