@@ -168,6 +168,7 @@ sigLepCut    = "Sum$(leps.lFlag & 2)==4" # see obj_def.h in multilepSearch, IS_S
 ssCut = "((leps[0].ID>0) == (leps[1].ID>0))"
 
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
+ptMllCut = "leps[0].pt>25 && leps[1].pt>20 && l12.m>60"
 
 def getCut(ch):
   lepFlav = "1"
@@ -201,5 +202,5 @@ def getCut(ch):
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, lepFlav]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, lepFlav, ptMllCut]])
   return myCut
