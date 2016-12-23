@@ -95,8 +95,13 @@ public:
   AsgElectronChargeIDSelectorTool* ECIDS_Tight95; //!
   AsgElectronChargeIDSelectorTool* ECIDS_Tight97; //!
 
-  double ECIDS_Loose95_OP, ECIDS_Loose97_OP, ECIDS_Medium95_OP, ECIDS_Medium97_OP, ECIDS_Tight95_OP, ECIDS_Tight97_OP;
-  std::string ECIDS_trainingFile;
+  double ECIDS_Loose95_OP; //!
+  double ECIDS_Loose97_OP; //!
+  double ECIDS_Medium95_OP; //!
+  double ECIDS_Medium97_OP; //!
+  double ECIDS_Tight95_OP; //!
+  double ECIDS_Tight97_OP; //!
+  std::string ECIDS_trainingFile; //!
 
   // this is a standard constructor
   ssEvtSelection (std::string name="ss2lSelection");

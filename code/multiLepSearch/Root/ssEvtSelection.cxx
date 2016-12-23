@@ -331,26 +331,32 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
 
+  ECIDS_Loose95 = new AsgElectronChargeIDSelectorTool("ECIDS_loose");
   CHECK(ECIDS_Loose95->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Loose95->setProperty("CutOnBDT", ECIDS_Loose95_OP));
   CHECK(ECIDS_Loose95->initialize());
 
+  ECIDS_Loose97 = new AsgElectronChargeIDSelectorTool("ECIDS_loose");
   CHECK(ECIDS_Loose97->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Loose97->setProperty("CutOnBDT", ECIDS_Loose97_OP));
   CHECK(ECIDS_Loose97->initialize());
 
+  ECIDS_Medium95 = new AsgElectronChargeIDSelectorTool("ECIDS_medium");
   CHECK(ECIDS_Medium95->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Medium95->setProperty("CutOnBDT", ECIDS_Medium95_OP));
   CHECK(ECIDS_Medium95->initialize());
 
+  ECIDS_Medium97 = new AsgElectronChargeIDSelectorTool("ECIDS_medium");
   CHECK(ECIDS_Medium97->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Medium97->setProperty("CutOnBDT", ECIDS_Medium97_OP));
   CHECK(ECIDS_Medium97->initialize());
 
+  ECIDS_Tight95 = new AsgElectronChargeIDSelectorTool("ECIDS_tight");
   CHECK(ECIDS_Tight95->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Tight95->setProperty("CutOnBDT", ECIDS_Tight95_OP));
   CHECK(ECIDS_Tight95->initialize());
 
+  ECIDS_Tight97 = new AsgElectronChargeIDSelectorTool("ECIDS_tight");
   CHECK(ECIDS_Tight97->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDS_Tight97->setProperty("CutOnBDT", ECIDS_Tight97_OP));
   CHECK(ECIDS_Tight97->initialize());
