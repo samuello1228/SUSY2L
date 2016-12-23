@@ -1,7 +1,7 @@
 #!/bin/bash
-tag=v8.1
-dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-303560_v80_Nicky.root
-grl=multiLepSearch/GRL/data16_13TeV.periodAllYear_DetStatus-v80-pro20-08_DQDefects-00-02-02_PHYS_StandardGRL_All_Good_25ns.xml
+tag=v8.6
+dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root
+grl=multiLepSearch/GRL/physics_25ns_20.7.xml
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_July27_afterFix.root
 file=../multiLepSearch/script/Data_sample_list.txt
 k=${tag}.data 
