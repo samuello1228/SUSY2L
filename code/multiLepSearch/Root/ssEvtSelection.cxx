@@ -1245,12 +1245,12 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 
   // ChargeIDSelector
   l.ElChargeID = 0;
-  l.ElChargeID |=  !(ECIDS_Loose95 )? false : (bool) ECIDS_Loose95 ->accept(el);
-  l.ElChargeID |= (!(ECIDS_Loose97 )? false : (bool) ECIDS_Loose97 ->accept(el)) << 1;
-  l.ElChargeID |= (!(ECIDS_Medium95)? false : (bool) ECIDS_Medium95->accept(el)) << 2;
-  l.ElChargeID |= (!(ECIDS_Medium97)? false : (bool) ECIDS_Medium97->accept(el)) << 3;
-  l.ElChargeID |= (!(ECIDS_Tight95 )? false : (bool) ECIDS_Tight95 ->accept(el)) << 4;
-  l.ElChargeID |= (!(ECIDS_Tight97 )? false : (bool) ECIDS_Tight97 ->accept(el)) << 5;
+  l.ElChargeID |=  ECIDS_Loose95 ? (bool) ECIDS_Loose95 ->accept(el) : false ;
+  l.ElChargeID |= (ECIDS_Loose97 ? (bool) ECIDS_Loose97 ->accept(el) : false ) << 1;
+  l.ElChargeID |= (ECIDS_Medium95? (bool) ECIDS_Medium95->accept(el) : false ) << 2;
+  l.ElChargeID |= (ECIDS_Medium97? (bool) ECIDS_Medium97->accept(el) : false ) << 3;
+  l.ElChargeID |= (ECIDS_Tight95 ? (bool) ECIDS_Tight95 ->accept(el) : false ) << 4;
+  l.ElChargeID |= (ECIDS_Tight97 ? (bool) ECIDS_Tight97 ->accept(el) : false ) << 5;
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
