@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "evt2l.C"
+#include "PP1_evt2l.C"
 #include <TH1F.h>
 
 Int_t ID1;
@@ -37,6 +38,8 @@ Double_t fjetpt;
 Double_t fjeteta;
 Double_t fjetphi;
 Double_t weight;
+Double_t qFwt;
+Double_t fLwt;
 Double_t averageMu;
 Int_t nVtx;
 
@@ -47,10 +50,12 @@ struct nEvent
     double nw;
     double nAOD;
 };
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,bool isPP1,std::vector<nEvent>& nSS)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
+    TChain *tree1P = nullptr;
+    if(isPP1) tree1P = new TChain("PP1_evt2l");
     {
         TString fileName = SamplePath;
         fileName += "user.clo.";
@@ -61,8 +66,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += "_myOutput.root/*.root";
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
+        if(isPP1) tree1P->Add(fileName.Data());
     }
     evt2l *evts = new evt2l(tree1);
+    PP1_evt2l *evtsP = nullptr;
+    if(isPP1) evtsP = new PP1_evt2l(tree1P);
     
     //channels
     std::vector<TString> channel;
@@ -142,6 +150,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("fjeteta",&fjeteta,"fjeteta/D");
         tree2[j]->Branch("fjetphi",&fjetphi,"fjetphi/D");
         tree2[j]->Branch("weight",&weight,"weight/D");
+        tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
+        tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
         tree2[j]->Branch("averageMu",&averageMu,"averageMu/D");
         tree2[j]->Branch("nVtx",&nVtx,"nVtx/I");
     }
@@ -159,10 +169,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(2,"ntuple");
         h2[j]->GetXaxis()->SetBinLabel(3,"trigger");
         h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(7,"mll_60");
-        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(8,"mll_60");
+        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
     }
     
     //fill histograms
@@ -201,6 +212,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             cout<<"number of event: " <<j<<endl;
         }
         evts->GetEntry(j);
+        if(isPP1) evtsP->GetEntry(j);
         
         //trigger
         if(evts->sig_trigCode==0)
@@ -212,19 +224,31 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        //exact 2 signal leptons
-        if(evts->leps_!=2) continue;
-        if(!(evts->leps_lFlag[0] & 1<<1)) continue;
-        if(!(evts->leps_lFlag[1] & 1<<1)) continue;
+
+        if(isPP1 && evtsP->evt_fLwt!=0)
+        {
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("fake",1);
+            }
+        }
+        else
+        {
+            //exact 2 signal leptons
+            if(evts->leps_!=2) continue;
+            if(!(evts->leps_lFlag[0] & 1<<1)) continue;
+            if(!(evts->leps_lFlag[1] & 1<<1)) continue;
+
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("=2SigLep",1);
+            }
+        }
+
         int sigIndex[2];
         sigIndex[0] = 0;
         sigIndex[1] = 1;
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("=2SigLep",1);
-        }
-        
-        //pt of leading lepton > 30 GeV
+        //pt of leading lepton > 25 GeV
         if(!(evts->leps_pt[sigIndex[0]]>25))
         {
             continue;
@@ -234,7 +258,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt1",1);
         }
         
-        //pt of subleading lepton > 30 GeV
+        //pt of subleading lepton > 20 GeV
         if(!(evts->leps_pt[sigIndex[1]]>20))
         {
             continue;
@@ -271,6 +295,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        
+        if(isPP1) qFwt = evtsP->evt_qFwt;
+        else qFwt = evts->evt_qFwt;
+        
+        if(isPP1) fLwt = evtsP->evt_fLwt;
+        else fLwt = evts->evt_fLwt;
+        
         averageMu = evts->evt_averageMu;
         nVtx = evts->sig_nVtx;
         
@@ -421,21 +452,22 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=7;k++)
+    for(int k=1;k<=8;k++)
     {
         cout<<long(h2[1]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
-        cout<<int(h2[j]->GetBinContent(8))<<endl;
+        cout<<int(h2[j]->GetBinContent(9))<<endl;
     }
     cout<<endl;
     
-    cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
+    //cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
     nSS.push_back(element);
     //delete
     delete evts;
+    if(isPP1) delete evtsP;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete tree2[j];
@@ -446,6 +478,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         delete h2[j];
     }
     delete tree1;
+    if(isPP1) delete tree1P;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete f2[j];
@@ -489,7 +522,8 @@ void skimming()
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
 
     //SamplePath += "AnalysisBase-02-04-17-414981/";
-    SamplePath += "AnalysisBase-02-04-17-419618/";
+    //SamplePath += "AnalysisBase-02-04-17-419618/";
+    SamplePath += "AnalysisBase-02-04-17-419618-wt/";
     
     //TString tag = "v7.8";
     TString tag = "v8.0";
@@ -510,7 +544,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],true,nSS);
         }
     }
     
@@ -526,7 +560,7 @@ void skimming()
         //for(unsigned int i=76;i<=77;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,BGSampleName[i],nSS);
+            skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
         }
     }
     
@@ -542,7 +576,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<SigSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,SigSampleName[i],nSS);
+            skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }
     }
 
