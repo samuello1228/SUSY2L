@@ -97,18 +97,18 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
       if (bin==-1) ATH_MSG_ERROR("No flipProb defined for this e: " << fabs(eta[i]) << " " << pt[i] );
   }
   
-  double weight = 0.0;
+  double weight = 0.0, ptot = 0.0;
   if (prob.size() >2){
     ATH_MSG_ERROR("More then 2 signal e in input, use only first 2");
-    weight = prob[0]+prob[1]-2*prob[0]*prob[1];
+    ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   }else if (prob.size()==2){
     ATH_MSG_DEBUG("2P: " << prob[0] << " " << prob[1]);
-    weight = prob[0]+prob[1]-2*prob[0]*prob[1];
+    ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   }else if (prob.size()==1){
     ATH_MSG_DEBUG("1P: " << prob[0] );
-    weight = prob[0];
+    ptot = prob[0];
   }
-  weight = weight/(1.-weight);
+  weight = ptot/(1.-ptot);
 
   if (sigma==0) return weight;
 
@@ -129,7 +129,6 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
     }
   }
 
-  double ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   if(prob.size()>=2){
     // Uncertainty calc based on w = p0 + p1 - 2*p0*p1
     uncertainty = 1./pow(1.-ptot,2) * sqrt( pow((1.-2*prob[1])*unc[0],2) + pow((1.-2*prob[0])*unc[1],2) );
