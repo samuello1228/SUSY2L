@@ -224,7 +224,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-
         if(isPP1 && evtsP->evt_fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -238,13 +237,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(evts->leps_!=2) continue;
             if(!(evts->leps_lFlag[0] & 1<<1)) continue;
             if(!(evts->leps_lFlag[1] & 1<<1)) continue;
-
+            
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("=2SigLep",1);
             }
         }
-
+        
         int sigIndex[2];
         sigIndex[0] = 0;
         sigIndex[1] = 1;
@@ -328,7 +327,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 channelIndex += 1;
             }
         }
-
+        
         //jets
         bool hasISR = false;
         nJet = 0;
@@ -358,8 +357,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 else
                 {
                     //no b-tagged
-                    if( (channelIndex!=2 && evts->jets_pt[k] > 20) ||
-                        (channelIndex==2 && evts->jets_pt[k] > 30) )
+                    if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
+                       (channelIndex==2 && evts->jets_pt[k] > 30) )
                     {
                         //Central light jets
                         nCJet++;
@@ -375,7 +374,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                     nFJet++;
                     if(nFJet==1) leadingFJetIndex = k;
                 }
-            }   
+            }
         }
         
         if(nJet>0)
@@ -520,7 +519,7 @@ void skimming()
     TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
-
+    
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     //SamplePath += "AnalysisBase-02-04-17-419618/";
     SamplePath += "AnalysisBase-02-04-17-419618-wt/";
@@ -529,9 +528,8 @@ void skimming()
     TString tag = "v8.0";
     //TString tag = "v7.11";
     
-
     std::vector<nEvent> nSS;
-
+    
     //Data
     if(true)
     //if(false)
@@ -579,7 +577,7 @@ void skimming()
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }
     }
-
+    
     for(unsigned int i=0;i<nSS.size();i++)
     {
         cout<<nSS[i].name<<" "<<nSS[i].n<<" "<<nSS[i].nw<<" "<<nSS[i].nAOD<<endl;
