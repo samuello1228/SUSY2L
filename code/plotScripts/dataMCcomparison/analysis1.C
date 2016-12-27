@@ -226,6 +226,7 @@ void analysis1()
     }
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
+    /*
     //tree
     std::vector< std::vector<TChain*> > tree1Data;
     for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
@@ -234,6 +235,7 @@ void analysis1()
         tree1Data.push_back(element);
     }
     initializeTree1(tree1Data,DataSampleID,channel);
+    */
     
     
     //For BG MC
@@ -430,6 +432,7 @@ void analysis1()
         delete file;
     }
     
+    /*
     //tree
     std::vector< std::vector<TChain*> > tree1Sig;
     for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
@@ -438,6 +441,7 @@ void analysis1()
         tree1Sig.push_back(element);
     }
     initializeTree1(tree1Sig,SigSampleID,channel);
+    */
     
     //Group for background
     std::vector<GroupData> BGGroupData;
@@ -785,7 +789,7 @@ void analysis1()
                 temp += Var[VarIndex].VarName;
                 temp += ">>";
                 temp += hName2Data[j];
-                tree2Data[j]->Draw(temp.Data());
+                tree2Data[j]->Draw(temp.Data(),"fLwt==0");
             }
             
             for(unsigned int j=0;j<BGSampleID.size();j++)
@@ -1089,7 +1093,7 @@ void analysis1()
     {
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
-            delete tree1Data[ChannelIndex][i];
+            //delete tree1Data[ChannelIndex][i];
         }
         for(unsigned int i=0;i<BGSampleID.size();i++)
         {
@@ -1097,7 +1101,7 @@ void analysis1()
         }
         for(unsigned int i=0;i<SigSampleID.size();i++)
         {
-            delete tree1Sig[ChannelIndex][i];
+            //delete tree1Sig[ChannelIndex][i];
         }
     }
     
@@ -1601,7 +1605,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
+    for(unsigned int RegionIndex=16;RegionIndex<=16;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1804,6 +1808,7 @@ void analysis1()
                     
                     TString Cut = "(1";
                     Cut += CommonCut;
+                    Cut += "&& fLwt==0";
                     
                     if(optimize)
                     {
