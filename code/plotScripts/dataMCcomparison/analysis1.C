@@ -444,40 +444,40 @@ void analysis1()
     */
     
     //Group for background
-    std::vector<GroupData> BGGroupData;
+    std::vector<GroupData> BGMCGroupData;
     if(Powheg)
     {
         GroupData element;
-        element.LegendName = "Z#rightarrow ee";       element.lower = 0;   element.upper = 0;  BGGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#mu#mu";    element.lower = 1;   element.upper = 1;  BGGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#tau#tau";  element.lower = 2;   element.upper = 2;  BGGroupData.push_back(element);
-        element.LegendName = "t#bar{t}";              element.lower = 3;   element.upper = 3;  BGGroupData.push_back(element);
-        element.LegendName = "Wt";                    element.lower = 4;   element.upper = 5;  BGGroupData.push_back(element);
+        element.LegendName = "Z#rightarrow ee";       element.lower = 0;   element.upper = 0;  BGMCGroupData.push_back(element);
+        element.LegendName = "Z#rightarrow#mu#mu";    element.lower = 1;   element.upper = 1;  BGMCGroupData.push_back(element);
+        element.LegendName = "Z#rightarrow#tau#tau";  element.lower = 2;   element.upper = 2;  BGMCGroupData.push_back(element);
+        element.LegendName = "t#bar{t}";              element.lower = 3;   element.upper = 3;  BGMCGroupData.push_back(element);
+        element.LegendName = "Wt";                    element.lower = 4;   element.upper = 5;  BGMCGroupData.push_back(element);
     }
     
     if(Sherpa)
     {
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 48;  element.upper = 71; BGGroupData.push_back(element);
+        element.lower = 48;  element.upper = 71; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 24;  element.upper = 47; BGGroupData.push_back(element);
+        element.lower = 24;  element.upper = 47; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 0;   element.upper = 23; BGGroupData.push_back(element);
+        element.lower = 0;   element.upper = 23; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 72;  element.upper = 72; BGGroupData.push_back(element);
+        element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 73;  element.upper = 74; BGGroupData.push_back(element);
+        element.lower = 73;  element.upper = 74; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 75;  element.upper = 88; BGGroupData.push_back(element);
+        element.lower = 75;  element.upper = 88; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 89;  element.upper = 108;BGGroupData.push_back(element);
+        element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
     }
     
     //plotting
@@ -754,11 +754,11 @@ void analysis1()
             }
             
             //h2BGGruop
-            Group BGGroup[BGGroupData.size()];
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            Group BGGroup[BGMCGroupData.size()];
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                BGGroup[j].info = &(BGGroupData[j]);
-                TString NameTemp = BGGroupData[j].GroupName;
+                BGGroup[j].info = &(BGMCGroupData[j]);
+                TString NameTemp = BGMCGroupData[j].GroupName;
                 BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             }
             
@@ -815,9 +815,9 @@ void analysis1()
             }
             
             //Non Z+jets
-            for(unsigned int j=3;j<BGGroupData.size();j++)
+            for(unsigned int j=3;j<BGMCGroupData.size();j++)
             {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
                     BGGroup[j].h2->Add(h2BG[k]);
                 }
@@ -830,7 +830,7 @@ void analysis1()
             h2BGSum->Scale(0);
             for(int j=0;j<=2;j++)
             {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
                     BGGroup[j].h2->Add(h2BG[k]);
                 }
@@ -855,7 +855,7 @@ void analysis1()
             }
             
             //h2BGGruop
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
                 delete BGGroup[j].h2;
             }
@@ -989,7 +989,7 @@ void analysis1()
                 
                 for(int j=0;j<=2;j++)
                 {
-                    for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                     {
                         TString NameTemp = "tree_rw_";
                         NameTemp += TString::Itoa(k,10);
@@ -1048,7 +1048,7 @@ void analysis1()
             FileName += TString::Itoa(ChannelIndex,10);
             FileName += ".root";
             TFile* fcfw = new TFile(FileName.Data(),"RECREATE");
-            for(unsigned int k=BGGroupData[0].lower;k<=BGGroupData[0].upper;k++)
+            for(unsigned int k=BGMCGroupData[0].lower;k<=BGMCGroupData[0].upper;k++)
             {
                 TString NameTemp = "tree_cfw_";
                 NameTemp += TString::Itoa(k,10);
@@ -1191,7 +1191,7 @@ void analysis1()
             double Significance[uncertaintyN][cutN];
             //uncertainty,cut value
             
-            double sumOfEvent[cutN][BGGroupData.size()+4][2];
+            double sumOfEvent[cutN][BGMCGroupData.size()+4][2];
             //cut value,sample,expN/error
             
             int SigID = 18;
@@ -1228,11 +1228,11 @@ void analysis1()
                     }
                     
                     //h2BGGruop
-                    Group BGGroup[BGGroupData.size()];
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
+                    Group BGGroup[BGMCGroupData.size()];
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
-                        BGGroup[j].info = &(BGGroupData[j]);
-                        TString NameTemp = BGGroupData[j].GroupName;
+                        BGGroup[j].info = &(BGMCGroupData[j]);
+                        TString NameTemp = BGMCGroupData[j].GroupName;
                         BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                     }
                     
@@ -1280,35 +1280,35 @@ void analysis1()
                     }
                     
                     //add background
-                    sumOfEvent[q][BGGroupData.size()][0]=0;
-                    sumOfEvent[q][BGGroupData.size()][1]=0;
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
+                    sumOfEvent[q][BGMCGroupData.size()][0]=0;
+                    sumOfEvent[q][BGMCGroupData.size()][1]=0;
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
-                        for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
                             BGGroup[j].h2->Add(h2BG[k]);
                         }
                         
                         //expected number of events for BG
                         sumOfEvent[q][j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[q][j][1]);
-                        //cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
-                        sumOfEvent[q][BGGroupData.size()][0] += sumOfEvent[q][j][0];
-                        sumOfEvent[q][BGGroupData.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
+                        //cout<<BGMCGroupData[j].GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
+                        sumOfEvent[q][BGMCGroupData.size()][0] += sumOfEvent[q][j][0];
+                        sumOfEvent[q][BGMCGroupData.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
                         
                     }
-                    //if(VarIndex==0) cout<<"Total BG: "<<sumOfEvent[q][BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGGroupData.size()][1])<<endl;
+                    //if(VarIndex==0) cout<<"Total BG: "<<sumOfEvent[q][BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGMCGroupData.size()][1])<<endl;
                     
                     
                     //expected number of events
                     h2Sig->Scale(SigXS[SigID]/SignAOD[SigID] *sumDataL);
-                    sumOfEvent[q][BGGroupData.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGGroupData.size()+2][1]);
-                    //cout<<"Signal: "<<sumOfEvent[q][BGGroupData.size()+2][0]<<" +/- "<<sumOfEvent[q][BGGroupData.size()+2][1]<<endl;
+                    sumOfEvent[q][BGMCGroupData.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGMCGroupData.size()+2][1]);
+                    //cout<<"Signal: "<<sumOfEvent[q][BGMCGroupData.size()+2][0]<<" +/- "<<sumOfEvent[q][BGMCGroupData.size()+2][1]<<endl;
                     
                     //Significance
-                    sumOfEvent[q][BGGroupData.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGGroupData.size()+2][0],sumOfEvent[q][BGGroupData.size()][0],uncertainty[u]);
-                    //cout<<"Significance: "<<sumOfEvent[q][BGGroupData.size()+3][0]<<endl<<endl;
-                    Significance[u][q] = sumOfEvent[q][BGGroupData.size()+3][0];
-                    //cout<<"Signal: "<<sumOfEvent[q][BGGroupData.size()+2][0]<<", BG: "<<sumOfEvent[q][BGGroupData.size()][0]<<", Significance: "<<sumOfEvent[q][BGGroupData.size()+3][0]<<endl<<endl;
+                    sumOfEvent[q][BGMCGroupData.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGMCGroupData.size()+2][0],sumOfEvent[q][BGMCGroupData.size()][0],uncertainty[u]);
+                    //cout<<"Significance: "<<sumOfEvent[q][BGMCGroupData.size()+3][0]<<endl<<endl;
+                    Significance[u][q] = sumOfEvent[q][BGMCGroupData.size()+3][0];
+                    //cout<<"Signal: "<<sumOfEvent[q][BGMCGroupData.size()+2][0]<<", BG: "<<sumOfEvent[q][BGMCGroupData.size()][0]<<", Significance: "<<sumOfEvent[q][BGMCGroupData.size()+3][0]<<endl<<endl;
                     
                     //delete
                     //h2BG
@@ -1318,7 +1318,7 @@ void analysis1()
                     }
                     
                     //h2BGGruop
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
                         delete BGGroup[j].h2;
                     }
@@ -1417,14 +1417,14 @@ void analysis1()
             
             {
                 //number event for BG and Sig
-                double min = sumOfEvent[0][BGGroupData.size()][0];
-                double max = sumOfEvent[0][BGGroupData.size()][0];
+                double min = sumOfEvent[0][BGMCGroupData.size()][0];
+                double max = sumOfEvent[0][BGMCGroupData.size()][0];
                 double BGNumber[cutN];
                 double SigNumber[cutN];
                 for(int q=0;q<cutN;q++)
                 {
-                    BGNumber[q] = sumOfEvent[q][BGGroupData.size()][0];
-                    SigNumber[q] = sumOfEvent[q][BGGroupData.size()+2][0];
+                    BGNumber[q] = sumOfEvent[q][BGMCGroupData.size()][0];
+                    SigNumber[q] = sumOfEvent[q][BGMCGroupData.size()+2][0];
                     if(BGNumber[q] < min) min = BGNumber[q];
                     if(SigNumber[q] < min) min = SigNumber[q];
                     if(BGNumber[q] > max) max = BGNumber[q];
@@ -1497,7 +1497,7 @@ void analysis1()
     };
     
     std::vector<SampleData> BGVVData;
-    for(unsigned int i = BGGroupData[5].lower;i <= BGGroupData[5].upper;i++)
+    for(unsigned int i = BGMCGroupData[5].lower;i <= BGMCGroupData[5].upper;i++)
     {
         SampleData element;
         element.SampleName = BGSampleID[i].Data();
@@ -1508,7 +1508,7 @@ void analysis1()
     }
     
     {
-        double sumOfEvent[BGGroupData.size()+SigMassSplitting.size()+2][3];
+        double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
         //sample,expN/error/significance
         
         double sumOfEventVV[BGVVData.size()][2];
@@ -1526,13 +1526,13 @@ void analysis1()
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
             cout<<RegionInfo[RegionIndex].RegionName.Data()<<endl;
-            sumOfEvent[BGGroupData.size()][0]=0;
-            sumOfEvent[BGGroupData.size()][1]=0;
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            sumOfEvent[BGMCGroupData.size()][0]=0;
+            sumOfEvent[BGMCGroupData.size()][1]=0;
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
                 sumOfEvent[j][0]=0;
                 sumOfEvent[j][1]=0;
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
                     double expN = 0;
                     double error2 = 0;
@@ -1548,24 +1548,24 @@ void analysis1()
                     
                     if(j==5)
                     {
-                        int VVindex = k - BGGroupData[5].lower;
+                        int VVindex = k - BGMCGroupData[5].lower;
                         sumOfEventVV[VVindex][0] = expN *cross;
                         sumOfEventVV[VVindex][1] = TMath::Sqrt(error2) *cross;
                         cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
                     }
                 }
-                cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[j][1])<<endl;
-                sumOfEvent[BGGroupData.size()][0] += sumOfEvent[j][0];
-                sumOfEvent[BGGroupData.size()][1] += sumOfEvent[j][1];
+                cout<<BGMCGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[j][1])<<endl;
+                sumOfEvent[BGMCGroupData.size()][0] += sumOfEvent[j][0];
+                sumOfEvent[BGMCGroupData.size()][1] += sumOfEvent[j][1];
             }
-            cout<<"Total BG: "<<sumOfEvent[BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1])<<endl;
+            cout<<"Total BG: "<<sumOfEvent[BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1])<<endl;
             
-            sumOfEvent[BGGroupData.size()+1][0]=0;
+            sumOfEvent[BGMCGroupData.size()+1][0]=0;
             for(unsigned int j=0;j<DataSampleID.size();j++)
             {
-                sumOfEvent[BGGroupData.size()+1][0] += double(tree2Data[j]->GetEntries());
+                sumOfEvent[BGMCGroupData.size()+1][0] += double(tree2Data[j]->GetEntries());
             }
-            cout<<"Data: "<<sumOfEvent[BGGroupData.size()+1][0]<<endl<<endl;
+            cout<<"Data: "<<sumOfEvent[BGMCGroupData.size()+1][0]<<endl<<endl;
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
@@ -1578,11 +1578,11 @@ void analysis1()
                     error2 += weight*weight;
                 }
                 double cross = SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL;
-                sumOfEvent[BGGroupData.size()+i+2][0] = expN *cross;
-                sumOfEvent[BGGroupData.size()+i+2][1] = TMath::Sqrt(error2) *cross;
-                sumOfEvent[BGGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroupData.size()+i+2][0],sumOfEvent[BGGroupData.size()][0],0.3);
+                sumOfEvent[BGMCGroupData.size()+i+2][0] = expN *cross;
+                sumOfEvent[BGMCGroupData.size()+i+2][1] = TMath::Sqrt(error2) *cross;
+                sumOfEvent[BGMCGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGMCGroupData.size()+i+2][0],sumOfEvent[BGMCGroupData.size()][0],0.3);
                 
-                cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroupData.size()+i+2][2]<<endl;
+                cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGMCGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGMCGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGMCGroupData.size()+i+2][2]<<endl;
             }
             cout<<endl;
             
@@ -1628,7 +1628,7 @@ void analysis1()
         {
             for(int i=0;i<=2;i++)
             {
-                for(unsigned int k=BGGroupData[i].lower;k<=BGGroupData[i].upper;k++)
+                for(unsigned int k=BGMCGroupData[i].lower;k<=BGMCGroupData[i].upper;k++)
                 {
                     TString NameTemp = "tree_rw_";
                     NameTemp += TString::Itoa(k,10);
@@ -1650,7 +1650,7 @@ void analysis1()
         //for charge filp BG
         if(RegionIndex>=12 && RegionIndex<=14)
         {
-            for(unsigned int k=BGGroupData[0].lower;k<=BGGroupData[0].upper;k++)
+            for(unsigned int k=BGMCGroupData[0].lower;k<=BGMCGroupData[0].upper;k++)
             {
                 TString NameTemp = "tree_cfw_";
                 NameTemp += TString::Itoa(k,10);
@@ -1718,11 +1718,11 @@ void analysis1()
             }
             
             //h2BGGruop
-            Group BGGroup[BGGroupData.size()];
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            Group BGGroup[BGMCGroupData.size()];
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                BGGroup[j].info = &(BGGroupData[j]);
-                TString NameTemp = BGGroupData[j].GroupName;
+                BGGroup[j].info = &(BGMCGroupData[j]);
+                TString NameTemp = BGMCGroupData[j].GroupName;
                 BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                 BGGroup[j].h2->SetLineColor(j+2);
@@ -1838,9 +1838,9 @@ void analysis1()
                        )
                        &&
                        (
-                       j<=BGGroupData[0].upper ||
-                       j<=BGGroupData[1].upper ||
-                       j<=BGGroupData[2].upper
+                       j<=BGMCGroupData[0].upper ||
+                       j<=BGMCGroupData[1].upper ||
+                       j<=BGMCGroupData[2].upper
                        )
                       )
                     {
@@ -1849,7 +1849,7 @@ void analysis1()
                     
                     //for charge filp BG
                     if(RegionIndex>=12 && RegionIndex<=14 &&
-                       j>=BGGroupData[0].lower && j<=BGGroupData[0].upper)
+                       j>=BGMCGroupData[0].lower && j<=BGMCGroupData[0].upper)
                     {
                         Cut += "*cfw";
                     }
@@ -1885,7 +1885,7 @@ void analysis1()
                 }
             }
             
-            double sumOfEvent[BGGroupData.size()+SigMassSplitting.size()+2][3];
+            double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
             //sample,expN/error/significance
             
             double sumOfEventVV[BGVVData.size()][2];
@@ -1900,8 +1900,8 @@ void analysis1()
             if(VarIndex==countVariable)
             {
                 //expected number of events for Data
-                sumOfEvent[BGGroupData.size()+1][0] = h2DataSum->Integral(0,-1);
-                cout<<"Data: "<<sumOfEvent[BGGroupData.size()+1][0]<<endl;
+                sumOfEvent[BGMCGroupData.size()+1][0] = h2DataSum->Integral(0,-1);
+                cout<<"Data: "<<sumOfEvent[BGMCGroupData.size()+1][0]<<endl;
             }
             
             //normalization for BG
@@ -1913,19 +1913,19 @@ void analysis1()
             //add background
             if(VarIndex==countVariable)
             {
-                sumOfEvent[BGGroupData.size()][0]=0;
-                sumOfEvent[BGGroupData.size()][1]=0;
+                sumOfEvent[BGMCGroupData.size()][0]=0;
+                sumOfEvent[BGMCGroupData.size()][1]=0;
             }
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
                     BGGroup[j].h2->Add(h2BG[k]);
                     
                     //for BGVV
                     if(VarIndex==countVariable && j==5)
                     {
-                        int VVindex = k - BGGroupData[j].lower;
+                        int VVindex = k - BGMCGroupData[j].lower;
                         sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
                     }
                 }
@@ -1935,9 +1935,9 @@ void analysis1()
                 {
                     //expected number of events for BG
                     sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                    cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
-                    sumOfEvent[BGGroupData.size()][0] += sumOfEvent[j][0];
-                    sumOfEvent[BGGroupData.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
+                    cout<<BGMCGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
+                    sumOfEvent[BGMCGroupData.size()][0] += sumOfEvent[j][0];
+                    sumOfEvent[BGMCGroupData.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                     
                     //for BGVV
                     if(j==5)
@@ -1949,7 +1949,7 @@ void analysis1()
                     }
                 }
             }
-            if(VarIndex==countVariable) cout<<"Total BG: "<<sumOfEvent[BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1])<<endl<<endl;
+            if(VarIndex==countVariable) cout<<"Total BG: "<<sumOfEvent[BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1])<<endl<<endl;
             
             //add Signal
             int SigScale = 10;
@@ -1974,12 +1974,12 @@ void analysis1()
                 {
                     //expected number of events
                     h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGGroupData.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroupData.size()+i+2][1]);
+                    sumOfEvent[BGMCGroupData.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGMCGroupData.size()+i+2][1]);
                     
                     //Significance
-                    sumOfEvent[BGGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroupData.size()+i+2][0],sumOfEvent[BGGroupData.size()][0],0.3);
+                    sumOfEvent[BGMCGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGMCGroupData.size()+i+2][0],sumOfEvent[BGMCGroupData.size()][0],0.3);
                     
-                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroupData.size()+i+2][2]<<endl;
+                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGMCGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGMCGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGMCGroupData.size()+i+2][2]<<endl;
                 }
                 cout<<endl;
                 
@@ -1992,9 +1992,9 @@ void analysis1()
                 fout.open(PathName.Data());
                 fout<<setprecision(1)<<std::fixed;
                 
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    fout<<BGGroupData[j].LatexName.Data();
+                    fout<<BGMCGroupData[j].LatexName.Data();
                     fout<<" & $";
                     fout<<sumOfEvent[j][0];
                     fout<<"\\pm";
@@ -2003,15 +2003,15 @@ void analysis1()
                 }
                 
                 fout<<"Total BG & $";
-                fout<<sumOfEvent[BGGroupData.size()][0];
+                fout<<sumOfEvent[BGMCGroupData.size()][0];
                 fout<<"\\pm";
-                fout<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1]);
+                fout<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1]);
                 fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 
                 if(RegionInfo[RegionIndex].showData)
                 {
                     fout<<"Data & $";
-                    fout<<sumOfEvent[BGGroupData.size()+1][0];
+                    fout<<sumOfEvent[BGMCGroupData.size()+1][0];
                     fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 }
                 
@@ -2023,15 +2023,15 @@ void analysis1()
                     fout<<SigMass2[SigMassSplitting[i].ID];
                     fout<<") & $";
                     fout<<setprecision(1)<<std::fixed;
-                    fout<<sumOfEvent[BGGroupData.size()+i+2][0];
+                    fout<<sumOfEvent[BGMCGroupData.size()+i+2][0];
                     fout<<"\\pm";
-                    fout<<sumOfEvent[BGGroupData.size()+i+2][1];
+                    fout<<sumOfEvent[BGMCGroupData.size()+i+2][1];
                     fout<<"$ &";
                     if(RegionInfo[RegionIndex].showSignificance)
                     {
                         fout<<"$";
                         fout<<setprecision(3)<<std::fixed;
-                        fout<<sumOfEvent[BGGroupData.size()+i+2][2];
+                        fout<<sumOfEvent[BGMCGroupData.size()+i+2][2];
                         fout<<"$";
                     }
                     fout<<"\\\\"<<endl<<"\\hline"<<endl;
@@ -2061,14 +2061,14 @@ void analysis1()
             {
                 //sort
                 std::vector<Group> vBGGroup;
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
                     vBGGroup.push_back(BGGroup[j]);
                 }
                 std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
                 
                 //stack
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
                     stack.Add(vBGGroup[j].h2);
                 }
@@ -2142,7 +2142,7 @@ void analysis1()
                 {
                     leg->AddEntry(h2DataSum,"Data","p");
                 }
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
                     leg->AddEntry(BGGroup[j].h2,BGGroup[j].info->LegendName.Data(),"fl");
                 }
@@ -2300,7 +2300,7 @@ void analysis1()
             }
             
             //h2BGGruop
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
                 delete BGGroup[j].h2;
             }
@@ -2357,9 +2357,9 @@ void analysis1()
                )
                &&
                (
-                i<=BGGroupData[0].upper ||
-                i<=BGGroupData[1].upper ||
-                i<=BGGroupData[2].upper
+                i<=BGMCGroupData[0].upper ||
+                i<=BGMCGroupData[1].upper ||
+                i<=BGMCGroupData[2].upper
                )
               )
             {
@@ -2370,7 +2370,7 @@ void analysis1()
             
             //for charge filp BG
             if(RegionIndex>=12 && RegionIndex<=14 &&
-               i>=BGGroupData[0].lower && i<=BGGroupData[0].upper)
+               i>=BGMCGroupData[0].lower && i<=BGMCGroupData[0].upper)
             {
                 TString NameTemp = "tree_cfw_";
                 NameTemp += TString::Itoa(i,10);
