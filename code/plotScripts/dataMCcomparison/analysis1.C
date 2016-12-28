@@ -741,14 +741,14 @@ void analysis1()
                 h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             }
             
-            //h2BG
-            TH1F* h2BG[BGMCSampleID.size()];
+            //h2BGMC
+            TH1F* h2BGMC[BGMCSampleID.size()];
             std::vector<TString> hName2BG;
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
-                h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 hName2BG.push_back(NameTemp);
             }
             
@@ -810,7 +810,7 @@ void analysis1()
             //normalization
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
-                h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
+                h2BGMC[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
             }
             
             //Non Z+jets
@@ -818,7 +818,7 @@ void analysis1()
             {
                 for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
-                    BGGroup[j].h2->Add(h2BG[k]);
+                    BGGroup[j].h2->Add(h2BGMC[k]);
                 }
                 h2BGSum->Add(BGGroup[j].h2);
             }
@@ -831,7 +831,7 @@ void analysis1()
             {
                 for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                 {
-                    BGGroup[j].h2->Add(h2BG[k]);
+                    BGGroup[j].h2->Add(h2BGMC[k]);
                 }
                 h2BGSum->Add(BGGroup[j].h2);
             }
@@ -847,10 +847,10 @@ void analysis1()
             //h2DataSum
             delete h2DataSum;
             
-            //h2BG
+            //h2BGMC
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
-                delete h2BG[j];
+                delete h2BGMC[j];
             }
             
             //h2BGGruop
@@ -1215,14 +1215,14 @@ void analysis1()
                     xaxis += " ";
                     xaxis += Var[VarIndex].unit;
                     
-                    //h2BG
-                    TH1F* h2BG[BGMCSampleID.size()];
+                    //h2BGMC
+                    TH1F* h2BGMC[BGMCSampleID.size()];
                     std::vector<TString> hName2BG;
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         TString NameTemp = "BG_";
                         NameTemp += TString::Itoa(j,10);
-                        h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hName2BG.push_back(NameTemp);
                     }
                     
@@ -1275,7 +1275,7 @@ void analysis1()
                     //normalization for BG
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
-                        h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
+                        h2BGMC[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
                     }
                     
                     //add background
@@ -1285,7 +1285,7 @@ void analysis1()
                     {
                         for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
-                            BGGroup[j].h2->Add(h2BG[k]);
+                            BGGroup[j].h2->Add(h2BGMC[k]);
                         }
                         
                         //expected number of events for BG
@@ -1310,10 +1310,10 @@ void analysis1()
                     //cout<<"Signal: "<<sumOfEvent[q][BGMCGroupData.size()+2][0]<<", BG: "<<sumOfEvent[q][BGMCGroupData.size()][0]<<", Significance: "<<sumOfEvent[q][BGMCGroupData.size()+3][0]<<endl<<endl;
                     
                     //delete
-                    //h2BG
+                    //h2BGMC
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
-                        delete h2BG[j];
+                        delete h2BGMC[j];
                     }
                     
                     //h2BGGruop
@@ -1705,14 +1705,14 @@ void analysis1()
                 h2DataSum->SetLineColor(1);
             }
             
-            //h2BG
-            TH1F* h2BG[BGMCSampleID.size()];
+            //h2BGMC
+            TH1F* h2BGMC[BGMCSampleID.size()];
             std::vector<TString> hName2BG;
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
-                h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 hName2BG.push_back(NameTemp);
             }
             
@@ -1885,7 +1885,7 @@ void analysis1()
                     tree2BGMC[j]->Draw(temp.Data(),Cut.Data());
                     
                     //normalization for BG
-                    h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
+                    h2BGMC[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
                 }
                 
                 //Add BGMC
@@ -1893,7 +1893,7 @@ void analysis1()
                 {
                     for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                     {
-                        BGGroup[j].h2->Add(h2BG[k]);
+                        BGGroup[j].h2->Add(h2BGMC[k]);
                     }
                 }
                 
@@ -2011,7 +2011,7 @@ void analysis1()
                         for(unsigned int k=BGGroup[j].info->lower;k<=BGGroup[j].info->upper;k++)
                         {
                             int VVindex = k - BGGroup[j].info->lower;
-                            sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
+                            sumOfEventVV[VVindex][0] = h2BGMC[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
                             cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
                         }
                     }
@@ -2342,10 +2342,10 @@ void analysis1()
             //h2DataSum
             delete h2DataSum;
             
-            //h2BG
+            //h2BGMC
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
-                delete h2BG[j];
+                delete h2BGMC[j];
             }
             
             //h2 for BGGruop
