@@ -466,6 +466,17 @@ void analysis1()
         element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
     }
     
+    //Group for data-driven background
+    std::vector<GroupData> BGDataGroupData;
+    {
+        GroupData element;
+        element.GroupName = "charge flip BG"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
+        
+        element.GroupName = "fake lepton BG"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
+    }
+    
     //plotting
     //Variables for plotting
     struct VarData
@@ -1703,8 +1714,9 @@ void analysis1()
                 hName2BG.push_back(NameTemp);
             }
             
-            //h2BGGruop
-            Group BGGroup[BGMCGroupData.size()];
+            //BGGruop
+            Group BGGroup[BGMCGroupData.size()+BGDataGroupData.size()];
+            //For MC background
             for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
                 BGGroup[j].info = &(BGMCGroupData[j]);
@@ -1713,6 +1725,18 @@ void analysis1()
                 BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                 BGGroup[j].h2->SetLineColor(j+2);
                 BGGroup[j].h2->SetFillColor(j+2);
+            }
+            
+            //For data-driven background
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                const unsigned int index = BGMCGroupData.size()+j;
+                BGGroup[index].info = &(BGDataGroupData[j]);
+                TString NameTemp = BGDataGroupData[j].GroupName;
+                BGGroup[index].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[index].h2->GetYaxis()->SetTitle("Number of events");
+                BGGroup[index].h2->SetLineColor(index+2);
+                BGGroup[index].h2->SetFillColor(index+2);
             }
             
             //h2BGSum
@@ -1747,6 +1771,7 @@ void analysis1()
             
             //fill histograms form trees
             {
+                //Common Cut
                 TString CommonCut = "";
                 if(Var[VarIndex].VarName=="jetpt"  ||
                    Var[VarIndex].VarName=="jeteta" ||
@@ -1778,6 +1803,7 @@ void analysis1()
                 
                 CommonCut += RegionInfo[RegionIndex].Cut;
                 
+                //Fill data
                 for(unsigned int j=0;j<DataSampleID.size();j++)
                 {
                     TString temp;
@@ -1805,6 +1831,13 @@ void analysis1()
                     tree2Data[j]->Draw(temp.Data(),Cut.Data());
                 }
                 
+                //Add data
+                for(unsigned int j=0;j<DataSampleID.size();j++)
+                {
+                    h2DataSum->Add(h2Data[j]);
+                }
+                
+                //Fill BGMC
                 for(unsigned int j=0;j<BGSampleID.size();j++)
                 {
                     TString temp = Var[VarIndex].VarName;
@@ -1852,6 +1885,47 @@ void analysis1()
                     tree2BG[j]->Draw(temp.Data(),Cut.Data());
                 }
                 
+                //Fill BGData
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<DataSampleID.size();k++)
+                    {
+                        h2Data[k]->Scale(0);
+                        
+                        TString temp = Var[VarIndex].VarName;
+                        temp += ">>";
+                        temp += hName2Data[k];
+                        
+                        TString Cut = "1";
+                        //Cut += "*weight";
+                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        {
+                            Cut += "*qFwt";
+                        }
+                        
+                        Cut += "*(1";
+                        Cut += CommonCut;
+                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        {
+                            Cut += "&& fLwt==0";
+                        }
+                        if(BGDataGroupData[j].GroupName == "fake lepton BG")
+                        {
+                            Cut += "&& fLwt!=0";
+                        }
+                        
+                        if(optimize)
+                        {
+                            Cut += " && jetpt<=";
+                            Cut += TString::Itoa(35,10);
+                        }
+                        Cut += ")";
+                        tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                        
+                        BGGroup[BGMCGroupData.size()+j].h2->Add(h2Data[k]);
+                    }
+                }
+                
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
                     TString temp = Var[VarIndex].VarName;
@@ -1876,12 +1950,6 @@ void analysis1()
             
             double sumOfEventVV[BGVVData.size()][2];
             //sample,expN/error
-            
-            //add data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                h2DataSum->Add(h2Data[j]);
-            }
             
             if(VarIndex==countVariable)
             {
@@ -2285,8 +2353,8 @@ void analysis1()
                 delete h2BG[j];
             }
             
-            //h2BGGruop
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            //h2 for BGGruop
+            for(unsigned int j=0;j<BGMCGroupData.size()+BGDataGroupData.size();j++)
             {
                 delete BGGroup[j].h2;
             }
