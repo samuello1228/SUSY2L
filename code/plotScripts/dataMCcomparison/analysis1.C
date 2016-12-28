@@ -30,9 +30,6 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
-bool Powheg = 0;
-bool Sherpa = 1;
-
 bool dorw = 0;
 bool simple = 1;
 bool combined = 0;
@@ -443,19 +440,8 @@ void analysis1()
     initializeTree1(tree1Sig,SigSampleID,channel);
     */
     
-    //Group for background
+    //Group for MC background
     std::vector<GroupData> BGMCGroupData;
-    if(Powheg)
-    {
-        GroupData element;
-        element.LegendName = "Z#rightarrow ee";       element.lower = 0;   element.upper = 0;  BGMCGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#mu#mu";    element.lower = 1;   element.upper = 1;  BGMCGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#tau#tau";  element.lower = 2;   element.upper = 2;  BGMCGroupData.push_back(element);
-        element.LegendName = "t#bar{t}";              element.lower = 3;   element.upper = 3;  BGMCGroupData.push_back(element);
-        element.LegendName = "Wt";                    element.lower = 4;   element.upper = 5;  BGMCGroupData.push_back(element);
-    }
-    
-    if(Sherpa)
     {
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
