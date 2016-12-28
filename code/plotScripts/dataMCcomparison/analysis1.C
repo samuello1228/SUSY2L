@@ -275,7 +275,7 @@ void analysis1()
     cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
     
     //Get number of events in AOD
-    std::vector<unsigned int> BGnAOD;
+    std::vector<unsigned int> BGMCnAOD;
     for(unsigned int i=0;i<BGMCSampleID.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
@@ -289,7 +289,7 @@ void analysis1()
         TH1F *h1 = (TH1F*) file->Get("hist");
         unsigned int nAOD = h1->GetBinContent(1);
         cout<<nAOD<<endl;
-        BGnAOD.push_back(nAOD);
+        BGMCnAOD.push_back(nAOD);
         
         delete file;
     }
@@ -810,7 +810,7 @@ void analysis1()
             //normalization
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
-                h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
+                h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
             }
             
             //Non Z+jets
@@ -1275,7 +1275,7 @@ void analysis1()
                     //normalization for BG
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
-                        h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
+                        h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
                     }
                     
                     //add background
@@ -1541,7 +1541,7 @@ void analysis1()
                         expN += weight;
                         error2 += weight*weight;
                     }
-                    double cross = BGMCXS[k]/BGnAOD[k] *sumDataL;
+                    double cross = BGMCXS[k]/BGMCnAOD[k] *sumDataL;
                     sumOfEvent[j][0] += expN *cross;
                     sumOfEvent[j][1] += error2 *cross*cross;
                     
@@ -1885,7 +1885,7 @@ void analysis1()
                     tree2BG[j]->Draw(temp.Data(),Cut.Data());
                     
                     //normalization for BG
-                    h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
+                    h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
                 }
                 
                 //Add BGMC
