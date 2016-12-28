@@ -711,8 +711,8 @@ void analysis1()
         {
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,ChannelIndex_ll[LeptonIndex],DataSampleID,channel);
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,ChannelIndex_ll[LeptonIndex],BGMCSampleID,channel);
+            std::vector<TChain*> tree2BGMC;
+            initializeTree2(tree2BGMC,ChannelIndex_ll[LeptonIndex],BGMCSampleID,channel);
 
             //initialize histograms
             TString title;
@@ -797,7 +797,7 @@ void analysis1()
                 temp += Var[VarIndex].VarName;
                 temp += ">>";
                 temp += hName2BG[j];
-                tree2BG[j]->Draw(temp.Data(),"weight");
+                tree2BGMC[j]->Draw(temp.Data(),"weight");
             }
             
             //add data
@@ -869,7 +869,7 @@ void analysis1()
             }
             for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
-                delete tree2BG[i];
+                delete tree2BGMC[i];
             }
         }
         
@@ -1195,8 +1195,8 @@ void analysis1()
             
             int SigID = 18;
             
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
+            std::vector<TChain*> tree2BGMC;
+            initializeTree2(tree2BGMC,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
             std::vector<TChain*> tree2Sig;
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
@@ -1255,7 +1255,7 @@ void analysis1()
                         Cut += "<=";
                         Cut += TString::Itoa(jetptCut[q],10);;
                         Cut += ")";
-                        tree2BG[j]->Draw(temp.Data(),Cut.Data());
+                        tree2BGMC[j]->Draw(temp.Data(),Cut.Data());
                     }
                     
                     //Draw for Signal
@@ -1330,7 +1330,7 @@ void analysis1()
             //delete tree2
             for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
-                delete tree2BG[i];
+                delete tree2BGMC[i];
             }
             for(unsigned int i=0;i<SigSampleID.size();i++)
             {
@@ -1519,8 +1519,8 @@ void analysis1()
         {
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
+            std::vector<TChain*> tree2BGMC;
+            initializeTree2(tree2BGMC,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
             std::vector<TChain*> tree2Sig;
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
@@ -1535,9 +1535,9 @@ void analysis1()
                 {
                     double expN = 0;
                     double error2 = 0;
-                    for(int m=0;m<tree2BG[k]->GetEntries();m++)
+                    for(int m=0;m<tree2BGMC[k]->GetEntries();m++)
                     {
-                        tree2BG[k]->GetEntry(m);
+                        tree2BGMC[k]->GetEntry(m);
                         expN += weight;
                         error2 += weight*weight;
                     }
@@ -1592,7 +1592,7 @@ void analysis1()
             }
             for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
-                delete tree2BG[i];
+                delete tree2BGMC[i];
             }
             for(unsigned int i=0;i<SigSampleID.size();i++)
             {
@@ -1609,8 +1609,8 @@ void analysis1()
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
-        std::vector<TChain*> tree2BG;
-        initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
+        std::vector<TChain*> tree2BGMC;
+        initializeTree2(tree2BGMC,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
         std::vector<TChain*> tree2Sig;
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
         
@@ -1641,7 +1641,7 @@ void analysis1()
                         
                         ch_rw->Add(FileName.Data());
                     }
-                    tree2BG[k]->AddFriend(NameTemp.Data());
+                    tree2BGMC[k]->AddFriend(NameTemp.Data());
                 }
             }
         }
@@ -1663,7 +1663,7 @@ void analysis1()
                     
                     ch_cfw->Add(FileName.Data());
                 }
-                tree2BG[k]->AddFriend(NameTemp.Data());
+                tree2BGMC[k]->AddFriend(NameTemp.Data());
             }
         }
         
@@ -1882,7 +1882,7 @@ void analysis1()
                         Cut += TString::Itoa(35,10);
                     }
                     Cut += ")";
-                    tree2BG[j]->Draw(temp.Data(),Cut.Data());
+                    tree2BGMC[j]->Draw(temp.Data(),Cut.Data());
                     
                     //normalization for BG
                     h2BG[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
@@ -2414,7 +2414,7 @@ void analysis1()
             {
                 TString NameTemp = "tree_rw_";
                 NameTemp += TString::Itoa(i,10);
-                delete tree2BG[i]->GetFriend(NameTemp.Data());
+                delete tree2BGMC[i]->GetFriend(NameTemp.Data());
             }
             
             //for charge filp BG
@@ -2423,10 +2423,10 @@ void analysis1()
             {
                 TString NameTemp = "tree_cfw_";
                 NameTemp += TString::Itoa(i,10);
-                delete tree2BG[i]->GetFriend(NameTemp.Data());
+                delete tree2BGMC[i]->GetFriend(NameTemp.Data());
             }
             
-            delete tree2BG[i];
+            delete tree2BGMC[i];
         }
         for(unsigned int i=0;i<SigSampleID.size();i++)
         {
