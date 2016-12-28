@@ -1602,7 +1602,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=16;RegionIndex<=16;RegionIndex++)
+    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1769,7 +1769,8 @@ void analysis1()
                 h2SigSum[j]->SetLineStyle(1);
             }
             
-            //fill histograms form trees
+            const int SigScale = 10;
+            //fill histograms from trees
             {
                 //Common Cut
                 TString CommonCut = "";
@@ -1829,11 +1830,8 @@ void analysis1()
                     }
                     Cut += ")";
                     tree2Data[j]->Draw(temp.Data(),Cut.Data());
-                }
-                
-                //Add data
-                for(unsigned int j=0;j<DataSampleID.size();j++)
-                {
+                    
+                    //Add data
                     h2DataSum->Add(h2Data[j]);
                 }
                 
@@ -1883,6 +1881,18 @@ void analysis1()
                     }
                     Cut += ")";
                     tree2BG[j]->Draw(temp.Data(),Cut.Data());
+                    
+                    //normalization for BG
+                    h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
+                }
+                
+                //Add MCBG
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                    {
+                        BGGroup[j].h2->Add(h2BG[k]);
+                    }
                 }
                 
                 //Fill BGData
@@ -1922,10 +1932,18 @@ void analysis1()
                         Cut += ")";
                         tree2Data[k]->Draw(temp.Data(),Cut.Data());
                         
+                        //Add MCData
                         BGGroup[BGMCGroupData.size()+j].h2->Add(h2Data[k]);
                     }
                 }
                 
+                //Add BG
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    h2BGSum->Add(BGGroup[j].h2);
+                }
+                
+                //Fill Signal
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
                     TString temp = Var[VarIndex].VarName;
@@ -1943,6 +1961,22 @@ void analysis1()
                     Cut += ")";
                     tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                 }
+                
+                //Add Signal
+                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                {
+                    unsigned int AOD = 0;
+                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    {
+                        if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
+                        {
+                            h2SigSum[i]->Add(h2Sig[j]);
+                            AOD += SignAOD[j];
+                        }
+                    }
+                    //normalization for Signal
+                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
+                }
             }
             
             double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
@@ -1956,36 +1990,12 @@ void analysis1()
                 //expected number of events for Data
                 sumOfEvent[BGMCGroupData.size()+1][0] = h2DataSum->Integral(0,-1);
                 cout<<"Data: "<<sumOfEvent[BGMCGroupData.size()+1][0]<<endl;
-            }
-            
-            //normalization for BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
-            }
-            
-            //add background
-            if(VarIndex==countVariable)
-            {
+                
+                //expected number of events for background
                 sumOfEvent[BGMCGroupData.size()][0]=0;
                 sumOfEvent[BGMCGroupData.size()][1]=0;
-            }
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
-            {
-                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
-                {
-                    BGGroup[j].h2->Add(h2BG[k]);
-                    
-                    //for BGVV
-                    if(VarIndex==countVariable && j==5)
-                    {
-                        int VVindex = k - BGMCGroupData[j].lower;
-                        sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
-                    }
-                }
-                h2BGSum->Add(BGGroup[j].h2);
                 
-                if(VarIndex==countVariable)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
                     //expected number of events for BG
                     sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
@@ -1996,34 +2006,17 @@ void analysis1()
                     //for BGVV
                     if(j==5)
                     {
-                        for(unsigned int VVindex=0;VVindex<BGVVData.size();VVindex++)
+                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
+                            int VVindex = k - BGMCGroupData[j].lower;
+                            sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
                             cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
                         }
                     }
                 }
-            }
-            if(VarIndex==countVariable) cout<<"Total BG: "<<sumOfEvent[BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1])<<endl<<endl;
-            
-            //add Signal
-            int SigScale = 10;
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                unsigned int AOD = 0;
-                for(unsigned int j=0;j<SigSampleID.size();j++)
-                {
-                    if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
-                    {
-                        h2SigSum[i]->Add(h2Sig[j]);
-                        AOD += SignAOD[j];
-                    }
-                }
-                //normalization for Signal
-                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
-            }
-            
-            if(VarIndex==countVariable)
-            {
+                cout<<"Total BG: "<<sumOfEvent[BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1])<<endl<<endl;
+        
+                //expected number of events for signal
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
