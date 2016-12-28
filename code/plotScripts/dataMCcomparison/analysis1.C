@@ -295,13 +295,13 @@ void analysis1()
     }
     
     //tree
-    std::vector< std::vector<TChain*> > tree1BG;
+    std::vector< std::vector<TChain*> > tree1BGMC;
     for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
     {
         std::vector<TChain*> element;
-        tree1BG.push_back(element);
+        tree1BGMC.push_back(element);
     }
-    initializeTree1(tree1BG,BGMCSampleID,channel);
+    initializeTree1(tree1BGMC,BGMCSampleID,channel);
     
     
     //For Signal MC
@@ -995,9 +995,9 @@ void analysis1()
                         
                         TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
                         treeTemp->Branch("rw",&rw,"rw/D");
-                        for(int m=0;m<tree1BG[ChannelIndex][k]->GetEntries();m++)
+                        for(int m=0;m<tree1BGMC[ChannelIndex][k]->GetEntries();m++)
                         {
-                            tree1BG[ChannelIndex][k]->GetEntry(m);
+                            tree1BGMC[ChannelIndex][k]->GetEntry(m);
                             if(simple)
                             {
                                 rw=fun[LeptonIndex]->Eval(ptll);
@@ -1054,9 +1054,9 @@ void analysis1()
                 
                 TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
                 treeTemp->Branch("cfw",&cfw,"cfw/D");
-                for(int m=0;m<tree1BG[ChannelIndex][k]->GetEntries();m++)
+                for(int m=0;m<tree1BGMC[ChannelIndex][k]->GetEntries();m++)
                 {
-                    tree1BG[ChannelIndex][k]->GetEntry(m);
+                    tree1BGMC[ChannelIndex][k]->GetEntry(m);
                     
                     double pt1s = pt1;
                     double pt2s = pt2;
@@ -1096,7 +1096,7 @@ void analysis1()
         }
         for(unsigned int i=0;i<BGMCSampleID.size();i++)
         {
-            delete tree1BG[ChannelIndex][i];
+            delete tree1BGMC[ChannelIndex][i];
         }
         for(unsigned int i=0;i<SigSampleID.size();i++)
         {
