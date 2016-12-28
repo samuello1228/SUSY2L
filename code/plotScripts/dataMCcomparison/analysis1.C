@@ -237,9 +237,9 @@ void analysis1()
     
     //For BGMC
     std::vector<TString> BGMCSampleID;
-    std::vector<double> BGXS; //cross section in pb
+    std::vector<double> BGMCXS; //cross section in pb
     BGMCSampleID.reserve(20);
-    BGXS.reserve(20);
+    BGMCXS.reserve(20);
     
     {
         //read BGSample.txt
@@ -258,17 +258,17 @@ void analysis1()
             SampleIDTemp += SampleNameTemp;
             BGMCSampleID.push_back(SampleIDTemp);
             
-            double BGXSTemp;
-            double BGXSTemp2;
-            fin>>BGXSTemp2;
-            fin>>BGXSTemp;
-            BGXSTemp2 *= BGXSTemp;
-            fin>>BGXSTemp;
-            BGXSTemp2 *= BGXSTemp;
+            double BGMCXSTemp;
+            double BGMCXSTemp2;
+            fin>>BGMCXSTemp2;
+            fin>>BGMCXSTemp;
+            BGMCXSTemp2 *= BGMCXSTemp;
+            fin>>BGMCXSTemp;
+            BGMCXSTemp2 *= BGMCXSTemp;
             
-            BGXS.push_back(BGXSTemp2);
+            BGMCXS.push_back(BGMCXSTemp2);
             
-            fin>>BGXSTemp;
+            fin>>BGMCXSTemp;
         }
         fin.close();
     }
@@ -810,7 +810,7 @@ void analysis1()
             //normalization
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
-                h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
+                h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
             }
             
             //Non Z+jets
@@ -1275,7 +1275,7 @@ void analysis1()
                     //normalization for BG
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
-                        h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
+                        h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
                     }
                     
                     //add background
@@ -1541,7 +1541,7 @@ void analysis1()
                         expN += weight;
                         error2 += weight*weight;
                     }
-                    double cross = BGXS[k]/BGnAOD[k] *sumDataL;
+                    double cross = BGMCXS[k]/BGnAOD[k] *sumDataL;
                     sumOfEvent[j][0] += expN *cross;
                     sumOfEvent[j][1] += error2 *cross*cross;
                     
@@ -1885,7 +1885,7 @@ void analysis1()
                     tree2BG[j]->Draw(temp.Data(),Cut.Data());
                     
                     //normalization for BG
-                    h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
+                    h2BG[j]->Scale(BGMCXS[j]/BGnAOD[j] *sumDataL);
                 }
                 
                 //Add BGMC
