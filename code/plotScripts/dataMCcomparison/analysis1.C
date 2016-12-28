@@ -235,10 +235,10 @@ void analysis1()
     */
     
     
-    //For BG MC
-    std::vector<TString> BGSampleID;
+    //For BGMC
+    std::vector<TString> BGMCSampleID;
     std::vector<double> BGXS; //cross section in pb
-    BGSampleID.reserve(20);
+    BGMCSampleID.reserve(20);
     BGXS.reserve(20);
     
     {
@@ -256,7 +256,7 @@ void analysis1()
             
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            BGSampleID.push_back(SampleIDTemp);
+            BGMCSampleID.push_back(SampleIDTemp);
             
             double BGXSTemp;
             double BGXSTemp2;
@@ -272,14 +272,14 @@ void analysis1()
         }
         fin.close();
     }
-    cout<<"Total number of BG files: "<<BGSampleID.size()<<endl;
+    cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
     
     //Get number of events in AOD
     std::vector<unsigned int> BGnAOD;
-    for(unsigned int i=0;i<BGSampleID.size();i++)
+    for(unsigned int i=0;i<BGMCSampleID.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
-        NameTemp += BGSampleID[i];
+        NameTemp += BGMCSampleID[i];
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += channel[0];
@@ -301,7 +301,7 @@ void analysis1()
         std::vector<TChain*> element;
         tree1BG.push_back(element);
     }
-    initializeTree1(tree1BG,BGSampleID,channel);
+    initializeTree1(tree1BG,BGMCSampleID,channel);
     
     
     //For Signal MC
@@ -712,7 +712,7 @@ void analysis1()
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,ChannelIndex_ll[LeptonIndex],DataSampleID,channel);
             std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,ChannelIndex_ll[LeptonIndex],BGSampleID,channel);
+            initializeTree2(tree2BG,ChannelIndex_ll[LeptonIndex],BGMCSampleID,channel);
 
             //initialize histograms
             TString title;
@@ -742,9 +742,9 @@ void analysis1()
             }
             
             //h2BG
-            TH1F* h2BG[BGSampleID.size()];
+            TH1F* h2BG[BGMCSampleID.size()];
             std::vector<TString> hName2BG;
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
@@ -791,7 +791,7 @@ void analysis1()
                 tree2Data[j]->Draw(temp.Data(),"fLwt==0");
             }
             
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString temp;
                 temp += Var[VarIndex].VarName;
@@ -808,7 +808,7 @@ void analysis1()
             h2Ratio_rw[LeptonIndex]->Add(h2DataSum);
             
             //normalization
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
             }
@@ -848,7 +848,7 @@ void analysis1()
             delete h2DataSum;
             
             //h2BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 delete h2BG[j];
             }
@@ -867,7 +867,7 @@ void analysis1()
             {
                 delete tree2Data[i];
             }
-            for(unsigned int i=0;i<BGSampleID.size();i++)
+            for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
                 delete tree2BG[i];
             }
@@ -1094,7 +1094,7 @@ void analysis1()
         {
             //delete tree1Data[ChannelIndex][i];
         }
-        for(unsigned int i=0;i<BGSampleID.size();i++)
+        for(unsigned int i=0;i<BGMCSampleID.size();i++)
         {
             delete tree1BG[ChannelIndex][i];
         }
@@ -1196,7 +1196,7 @@ void analysis1()
             int SigID = 18;
             
             std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
+            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
             std::vector<TChain*> tree2Sig;
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
@@ -1216,9 +1216,9 @@ void analysis1()
                     xaxis += Var[VarIndex].unit;
                     
                     //h2BG
-                    TH1F* h2BG[BGSampleID.size()];
+                    TH1F* h2BG[BGMCSampleID.size()];
                     std::vector<TString> hName2BG;
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
+                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         TString NameTemp = "BG_";
                         NameTemp += TString::Itoa(j,10);
@@ -1244,7 +1244,7 @@ void analysis1()
                     }
                     
                     //Draw for BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
+                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         TString temp = Var[VarIndex].VarName;
                         temp += ">>";
@@ -1273,7 +1273,7 @@ void analysis1()
                     }
                     
                     //normalization for BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
+                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
                     }
@@ -1311,7 +1311,7 @@ void analysis1()
                     
                     //delete
                     //h2BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
+                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         delete h2BG[j];
                     }
@@ -1328,7 +1328,7 @@ void analysis1()
             }
             
             //delete tree2
-            for(unsigned int i=0;i<BGSampleID.size();i++)
+            for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
                 delete tree2BG[i];
             }
@@ -1499,7 +1499,7 @@ void analysis1()
     for(unsigned int i = BGMCGroupData[5].lower;i <= BGMCGroupData[5].upper;i++)
     {
         SampleData element;
-        element.SampleName = BGSampleID[i].Data();
+        element.SampleName = BGMCSampleID[i].Data();
         element.SampleName.Remove(0,19);
         element.SampleName.ReplaceAll("_","\\_");
         element.index = i;
@@ -1520,7 +1520,7 @@ void analysis1()
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
             std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
+            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
             std::vector<TChain*> tree2Sig;
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
@@ -1590,7 +1590,7 @@ void analysis1()
             {
                 delete tree2Data[i];
             }
-            for(unsigned int i=0;i<BGSampleID.size();i++)
+            for(unsigned int i=0;i<BGMCSampleID.size();i++)
             {
                 delete tree2BG[i];
             }
@@ -1610,7 +1610,7 @@ void analysis1()
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
         std::vector<TChain*> tree2BG;
-        initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
+        initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
         std::vector<TChain*> tree2Sig;
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
         
@@ -1706,9 +1706,9 @@ void analysis1()
             }
             
             //h2BG
-            TH1F* h2BG[BGSampleID.size()];
+            TH1F* h2BG[BGMCSampleID.size()];
             std::vector<TString> hName2BG;
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
@@ -1838,7 +1838,7 @@ void analysis1()
                 }
                 
                 //Fill BGMC
-                for(unsigned int j=0;j<BGSampleID.size();j++)
+                for(unsigned int j=0;j<BGMCSampleID.size();j++)
                 {
                     TString temp = Var[VarIndex].VarName;
                     temp += ">>";
@@ -2343,7 +2343,7 @@ void analysis1()
             delete h2DataSum;
             
             //h2BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
+            for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 delete h2BG[j];
             }
@@ -2393,7 +2393,7 @@ void analysis1()
         {
             delete tree2Data[i];
         }
-        for(unsigned int i=0;i<BGSampleID.size();i++)
+        for(unsigned int i=0;i<BGMCSampleID.size();i++)
         {
             //Z pt reweighting
             if(dorw
