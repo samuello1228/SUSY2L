@@ -477,6 +477,8 @@ void analysis1()
         element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
     }
     
+    const unsigned int BGGroupSize = BGMCGroupData.size()+BGDataGroupData.size();
+    
     //plotting
     //Variables for plotting
     struct VarData
@@ -1715,7 +1717,7 @@ void analysis1()
             }
             
             //BGGruop
-            Group BGGroup[BGMCGroupData.size()+BGDataGroupData.size()];
+            Group BGGroup[BGGroupSize];
             //For MC background
             for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
@@ -1886,7 +1888,7 @@ void analysis1()
                     h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
                 }
                 
-                //Add MCBG
+                //Add BGMC
                 for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
                     for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
@@ -1938,7 +1940,7 @@ void analysis1()
                 }
                 
                 //Add BG
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int j=0;j<BGGroupSize;j++)
                 {
                     h2BGSum->Add(BGGroup[j].h2);
                 }
@@ -1979,54 +1981,54 @@ void analysis1()
                 }
             }
             
-            double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
-            //sample,expN/error/significance
-            
-            double sumOfEventVV[BGVVData.size()][2];
-            //sample,expN/error
-            
             if(VarIndex==countVariable)
             {
+                double sumOfEvent[BGGroupSize+SigMassSplitting.size()+2][3];
+                //sample,expN/error/significance
+                
+                double sumOfEventVV[BGVVData.size()][2];
+                //sample,expN/error
+                
                 //expected number of events for Data
-                sumOfEvent[BGMCGroupData.size()+1][0] = h2DataSum->Integral(0,-1);
-                cout<<"Data: "<<sumOfEvent[BGMCGroupData.size()+1][0]<<endl;
+                sumOfEvent[BGGroupSize+1][0] = h2DataSum->Integral(0,-1);
+                cout<<"Data: "<<sumOfEvent[BGGroupSize+1][0]<<endl;
                 
                 //expected number of events for background
-                sumOfEvent[BGMCGroupData.size()][0]=0;
-                sumOfEvent[BGMCGroupData.size()][1]=0;
+                sumOfEvent[BGGroupSize][0]=0;
+                sumOfEvent[BGGroupSize][1]=0;
                 
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int j=0;j<BGGroupSize;j++)
                 {
                     //expected number of events for BG
                     sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                    cout<<BGMCGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
-                    sumOfEvent[BGMCGroupData.size()][0] += sumOfEvent[j][0];
-                    sumOfEvent[BGMCGroupData.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
+                    cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
+                    sumOfEvent[BGGroupSize][0] += sumOfEvent[j][0];
+                    sumOfEvent[BGGroupSize][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                     
                     //for BGVV
-                    if(j==5)
+                    if(BGGroup[j].info->GroupName == "VV")
                     {
-                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                        for(unsigned int k=BGGroup[j].info->lower;k<=BGGroup[j].info->upper;k++)
                         {
-                            int VVindex = k - BGMCGroupData[j].lower;
+                            int VVindex = k - BGGroup[j].info->lower;
                             sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
                             cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
                         }
                     }
                 }
-                cout<<"Total BG: "<<sumOfEvent[BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1])<<endl<<endl;
+                cout<<"Total BG: "<<sumOfEvent[BGGroupSize][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroupSize][1])<<endl<<endl;
         
                 //expected number of events for signal
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
                     h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGMCGroupData.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGMCGroupData.size()+i+2][1]);
+                    sumOfEvent[BGGroupSize+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroupSize+i+2][1]);
                     
                     //Significance
-                    sumOfEvent[BGMCGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGMCGroupData.size()+i+2][0],sumOfEvent[BGMCGroupData.size()][0],0.3);
+                    sumOfEvent[BGGroupSize+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroupSize+i+2][0],sumOfEvent[BGGroupSize][0],0.3);
                     
-                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGMCGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGMCGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGMCGroupData.size()+i+2][2]<<endl;
+                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroupSize+i+2][0]<<" +/- "<<sumOfEvent[BGGroupSize+i+2][1]<<", Significance: "<<sumOfEvent[BGGroupSize+i+2][2]<<endl;
                 }
                 cout<<endl;
                 
@@ -2039,9 +2041,9 @@ void analysis1()
                 fout.open(PathName.Data());
                 fout<<setprecision(1)<<std::fixed;
                 
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int j=0;j<BGGroupSize;j++)
                 {
-                    fout<<BGMCGroupData[j].LatexName.Data();
+                    fout<<BGGroup[j].info->LatexName.Data();
                     fout<<" & $";
                     fout<<sumOfEvent[j][0];
                     fout<<"\\pm";
@@ -2050,15 +2052,15 @@ void analysis1()
                 }
                 
                 fout<<"Total BG & $";
-                fout<<sumOfEvent[BGMCGroupData.size()][0];
+                fout<<sumOfEvent[BGGroupSize][0];
                 fout<<"\\pm";
-                fout<<TMath::Sqrt(sumOfEvent[BGMCGroupData.size()][1]);
+                fout<<TMath::Sqrt(sumOfEvent[BGGroupSize][1]);
                 fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 
                 if(RegionInfo[RegionIndex].showData)
                 {
                     fout<<"Data & $";
-                    fout<<sumOfEvent[BGMCGroupData.size()+1][0];
+                    fout<<sumOfEvent[BGGroupSize+1][0];
                     fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 }
                 
@@ -2070,15 +2072,15 @@ void analysis1()
                     fout<<SigMass2[SigMassSplitting[i].ID];
                     fout<<") & $";
                     fout<<setprecision(1)<<std::fixed;
-                    fout<<sumOfEvent[BGMCGroupData.size()+i+2][0];
+                    fout<<sumOfEvent[BGGroupSize+i+2][0];
                     fout<<"\\pm";
-                    fout<<sumOfEvent[BGMCGroupData.size()+i+2][1];
+                    fout<<sumOfEvent[BGGroupSize+i+2][1];
                     fout<<"$ &";
                     if(RegionInfo[RegionIndex].showSignificance)
                     {
                         fout<<"$";
                         fout<<setprecision(3)<<std::fixed;
-                        fout<<sumOfEvent[BGMCGroupData.size()+i+2][2];
+                        fout<<sumOfEvent[BGGroupSize+i+2][2];
                         fout<<"$";
                     }
                     fout<<"\\\\"<<endl<<"\\hline"<<endl;
@@ -2347,7 +2349,7 @@ void analysis1()
             }
             
             //h2 for BGGruop
-            for(unsigned int j=0;j<BGMCGroupData.size()+BGDataGroupData.size();j++)
+            for(unsigned int j=0;j<BGGroupSize;j++)
             {
                 delete BGGroup[j].h2;
             }
