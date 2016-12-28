@@ -743,13 +743,13 @@ void analysis1()
             
             //h2BGMC
             TH1F* h2BGMC[BGMCSampleID.size()];
-            std::vector<TString> hName2BG;
+            std::vector<TString> hName2BGMC;
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
                 h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2BG.push_back(NameTemp);
+                hName2BGMC.push_back(NameTemp);
             }
             
             //h2BGGruop
@@ -796,7 +796,7 @@ void analysis1()
                 TString temp;
                 temp += Var[VarIndex].VarName;
                 temp += ">>";
-                temp += hName2BG[j];
+                temp += hName2BGMC[j];
                 tree2BGMC[j]->Draw(temp.Data(),"weight");
             }
             
@@ -1217,13 +1217,13 @@ void analysis1()
                     
                     //h2BGMC
                     TH1F* h2BGMC[BGMCSampleID.size()];
-                    std::vector<TString> hName2BG;
+                    std::vector<TString> hName2BGMC;
                     for(unsigned int j=0;j<BGMCSampleID.size();j++)
                     {
                         TString NameTemp = "BG_";
                         NameTemp += TString::Itoa(j,10);
                         h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                        hName2BG.push_back(NameTemp);
+                        hName2BGMC.push_back(NameTemp);
                     }
                     
                     //h2BGGruop
@@ -1248,7 +1248,7 @@ void analysis1()
                     {
                         TString temp = Var[VarIndex].VarName;
                         temp += ">>";
-                        temp += hName2BG[j];
+                        temp += hName2BGMC[j];
                         
                         TString Cut = "weight*(";
                         Cut += Var[CutVarIndex].VarName;
@@ -1707,13 +1707,13 @@ void analysis1()
             
             //h2BGMC
             TH1F* h2BGMC[BGMCSampleID.size()];
-            std::vector<TString> hName2BG;
+            std::vector<TString> hName2BGMC;
             for(unsigned int j=0;j<BGMCSampleID.size();j++)
             {
                 TString NameTemp = "BG_";
                 NameTemp += TString::Itoa(j,10);
                 h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2BG.push_back(NameTemp);
+                hName2BGMC.push_back(NameTemp);
             }
             
             //BGGruop
@@ -1842,7 +1842,7 @@ void analysis1()
                 {
                     TString temp = Var[VarIndex].VarName;
                     temp += ">>";
-                    temp += hName2BG[j];
+                    temp += hName2BGMC[j];
                     
                     TString Cut = "weight";
                     
