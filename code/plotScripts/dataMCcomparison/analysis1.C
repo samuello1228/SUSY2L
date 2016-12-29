@@ -1110,6 +1110,7 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
+        bool isSS;
         bool isSS_ee;
         std::vector<unsigned int> qFChannel;
         TString Cut;
@@ -1127,15 +1128,17 @@ void analysis1()
             element.setOfChannel.push_back(ChannelIndex);
             unsigned int OS = ChannelIndex;
             if(OS>=6) OS -= 6;
+            element.isSS = OS>=3;
             element.isSS_ee = OS==3;
             if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
-            element.showData = OS<=2;
-            element.showSignificance = OS>=3;
+            element.showData = !element.isSS;
+            element.showSignificance = element.isSS;
             element.Cut = "";
             RegionInfo.push_back(element);
         }
         
         //Control Region
+        element.isSS = true;
         element.showData = true;
         element.showSignificance = false;
         element.Cut = "&& mll>81.18 && mll<101.18";
@@ -1793,6 +1796,7 @@ void analysis1()
                 h2SigSum[j]->SetLineStyle(1);
             }
             
+            THStack stack;
             const int SigScale = 10;
             //fill histograms from trees
             {
@@ -1859,6 +1863,7 @@ void analysis1()
                     h2DataSum->Add(h2Data[j]);
                 }
                 
+                //BG
                 //Fill BGMC
                 for(unsigned int j=0;j<BGMCSampleID.size();j++)
                 {
@@ -1868,6 +1873,7 @@ void analysis1()
                     
                     TString Cut = "weight";
                     
+                    /*
                     //Z pt reweighting
                     if(dorw
                        &&
@@ -1885,15 +1891,18 @@ void analysis1()
                        )
                       )
                     {
-                        //Cut += "*rw";
+                        Cut += "*rw";
                     }
+                    */
                     
+                    /*
                     //for charge filp BG
                     if(RegionIndex>=12 && RegionIndex<=14 &&
                        j>=BGMCGroupData[0].lower && j<=BGMCGroupData[0].upper)
                     {
                         Cut += "*cfw";
                     }
+                    */
                     
                     Cut += "*(1";
                     Cut += CommonCut;
@@ -1970,9 +1979,29 @@ void analysis1()
                 }
                 
                 //Add BG
+                std::vector<Group> vBGGroup;
                 for(unsigned int j=0;j<BGGroupSize;j++)
                 {
+                    /*
+                    if(RegionInfo[RegionIndex].isSS_ee &&
+                       (
+                        BGMCGroupData[j].GroupName = "Zee"   ||
+                        BGMCGroupData[j].GroupName = "Zmumu" ||
+                        BGMCGroupData[j].GroupName = "Ztauatu"
+                       )
+                      ) continue;
+                    */
                     h2BGSum->Add(BGGroup[j].h2);
+                    vBGGroup.push_back(BGGroup[j]);
+                }
+                
+                //sort
+                std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
+                
+                //stack
+                for(unsigned int j=0;j<vBGGroup.size();j++)
+                {
+                    stack.Add(vBGGroup[j].h2);
                 }
                 
                 //Fill Signal
@@ -2134,23 +2163,6 @@ void analysis1()
                     fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
                 }
                 fout.close();
-            }
-            
-            THStack stack;
-            {
-                //sort
-                std::vector<Group> vBGGroup;
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
-                {
-                    vBGGroup.push_back(BGGroup[j]);
-                }
-                std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
-                
-                //stack
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
-                {
-                    stack.Add(vBGGroup[j].h2);
-                }
             }
             
             {
