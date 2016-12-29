@@ -1110,6 +1110,8 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
+        bool isSS_ee;
+        std::vector<unsigned int> qFChannel;
         TString Cut;
     };
     
@@ -1121,9 +1123,12 @@ void analysis1()
         {
             element.RegionName = channel[ChannelIndex];
             element.setOfChannel.clear();
+            element.qFChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
             unsigned int OS = ChannelIndex;
             if(OS>=6) OS -= 6;
+            element.isSS_ee = OS==3;
+            if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
             element.showData = OS<=2;
             element.showSignificance = OS>=3;
             element.Cut = "";
@@ -1136,35 +1141,49 @@ void analysis1()
         element.Cut = "&& mll>81.18 && mll<101.18";
         
         //SS_ee
+        element.isSS_ee = true;
+        
         element.RegionName = "CR_nonISR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
+        element.qFChannel.push_back(0);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(9);
+        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
         element.setOfChannel.push_back(9);
+        element.qFChannel.push_back(0);
+        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         //SS_mumu
+        element.isSS_ee = false;
+        
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
@@ -1614,6 +1633,9 @@ void analysis1()
         std::vector<TChain*> tree2Sig;
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
         
+        std::vector<TChain*> tree2DataOS;
+        if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
+        
         //Z pt reweighting
         if(dorw
            &&
@@ -1932,7 +1954,15 @@ void analysis1()
                             Cut += TString::Itoa(35,10);
                         }
                         Cut += ")";
-                        tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                        
+                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        {
+                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                        }
+                        if(BGDataGroupData[j].GroupName == "fake lepton BG")
+                        {
+                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                        }
                         
                         //Add MCData
                         BGGroup[BGMCGroupData.size()+j].h2->Add(h2Data[k]);
@@ -2392,6 +2422,7 @@ void analysis1()
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
             delete tree2Data[i];
+            if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
         }
         for(unsigned int i=0;i<BGMCSampleID.size();i++)
         {
