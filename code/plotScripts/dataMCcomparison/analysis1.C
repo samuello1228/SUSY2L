@@ -470,10 +470,10 @@ void analysis1()
     std::vector<GroupData> BGDataGroupData;
     {
         GroupData element;
-        element.GroupName = "charge flip BG"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.GroupName = "charge flip"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
         element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
         
-        element.GroupName = "fake lepton BG"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.GroupName = "fake lepton"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
         element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
     }
     
@@ -1114,6 +1114,8 @@ void analysis1()
         bool isSS_ee;
         std::vector<unsigned int> qFChannel;
         TString Cut;
+        std::vector<TString> setOfBGMC;
+        std::vector<TString> setOfBGData;
     };
     
     std::vector<RegionData> RegionInfo;
@@ -1134,8 +1136,10 @@ void analysis1()
             element.showData = !element.isSS;
             element.showSignificance = element.isSS;
             element.Cut = "";
+            
             RegionInfo.push_back(element);
         }
+        
         
         //Control Region
         element.isSS = true;
@@ -1190,6 +1194,29 @@ void analysis1()
         element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
+        
+        //setOfBG
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            if(RegionInfo[RegionIndex].isSS)
+            {
+                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
+                
+                if(RegionInfo[RegionIndex].isSS_ee) RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
+                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
+            }
+            else
+            {
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
+            }
+        }
     }
     
     
@@ -1941,18 +1968,18 @@ void analysis1()
                         
                         TString Cut = "1";
                         //Cut += "*weight";
-                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        if(BGDataGroupData[j].GroupName == "charge flip")
                         {
                             Cut += "*qFwt";
                         }
                         
                         Cut += "*(1";
                         Cut += CommonCut;
-                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        if(BGDataGroupData[j].GroupName == "charge flip")
                         {
                             Cut += "&& fLwt==0";
                         }
-                        if(BGDataGroupData[j].GroupName == "fake lepton BG")
+                        if(BGDataGroupData[j].GroupName == "fake lepton")
                         {
                             Cut += "&& fLwt!=0";
                         }
@@ -1964,11 +1991,11 @@ void analysis1()
                         }
                         Cut += ")";
                         
-                        if(BGDataGroupData[j].GroupName == "charge flip BG")
+                        if(BGDataGroupData[j].GroupName == "charge flip")
                         {
                             tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
                         }
-                        if(BGDataGroupData[j].GroupName == "fake lepton BG")
+                        if(BGDataGroupData[j].GroupName == "fake lepton")
                         {
                             tree2Data[k]->Draw(temp.Data(),Cut.Data());
                         }
