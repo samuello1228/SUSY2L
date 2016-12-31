@@ -1664,6 +1664,7 @@ void analysis1()
         std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
         std::vector<Group> BGGroup;
         {
+            //For MC background
             for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
                 for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
@@ -1688,6 +1689,20 @@ void analysis1()
                         
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGMCGroupData[j]);
+                        BGGroup.push_back(BGGroupElement);
+                    }
+                }
+            }
+            
+            //For data-driven background
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                {
+                    if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                    {
+                        Group BGGroupElement;
+                        BGGroupElement.info = &(BGDataGroupData[j]);
                         BGGroup.push_back(BGGroupElement);
                     }
                 }
@@ -1826,7 +1841,8 @@ void analysis1()
                 h2DataSum->SetLineColor(1);
             }
             
-            //BGGruop
+            //BG
+            //For MC background
             double sumOfEventVV[BGVVData.size()][2];
             //sample,expN/error
             
@@ -1903,18 +1919,60 @@ void analysis1()
                     delete hTemp;
                 }
             }
-            return;
             
             //For data-driven background
-            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
             {
-                const unsigned int index = BGMCGroupData.size()+j;
-                BGGroup[index].info = &(BGDataGroupData[j]);
-                TString NameTemp = BGDataGroupData[j].GroupName;
-                BGGroup[index].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                BGGroup[index].h2->GetYaxis()->SetTitle("Number of events");
-                BGGroup[index].h2->SetLineColor(index+2);
-                BGGroup[index].h2->SetFillColor(index+2);
+                TString NameTemp = BGGroup[j].info->GroupName;
+                BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                BGGroup[j].h2->SetLineColor(j+2);
+                BGGroup[j].h2->SetFillColor(j+2);
+                
+                for(unsigned int k=0;k<DataSampleID.size();k++)
+                {
+                    h2Data[k]->Scale(0);
+                    
+                    TString temp = Var[VarIndex].VarName;
+                    temp += ">>";
+                    temp += hName2Data[k];
+                    
+                    TString Cut = "1";
+                    if(BGGroup[j].info->GroupName == "charge flip")
+                    {
+                        Cut += "*qFwt";
+                    }
+                    
+                    Cut += "*(1";
+                    Cut += CommonCut;
+                    if(BGGroup[j].info->GroupName == "charge flip")
+                    {
+                        Cut += "&& fLwt==0";
+                    }
+                    if(BGGroup[j].info->GroupName == "fake lepton")
+                    {
+                        Cut += "&& fLwt!=0";
+                    }
+                    
+                    if(optimize)
+                    {
+                        Cut += " && jetpt<=";
+                        Cut += TString::Itoa(35,10);
+                    }
+                    Cut += ")";
+                    
+                    if(BGGroup[j].info->GroupName == "charge flip")
+                    {
+                        tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                    }
+                    if(BGGroup[j].info->GroupName == "fake lepton")
+                    {
+                        tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                    }
+                    
+                    //Add MCData
+                    BGGroup[j].h2->Add(h2Data[k]);
+                }
             }
             
             //h2BGSum
@@ -1947,14 +2005,14 @@ void analysis1()
                 h2SigSum[j]->SetLineStyle(1);
             }
             
-            
             const int SigScale = 10;
             //fill histograms from trees
             {
-                
                 //Fill data
                 for(unsigned int j=0;j<DataSampleID.size();j++)
                 {
+                    h2Data[j]->Scale(0);
+                    
                     TString temp;
                     if(Var[VarIndex].VarName=="averageMu")
                     {
@@ -1982,59 +2040,6 @@ void analysis1()
                     //Add data
                     h2DataSum->Add(h2Data[j]);
                 }
-                
-                //BG
-                //Fill BGData
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
-                {
-                    for(unsigned int k=0;k<DataSampleID.size();k++)
-                    {
-                        h2Data[k]->Scale(0);
-                        
-                        TString temp = Var[VarIndex].VarName;
-                        temp += ">>";
-                        temp += hName2Data[k];
-                        
-                        TString Cut = "1";
-                        //Cut += "*weight";
-                        if(BGDataGroupData[j].GroupName == "charge flip")
-                        {
-                            Cut += "*qFwt";
-                        }
-                        
-                        Cut += "*(1";
-                        Cut += CommonCut;
-                        if(BGDataGroupData[j].GroupName == "charge flip")
-                        {
-                            Cut += "&& fLwt==0";
-                        }
-                        if(BGDataGroupData[j].GroupName == "fake lepton")
-                        {
-                            Cut += "&& fLwt!=0";
-                        }
-                        
-                        if(optimize)
-                        {
-                            Cut += " && jetpt<=";
-                            Cut += TString::Itoa(35,10);
-                        }
-                        Cut += ")";
-                        
-                        if(BGDataGroupData[j].GroupName == "charge flip")
-                        {
-                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
-                        }
-                        if(BGDataGroupData[j].GroupName == "fake lepton")
-                        {
-                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
-                        }
-                        
-                        //Add MCData
-                        BGGroup[BGMCGroupData.size()+j].h2->Add(h2Data[k]);
-                    }
-                }
-                
-
                 
                 //Fill Signal
                 for(unsigned int j=0;j<SigSampleID.size();j++)
@@ -2074,7 +2079,7 @@ void analysis1()
             
             //Add BG
             std::vector<Group> vBGGroup;
-            for(unsigned int j=0;j<BGGroupSize;j++)
+            for(unsigned int j=0;j<BGGroup.size();j++)
             {
                 h2BGSum->Add(BGGroup[j].h2);
                 vBGGroup.push_back(BGGroup[j]);
@@ -2089,7 +2094,7 @@ void analysis1()
             {
                 stack.Add(vBGGroup[j].h2);
             }
-            
+            return;
             if(VarIndex==countVariable)
             {
                 double sumOfEvent[BGGroupSize+SigMassSplitting.size()+2][3];
@@ -2421,7 +2426,7 @@ void analysis1()
             delete h2DataSum;
             
             //h2 for BGGruop
-            for(unsigned int j=0;j<BGGroupSize;j++)
+            for(unsigned int j=0;j<BGGroup.size();j++)
             {
                 delete BGGroup[j].h2;
             }
