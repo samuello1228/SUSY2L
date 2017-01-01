@@ -1940,6 +1940,10 @@ void analysis1()
                     {
                         Cut += "*qFwt";
                     }
+                    if(BGGroup[j].info->GroupName == "fake lepton")
+                    {
+                        Cut += "*fLwt";
+                    }
                     
                     Cut += "*(1";
                     Cut += CommonCut;
