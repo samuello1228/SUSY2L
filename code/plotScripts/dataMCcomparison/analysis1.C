@@ -1892,36 +1892,34 @@ void analysis1()
                         
                         TString Cut = "weight";
                         
-                        /*
-                         //Z pt reweighting
-                         if(dorw
-                         &&
-                         (
-                         RegionIndex==0 ||
-                         RegionIndex==1 ||
-                         RegionIndex==6 ||
-                         RegionIndex==7
-                         )
-                         &&
-                         (
-                         k<=BGMCGroupData[0].upper ||
-                         k<=BGMCGroupData[1].upper ||
-                         k<=BGMCGroupData[2].upper
-                         )
-                         )
-                         {
-                         Cut += "*rw";
-                         }
-                         */
                         
-                        /*
-                         //for charge filp BG
-                         if(RegionIndex>=12 && RegionIndex<=14 &&
-                         k>=BGMCGroupData[0].lower && k<=BGMCGroupData[0].upper)
-                         {
-                         Cut += "*cfw";
-                         }
-                         */
+                        //Z pt reweighting
+                        if(dorw
+                           &&
+                            (
+                            RegionIndex==0 ||
+                            RegionIndex==1 ||
+                            RegionIndex==6 ||
+                            RegionIndex==7
+                            )
+                           &&
+                            (
+                            BGGroup[j].info->GroupName == "Zee" ||
+                            BGGroup[j].info->GroupName == "Zmumu" ||
+                            BGGroup[j].info->GroupName == "Ztautau"
+                            )
+                          )
+                        {
+                            //Cut += "*rw";
+                        }
+                        
+                        //for charge filp BG
+                        if(RegionIndex>=12 && RegionIndex<=14 &&
+                           BGGroup[j].info->GroupName == "Zee")
+                        {
+                            //Cut += "*cfw";
+                        }
+                        
                         
                         Cut += "*(1";
                         Cut += CommonCut;
@@ -2475,9 +2473,9 @@ void analysis1()
                     )
                    &&
                    (
-                    i<=BGMCGroupData[0].upper ||
-                    i<=BGMCGroupData[1].upper ||
-                    i<=BGMCGroupData[2].upper
+                    BGGroup[j].info->GroupName == "Zee" ||
+                    BGGroup[j].info->GroupName == "Zmumu" ||
+                    BGGroup[j].info->GroupName == "Ztautau"
                     )
                    )
                 {
@@ -2488,7 +2486,7 @@ void analysis1()
                 
                 //for charge filp BG
                 if(RegionIndex>=12 && RegionIndex<=14 &&
-                   i>=BGMCGroupData[0].lower && i<=BGMCGroupData[0].upper)
+                   BGGroup[j].info->GroupName == "Zee")
                 {
                     TString NameTemp = "tree_cfw_";
                     NameTemp += TString::Itoa(i,10);
