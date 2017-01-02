@@ -1815,18 +1815,7 @@ void analysis1()
             
             CommonCut += RegionInfo[RegionIndex].Cut;
             
-            
-            //h2Data
-            TH1F* h2Data[DataSampleID.size()];
-            std::vector<TString> hName2Data;
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                TString NameTemp = "Data_";
-                NameTemp += TString::Itoa(j,10);
-                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Data.push_back(NameTemp);
-            }
-            
+            //Fill histograms from trees
             //h2DataSum
             TH1F* h2DataSum;
             {
@@ -1838,8 +1827,47 @@ void analysis1()
                 h2DataSum->SetMarkerSize(1);
                 h2DataSum->SetLineColor(1);
             }
+
+            //h2Data
+            TH1F* h2Data[DataSampleID.size()];
+            std::vector<TString> hName2Data;
+            for(unsigned int j=0;j<DataSampleID.size();j++)
+            {
+                TString NameTemp = "Data_";
+                NameTemp += TString::Itoa(j,10);
+                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                hName2Data.push_back(NameTemp);
+                
+                //Fill data
+                TString temp;
+                if(Var[VarIndex].VarName=="averageMu")
+                {
+                    temp = "averageMu/1.16";
+                }
+                else
+                {
+                    temp = Var[VarIndex].VarName;
+                }
+                temp += ">>";
+                temp += hName2Data[j];
+                
+                TString Cut = "(1";
+                Cut += CommonCut;
+                Cut += "&& fLwt==0";
+                
+                if(optimize)
+                {
+                    Cut += " && jetpt<=";
+                    Cut += TString::Itoa(35,10);
+                }
+                Cut += ")";
+                tree2Data[j]->Draw(temp.Data(),Cut.Data());
+                
+                //Add data
+                h2DataSum->Add(h2Data[j]);
+            }
             
-            //BG
+            //Background
             //For MC background
             double sumOfEventVV[BGVVData.size()][2];
             //sample,expN/error
@@ -2010,39 +2038,6 @@ void analysis1()
             const int SigScale = 10;
             //fill histograms from trees
             {
-                //Fill data
-                for(unsigned int j=0;j<DataSampleID.size();j++)
-                {
-                    h2Data[j]->Scale(0);
-                    
-                    TString temp;
-                    if(Var[VarIndex].VarName=="averageMu")
-                    {
-                        temp = "averageMu/1.16";
-                    }
-                    else
-                    {
-                        temp = Var[VarIndex].VarName;
-                    }
-                    temp += ">>";
-                    temp += hName2Data[j];
-                    
-                    TString Cut = "(1";
-                    Cut += CommonCut;
-                    Cut += "&& fLwt==0";
-                    
-                    if(optimize)
-                    {
-                        Cut += " && jetpt<=";
-                        Cut += TString::Itoa(35,10);
-                    }
-                    Cut += ")";
-                    tree2Data[j]->Draw(temp.Data(),Cut.Data());
-                    
-                    //Add data
-                    h2DataSum->Add(h2Data[j]);
-                }
-                
                 //Fill Signal
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
