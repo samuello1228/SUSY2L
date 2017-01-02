@@ -2012,17 +2012,6 @@ void analysis1()
                 h2BGSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             }
             
-            //h2Sig
-            TH1F* h2Sig[SigSampleID.size()];
-            std::vector<TString> hName2Sig;
-            for(unsigned int j=0;j<SigSampleID.size();j++)
-            {
-                TString NameTemp = "Sig_";
-                NameTemp += TString::Itoa(j,10);
-                h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Sig.push_back(NameTemp);
-            }
-            
             //h2SigSum
             TH1F* h2SigSum[SigMassSplitting.size()];
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
@@ -2035,43 +2024,47 @@ void analysis1()
                 h2SigSum[j]->SetLineStyle(1);
             }
             
-            const int SigScale = 10;
-            //fill histograms from trees
+            //h2Sig
+            TH1F* h2Sig[SigSampleID.size()];
+            for(unsigned int j=0;j<SigSampleID.size();j++)
             {
+                TString NameTemp = "Sig_";
+                NameTemp += TString::Itoa(j,10);
+                h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                
                 //Fill Signal
+                TString temp = Var[VarIndex].VarName;
+                temp += ">>";
+                temp += NameTemp;
+                
+                TString Cut = "weight*(1";
+                Cut += CommonCut;
+                
+                if(optimize)
+                {
+                    Cut += " && jetpt<=";
+                    Cut += TString::Itoa(35,10);
+                }
+                Cut += ")";
+                tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+            }
+            
+            //Add Signal for the same mass splitting
+            const int SigScale = 10;
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                unsigned int AOD = 0;
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
-                    TString temp = Var[VarIndex].VarName;
-                    temp += ">>";
-                    temp += hName2Sig[j];
-                    
-                    TString Cut = "weight*(1";
-                    Cut += CommonCut;
-                    
-                    if(optimize)
+                    if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
                     {
-                        Cut += " && jetpt<=";
-                        Cut += TString::Itoa(35,10);
+                        h2SigSum[i]->Add(h2Sig[j]);
+                        AOD += SignAOD[j];
                     }
-                    Cut += ")";
-                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                 }
                 
-                //Add Signal
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
-                    unsigned int AOD = 0;
-                    for(unsigned int j=0;j<SigSampleID.size();j++)
-                    {
-                        if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
-                        {
-                            h2SigSum[i]->Add(h2Sig[j]);
-                            AOD += SignAOD[j];
-                        }
-                    }
-                    //normalization for Signal
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
-                }
+                //normalization for Signal
+                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
             }
             
             //Add BG
