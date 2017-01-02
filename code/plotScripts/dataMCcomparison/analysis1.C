@@ -1783,145 +1783,83 @@ void analysis1()
             xaxis += " ";
             xaxis += Var[VarIndex].unit;
             
-            //Common Cut
-            TString CommonCut = "";
-            if(Var[VarIndex].VarName=="jetpt"  ||
-               Var[VarIndex].VarName=="jeteta" ||
-               Var[VarIndex].VarName=="jetphi" )
-            {
-                CommonCut += " && nJet>0";
-            }
-            
-            if(Var[VarIndex].VarName=="bjetpt"  ||
-               Var[VarIndex].VarName=="bjeteta" ||
-               Var[VarIndex].VarName=="bjetphi" )
-            {
-                CommonCut += " && nBJet>0";
-            }
-            
-            if(Var[VarIndex].VarName=="cjetpt"  ||
-               Var[VarIndex].VarName=="cjeteta" ||
-               Var[VarIndex].VarName=="cjetphi" )
-            {
-                CommonCut += " && nCJet>0";
-            }
-            
-            if(Var[VarIndex].VarName=="fjetpt"  ||
-               Var[VarIndex].VarName=="fjeteta" ||
-               Var[VarIndex].VarName=="fjetphi" )
-            {
-                CommonCut += " && nFJet>0";
-            }
-            
-            CommonCut += RegionInfo[RegionIndex].Cut;
-            
             //Fill histograms from trees
-            //h2DataSum
             TH1F* h2DataSum;
-            {
-                TString NameTemp = "DataSum";
-                h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2DataSum->GetYaxis()->SetTitle("Number of events");
-                h2DataSum->SetMarkerColor(1);
-                h2DataSum->SetMarkerStyle(20);
-                h2DataSum->SetMarkerSize(1);
-                h2DataSum->SetLineColor(1);
-            }
-
-            //h2Data
-            TH1F* h2Data[DataSampleID.size()];
-            std::vector<TString> hName2Data;
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                TString NameTemp = "Data_";
-                NameTemp += TString::Itoa(j,10);
-                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Data.push_back(NameTemp);
-                
-                //Fill data
-                TString temp;
-                if(Var[VarIndex].VarName=="averageMu")
-                {
-                    temp = "averageMu/1.16";
-                }
-                else
-                {
-                    temp = Var[VarIndex].VarName;
-                }
-                temp += ">>";
-                temp += hName2Data[j];
-                
-                TString Cut = "(1";
-                Cut += CommonCut;
-                Cut += "&& fLwt==0";
-                
-                if(optimize)
-                {
-                    Cut += " && jetpt<=";
-                    Cut += TString::Itoa(35,10);
-                }
-                Cut += ")";
-                tree2Data[j]->Draw(temp.Data(),Cut.Data());
-                
-                //Add data
-                h2DataSum->Add(h2Data[j]);
-            }
-            
-            //Background
-            //For MC background
+            TH1F* h2SigSum[SigMassSplitting.size()];
+            TH1F* h2Sig[SigSampleID.size()];
             double sumOfEventVV[BGVVData.size()][2];
             //sample,expN/error
-            
-            for(unsigned int j=0;j<tree2BGMC.size();j++)
+
             {
-                BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                BGGroup[j].h2->SetLineColor(j+2);
-                BGGroup[j].h2->SetFillColor(j+2);
-                
-                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                //Common Cut
+                TString CommonCut = "";
+                if(Var[VarIndex].VarName=="jetpt"  ||
+                   Var[VarIndex].VarName=="jeteta" ||
+                   Var[VarIndex].VarName=="jetphi" )
                 {
-                    TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    CommonCut += " && nJet>0";
+                }
+                
+                if(Var[VarIndex].VarName=="bjetpt"  ||
+                   Var[VarIndex].VarName=="bjeteta" ||
+                   Var[VarIndex].VarName=="bjetphi" )
+                {
+                    CommonCut += " && nBJet>0";
+                }
+                
+                if(Var[VarIndex].VarName=="cjetpt"  ||
+                   Var[VarIndex].VarName=="cjeteta" ||
+                   Var[VarIndex].VarName=="cjetphi" )
+                {
+                    CommonCut += " && nCJet>0";
+                }
+                
+                if(Var[VarIndex].VarName=="fjetpt"  ||
+                   Var[VarIndex].VarName=="fjeteta" ||
+                   Var[VarIndex].VarName=="fjetphi" )
+                {
+                    CommonCut += " && nFJet>0";
+                }
+                
+                CommonCut += RegionInfo[RegionIndex].Cut;
+                
+                //h2DataSum
+                {
+                    TString NameTemp = "DataSum";
+                    h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2DataSum->GetYaxis()->SetTitle("Number of events");
+                    h2DataSum->SetMarkerColor(1);
+                    h2DataSum->SetMarkerStyle(20);
+                    h2DataSum->SetMarkerSize(1);
+                    h2DataSum->SetLineColor(1);
+                }
+                
+                //h2Data
+                TH1F* h2Data[DataSampleID.size()];
+                std::vector<TString> hName2Data;
+                for(unsigned int j=0;j<DataSampleID.size();j++)
+                {
+                    TString NameTemp = "Data_";
+                    NameTemp += TString::Itoa(j,10);
+                    h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    hName2Data.push_back(NameTemp);
                     
-                    //fill histograms from trees
-                    TString temp = Var[VarIndex].VarName;
-                    temp += ">>BGMC";
+                    //Fill data
+                    TString temp;
+                    if(Var[VarIndex].VarName=="averageMu")
+                    {
+                        temp = "averageMu/1.16";
+                    }
+                    else
+                    {
+                        temp = Var[VarIndex].VarName;
+                    }
+                    temp += ">>";
+                    temp += hName2Data[j];
                     
-                    TString Cut = "weight";
-                    
-                    /*
-                     //Z pt reweighting
-                     if(dorw
-                     &&
-                     (
-                     RegionIndex==0 ||
-                     RegionIndex==1 ||
-                     RegionIndex==6 ||
-                     RegionIndex==7
-                     )
-                     &&
-                     (
-                     k<=BGMCGroupData[0].upper ||
-                     k<=BGMCGroupData[1].upper ||
-                     k<=BGMCGroupData[2].upper
-                     )
-                     )
-                     {
-                     Cut += "*rw";
-                     }
-                     */
-                    
-                    /*
-                     //for charge filp BG
-                     if(RegionIndex>=12 && RegionIndex<=14 &&
-                     k>=BGMCGroupData[0].lower && k<=BGMCGroupData[0].upper)
-                     {
-                     Cut += "*cfw";
-                     }
-                     */
-                    
-                    Cut += "*(1";
+                    TString Cut = "(1";
                     Cut += CommonCut;
+                    Cut += "&& fLwt==0";
                     
                     if(optimize)
                     {
@@ -1929,60 +1867,179 @@ void analysis1()
                         Cut += TString::Itoa(35,10);
                     }
                     Cut += ")";
-                    tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                    tree2Data[j]->Draw(temp.Data(),Cut.Data());
                     
-                    //normalization for BG
-                    hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
-                    
-                    //expN for BGVV
-                    if(VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
-                    {
-                        sumOfEventVV[k][0] = hTemp->IntegralAndError(0,-1,sumOfEventVV[k][1]);
-                        cout<<BGVVData[k].SampleName.Data()<<": "<<sumOfEventVV[k][0]<<" +/- "<<sumOfEventVV[k][1]<<endl;
-                    }
-                    
-                    BGGroup[j].h2->Add(hTemp);
-                    delete hTemp;
+                    //Add data
+                    h2DataSum->Add(h2Data[j]);
                 }
-            }
-            
-            //For data-driven background
-            for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
-            {
-                TString NameTemp = BGGroup[j].info->GroupName;
-                BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                BGGroup[j].h2->SetLineColor(j+2);
-                BGGroup[j].h2->SetFillColor(j+2);
                 
-                for(unsigned int k=0;k<DataSampleID.size();k++)
+                //Background
+                //For MC background
+                for(unsigned int j=0;j<tree2BGMC.size();j++)
                 {
-                    h2Data[k]->Scale(0);
+                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                    BGGroup[j].h2->SetLineColor(j+2);
+                    BGGroup[j].h2->SetFillColor(j+2);
                     
+                    for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                    {
+                        TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        
+                        //fill histograms from trees
+                        TString temp = Var[VarIndex].VarName;
+                        temp += ">>BGMC";
+                        
+                        TString Cut = "weight";
+                        
+                        /*
+                         //Z pt reweighting
+                         if(dorw
+                         &&
+                         (
+                         RegionIndex==0 ||
+                         RegionIndex==1 ||
+                         RegionIndex==6 ||
+                         RegionIndex==7
+                         )
+                         &&
+                         (
+                         k<=BGMCGroupData[0].upper ||
+                         k<=BGMCGroupData[1].upper ||
+                         k<=BGMCGroupData[2].upper
+                         )
+                         )
+                         {
+                         Cut += "*rw";
+                         }
+                         */
+                        
+                        /*
+                         //for charge filp BG
+                         if(RegionIndex>=12 && RegionIndex<=14 &&
+                         k>=BGMCGroupData[0].lower && k<=BGMCGroupData[0].upper)
+                         {
+                         Cut += "*cfw";
+                         }
+                         */
+                        
+                        Cut += "*(1";
+                        Cut += CommonCut;
+                        
+                        if(optimize)
+                        {
+                            Cut += " && jetpt<=";
+                            Cut += TString::Itoa(35,10);
+                        }
+                        Cut += ")";
+                        tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                        
+                        //normalization for BG
+                        hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                        
+                        //expN for BGVV
+                        if(VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
+                        {
+                            sumOfEventVV[k][0] = hTemp->IntegralAndError(0,-1,sumOfEventVV[k][1]);
+                            cout<<BGVVData[k].SampleName.Data()<<": "<<sumOfEventVV[k][0]<<" +/- "<<sumOfEventVV[k][1]<<endl;
+                        }
+                        
+                        BGGroup[j].h2->Add(hTemp);
+                        delete hTemp;
+                    }
+                }
+                
+                //For data-driven background
+                for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
+                {
+                    TString NameTemp = BGGroup[j].info->GroupName;
+                    BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                    BGGroup[j].h2->SetLineColor(j+2);
+                    BGGroup[j].h2->SetFillColor(j+2);
+                    
+                    for(unsigned int k=0;k<DataSampleID.size();k++)
+                    {
+                        h2Data[k]->Scale(0);
+                        
+                        TString temp = Var[VarIndex].VarName;
+                        temp += ">>";
+                        temp += hName2Data[k];
+                        
+                        TString Cut = "1";
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            Cut += "*qFwt";
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            Cut += "*fLwt";
+                        }
+                        
+                        Cut += "*(1";
+                        Cut += CommonCut;
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            Cut += "&& fLwt==0";
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            Cut += "&& fLwt!=0";
+                        }
+                        
+                        if(optimize)
+                        {
+                            Cut += " && jetpt<=";
+                            Cut += TString::Itoa(35,10);
+                        }
+                        Cut += ")";
+                        
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                        }
+                        
+                        //Add MCData
+                        BGGroup[j].h2->Add(h2Data[k]);
+                    }
+                }
+                
+                //delete h2Data
+                for(unsigned int j=0;j<DataSampleID.size();j++)
+                {
+                    delete h2Data[j];
+                }
+                
+                //h2SigSum
+                for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                {
+                    TString NameTemp = "SigSum_";
+                    NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
+                    h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
+                    h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
+                    h2SigSum[j]->SetLineStyle(1);
+                }
+                
+                //h2Sig
+                
+                for(unsigned int j=0;j<SigSampleID.size();j++)
+                {
+                    TString NameTemp = "Sig_";
+                    NameTemp += TString::Itoa(j,10);
+                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    
+                    //Fill Signal
                     TString temp = Var[VarIndex].VarName;
                     temp += ">>";
-                    temp += hName2Data[k];
+                    temp += NameTemp;
                     
-                    TString Cut = "1";
-                    if(BGGroup[j].info->GroupName == "charge flip")
-                    {
-                        Cut += "*qFwt";
-                    }
-                    if(BGGroup[j].info->GroupName == "fake lepton")
-                    {
-                        Cut += "*fLwt";
-                    }
-                    
-                    Cut += "*(1";
+                    TString Cut = "weight*(1";
                     Cut += CommonCut;
-                    if(BGGroup[j].info->GroupName == "charge flip")
-                    {
-                        Cut += "&& fLwt==0";
-                    }
-                    if(BGGroup[j].info->GroupName == "fake lepton")
-                    {
-                        Cut += "&& fLwt!=0";
-                    }
                     
                     if(optimize)
                     {
@@ -1990,63 +2047,8 @@ void analysis1()
                         Cut += TString::Itoa(35,10);
                     }
                     Cut += ")";
-                    
-                    if(BGGroup[j].info->GroupName == "charge flip")
-                    {
-                        tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
-                    }
-                    if(BGGroup[j].info->GroupName == "fake lepton")
-                    {
-                        tree2Data[k]->Draw(temp.Data(),Cut.Data());
-                    }
-                    
-                    //Add MCData
-                    BGGroup[j].h2->Add(h2Data[k]);
+                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                 }
-            }
-            
-            //h2BGSum
-            TH1F* h2BGSum;
-            {
-                TString NameTemp = "BGSum";
-                h2BGSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2SigSum
-            TH1F* h2SigSum[SigMassSplitting.size()];
-            for(unsigned int j=0;j<SigMassSplitting.size();j++)
-            {
-                TString NameTemp = "SigSum_";
-                NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
-                h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
-                h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
-                h2SigSum[j]->SetLineStyle(1);
-            }
-            
-            //h2Sig
-            TH1F* h2Sig[SigSampleID.size()];
-            for(unsigned int j=0;j<SigSampleID.size();j++)
-            {
-                TString NameTemp = "Sig_";
-                NameTemp += TString::Itoa(j,10);
-                h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                
-                //Fill Signal
-                TString temp = Var[VarIndex].VarName;
-                temp += ">>";
-                temp += NameTemp;
-                
-                TString Cut = "weight*(1";
-                Cut += CommonCut;
-                
-                if(optimize)
-                {
-                    Cut += " && jetpt<=";
-                    Cut += TString::Itoa(35,10);
-                }
-                Cut += ")";
-                tree2Sig[j]->Draw(temp.Data(),Cut.Data());
             }
             
             //Add Signal for the same mass splitting
@@ -2068,9 +2070,11 @@ void analysis1()
             }
             
             //Add BG
+            TH1F* h2BGSum;
             std::vector<Group> vBGGroup;
             for(unsigned int j=0;j<BGGroup.size();j++)
             {
+                h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2BGSum->Add(BGGroup[j].h2);
                 vBGGroup.push_back(BGGroup[j]);
             }
@@ -2406,12 +2410,6 @@ void analysis1()
             //c2->WaitPrimitive();
             
             //delete
-            //h2Data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                delete h2Data[j];
-            }
-            
             //h2DataSum
             delete h2DataSum;
             
