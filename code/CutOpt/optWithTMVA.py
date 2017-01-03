@@ -39,8 +39,7 @@ factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
 for (aVar, aFormula) in ssUtil.basicBDTVars:
   factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
-useISR = False if (int(options.channel/10) == 0) else True
-if useISR:
+if (int((options.channel%100)/10) != 0):
   for (aVar, aFormula) in ssUtil.isrBDTVars:
     factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
