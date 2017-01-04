@@ -1,6 +1,7 @@
 #!/bin/bash
 
-channels="1 2 3 4 10 11 12 13 14 20 21 22 23 24"
+# channels="1 2 3 4 10 11 12 13 14 20 21 22 23 24"
+channels="1 2 3 4 10 11 12 13 14"
 masses="20 50 100"
 # masses1="all 20"
 # masses2="50 100 +"
@@ -37,7 +38,7 @@ do
 	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile --NTrees $nTrees --NodeSize $nodeSize --Depth $depth&
 	echo "Submitted jobs for channel 0 dm=20 nTrees="$nTrees" nodeSize="$nodeSize" depth="$depth
 
-	outFile="dm50_Channel0_.root"
+	outFile="dm50_Channel0.root"
 	sigFiles="CutOpt/GabrielFiles/sigFiles_50.txt"
 	python CutOpt/optWithTMVA.py -b $bkgFiles -s $sigFiles -d $dataFiles -c 0 -o $outFile --NTrees $nTrees --NodeSize $nodeSize --Depth $depth&
 	echo "Submitted jobs for channel 0 dm=50 nTrees="$nTrees" nodeSize="$nodeSize" depth="$depth
