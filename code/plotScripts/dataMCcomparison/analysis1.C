@@ -1668,7 +1668,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
+    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1744,7 +1744,11 @@ void analysis1()
                         //for charge filp BG
                         if(docfw
                            &&
-                           (RegionIndex>=12 && RegionIndex<=14)
+                           (
+                            RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                            RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                            RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                           )
                            &&
                            BGGroupElement.info->GroupName == "Zee"
                           )
@@ -1940,7 +1944,11 @@ void analysis1()
                         //for charge filp BG
                         if(docfw
                            &&
-                           (RegionIndex>=12 && RegionIndex<=14)
+                           (
+                            RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                            RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                            RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                           )
                            &&
                            BGGroup[j].info->GroupName == "Zee"
                           )
@@ -2512,7 +2520,11 @@ void analysis1()
                 //for charge filp BG
                 if(docfw
                    &&
-                   (RegionIndex>=12 && RegionIndex<=14)
+                   (
+                    RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                    RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                    RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                   )
                    &&
                    BGGroup[j].info->GroupName == "Zee"
                   )
