@@ -1,8 +1,13 @@
-mkdir AnalysisBase-02-04-17
-cd AnalysisBase-02-04-17
+mkdir AnalysisBase-02-04-18
+cd AnalysisBase-02-04-18
 
-#https://svnweb.cern.ch/trac/atlasinst/browser/Institutes/Michigan/SUSY/code/multiLepSearch/
-svn co -r 414670 svn+ssh://svn.cern.ch/reps/atlasinst/Institutes/Michigan/SUSY/code/multiLepSearch
+#https://gitlab.cern.ch/hku/SUSY2L/tree/master/code/multiLepSearch
+git clone https://:@gitlab.cern.ch:8443/hku/SUSY2L.git
+cd SUSY2L/code/
+git checkout dfab9edbe7cdd90c604ca2e8edbfec09b010e837
+rm -rf archive
+rm -rf chargeMisID
+rm -rf truthCheck
 
 setupATLAS
 #localSetupRucioClients
@@ -10,9 +15,7 @@ setupATLAS
 #localSetupPandaClient currentJedi
 
 #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/SUSYPhys/SUSYTools/tags/
-rcSetup Base,2.4.17
-svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonEfficiencyCorrections/tags/MuonEfficiencyCorrections-03-03-08 MuonEfficiencyCorrections
-svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/ElectronPhotonID/ElectronPhotonFourMomentumCorrection/tags/ElectronPhotonFourMomentumCorrection-00-02-13 ElectronPhotonFourMomentumCorrection
+rcSetup Base,2.4.18
 
 rc find_packages
 rc clean
