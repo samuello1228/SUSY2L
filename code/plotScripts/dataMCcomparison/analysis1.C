@@ -694,8 +694,22 @@ void analysis1()
     }
     SetAtlasStyle();
     
-    //if(dorw)
-    if(false)
+    struct RegionData
+    {
+        TString RegionName;
+        std::vector<unsigned int> setOfChannel;
+        bool showData;
+        bool showSignificance;
+        bool isSS;
+        bool isSS_ee;
+        std::vector<unsigned int> qFChannel;
+        TString Cut;
+        std::vector<TString> setOfBGMC;
+        std::vector<TString> setOfBGData;
+    };
+    
+    if(dorw)
+    //if(false)
     {
         //Z pt reweighting
         int VarIndex=5;
@@ -704,17 +718,76 @@ void analysis1()
         ChannelIndex_ll[0].push_back(6);
         ChannelIndex_ll[1].push_back(1);
         ChannelIndex_ll[1].push_back(7);
+        
+        std::vector<RegionData> RegionInfo;
+        {
+            RegionData element;
+            
+            element.setOfBGMC.push_back("Zee");
+            element.setOfBGMC.push_back("Zmumu");
+            element.setOfBGMC.push_back("Ztautau");
+            element.setOfBGMC.push_back("ttbar");
+            element.setOfBGMC.push_back("Wt");
+            element.setOfBGMC.push_back("VV");
+            element.setOfBGMC.push_back("Vgamma");
+            
+            element.RegionName = "OS_ee";
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            element.setOfChannel.push_back(6);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = "OS_mumu";
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            element.setOfChannel.push_back(7);
+            RegionInfo.push_back(element);
+        }
 
         //calculate ratio plot
         TH1F* h2Ratio_rw[2];
-        for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,ChannelIndex_ll[LeptonIndex],DataSampleID,channel);
-            std::vector<TChain*> tree2BGMC;
-            initializeTree2(tree2BGMC,ChannelIndex_ll[LeptonIndex],BGMCSampleID,channel);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            
+            std::vector< std::vector<TChain*> > tree2BGMC;
+            std::vector< std::vector<double> > BGMCGroupXS;
+            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector<Group> BGGroup;
+            {
+                //For MC background
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    {
+                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        {
+                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<double> BGMCGroupXSElement;
+                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            {
+                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
+                            }
+                            std::vector<TChain*> tree2BGMCElement;
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            
+                            tree2BGMC.push_back(tree2BGMCElement);
+                            BGMCGroupXS.push_back(BGMCGroupXSElement);
+                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGMCGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                            
+                        }
+                    }
+                }
+            }
 
-            //initialize histograms
             TString title;
             title += Var[VarIndex].VarTitle;
             
@@ -723,153 +796,110 @@ void analysis1()
             xaxis += " ";
             xaxis += Var[VarIndex].unit;
             
+            //h2DataSum
+            TH1F* h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            
             //h2Data
-            TH1F* h2Data[DataSampleID.size()];
-            std::vector<TString> hName2Data;
             for(unsigned int j=0;j<DataSampleID.size();j++)
             {
-                TString NameTemp = "Data_";
-                NameTemp += TString::Itoa(j,10);
-                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Data.push_back(NameTemp);
+                TH1F* hTemp = new TH1F("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                
+                //fill histograms from trees
+                TString temp;
+                temp += Var[VarIndex].VarName;
+                temp += ">>Data";
+                tree2Data[j]->Draw(temp.Data(),"fLwt==0");
+                
+                //add data
+                h2DataSum->Add(hTemp);
+                delete hTemp;
             }
             
-            //h2DataSum
-            TH1F* h2DataSum;
+            //For MC background
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                TString NameTemp = "DataSum";
-                h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2BGMC
-            TH1F* h2BGMC[BGMCSampleID.size()];
-            std::vector<TString> hName2BGMC;
-            for(unsigned int j=0;j<BGMCSampleID.size();j++)
-            {
-                TString NameTemp = "BG_";
-                NameTemp += TString::Itoa(j,10);
-                h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2BGMC.push_back(NameTemp);
-            }
-            
-            //h2BGGruop
-            Group BGGroup[BGMCGroupData.size()];
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
-            {
-                BGGroup[j].info = &(BGMCGroupData[j]);
-                TString NameTemp = BGMCGroupData[j].GroupName;
-                BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2BGSum
-            TH1F* h2BGSum;
-            {
-                TString NameTemp = "BGSum";
-                h2BGSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    
+                    //fill histograms from trees
+                    TString temp;
+                    temp += Var[VarIndex].VarName;
+                    temp += ">>BGMC";
+                    tree2BGMC[j][k]->Draw(temp.Data(),"weight");
+                    
+                    //normalization for BG
+                    hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                    
+                    //add BG
+                    BGGroup[j].h2->Add(hTemp);
+                    delete hTemp;
+                }
             }
             
             //ratio plot for reweighting
             {
                 TString NameTemp = "Ratio_";
-                NameTemp += TString::Itoa(LeptonIndex,10);
-                h2Ratio_rw[LeptonIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2Ratio_rw[LeptonIndex]->GetXaxis()->SetTitle(xaxis.Data());
-                h2Ratio_rw[LeptonIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
-                h2Ratio_rw[LeptonIndex]->SetMarkerColor(LeptonIndex+1);
-                h2Ratio_rw[LeptonIndex]->SetMarkerSize(1);
-                h2Ratio_rw[LeptonIndex]->SetLineColor(LeptonIndex+1);
-                h2Ratio_rw[LeptonIndex]->Sumw2();
+                NameTemp += RegionInfo[RegionIndex].RegionName;
+                h2Ratio_rw[RegionIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Ratio_rw[RegionIndex]->GetXaxis()->SetTitle(xaxis.Data());
+                h2Ratio_rw[RegionIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
+                h2Ratio_rw[RegionIndex]->SetMarkerColor(RegionIndex+1);
+                h2Ratio_rw[RegionIndex]->SetMarkerSize(1);
+                h2Ratio_rw[RegionIndex]->SetLineColor(RegionIndex+1);
+                h2Ratio_rw[RegionIndex]->Sumw2();
             }
-            
-            //fill histograms form trees
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                TString temp;
-                temp += Var[VarIndex].VarName;
-                temp += ">>";
-                temp += hName2Data[j];
-                tree2Data[j]->Draw(temp.Data(),"fLwt==0");
-            }
-            
-            for(unsigned int j=0;j<BGMCSampleID.size();j++)
-            {
-                TString temp;
-                temp += Var[VarIndex].VarName;
-                temp += ">>";
-                temp += hName2BGMC[j];
-                tree2BGMC[j]->Draw(temp.Data(),"weight");
-            }
-            
-            //add data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                h2DataSum->Add(h2Data[j]);
-            }
-            h2Ratio_rw[LeptonIndex]->Add(h2DataSum);
-            
-            //normalization
-            for(unsigned int j=0;j<BGMCSampleID.size();j++)
-            {
-                h2BGMC[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
-            }
-            
-            //Non Z+jets
-            for(unsigned int j=3;j<BGMCGroupData.size();j++)
-            {
-                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
-                {
-                    BGGroup[j].h2->Add(h2BGMC[k]);
-                }
-                h2BGSum->Add(BGGroup[j].h2);
-            }
-            h2BGSum->Scale(-1);
-            h2Ratio_rw[LeptonIndex]->Add(h2BGSum);
+            h2Ratio_rw[RegionIndex]->Add(h2DataSum);
             
             //Z+jets
-            h2BGSum->Scale(0);
-            for(int j=0;j<=2;j++)
+            TH1F* h2Zjets = new TH1F("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1F* h2nonZjets = new TH1F("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+
+            //Non Z+jets
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                if(BGGroup[j].info->GroupName == "Zee"     ||
+                   BGGroup[j].info->GroupName == "Zmumu"   ||
+                   BGGroup[j].info->GroupName == "Ztautau" )
                 {
-                    BGGroup[j].h2->Add(h2BGMC[k]);
+                    h2Zjets->Add(BGGroup[j].h2);
                 }
-                h2BGSum->Add(BGGroup[j].h2);
+                else
+                {
+                    h2nonZjets->Add(BGGroup[j].h2);
+                }
             }
-            h2Ratio_rw[LeptonIndex]->Divide(h2BGSum);
+            h2nonZjets->Scale(-1);
+            h2Ratio_rw[RegionIndex]->Add(h2nonZjets);
+            h2Ratio_rw[RegionIndex]->Divide(h2Zjets);
             
             //delete
-            //h2Data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                delete h2Data[j];
-            }
-            
             //h2DataSum
             delete h2DataSum;
             
-            //h2BGMC
-            for(unsigned int j=0;j<BGMCSampleID.size();j++)
-            {
-                delete h2BGMC[j];
-            }
-            
             //h2BGGruop
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            for(unsigned int j=0;j<BGGroup.size();j++)
             {
                 delete BGGroup[j].h2;
             }
             
-            //h2BGSum
-            delete h2BGSum;
+            //Z+jets
+            delete h2Zjets;
+            delete h2nonZjets;
             
             //delete tree2
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
                 delete tree2Data[i];
             }
-            for(unsigned int i=0;i<BGMCSampleID.size();i++)
+            
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                delete tree2BGMC[i];
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    delete tree2BGMC[j][k];
+                }
             }
         }
         
@@ -1105,20 +1135,6 @@ void analysis1()
             //delete tree1Sig[ChannelIndex][i];
         }
     }
-    
-    struct RegionData
-    {
-        TString RegionName;
-        std::vector<unsigned int> setOfChannel;
-        bool showData;
-        bool showSignificance;
-        bool isSS;
-        bool isSS_ee;
-        std::vector<unsigned int> qFChannel;
-        TString Cut;
-        std::vector<TString> setOfBGMC;
-        std::vector<TString> setOfBGData;
-    };
     
     std::vector<RegionData> RegionInfo;
     {
@@ -1668,7 +1684,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
