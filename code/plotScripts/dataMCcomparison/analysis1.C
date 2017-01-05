@@ -712,12 +712,11 @@ void analysis1()
     //if(false)
     {
         //Z pt reweighting
-        int VarIndex=5;
-        std::vector<unsigned int> ChannelIndex_ll[2];
-        ChannelIndex_ll[0].push_back(0);
-        ChannelIndex_ll[0].push_back(6);
-        ChannelIndex_ll[1].push_back(1);
-        ChannelIndex_ll[1].push_back(7);
+        int VarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "ptll") VarIndex = i;
+        }
         
         std::vector<RegionData> RegionInfo;
         {
@@ -907,14 +906,14 @@ void analysis1()
         //simple fit
         if(simple)
         {
-            for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+            for(int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
                 TString NameTemp = "fun_";
-                NameTemp += TString::Itoa(LeptonIndex,10);
-                fun[LeptonIndex] = new TF1(NameTemp.Data(),"pol2",Var[VarIndex].xmin,Var[VarIndex].xmax);
-                fun[LeptonIndex]->SetLineColor(LeptonIndex+1);
-                fun[LeptonIndex]->SetLineStyle(2);
-                h2Ratio_rw[LeptonIndex]->Fit(NameTemp.Data(),"R");
+                NameTemp += TString::Itoa(RegionIndex,10);
+                fun[RegionIndex] = new TF1(NameTemp.Data(),"pol2",Var[VarIndex].xmin,Var[VarIndex].xmax);
+                fun[RegionIndex]->SetLineColor(RegionIndex+1);
+                fun[RegionIndex]->SetLineStyle(2);
+                h2Ratio_rw[RegionIndex]->Fit(NameTemp.Data(),"R");
             }
         }
         
@@ -1006,12 +1005,12 @@ void analysis1()
         delete c2;
         
         //add weight in the tree
-        for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
-            for(unsigned int i=0;i<ChannelIndex_ll[LeptonIndex].size();i++)
+            for(unsigned int i=0;i<RegionInfo[RegionIndex].setOfChannel.size();i++)
             {
                 TString FileName = "skimming/rw_";
-                const int ChannelIndex = ChannelIndex_ll[LeptonIndex][i];
+                const int ChannelIndex = RegionInfo[RegionIndex].setOfChannel[i];
                 FileName += TString::Itoa(ChannelIndex,10);
                 FileName += ".root";
                 TFile* frw = new TFile(FileName.Data(),"RECREATE");
@@ -1030,7 +1029,7 @@ void analysis1()
                             tree1BGMC[ChannelIndex][k]->GetEntry(m);
                             if(simple)
                             {
-                                rw=fun[LeptonIndex]->Eval(ptll);
+                                rw=fun[RegionIndex]->Eval(ptll);
                             }
                             if(combined)
                             {
