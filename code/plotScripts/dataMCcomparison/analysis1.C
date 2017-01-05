@@ -1668,7 +1668,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1710,10 +1710,10 @@ void analysis1()
                         if(dorw
                            &&
                            (
-                            RegionIndex==0 ||
-                            RegionIndex==1 ||
-                            RegionIndex==6 ||
-                            RegionIndex==7
+                            RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                            RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                            RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                            RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
                            )
                            &&
                            (
@@ -1921,10 +1921,10 @@ void analysis1()
                         if(dorw
                            &&
                             (
-                             RegionIndex==0 ||
-                             RegionIndex==1 ||
-                             RegionIndex==6 ||
-                             RegionIndex==7
+                             RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                             RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                             RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                             RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
                             )
                            &&
                             (
@@ -2491,10 +2491,10 @@ void analysis1()
                 if(dorw
                    &&
                    (
-                    RegionIndex==0 ||
-                    RegionIndex==1 ||
-                    RegionIndex==6 ||
-                    RegionIndex==7
+                    RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                    RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                    RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                    RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
                    )
                    &&
                    (
