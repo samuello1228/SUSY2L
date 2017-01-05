@@ -31,6 +31,7 @@
 #include "RooStats/RooStatsUtils.h"
 
 bool dorw = 1;
+bool docfw = 1;
 bool simple = 1;
 bool combined = 0;
 
@@ -1021,6 +1022,8 @@ void analysis1()
         delete fun[1];
     }
     
+    //if(docfw)
+    if(false)
     {
         //Charge Flip root files
         TFile* f_cf_data;
@@ -1691,44 +1694,71 @@ void analysis1()
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGMCGroupData[j]);
                         BGGroup.push_back(BGGroupElement);
-                    }
-                }
-                
-                //Z pt reweighting
-                if(dorw
-                   &&
-                   (
-                    RegionIndex==0 ||
-                    RegionIndex==1 ||
-                    RegionIndex==6 ||
-                    RegionIndex==7
-                   )
-                   &&
-                   (
-                    BGGroup[j].info->GroupName == "Zee" ||
-                    BGGroup[j].info->GroupName == "Zmumu" ||
-                    BGGroup[j].info->GroupName == "Ztautau"
-                   )
-                  )
-                {
-                    for(unsigned int k=0;k<tree2BGMC[j].size();k++)
-                    {
-                        TString NameTemp = "tree_rw_";
-                        NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
-                        TChain* ch_rw = new TChain(NameTemp.Data());
                         
-                        for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                        //Z pt reweighting
+                        if(dorw
+                           &&
+                           (
+                            RegionIndex==0 ||
+                            RegionIndex==1 ||
+                            RegionIndex==6 ||
+                            RegionIndex==7
+                           )
+                           &&
+                           (
+                            BGGroupElement.info->GroupName == "Zee" ||
+                            BGGroupElement.info->GroupName == "Zmumu" ||
+                            BGGroupElement.info->GroupName == "Ztautau"
+                           )
+                          )
                         {
-                            TString FileName = "skimming/rw_";
-                            FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
-                            FileName += ".root";
-                            
-                            ch_rw->Add(FileName.Data());
+                            for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                            {
+                                TString NameTemp = "tree_rw_";
+                                NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                TChain* ch_rw = new TChain(NameTemp.Data());
+                                
+                                for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                                {
+                                    TString FileName = "skimming/rw_";
+                                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                                    FileName += ".root";
+                                    
+                                    ch_rw->Add(FileName.Data());
+                                }
+                                tree2BGMCElement[k]->AddFriend(NameTemp.Data());
+                            }
                         }
-                        tree2BGMC[j][k]->AddFriend(NameTemp.Data());
+                        
+                        /*
+                         //for charge filp BG
+                         if(docfw
+                         &&
+                         (RegionIndex>=12 && RegionIndex<=14)
+                         &&
+                         BGGroup[j].info->GroupName == "Zee"
+                         )
+                         {
+                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                         {
+                         TString NameTemp = "tree_cfw_";
+                         NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                         TChain* ch_cfw = new TChain(NameTemp.Data());
+                         
+                         for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                         {
+                         TString FileName = "skimming/cfw_";
+                         FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                         FileName += ".root";
+                         
+                         ch_cfw->Add(FileName.Data());
+                         }
+                         tree2BGMC[j][k]->AddFriend(NameTemp.Data());
+                         }
+                         }
+                         */
                     }
                 }
-                
             }
             
             //For data-driven background
@@ -1751,29 +1781,6 @@ void analysis1()
         
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
-        
-        /*
-        //for charge filp BG
-        if(RegionIndex>=12 && RegionIndex<=14)
-        {
-            for(unsigned int k=BGMCGroupData[0].lower;k<=BGMCGroupData[0].upper;k++)
-            {
-                TString NameTemp = "tree_cfw_";
-                NameTemp += TString::Itoa(k,10);
-                TChain* ch_cfw = new TChain(NameTemp.Data());
-                
-                for(unsigned int j=0;j<RegionInfo[RegionIndex].setOfChannel.size();j++)
-                {
-                    TString FileName = "skimming/cfw_";
-                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[j],10);
-                    FileName += ".root";
-                    
-                    ch_cfw->Add(FileName.Data());
-                }
-                tree2BGMC[k]->AddFriend(NameTemp.Data());
-            }
-        }
-        */
         
         //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -1921,8 +1928,12 @@ void analysis1()
                         }
                         
                         //for charge filp BG
-                        if(RegionIndex>=12 && RegionIndex<=14 &&
-                           BGGroup[j].info->GroupName == "Zee")
+                        if(docfw
+                           &&
+                           (RegionIndex>=12 && RegionIndex<=14)
+                           &&
+                           BGGroup[j].info->GroupName == "Zee"
+                          )
                         {
                             //Cut += "*cfw";
                         }
@@ -2031,7 +2042,6 @@ void analysis1()
                 }
                 
                 //h2Sig
-                
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
                     TString NameTemp = "Sig_";
@@ -2488,15 +2498,18 @@ void analysis1()
                     NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
                     delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                 }
-                
                 /*
                 //for charge filp BG
-                if(RegionIndex>=12 && RegionIndex<=14 &&
-                   BGGroup[j].info->GroupName == "Zee")
+                if(docfw
+                   &&
+                   (RegionIndex>=12 && RegionIndex<=14)
+                   &&
+                   BGGroup[j].info->GroupName == "Zee"
+                  )
                 {
                     TString NameTemp = "tree_cfw_";
-                    NameTemp += TString::Itoa(i,10);
-                    delete tree2BGMC[i]->GetFriend(NameTemp.Data());
+                    NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                    delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                 }
                 */
                 
