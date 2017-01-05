@@ -88,6 +88,29 @@ void initializeTree1(std::vector< std::vector<TChain*> >& tree, std::vector<TStr
     }
 }
 
+void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
+{
+    tree = new TChain("tree");
+    
+    TString fileName = "skimming/skimming.";
+    fileName += SampleID;
+    fileName += "_";
+    fileName += channel;
+    fileName += ".root";
+    //cout<<fileName<<endl;
+    
+    tree->Add(fileName.Data());
+    
+    tree->SetBranchAddress("ptll", &ptll, &b_ptll);
+    tree->SetBranchAddress("weight", &weight, &b_weight);
+    
+    tree->SetBranchAddress("pt1", &pt1, &b_pt1);
+    tree->SetBranchAddress("pt2", &pt2, &b_pt2);
+    tree->SetBranchAddress("eta1", &eta1, &b_eta1);
+    tree->SetBranchAddress("eta2", &eta2, &b_eta2);
+    
+}
+
 void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<TString>& channel)
 {
     for(unsigned int i=0;i<SampleID.size();i++)
@@ -1015,31 +1038,40 @@ void analysis1()
                 FileName += ".root";
                 TFile* frw = new TFile(FileName.Data(),"RECREATE");
                 
-                for(int j=0;j<=2;j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                    if(BGMCGroupData[j].GroupName == "Zee"     ||
+                       BGMCGroupData[j].GroupName == "Zmumu"   ||
+                       BGMCGroupData[j].GroupName == "Ztautau" )
                     {
-                        TString NameTemp = "tree_rw_";
-                        NameTemp += TString::Itoa(k,10);
-                        
-                        TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
-                        treeTemp->Branch("rw",&rw,"rw/D");
-                        for(int m=0;m<tree1BGMC[ChannelIndex][k]->GetEntries();m++)
+                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
-                            tree1BGMC[ChannelIndex][k]->GetEntry(m);
-                            if(simple)
+                            TChain* tree1 = nullptr;
+                            initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                            
+                            TString NameTemp = "tree_rw_";
+                            NameTemp += TString::Itoa(k,10);
+                            TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
+                            tree2->Branch("rw",&rw,"rw/D");
+                            
+                            for(int m=0;m<tree1->GetEntries();m++)
                             {
-                                rw=fun[RegionIndex]->Eval(ptll);
+                                tree1->GetEntry(m);
+                                if(simple)
+                                {
+                                    rw=fun[RegionIndex]->Eval(ptll);
+                                }
+                                if(combined)
+                                {
+                                    rw=fun[1]->Eval(ptll);
+                                }
+                                tree2->Fill();
                             }
-                            if(combined)
-                            {
-                                rw=fun[1]->Eval(ptll);
-                            }
-                            treeTemp->Fill();
+                            delete tree1;
+                            
+                            frw->cd();
+                            tree2->Write();
                         }
-                        
-                        frw->cd();
-                        treeTemp->Write();
                     }
                 }
                 delete frw;
