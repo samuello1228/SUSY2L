@@ -1553,6 +1553,8 @@ void analysis1()
         BGVVData.push_back(element);
     }
     
+    if(false)
+    //if(true)
     {
         double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
         //sample,expN/error/significance
@@ -1651,7 +1653,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1745,7 +1747,8 @@ void analysis1()
                 }
             }
         }
-        
+        */
+        /*
         //for charge filp BG
         if(RegionIndex>=12 && RegionIndex<=14)
         {
@@ -1910,7 +1913,7 @@ void analysis1()
                             )
                           )
                         {
-                            //Cut += "*rw";
+                            Cut += "*rw";
                         }
                         
                         //for charge filp BG
@@ -2068,11 +2071,10 @@ void analysis1()
             }
             
             //Add BG
-            TH1F* h2BGSum;
+            TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             std::vector<Group> vBGGroup;
             for(unsigned int j=0;j<BGGroup.size();j++)
             {
-                h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2BGSum->Add(BGGroup[j].h2);
                 vBGGroup.push_back(BGGroup[j]);
             }
@@ -2483,7 +2485,9 @@ void analysis1()
                     NameTemp += TString::Itoa(i,10);
                     delete tree2BGMC[i]->GetFriend(NameTemp.Data());
                 }
+                */
                 
+                /*
                 //for charge filp BG
                 if(RegionIndex>=12 && RegionIndex<=14 &&
                    BGGroup[j].info->GroupName == "Zee")
