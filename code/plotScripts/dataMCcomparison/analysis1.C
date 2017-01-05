@@ -30,7 +30,7 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
-bool dorw = 0;
+bool dorw = 1;
 bool simple = 1;
 bool combined = 0;
 
@@ -1653,7 +1653,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1715,7 +1715,6 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
         
-        /*
         //Z pt reweighting
         if(dorw
            &&
@@ -1743,11 +1742,11 @@ void analysis1()
                         
                         ch_rw->Add(FileName.Data());
                     }
-                    tree2BGMC[k]->AddFriend(NameTemp.Data());
+                    tree2BGMC[i][k - BGMCGroupData[i].lower]->AddFriend(NameTemp.Data());
                 }
             }
         }
-        */
+        
         /*
         //for charge filp BG
         if(RegionIndex>=12 && RegionIndex<=14)
@@ -2463,7 +2462,6 @@ void analysis1()
         {
             for(unsigned int k=0;k<tree2BGMC[j].size();k++)
             {
-                /*
                 //Z pt reweighting
                 if(dorw
                    &&
@@ -2482,10 +2480,9 @@ void analysis1()
                    )
                 {
                     TString NameTemp = "tree_rw_";
-                    NameTemp += TString::Itoa(i,10);
-                    delete tree2BGMC[i]->GetFriend(NameTemp.Data());
+                    NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                    delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                 }
-                */
                 
                 /*
                 //for charge filp BG
