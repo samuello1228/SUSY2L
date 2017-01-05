@@ -693,7 +693,8 @@ void analysis1()
     }
     SetAtlasStyle();
     
-    if(dorw)
+    //if(dorw)
+    if(false)
     {
         //Z pt reweighting
         int VarIndex=5;
@@ -1692,6 +1693,42 @@ void analysis1()
                         BGGroup.push_back(BGGroupElement);
                     }
                 }
+                
+                //Z pt reweighting
+                if(dorw
+                   &&
+                   (
+                    RegionIndex==0 ||
+                    RegionIndex==1 ||
+                    RegionIndex==6 ||
+                    RegionIndex==7
+                   )
+                   &&
+                   (
+                    BGGroup[j].info->GroupName == "Zee" ||
+                    BGGroup[j].info->GroupName == "Zmumu" ||
+                    BGGroup[j].info->GroupName == "Ztautau"
+                   )
+                  )
+                {
+                    for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                    {
+                        TString NameTemp = "tree_rw_";
+                        NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                        TChain* ch_rw = new TChain(NameTemp.Data());
+                        
+                        for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                        {
+                            TString FileName = "skimming/rw_";
+                            FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                            FileName += ".root";
+                            
+                            ch_rw->Add(FileName.Data());
+                        }
+                        tree2BGMC[j][k]->AddFriend(NameTemp.Data());
+                    }
+                }
+                
             }
             
             //For data-driven background
@@ -1714,38 +1751,6 @@ void analysis1()
         
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
-        
-        //Z pt reweighting
-        if(dorw
-           &&
-           (
-           RegionIndex==0 ||
-           RegionIndex==1 ||
-           RegionIndex==6 ||
-           RegionIndex==7
-           )
-          )
-        {
-            for(int i=0;i<=2;i++)
-            {
-                for(unsigned int k=BGMCGroupData[i].lower;k<=BGMCGroupData[i].upper;k++)
-                {
-                    TString NameTemp = "tree_rw_";
-                    NameTemp += TString::Itoa(k,10);
-                    TChain* ch_rw = new TChain(NameTemp.Data());
-                    
-                    for(unsigned int j=0;j<RegionInfo[RegionIndex].setOfChannel.size();j++)
-                    {
-                        TString FileName = "skimming/rw_";
-                        FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[j],10);
-                        FileName += ".root";
-                        
-                        ch_rw->Add(FileName.Data());
-                    }
-                    tree2BGMC[i][k - BGMCGroupData[i].lower]->AddFriend(NameTemp.Data());
-                }
-            }
-        }
         
         /*
         //for charge filp BG
@@ -1899,16 +1904,16 @@ void analysis1()
                         if(dorw
                            &&
                             (
-                            RegionIndex==0 ||
-                            RegionIndex==1 ||
-                            RegionIndex==6 ||
-                            RegionIndex==7
+                             RegionIndex==0 ||
+                             RegionIndex==1 ||
+                             RegionIndex==6 ||
+                             RegionIndex==7
                             )
                            &&
                             (
-                            BGGroup[j].info->GroupName == "Zee" ||
-                            BGGroup[j].info->GroupName == "Zmumu" ||
-                            BGGroup[j].info->GroupName == "Ztautau"
+                             BGGroup[j].info->GroupName == "Zee" ||
+                             BGGroup[j].info->GroupName == "Zmumu" ||
+                             BGGroup[j].info->GroupName == "Ztautau"
                             )
                           )
                         {
@@ -2470,14 +2475,14 @@ void analysis1()
                     RegionIndex==1 ||
                     RegionIndex==6 ||
                     RegionIndex==7
-                    )
+                   )
                    &&
                    (
                     BGGroup[j].info->GroupName == "Zee" ||
                     BGGroup[j].info->GroupName == "Zmumu" ||
                     BGGroup[j].info->GroupName == "Ztautau"
-                    )
                    )
+                  )
                 {
                     TString NameTemp = "tree_rw_";
                     NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
