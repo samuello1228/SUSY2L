@@ -1202,11 +1202,22 @@ void analysis1()
         {
             if(RegionInfo[RegionIndex].isSS)
             {
+                if(RegionInfo[RegionIndex].isSS_ee)
+                {
+                    if(docfw)
+                    {
+                        RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
+                    }
+                    else
+                    {
+                        RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
+                    }
+                }
+                
+                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
+                
                 RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
-                
-                if(RegionInfo[RegionIndex].isSS_ee) RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
-                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
             }
             else
             {
@@ -1657,7 +1668,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
+    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1730,33 +1741,32 @@ void analysis1()
                             }
                         }
                         
-                        /*
-                         //for charge filp BG
-                         if(docfw
-                         &&
-                         (RegionIndex>=12 && RegionIndex<=14)
-                         &&
-                         BGGroup[j].info->GroupName == "Zee"
-                         )
-                         {
-                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
-                         {
-                         TString NameTemp = "tree_cfw_";
-                         NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
-                         TChain* ch_cfw = new TChain(NameTemp.Data());
-                         
-                         for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
-                         {
-                         TString FileName = "skimming/cfw_";
-                         FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
-                         FileName += ".root";
-                         
-                         ch_cfw->Add(FileName.Data());
-                         }
-                         tree2BGMC[j][k]->AddFriend(NameTemp.Data());
-                         }
-                         }
-                         */
+                        //for charge filp BG
+                        if(docfw
+                           &&
+                           (RegionIndex>=12 && RegionIndex<=14)
+                           &&
+                           BGGroupElement.info->GroupName == "Zee"
+                          )
+                        {
+                            for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                            {
+                                TString NameTemp = "tree_cfw_";
+                                NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                TChain* ch_cfw = new TChain(NameTemp.Data());
+                                
+                                for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                                {
+                                    TString FileName = "skimming/cfw_";
+                                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                                    FileName += ".root";
+                                    
+                                    ch_cfw->Add(FileName.Data());
+                                }
+                                tree2BGMCElement[k]->AddFriend(NameTemp.Data());
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -1904,8 +1914,8 @@ void analysis1()
                         TString temp = Var[VarIndex].VarName;
                         temp += ">>BGMC";
                         
+                        //Weight
                         TString Cut = "weight";
-                        
                         
                         //Z pt reweighting
                         if(dorw
@@ -1935,10 +1945,10 @@ void analysis1()
                            BGGroup[j].info->GroupName == "Zee"
                           )
                         {
-                            //Cut += "*cfw";
+                            Cut += "*cfw";
                         }
                         
-                        
+                        //Cut
                         Cut += "*(1";
                         Cut += CommonCut;
                         
@@ -2498,7 +2508,7 @@ void analysis1()
                     NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
                     delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                 }
-                /*
+                
                 //for charge filp BG
                 if(docfw
                    &&
@@ -2511,7 +2521,6 @@ void analysis1()
                     NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
                     delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                 }
-                */
                 
                 delete tree2BGMC[j][k];
             }
