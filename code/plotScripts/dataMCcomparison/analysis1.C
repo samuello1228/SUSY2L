@@ -59,35 +59,6 @@ TBranch* b_pt2;
 TBranch* b_eta1;
 TBranch* b_eta2;
 
-void initializeTree1(std::vector< std::vector<TChain*> >& tree, std::vector<TString>& SampleID, std::vector<TString>& channel)
-{
-    for(unsigned int i=0;i<SampleID.size();i++)
-    {
-        for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-        {
-            TChain* treeTemp = new TChain("tree");
-            
-            TString fileName = "skimming/skimming.";
-            fileName += SampleID[i];
-            fileName += "_";
-            fileName += channel[ChannelIndex];
-            fileName += ".root";
-            //cout<<fileName<<endl;
-            
-            treeTemp->Add(fileName.Data());
-            tree[ChannelIndex].push_back(treeTemp);
-            
-            tree[ChannelIndex][i]->SetBranchAddress("ptll", &ptll, &b_ptll);
-            tree[ChannelIndex][i]->SetBranchAddress("weight", &weight, &b_weight);
-            
-            tree[ChannelIndex][i]->SetBranchAddress("pt1", &pt1, &b_pt1);
-            tree[ChannelIndex][i]->SetBranchAddress("pt2", &pt2, &b_pt2);
-            tree[ChannelIndex][i]->SetBranchAddress("eta1", &eta1, &b_eta1);
-            tree[ChannelIndex][i]->SetBranchAddress("eta2", &eta2, &b_eta2);
-        }
-    }
-}
-
 void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
 {
     tree = new TChain("tree");
@@ -102,7 +73,6 @@ void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
     tree->Add(fileName.Data());
     
     tree->SetBranchAddress("ptll", &ptll, &b_ptll);
-    tree->SetBranchAddress("weight", &weight, &b_weight);
     
     tree->SetBranchAddress("pt1", &pt1, &b_pt1);
     tree->SetBranchAddress("pt2", &pt2, &b_pt2);
@@ -247,18 +217,6 @@ void analysis1()
     }
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
-    /*
-    //tree
-    std::vector< std::vector<TChain*> > tree1Data;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1Data.push_back(element);
-    }
-    initializeTree1(tree1Data,DataSampleID,channel);
-    */
-    
-    
     //For BGMC
     std::vector<TString> BGMCSampleID;
     std::vector<double> BGMCXS; //cross section in pb
@@ -317,16 +275,6 @@ void analysis1()
         
         delete file;
     }
-    
-    //tree
-    std::vector< std::vector<TChain*> > tree1BGMC;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1BGMC.push_back(element);
-    }
-    initializeTree1(tree1BGMC,BGMCSampleID,channel);
-    
     
     //For Signal MC
     struct SigInfo
@@ -452,17 +400,6 @@ void analysis1()
         
         delete file;
     }
-    
-    /*
-    //tree
-    std::vector< std::vector<TChain*> > tree1Sig;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1Sig.push_back(element);
-    }
-    initializeTree1(tree1Sig,SigSampleID,channel);
-    */
     
     //Group for MC background
     std::vector<GroupData> BGMCGroupData;
@@ -731,8 +668,8 @@ void analysis1()
         std::vector<TString> setOfBGData;
     };
     
-    if(dorw)
-    //if(false)
+    //if(dorw)
+    if(false)
     {
         //Z pt reweighting
         int VarIndex = 0;
@@ -1083,8 +1020,8 @@ void analysis1()
         delete fun[1];
     }
     
-    //if(docfw)
-    if(false)
+    if(docfw)
+    //if(false)
     {
         //Charge Flip root files
         TFile* f_cf_data;
@@ -1110,61 +1047,55 @@ void analysis1()
             FileName += TString::Itoa(ChannelIndex,10);
             FileName += ".root";
             TFile* fcfw = new TFile(FileName.Data(),"RECREATE");
-            for(unsigned int k=BGMCGroupData[0].lower;k<=BGMCGroupData[0].upper;k++)
+            
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                TString NameTemp = "tree_cfw_";
-                NameTemp += TString::Itoa(k,10);
-                
-                TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
-                treeTemp->Branch("cfw",&cfw,"cfw/D");
-                for(int m=0;m<tree1BGMC[ChannelIndex][k]->GetEntries();m++)
+                if(BGMCGroupData[j].GroupName == "Zee")
                 {
-                    tree1BGMC[ChannelIndex][k]->GetEntry(m);
-                    
-                    double pt1s = pt1;
-                    double pt2s = pt2;
-                    double eta1s = fabs(eta1);
-                    double eta2s = fabs(eta2);
-                    
-                    if(pt1s>=1000) pt1s = 999;
-                    if(pt2s>=1000) pt2s = 999;
-                    if(eta1s>=2.47) eta1s = 2.46;
-                    if(eta2s>=2.47) eta2s = 2.46;
-                    
-                    double data1 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta1s,pt1s));
-                    double data2 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta2s,pt2s));
-                    
-                    double mc1 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta1s,pt1s));
-                    double mc2 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta2s,pt2s));
-                    
-                    cfw = ( data1*(1-data2) + data2*(1-data1) )/( mc1*(1-mc2) + mc2*(1-mc1) );
-                    treeTemp->Fill();
+                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                    {
+                        TChain* tree1 = nullptr;
+                        initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                        
+                        TString NameTemp = "tree_cfw_";
+                        NameTemp += TString::Itoa(k,10);
+                        TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
+                        tree2->Branch("cfw",&cfw,"cfw/D");
+                        
+                        for(int m=0;m<tree1->GetEntries();m++)
+                        {
+                            tree1->GetEntry(m);
+                            
+                            double pt1s = pt1;
+                            double pt2s = pt2;
+                            double eta1s = fabs(eta1);
+                            double eta2s = fabs(eta2);
+                            
+                            if(pt1s>=1000) pt1s = 999;
+                            if(pt2s>=1000) pt2s = 999;
+                            if(eta1s>=2.47) eta1s = 2.46;
+                            if(eta2s>=2.47) eta2s = 2.46;
+                            
+                            double data1 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta1s,pt1s));
+                            double data2 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta2s,pt2s));
+                            
+                            double mc1 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta1s,pt1s));
+                            double mc2 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta2s,pt2s));
+                            
+                            cfw = ( data1*(1-data2) + data2*(1-data1) )/( mc1*(1-mc2) + mc2*(1-mc1) );
+                            tree2->Fill();
+                        }
+                        delete tree1;
+                        
+                        fcfw->cd();
+                        tree2->Write();
+                    }
                 }
-                
-                fcfw->cd();
-                treeTemp->Write();
             }
             delete fcfw;
         }
         delete f_cf_data;
         delete f_cf_mc;
-    }
-    
-    //delete tree1
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        for(unsigned int i=0;i<DataSampleID.size();i++)
-        {
-            //delete tree1Data[ChannelIndex][i];
-        }
-        for(unsigned int i=0;i<BGMCSampleID.size();i++)
-        {
-            delete tree1BGMC[ChannelIndex][i];
-        }
-        for(unsigned int i=0;i<SigSampleID.size();i++)
-        {
-            //delete tree1Sig[ChannelIndex][i];
-        }
     }
     
     std::vector<RegionData> RegionInfo;
@@ -1715,7 +1646,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
+    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
