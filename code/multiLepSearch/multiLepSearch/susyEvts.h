@@ -16,6 +16,7 @@ class susyEvts{
    TString version;
    TTree* makeTree(TString treename="anglesTree");
    TTree* makeWeightOnlyTree(TString treename, susyEvts* parent);
+   TTree* makePtCorrTree(TString treename, susyEvts* parent);
    TTree* makeKinematicsSysTree(TString treename, susyEvts* parent);
    Int_t GetEntry(Long64_t entry = 0, Int_t getall = 0){return tree1->GetEntry(entry, getall);}
    int fill(){return tree2->Fill();}
