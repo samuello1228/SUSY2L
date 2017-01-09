@@ -1114,7 +1114,15 @@ void analysis1()
             if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
             element.showData = !element.isSS;
             element.showSignificance = element.isSS;
-            element.Cut = "";
+            
+            if(element.isSS)
+            {
+                element.Cut = "&& ( mll<76.18 || mll>106.18 )";
+            }
+            else
+            {
+                element.Cut = "";
+            }
             
             RegionInfo.push_back(element);
         }
@@ -1667,7 +1675,7 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -2538,31 +2546,35 @@ void analysis1()
     
     //latex for tables
     //latex for expN
-    for(unsigned int ISR=0;ISR<=6;ISR+=6)
+    for(unsigned int sign=0;sign<=3;sign+=3)
     {
         TString PathName = "latex/data/";
         PathName += "expN_";
-        if(ISR==0) PathName += "non";
-        PathName += "ISR.tex";
+        if(sign==0) PathName += "OS";
+        else PathName += "SS";
+        PathName += ".tex";
         
         ofstream fout;
         fout.open(PathName.Data());
         
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
         {
+            if(SixChannel>=3 && SixChannel<=5) continue;
+            
             fout<<"\\begin{frame}"<<endl;
             fout<<"\\frametitle{Expected number of events (For ";
-            if(ISR==0) fout<<"non";
-            fout<<"ISR)}"<<endl;
+            if(sign==0) fout<<"opposite sign";
+            else fout<<"same sign";
+            fout<<")}"<<endl;
             
             fout<<"For ";
-            if(SixChannel%3 == 0) fout<<"ee";
-            else if(SixChannel%3 == 1) fout<<"$\\mu\\mu$";
-            else if(SixChannel%3 == 2) fout<<"e$\\mu$";
+            if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
+            else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
+            else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
             fout<<" channel, ";
-            if(SixChannel<=2) fout<<"opposite";
-            else fout<<"same";
-            fout<<" sign \\\\"<<endl;
+            if(SixChannel<=2) fout<<"non-ISR";
+            else fout<<"ISR";
+            fout<<"\\\\"<<endl;
             
             fout<<"\\vspace{5mm}"<<endl;
             fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
@@ -2570,7 +2582,7 @@ void analysis1()
             fout<<"& Number of events & Significance \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/"<<channel[SixChannel+ISR].Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/"<<channel[sign+SixChannel].Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -2581,25 +2593,29 @@ void analysis1()
         //For VV
         PathName = "latex/data/";
         PathName += "expN_BGVV_";
-        if(ISR==0) PathName += "non";
-        PathName += "ISR.tex";
+        if(sign==0) PathName += "OS";
+        else PathName += "SS";
+        PathName += ".tex";
         fout.open(PathName.Data());
         
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
         {
+            if(SixChannel>=3 && SixChannel<=5) continue;
+            
             fout<<"\\begin{frame}"<<endl;
             fout<<"\\frametitle{Expected number of events for VV (For ";
-            if(ISR==0) fout<<"non";
-            fout<<"ISR)}"<<endl;
+            if(sign==0) fout<<"opposite sign";
+            else fout<<"same sign";
+            fout<<")}"<<endl;
             
             fout<<"For ";
-            if(SixChannel%3 == 0) fout<<"ee";
-            else if(SixChannel%3 == 1) fout<<"$\\mu\\mu$";
-            else if(SixChannel%3 == 2) fout<<"e$\\mu$";
+            if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
+            else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
+            else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
             fout<<" channel, ";
-            if(SixChannel<=2) fout<<"opposite";
-            else fout<<"same";
-            fout<<" sign \\\\"<<endl;
+            if(SixChannel<=2) fout<<"non-ISR";
+            else fout<<"ISR";
+            fout<<"\\\\"<<endl;
             
             fout<<"\\vspace{5mm}"<<endl;
             fout<<"\\begin{tabular}{|c|c|}"<<endl;
@@ -2607,7 +2623,7 @@ void analysis1()
             fout<<"& Number of events \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/BGVV_"<<channel[SixChannel+ISR].Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/BGVV_"<<channel[sign+SixChannel].Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -2652,13 +2668,14 @@ void analysis1()
     }
     
     //latex for plot
-    //plot_nonISR.tex and plot_ISR.tex
-    for(unsigned int ISR=0;ISR<=6;ISR+=6)
+    //plot_OS.tex and plot_SS.tex
+    for(unsigned int sign=0;sign<=3;sign+=3)
     {
         TString PathName = "latex/data/";
         PathName += "plot_";
-        if(ISR==0) PathName += "non";
-        PathName += "ISR.tex";
+        if(sign==0) PathName += "OS";
+        else PathName += "SS";
+        PathName += ".tex";
         
         ofstream fout;
         fout.open(PathName.Data());
@@ -2667,26 +2684,30 @@ void analysis1()
         {
             if(Var[VarIndex].VarName=="averageMu") continue;
             if(Var[VarIndex].VarName=="nVtx") continue;
-            if( ISR==0 &&
-                (Var[VarIndex].VarName=="bjetpt"  ||
-                 Var[VarIndex].VarName=="bjeteta" ||
-                 Var[VarIndex].VarName=="bjetphi" ||
-                 Var[VarIndex].VarName=="cjetpt"  ||
-                 Var[VarIndex].VarName=="cjeteta" ||
-                 Var[VarIndex].VarName=="cjetphi" )
-              ) continue;
-            
+
             fout<<"\\begin{frame}"<<endl;
             
             fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
-            if(ISR==0) fout<<"non";
-            fout<<"ISR)}"<<endl;
+            if(sign==0) fout<<"opposite sign";
+            else fout<<"same sign";
+            fout<<")}"<<endl;
             
             fout<<"\\Wider[5em]{"<<endl;
-            for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+            for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
             {
+                if(SixChannel>=3 && SixChannel<=5) continue;
+                
+                if(SixChannel<=2 &&
+                   (Var[VarIndex].VarName=="bjetpt"  ||
+                    Var[VarIndex].VarName=="bjeteta" ||
+                    Var[VarIndex].VarName=="bjetphi" ||
+                    Var[VarIndex].VarName=="cjetpt"  ||
+                    Var[VarIndex].VarName=="cjeteta" ||
+                    Var[VarIndex].VarName=="cjetphi" )
+                   ) continue;
+                
                 fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[SixChannel+ISR].Data()<<"}";
+                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[sign+SixChannel].Data()<<"}";
                 if(SixChannel==2) fout<<" \\\\";
                 fout<<endl;
             }
@@ -2746,7 +2767,7 @@ void analysis1()
         fout.open(PathName.Data());
         for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
-            for(unsigned int ISR=0;ISR<=6;ISR+=6)
+            for(unsigned int sign=0;sign<=3;sign+=3)
             {
                 if(!
                    (Var[VarIndex].VarName=="pt1"   ||
@@ -2760,26 +2781,29 @@ void analysis1()
                     Var[VarIndex].VarName=="HT"    )
                    )continue;
                 
-                if( ISR==0 &&
-                   (Var[VarIndex].VarName=="bjetpt"  ||
-                    Var[VarIndex].VarName=="bjeteta" ||
-                    Var[VarIndex].VarName=="bjetphi" ||
-                    Var[VarIndex].VarName=="cjetpt"  ||
-                    Var[VarIndex].VarName=="cjeteta" ||
-                    Var[VarIndex].VarName=="cjetphi" )
-                   ) continue;
-                
                 fout<<"\\begin{frame}"<<endl;
                 
                 fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
-                if(ISR==0) fout<<"non";
-                fout<<"ISR)}"<<endl;
+                if(sign==0) fout<<"opposite sign";
+                else fout<<"same sign";
+                fout<<")}"<<endl;
                 
                 fout<<"\\Wider[5em]{"<<endl;
-                for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+                for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
                 {
+                    if(SixChannel>=3 && SixChannel<=5) continue;
+                    
+                    if(SixChannel<=2 &&
+                       (Var[VarIndex].VarName=="bjetpt"  ||
+                        Var[VarIndex].VarName=="bjeteta" ||
+                        Var[VarIndex].VarName=="bjetphi" ||
+                        Var[VarIndex].VarName=="cjetpt"  ||
+                        Var[VarIndex].VarName=="cjeteta" ||
+                        Var[VarIndex].VarName=="cjetphi" )
+                       ) continue;
+                    
                     fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[SixChannel+ISR].Data()<<"}";
+                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[sign+SixChannel].Data()<<"}";
                     if(SixChannel==2) fout<<" \\\\";
                     fout<<endl;
                 }
