@@ -1210,18 +1210,20 @@ void analysis1()
         }
     }
     
-    RegionInfo[4].setOfBGMC = RegionInfo[0].setOfBGMC;
-    RegionInfo[4].setOfBGData = RegionInfo[0].setOfBGData;
+    //Significance optimization
     if(doOptimize)
     {
-        //Significance
         int CutVarIndex = 0;
         for(unsigned int i=0;i<Var.size();i++)
         {
             if(Var[i].VarName == "jetpt") CutVarIndex = i;
         }
         
-        const int VarIndex = 0;
+        int CountVarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "pt1") CountVarIndex = i;
+        }
         
         const int SigID = 18;
         
@@ -1309,12 +1311,12 @@ void analysis1()
                 {
                     //initialize histograms
                     TString title;
-                    title += Var[VarIndex].VarTitle;
+                    title += Var[CountVarIndex].VarTitle;
                     
                     TString xaxis;
-                    xaxis += Var[VarIndex].VarTitle;
+                    xaxis += Var[CountVarIndex].VarTitle;
                     xaxis += " ";
-                    xaxis += Var[VarIndex].unit;
+                    xaxis += Var[CountVarIndex].unit;
                     
                     TH1F* h2Sig;
                     
@@ -1322,17 +1324,17 @@ void analysis1()
                     //For MC background
                     for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(j+2);
                         BGGroup[j].h2->SetFillColor(j+2);
                         
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
-                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[VarIndex].VarName;
+                            TString temp = Var[CountVarIndex].VarName;
                             temp += ">>BGMC";
                             
                             TString Cut = "weight*(";
@@ -1355,17 +1357,17 @@ void analysis1()
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
                         TString NameTemp = BGGroup[j].info->GroupName; //?????????????????????????????????????
-                        BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(j+2);
                         BGGroup[j].h2->SetFillColor(j+2);
                         
                         for(unsigned int k=0;k<DataSampleID.size();k++)
                         {
-                            TH1F* hTemp = new TH1F("BGData",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            TH1F* hTemp = new TH1F("BGData",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[VarIndex].VarName;
+                            TString temp = Var[CountVarIndex].VarName;
                             temp += ">>BGData";
                             
                             TString Cut = "1";
@@ -1411,9 +1413,9 @@ void analysis1()
                     
                     //h2Sig
                     {
-                        h2Sig = new TH1F("Sig",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Sig = new TH1F("Sig",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
 
-                        TString temp = Var[VarIndex].VarName;
+                        TString temp = Var[CountVarIndex].VarName;
                         temp += ">>Sig";
                         
                         TString Cut = "weight*(";
