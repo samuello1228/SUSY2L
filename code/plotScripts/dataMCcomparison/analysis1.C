@@ -30,12 +30,12 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
-bool dorw = 1;
-bool docfw = 1;
+bool dorw = 0;
+bool docfw = 0;
 bool simple = 1;
 bool combined = 0;
 
-bool doOptimize = 0;
+bool doOptimize = 1;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -668,8 +668,8 @@ void analysis1()
         std::vector<TString> setOfBGData;
     };
     
-    //if(dorw)
-    if(false)
+    if(dorw)
+    //if(false)
     {
         //Z pt reweighting
         int VarIndex = 0;
@@ -1210,14 +1210,23 @@ void analysis1()
         }
     }
     
-    
+    RegionInfo[4].setOfBGMC = RegionInfo[0].setOfBGMC;
+    RegionInfo[4].setOfBGData = RegionInfo[0].setOfBGData;
     if(doOptimize)
     {
         //Significance
-        int CutVarIndex = 13;
+        int CutVarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "jetpt") CutVarIndex = i;
+        }
+        
+        const int VarIndex = 0;
+        
+        const int SigID = 18;
         
         //cut value
-        double jetptCut[] = {20,25,30,35,40,45,50,70,100,150,200};
+        const double jetptCut[] = {20,25,30,35,40,45,50,70,100,150,200};
         //double jetptCut[] = {25,30,35,40,45,50,70,100,150,200};
         const int cutN = sizeof(jetptCut)/sizeof(jetptCut[0]);
         
@@ -1225,27 +1234,79 @@ void analysis1()
         //for(int RegionIndex=10;RegionIndex<=10;RegionIndex++)
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
-            double uncertainty[] = {0.1,0.2,0.3};
+            std::vector<TChain*> tree2Data;
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            
+            std::vector< std::vector<TChain*> > tree2BGMC;
+            std::vector< std::vector<double> > BGMCGroupXS;
+            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector<Group> BGGroup;
+            {
+                //For MC background
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    {
+                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        {
+                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<double> BGMCGroupXSElement;
+                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            {
+                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
+                            }
+                            std::vector<TChain*> tree2BGMCElement;
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            
+                            tree2BGMC.push_back(tree2BGMCElement);
+                            BGMCGroupXS.push_back(BGMCGroupXSElement);
+                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGMCGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                        }
+                    }
+                }
+                
+                //For data-driven background
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                    {
+                        if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                        {
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGDataGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                        }
+                    }
+                }
+            }
+            
+            //need only one signal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            std::vector<TChain*> tree2Sig;
+            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
+            
+            std::vector<TChain*> tree2DataOS;
+            if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
+ 
+            const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
             double Significance[uncertaintyN][cutN];
             //uncertainty,cut value
             
-            double sumOfEvent[cutN][BGMCGroupData.size()+4][2];
+            double sumOfEvent[cutN][BGGroup.size()+4][2];
             //cut value,sample,expN/error
-            
-            int SigID = 18;
-            
-            std::vector<TChain*> tree2BGMC;
-            initializeTree2(tree2BGMC,RegionInfo[RegionIndex].setOfChannel,BGMCSampleID,channel);
-            std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
             //calculate sumOfEvent and Significance
             for(int u=0;u<uncertaintyN;u++)
             {
                 for(int q=0;q<cutN;q++)
                 {
-                    const int VarIndex = 0;
                     //initialize histograms
                     TString title;
                     title += Var[VarIndex].VarTitle;
@@ -1255,54 +1316,105 @@ void analysis1()
                     xaxis += " ";
                     xaxis += Var[VarIndex].unit;
                     
-                    //h2BGMC
-                    TH1F* h2BGMC[BGMCSampleID.size()];
-                    std::vector<TString> hName2BGMC;
-                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
+                    TH1F* h2Sig;
+                    
+                    //Background
+                    //For MC background
+                    for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        TString NameTemp = "BG_";
-                        NameTemp += TString::Itoa(j,10);
-                        h2BGMC[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                        hName2BGMC.push_back(NameTemp);
+                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                        BGGroup[j].h2->SetLineColor(j+2);
+                        BGGroup[j].h2->SetFillColor(j+2);
+                        
+                        for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                        {
+                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            
+                            //fill histograms from trees
+                            TString temp = Var[VarIndex].VarName;
+                            temp += ">>BGMC";
+                            
+                            TString Cut = "weight*(";
+                            Cut += Var[CutVarIndex].VarName;
+                            Cut += "<=";
+                            Cut += TString::Itoa(jetptCut[q],10);;
+                            Cut += ")";
+
+                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            
+                            //normalization for BG
+                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                            
+                            BGGroup[j].h2->Add(hTemp);
+                            delete hTemp;
+                        }
                     }
                     
-                    //h2BGGruop
-                    Group BGGroup[BGMCGroupData.size()];
-                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                    //For data-driven background
+                    for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].info = &(BGMCGroupData[j]);
-                        TString NameTemp = BGMCGroupData[j].GroupName;
+                        TString NameTemp = BGGroup[j].info->GroupName; //?????????????????????????????????????
                         BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                        BGGroup[j].h2->SetLineColor(j+2);
+                        BGGroup[j].h2->SetFillColor(j+2);
+                        
+                        for(unsigned int k=0;k<DataSampleID.size();k++)
+                        {
+                            TH1F* hTemp = new TH1F("BGData",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            
+                            //fill histograms from trees
+                            TString temp = Var[VarIndex].VarName;
+                            temp += ">>BGData";
+                            
+                            TString Cut = "1";
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += "*qFwt";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += "*fLwt";
+                            }
+                            
+                            Cut += "*(1";
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += "&& fLwt==0";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += "&& fLwt!=0";
+                            }
+                            
+                            Cut += " && ";
+                            Cut += Var[CutVarIndex].VarName;
+                            Cut += "<=";
+                            Cut += TString::Itoa(jetptCut[q],10);;
+                            Cut += ")";
+                            
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            
+                            //Add MCData
+                            BGGroup[j].h2->Add(hTemp);
+                            delete hTemp;
+                        }
                     }
                     
                     //h2Sig
-                    TH1F* h2Sig;
-                    TString hName2Sig;
                     {
-                        hName2Sig = "Sig";
-                        h2Sig = new TH1F(hName2Sig.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                    }
-                    
-                    //Draw for BG
-                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
-                    {
+                        h2Sig = new TH1F("Sig",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+
                         TString temp = Var[VarIndex].VarName;
-                        temp += ">>";
-                        temp += hName2BGMC[j];
-                        
-                        TString Cut = "weight*(";
-                        Cut += Var[CutVarIndex].VarName;
-                        Cut += "<=";
-                        Cut += TString::Itoa(jetptCut[q],10);;
-                        Cut += ")";
-                        tree2BGMC[j]->Draw(temp.Data(),Cut.Data());
-                    }
-                    
-                    //Draw for Signal
-                    {
-                        TString temp = Var[VarIndex].VarName;
-                        temp += ">>";
-                        temp += hName2Sig;
+                        temp += ">>Sig";
                         
                         TString Cut = "weight*(";
                         Cut += Var[CutVarIndex].VarName;
@@ -1310,54 +1422,37 @@ void analysis1()
                         Cut += TString::Itoa(jetptCut[q],10);;
                         Cut += ")";
                         tree2Sig[SigID]->Draw(temp.Data(),Cut.Data());
-                    }
-                    
-                    //normalization for BG
-                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
-                    {
-                        h2BGMC[j]->Scale(BGMCXS[j]/BGMCnAOD[j] *sumDataL);
-                    }
-                    
-                    //add background
-                    sumOfEvent[q][BGMCGroupData.size()][0]=0;
-                    sumOfEvent[q][BGMCGroupData.size()][1]=0;
-                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
-                    {
-                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
-                        {
-                            BGGroup[j].h2->Add(h2BGMC[k]);
-                        }
                         
-                        //expected number of events for BG
-                        sumOfEvent[q][j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[q][j][1]);
-                        //cout<<BGMCGroupData[j].GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
-                        sumOfEvent[q][BGMCGroupData.size()][0] += sumOfEvent[q][j][0];
-                        sumOfEvent[q][BGMCGroupData.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
-                        
+                        //normalization for Signal
+                        h2Sig->Scale(SigXS[SigID]/SignAOD[SigID] *sumDataL);
                     }
-                    //if(VarIndex==0) cout<<"Total BG: "<<sumOfEvent[q][BGMCGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGMCGroupData.size()][1])<<endl;
-                    
                     
                     //expected number of events
-                    h2Sig->Scale(SigXS[SigID]/SignAOD[SigID] *sumDataL);
-                    sumOfEvent[q][BGMCGroupData.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGMCGroupData.size()+2][1]);
-                    //cout<<"Signal: "<<sumOfEvent[q][BGMCGroupData.size()+2][0]<<" +/- "<<sumOfEvent[q][BGMCGroupData.size()+2][1]<<endl;
+                    sumOfEvent[q][BGGroup.size()][0]=0;
+                    sumOfEvent[q][BGGroup.size()][1]=0;
+                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    {
+                        //expected number of events for BG
+                        sumOfEvent[q][j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[q][j][1]);
+                        //cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
+                        sumOfEvent[q][BGGroup.size()][0] += sumOfEvent[q][j][0];
+                        sumOfEvent[q][BGGroup.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
+                    }
+                    //cout<<"Total BG: "<<sumOfEvent[q][BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGGroup.size()][1])<<endl;
+                    
+                    //expected number of events for Signal
+                    sumOfEvent[q][BGGroup.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGGroup.size()+2][1]);
+                    //cout<<"Signal: "<<sumOfEvent[q][BGGroup.size()+2][0]<<" +/- "<<sumOfEvent[q][BGGroup.size()+2][1]<<endl;
                     
                     //Significance
-                    sumOfEvent[q][BGMCGroupData.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGMCGroupData.size()+2][0],sumOfEvent[q][BGMCGroupData.size()][0],uncertainty[u]);
-                    //cout<<"Significance: "<<sumOfEvent[q][BGMCGroupData.size()+3][0]<<endl<<endl;
-                    Significance[u][q] = sumOfEvent[q][BGMCGroupData.size()+3][0];
-                    //cout<<"Signal: "<<sumOfEvent[q][BGMCGroupData.size()+2][0]<<", BG: "<<sumOfEvent[q][BGMCGroupData.size()][0]<<", Significance: "<<sumOfEvent[q][BGMCGroupData.size()+3][0]<<endl<<endl;
+                    sumOfEvent[q][BGGroup.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGGroup.size()+2][0],sumOfEvent[q][BGGroup.size()][0],uncertainty[u]);
+                    //cout<<"Significance: "<<sumOfEvent[q][BGGroup.size()+3][0]<<endl<<endl;
+                    Significance[u][q] = sumOfEvent[q][BGGroup.size()+3][0];
+                    //cout<<"Signal: "<<sumOfEvent[q][BGGroup.size()+2][0]<<", BG: "<<sumOfEvent[q][BGGroup.size()][0]<<", Significance: "<<sumOfEvent[q][BGGroup.size()+3][0]<<endl<<endl;
                     
                     //delete
-                    //h2BGMC
-                    for(unsigned int j=0;j<BGMCSampleID.size();j++)
-                    {
-                        delete h2BGMC[j];
-                    }
-                    
                     //h2BGGruop
-                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                    for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         delete BGGroup[j].h2;
                     }
@@ -1368,22 +1463,30 @@ void analysis1()
             }
             
             //delete tree2
-            for(unsigned int i=0;i<BGMCSampleID.size();i++)
+            for(unsigned int i=0;i<DataSampleID.size();i++)
             {
-                delete tree2BGMC[i];
+                delete tree2Data[i];
+                if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
+            }
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
+            {
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    delete tree2BGMC[j][k];
+                }
             }
             for(unsigned int i=0;i<SigSampleID.size();i++)
             {
                 delete tree2Sig[i];
             }
             
+            //Significance graph
             TCanvas* c2 = new TCanvas();
             TString xaxis;
             xaxis += Var[CutVarIndex].VarTitle;
             xaxis += " ";
             xaxis += Var[CutVarIndex].unit;
             {
-                //Significance graph
                 double min = Significance[0][0];
                 double max = Significance[0][0];
                 TGraph* SignificanceGraph[uncertaintyN];
@@ -1456,14 +1559,14 @@ void analysis1()
             
             {
                 //number event for BG and Sig
-                double min = sumOfEvent[0][BGMCGroupData.size()][0];
-                double max = sumOfEvent[0][BGMCGroupData.size()][0];
+                double min = sumOfEvent[0][BGGroup.size()][0];
+                double max = sumOfEvent[0][BGGroup.size()][0];
                 double BGNumber[cutN];
                 double SigNumber[cutN];
                 for(int q=0;q<cutN;q++)
                 {
-                    BGNumber[q] = sumOfEvent[q][BGMCGroupData.size()][0];
-                    SigNumber[q] = sumOfEvent[q][BGMCGroupData.size()+2][0];
+                    BGNumber[q] = sumOfEvent[q][BGGroup.size()][0];
+                    SigNumber[q] = sumOfEvent[q][BGGroup.size()+2][0];
                     if(BGNumber[q] < min) min = BGNumber[q];
                     if(SigNumber[q] < min) min = SigNumber[q];
                     if(BGNumber[q] > max) max = BGNumber[q];
@@ -1646,7 +1749,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=15;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
