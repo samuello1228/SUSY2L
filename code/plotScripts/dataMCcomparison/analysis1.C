@@ -747,8 +747,7 @@ void analysis1()
                 }
             }
 
-            TString title;
-            title += Var[VarIndex].VarTitle;
+            TString title = Var[VarIndex].VarTitle;
             
             TString xaxis;
             xaxis += Var[VarIndex].VarTitle;
@@ -1309,8 +1308,7 @@ void analysis1()
                 for(int q=0;q<cutN;q++)
                 {
                     //initialize histograms
-                    TString title;
-                    title += Var[CountVarIndex].VarTitle;
+                    TString title = Var[CountVarIndex].VarTitle;
                     
                     TString xaxis;
                     xaxis += Var[CountVarIndex].VarTitle;
@@ -1663,9 +1661,13 @@ void analysis1()
     }
     
     //plot graph
-    bool optimize = 0;
-    unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
+    const bool optimize = 0;
+    unsigned int countVariable = 0;
+    for(unsigned int i=0;i<Var.size();i++)
+    {
+        if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
+    }
+    for(unsigned int RegionIndex=14;RegionIndex<=14;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1798,10 +1800,7 @@ void analysis1()
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
-            TString title;
-            title += Var[VarIndex].VarTitle;
-            title += "_";
-            title += RegionInfo[RegionIndex].RegionName;
+            TString title = Var[VarIndex].VarTitle;
             
             TString xaxis;
             xaxis += Var[VarIndex].VarTitle;
@@ -1850,8 +1849,7 @@ void analysis1()
                 
                 //h2DataSum
                 {
-                    TString NameTemp = "DataSum";
-                    h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                     h2DataSum->GetYaxis()->SetTitle("Number of events");
                     h2DataSum->SetMarkerColor(1);
                     h2DataSum->SetMarkerStyle(20);
@@ -1983,8 +1981,7 @@ void analysis1()
                 //For data-driven background
                 for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                 {
-                    TString NameTemp = BGGroup[j].info->GroupName;
-                    BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                     BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                     BGGroup[j].h2->SetLineColor(j+2);
                     BGGroup[j].h2->SetFillColor(j+2);
@@ -2342,8 +2339,7 @@ void analysis1()
                 h2DataSum->GetYaxis()->SetTitleOffset(y_offset/scale1);
                 
                 //ratio plot
-                TString NameTemp = "Ratio";
-                h2Ratio = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2Ratio->GetXaxis()->SetTitle(xaxis.Data());
                 h2Ratio->GetYaxis()->SetTitle("Data/MC");
                 h2Ratio->GetYaxis()->CenterTitle();
