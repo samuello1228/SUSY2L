@@ -1229,7 +1229,7 @@ void analysis1()
         
         //cut value
         const double jetptCut[] = {20,25,30,35,40,45,50,70,100,150,200};
-        //double jetptCut[] = {25,30,35,40,45,50,70,100,150,200};
+        //const double jetptCut[] = {25,30,35,40,45,50,70,100,150,200};
         const int cutN = sizeof(jetptCut)/sizeof(jetptCut[0]);
         
         for(int RegionIndex=4;RegionIndex<=4;RegionIndex++)
@@ -1289,7 +1289,6 @@ void analysis1()
                 }
             }
             
-            //need only one signal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             std::vector<TChain*> tree2Sig;
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
@@ -1356,8 +1355,7 @@ void analysis1()
                     //For data-driven background
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        TString NameTemp = BGGroup[j].info->GroupName; //?????????????????????????????????????
-                        BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(j+2);
                         BGGroup[j].h2->SetFillColor(j+2);
@@ -1508,7 +1506,14 @@ void analysis1()
                 
                 SignificanceGraph[0]->GetXaxis()->SetTitle(xaxis.Data());
                 SignificanceGraph[0]->GetYaxis()->SetTitle("Significance");
-                SignificanceGraph[0]->SetMinimum(min/1.1);
+                if(min > 0)
+                {
+                    SignificanceGraph[0]->SetMinimum(min/1.1);
+                }
+                else
+                {
+                    SignificanceGraph[0]->SetMinimum(min*1.1);
+                }
                 SignificanceGraph[0]->SetMaximum(max*1.1);
                 
                 //Legend
@@ -1632,7 +1637,6 @@ void analysis1()
             delete c2;
         }
     }
-    
     
     struct SampleData
     {
