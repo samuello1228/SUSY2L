@@ -30,8 +30,8 @@ alg = ROOT.ssEvtPostProc1()
 alg.isData = 0 if options.isMC else 1
 
 qFlipTool = ROOT.ChargeFlipBkgTool("myChargeFlipTool")
-qFlipTool.setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_MC_signal.root")
-qFlipTool.setProperty("InputRatesHistoName", "hFlipProb")
+qFlipTool.setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_data_signal_wSys.root")
+#qFlipTool.setProperty("InputRatesHistoName", "hFlipProb")
 alg.mChargeFlipBkgTool = qFlipTool
 
 fakeLepTool = ROOT.FakeLepBkgTool("myFakeLepTool")
@@ -44,7 +44,8 @@ fakeLepTool = ROOT.FakeLepBkgTool("myFakeLepTool")
 
 fakeLepTool.setProperty("Method", "FakeFactor")
 fakeLepTool.setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/fakefactor_2D_Data16.root")
-fakeLepTool.setProperty("eFakeFactorHistoName", "h_ff_ele_v2")
+fakeLepTool.setProperty("eFakeFactorHistoName", "h_ff_ele")
+#fakeLepTool.setProperty("eFakeFactorHistoName", "h_ff_ele_v2") #this histo has problem of bin error being just the sqrt of bin content
 fakeLepTool.setProperty("uFakeFactorHistoName", "h_ff_mu")
 
 alg.mFakeLepBkgTool = fakeLepTool
