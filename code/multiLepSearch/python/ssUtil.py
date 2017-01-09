@@ -156,13 +156,19 @@ trigCut   = "sig.trigCode!=0"
 
 isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==0
 nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
+#zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
 zMassCut     = "!(int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
 
-sigLepCut    = "Sum$(leps.lFlag & 2)==4" # see obj_def.h in multilepSearch, IS_SIGNAL = 2th bit in lFlag
+sigLepCut    = "((leps.lFlag[0] & 2) + (leps.lFlag[1] & 2) )==4" # see obj_def.h in multilepSearch, IS_SIGNAL = 2th bit in lFlag
 ssCut = "((leps[0].ID>0) == (leps[1].ID>0))"
+
+exact2LepCut = "Length$(leps.lFlag)==2"
+lepptCut = "(leps.pt[0]>25.) && (leps.pt[1]>20.)"
+l12mCut = "(l12.m>60.)"
 
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
 
 def getCut(useISR):
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, sigLepSSWithDataBkgCut]])
+  #myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, exact2LepCut, lepptCut, l12mCut, sigLepSSWithDataBkgCut]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, exact2LepCut, sigLepSSWithDataBkgCut]])
   return myCut

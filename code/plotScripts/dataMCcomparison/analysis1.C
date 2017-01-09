@@ -30,10 +30,8 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
-bool Powheg = 0;
-bool Sherpa = 1;
-
 bool dorw = 0;
+bool docfw = 0;
 bool simple = 1;
 bool combined = 0;
 
@@ -61,33 +59,26 @@ TBranch* b_pt2;
 TBranch* b_eta1;
 TBranch* b_eta2;
 
-void initializeTree1(std::vector< std::vector<TChain*> >& tree, std::vector<TString>& SampleID, std::vector<TString>& channel)
+void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
 {
-    for(unsigned int i=0;i<SampleID.size();i++)
-    {
-        for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-        {
-            TChain* treeTemp = new TChain("tree");
-            
-            TString fileName = "skimming/skimming.";
-            fileName += SampleID[i];
-            fileName += "_";
-            fileName += channel[ChannelIndex];
-            fileName += ".root";
-            //cout<<fileName<<endl;
-            
-            treeTemp->Add(fileName.Data());
-            tree[ChannelIndex].push_back(treeTemp);
-            
-            tree[ChannelIndex][i]->SetBranchAddress("ptll", &ptll, &b_ptll);
-            tree[ChannelIndex][i]->SetBranchAddress("weight", &weight, &b_weight);
-            
-            tree[ChannelIndex][i]->SetBranchAddress("pt1", &pt1, &b_pt1);
-            tree[ChannelIndex][i]->SetBranchAddress("pt2", &pt2, &b_pt2);
-            tree[ChannelIndex][i]->SetBranchAddress("eta1", &eta1, &b_eta1);
-            tree[ChannelIndex][i]->SetBranchAddress("eta2", &eta2, &b_eta2);
-        }
-    }
+    tree = new TChain("tree");
+    
+    TString fileName = "skimming/skimming.";
+    fileName += SampleID;
+    fileName += "_";
+    fileName += channel;
+    fileName += ".root";
+    //cout<<fileName<<endl;
+    
+    tree->Add(fileName.Data());
+    
+    tree->SetBranchAddress("ptll", &ptll, &b_ptll);
+    
+    tree->SetBranchAddress("pt1", &pt1, &b_pt1);
+    tree->SetBranchAddress("pt2", &pt2, &b_pt2);
+    tree->SetBranchAddress("eta1", &eta1, &b_eta1);
+    tree->SetBranchAddress("eta2", &eta2, &b_eta2);
+    
 }
 
 void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<TString>& channel)
@@ -226,21 +217,11 @@ void analysis1()
     }
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
-    //tree
-    std::vector< std::vector<TChain*> > tree1Data;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1Data.push_back(element);
-    }
-    initializeTree1(tree1Data,DataSampleID,channel);
-    
-    
-    //For BG MC
-    std::vector<TString> BGSampleID;
-    std::vector<double> BGXS; //cross section in pb
-    BGSampleID.reserve(20);
-    BGXS.reserve(20);
+    //For BGMC
+    std::vector<TString> BGMCSampleID;
+    std::vector<double> BGMCXS; //cross section in pb
+    BGMCSampleID.reserve(20);
+    BGMCXS.reserve(20);
     
     {
         //read BGSample.txt
@@ -257,30 +238,30 @@ void analysis1()
             
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            BGSampleID.push_back(SampleIDTemp);
+            BGMCSampleID.push_back(SampleIDTemp);
             
-            double BGXSTemp;
-            double BGXSTemp2;
-            fin>>BGXSTemp2;
-            fin>>BGXSTemp;
-            BGXSTemp2 *= BGXSTemp;
-            fin>>BGXSTemp;
-            BGXSTemp2 *= BGXSTemp;
+            double BGMCXSTemp;
+            double BGMCXSTemp2;
+            fin>>BGMCXSTemp2;
+            fin>>BGMCXSTemp;
+            BGMCXSTemp2 *= BGMCXSTemp;
+            fin>>BGMCXSTemp;
+            BGMCXSTemp2 *= BGMCXSTemp;
             
-            BGXS.push_back(BGXSTemp2);
+            BGMCXS.push_back(BGMCXSTemp2);
             
-            fin>>BGXSTemp;
+            fin>>BGMCXSTemp;
         }
         fin.close();
     }
-    cout<<"Total number of BG files: "<<BGSampleID.size()<<endl;
+    cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
     
     //Get number of events in AOD
-    std::vector<unsigned int> BGnAOD;
-    for(unsigned int i=0;i<BGSampleID.size();i++)
+    std::vector<unsigned int> BGMCnAOD;
+    for(unsigned int i=0;i<BGMCSampleID.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
-        NameTemp += BGSampleID[i];
+        NameTemp += BGMCSampleID[i];
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += channel[0];
@@ -290,20 +271,10 @@ void analysis1()
         TH1F *h1 = (TH1F*) file->Get("hist");
         unsigned int nAOD = h1->GetBinContent(1);
         cout<<nAOD<<endl;
-        BGnAOD.push_back(nAOD);
+        BGMCnAOD.push_back(nAOD);
         
         delete file;
     }
-    
-    //tree
-    std::vector< std::vector<TChain*> > tree1BG;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1BG.push_back(element);
-    }
-    initializeTree1(tree1BG,BGSampleID,channel);
-    
     
     //For Signal MC
     struct SigInfo
@@ -430,50 +401,41 @@ void analysis1()
         delete file;
     }
     
-    //tree
-    std::vector< std::vector<TChain*> > tree1Sig;
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        std::vector<TChain*> element;
-        tree1Sig.push_back(element);
-    }
-    initializeTree1(tree1Sig,SigSampleID,channel);
-    
-    //Group for background
-    std::vector<GroupData> BGGroupData;
-    if(Powheg)
-    {
-        GroupData element;
-        element.LegendName = "Z#rightarrow ee";       element.lower = 0;   element.upper = 0;  BGGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#mu#mu";    element.lower = 1;   element.upper = 1;  BGGroupData.push_back(element);
-        element.LegendName = "Z#rightarrow#tau#tau";  element.lower = 2;   element.upper = 2;  BGGroupData.push_back(element);
-        element.LegendName = "t#bar{t}";              element.lower = 3;   element.upper = 3;  BGGroupData.push_back(element);
-        element.LegendName = "Wt";                    element.lower = 4;   element.upper = 5;  BGGroupData.push_back(element);
-    }
-    
-    if(Sherpa)
+    //Group for MC background
+    std::vector<GroupData> BGMCGroupData;
     {
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 48;  element.upper = 71; BGGroupData.push_back(element);
+        element.lower = 48;  element.upper = 71; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 24;  element.upper = 47; BGGroupData.push_back(element);
+        element.lower = 24;  element.upper = 47; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 0;   element.upper = 23; BGGroupData.push_back(element);
+        element.lower = 0;   element.upper = 23; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 72;  element.upper = 72; BGGroupData.push_back(element);
+        element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 73;  element.upper = 74; BGGroupData.push_back(element);
+        element.lower = 73;  element.upper = 74; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 75;  element.upper = 88; BGGroupData.push_back(element);
+        element.lower = 75;  element.upper = 88; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 89;  element.upper = 108;BGGroupData.push_back(element);
+        element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
+    }
+    
+    //Group for data-driven background
+    std::vector<GroupData> BGDataGroupData;
+    {
+        GroupData element;
+        element.GroupName = "charge flip"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
+        
+        element.GroupName = "fake lepton"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
+        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
     }
     
     //plotting
@@ -692,26 +654,99 @@ void analysis1()
     }
     SetAtlasStyle();
     
+    struct RegionData
+    {
+        TString RegionName;
+        std::vector<unsigned int> setOfChannel;
+        bool showData;
+        bool showSignificance;
+        bool isSS;
+        bool isSS_ee;
+        std::vector<unsigned int> qFChannel;
+        TString Cut;
+        std::vector<TString> setOfBGMC;
+        std::vector<TString> setOfBGData;
+    };
+    
     if(dorw)
+    //if(false)
     {
         //Z pt reweighting
-        int VarIndex=5;
-        std::vector<unsigned int> ChannelIndex_ll[2];
-        ChannelIndex_ll[0].push_back(0);
-        ChannelIndex_ll[0].push_back(6);
-        ChannelIndex_ll[1].push_back(1);
-        ChannelIndex_ll[1].push_back(7);
+        int VarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "ptll") VarIndex = i;
+        }
+        
+        std::vector<RegionData> RegionInfo;
+        {
+            RegionData element;
+            
+            element.setOfBGMC.push_back("Zee");
+            element.setOfBGMC.push_back("Zmumu");
+            element.setOfBGMC.push_back("Ztautau");
+            element.setOfBGMC.push_back("ttbar");
+            element.setOfBGMC.push_back("Wt");
+            element.setOfBGMC.push_back("VV");
+            element.setOfBGMC.push_back("Vgamma");
+            
+            element.RegionName = "OS_ee";
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            element.setOfChannel.push_back(6);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = "OS_mumu";
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            element.setOfChannel.push_back(7);
+            RegionInfo.push_back(element);
+        }
 
         //calculate ratio plot
         TH1F* h2Ratio_rw[2];
-        for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,ChannelIndex_ll[LeptonIndex],DataSampleID,channel);
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,ChannelIndex_ll[LeptonIndex],BGSampleID,channel);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            
+            std::vector< std::vector<TChain*> > tree2BGMC;
+            std::vector< std::vector<double> > BGMCGroupXS;
+            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector<Group> BGGroup;
+            {
+                //For MC background
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    {
+                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        {
+                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<double> BGMCGroupXSElement;
+                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            {
+                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
+                            }
+                            std::vector<TChain*> tree2BGMCElement;
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            
+                            tree2BGMC.push_back(tree2BGMCElement);
+                            BGMCGroupXS.push_back(BGMCGroupXSElement);
+                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGMCGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                            
+                        }
+                    }
+                }
+            }
 
-            //initialize histograms
             TString title;
             title += Var[VarIndex].VarTitle;
             
@@ -720,153 +755,110 @@ void analysis1()
             xaxis += " ";
             xaxis += Var[VarIndex].unit;
             
+            //h2DataSum
+            TH1F* h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            
             //h2Data
-            TH1F* h2Data[DataSampleID.size()];
-            std::vector<TString> hName2Data;
             for(unsigned int j=0;j<DataSampleID.size();j++)
             {
-                TString NameTemp = "Data_";
-                NameTemp += TString::Itoa(j,10);
-                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Data.push_back(NameTemp);
+                TH1F* hTemp = new TH1F("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                
+                //fill histograms from trees
+                TString temp;
+                temp += Var[VarIndex].VarName;
+                temp += ">>Data";
+                tree2Data[j]->Draw(temp.Data(),"fLwt==0");
+                
+                //add data
+                h2DataSum->Add(hTemp);
+                delete hTemp;
             }
             
-            //h2DataSum
-            TH1F* h2DataSum;
+            //For MC background
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                TString NameTemp = "DataSum";
-                h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2BG
-            TH1F* h2BG[BGSampleID.size()];
-            std::vector<TString> hName2BG;
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                TString NameTemp = "BG_";
-                NameTemp += TString::Itoa(j,10);
-                h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2BG.push_back(NameTemp);
-            }
-            
-            //h2BGGruop
-            Group BGGroup[BGGroupData.size()];
-            for(unsigned int j=0;j<BGGroupData.size();j++)
-            {
-                BGGroup[j].info = &(BGGroupData[j]);
-                TString NameTemp = BGGroupData[j].GroupName;
-                BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2BGSum
-            TH1F* h2BGSum;
-            {
-                TString NameTemp = "BGSum";
-                h2BGSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    
+                    //fill histograms from trees
+                    TString temp;
+                    temp += Var[VarIndex].VarName;
+                    temp += ">>BGMC";
+                    tree2BGMC[j][k]->Draw(temp.Data(),"weight");
+                    
+                    //normalization for BG
+                    hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                    
+                    //add BG
+                    BGGroup[j].h2->Add(hTemp);
+                    delete hTemp;
+                }
             }
             
             //ratio plot for reweighting
             {
                 TString NameTemp = "Ratio_";
-                NameTemp += TString::Itoa(LeptonIndex,10);
-                h2Ratio_rw[LeptonIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2Ratio_rw[LeptonIndex]->GetXaxis()->SetTitle(xaxis.Data());
-                h2Ratio_rw[LeptonIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
-                h2Ratio_rw[LeptonIndex]->SetMarkerColor(LeptonIndex+1);
-                h2Ratio_rw[LeptonIndex]->SetMarkerSize(1);
-                h2Ratio_rw[LeptonIndex]->SetLineColor(LeptonIndex+1);
-                h2Ratio_rw[LeptonIndex]->Sumw2();
+                NameTemp += RegionInfo[RegionIndex].RegionName;
+                h2Ratio_rw[RegionIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Ratio_rw[RegionIndex]->GetXaxis()->SetTitle(xaxis.Data());
+                h2Ratio_rw[RegionIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
+                h2Ratio_rw[RegionIndex]->SetMarkerColor(RegionIndex+1);
+                h2Ratio_rw[RegionIndex]->SetMarkerSize(1);
+                h2Ratio_rw[RegionIndex]->SetLineColor(RegionIndex+1);
+                h2Ratio_rw[RegionIndex]->Sumw2();
             }
-            
-            //fill histograms form trees
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                TString temp;
-                temp += Var[VarIndex].VarName;
-                temp += ">>";
-                temp += hName2Data[j];
-                tree2Data[j]->Draw(temp.Data());
-            }
-            
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                TString temp;
-                temp += Var[VarIndex].VarName;
-                temp += ">>";
-                temp += hName2BG[j];
-                tree2BG[j]->Draw(temp.Data(),"weight");
-            }
-            
-            //add data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                h2DataSum->Add(h2Data[j]);
-            }
-            h2Ratio_rw[LeptonIndex]->Add(h2DataSum);
-            
-            //normalization
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
-            }
-            
-            //Non Z+jets
-            for(unsigned int j=3;j<BGGroupData.size();j++)
-            {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
-                {
-                    BGGroup[j].h2->Add(h2BG[k]);
-                }
-                h2BGSum->Add(BGGroup[j].h2);
-            }
-            h2BGSum->Scale(-1);
-            h2Ratio_rw[LeptonIndex]->Add(h2BGSum);
+            h2Ratio_rw[RegionIndex]->Add(h2DataSum);
             
             //Z+jets
-            h2BGSum->Scale(0);
-            for(int j=0;j<=2;j++)
+            TH1F* h2Zjets = new TH1F("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1F* h2nonZjets = new TH1F("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+
+            //Non Z+jets
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                if(BGGroup[j].info->GroupName == "Zee"     ||
+                   BGGroup[j].info->GroupName == "Zmumu"   ||
+                   BGGroup[j].info->GroupName == "Ztautau" )
                 {
-                    BGGroup[j].h2->Add(h2BG[k]);
+                    h2Zjets->Add(BGGroup[j].h2);
                 }
-                h2BGSum->Add(BGGroup[j].h2);
+                else
+                {
+                    h2nonZjets->Add(BGGroup[j].h2);
+                }
             }
-            h2Ratio_rw[LeptonIndex]->Divide(h2BGSum);
+            h2nonZjets->Scale(-1);
+            h2Ratio_rw[RegionIndex]->Add(h2nonZjets);
+            h2Ratio_rw[RegionIndex]->Divide(h2Zjets);
             
             //delete
-            //h2Data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                delete h2Data[j];
-            }
-            
             //h2DataSum
             delete h2DataSum;
             
-            //h2BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                delete h2BG[j];
-            }
-            
             //h2BGGruop
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            for(unsigned int j=0;j<BGGroup.size();j++)
             {
                 delete BGGroup[j].h2;
             }
             
-            //h2BGSum
-            delete h2BGSum;
+            //Z+jets
+            delete h2Zjets;
+            delete h2nonZjets;
             
             //delete tree2
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
                 delete tree2Data[i];
             }
-            for(unsigned int i=0;i<BGSampleID.size();i++)
+            
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                delete tree2BG[i];
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    delete tree2BGMC[j][k];
+                }
             }
         }
         
@@ -874,14 +866,14 @@ void analysis1()
         //simple fit
         if(simple)
         {
-            for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+            for(int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
                 TString NameTemp = "fun_";
-                NameTemp += TString::Itoa(LeptonIndex,10);
-                fun[LeptonIndex] = new TF1(NameTemp.Data(),"pol2",Var[VarIndex].xmin,Var[VarIndex].xmax);
-                fun[LeptonIndex]->SetLineColor(LeptonIndex+1);
-                fun[LeptonIndex]->SetLineStyle(2);
-                h2Ratio_rw[LeptonIndex]->Fit(NameTemp.Data(),"R");
+                NameTemp += TString::Itoa(RegionIndex,10);
+                fun[RegionIndex] = new TF1(NameTemp.Data(),"pol2",Var[VarIndex].xmin,Var[VarIndex].xmax);
+                fun[RegionIndex]->SetLineColor(RegionIndex+1);
+                fun[RegionIndex]->SetLineStyle(2);
+                h2Ratio_rw[RegionIndex]->Fit(NameTemp.Data(),"R");
             }
         }
         
@@ -973,41 +965,50 @@ void analysis1()
         delete c2;
         
         //add weight in the tree
-        for(int LeptonIndex=0;LeptonIndex<=1;LeptonIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
-            for(unsigned int i=0;i<ChannelIndex_ll[LeptonIndex].size();i++)
+            for(unsigned int i=0;i<RegionInfo[RegionIndex].setOfChannel.size();i++)
             {
                 TString FileName = "skimming/rw_";
-                const int ChannelIndex = ChannelIndex_ll[LeptonIndex][i];
+                const int ChannelIndex = RegionInfo[RegionIndex].setOfChannel[i];
                 FileName += TString::Itoa(ChannelIndex,10);
                 FileName += ".root";
                 TFile* frw = new TFile(FileName.Data(),"RECREATE");
                 
-                for(int j=0;j<=2;j++)
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
+                    if(BGMCGroupData[j].GroupName == "Zee"     ||
+                       BGMCGroupData[j].GroupName == "Zmumu"   ||
+                       BGMCGroupData[j].GroupName == "Ztautau" )
                     {
-                        TString NameTemp = "tree_rw_";
-                        NameTemp += TString::Itoa(k,10);
-                        
-                        TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
-                        treeTemp->Branch("rw",&rw,"rw/D");
-                        for(int m=0;m<tree1BG[ChannelIndex][k]->GetEntries();m++)
+                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
-                            tree1BG[ChannelIndex][k]->GetEntry(m);
-                            if(simple)
+                            TChain* tree1 = nullptr;
+                            initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                            
+                            TString NameTemp = "tree_rw_";
+                            NameTemp += TString::Itoa(k,10);
+                            TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
+                            tree2->Branch("rw",&rw,"rw/D");
+                            
+                            for(int m=0;m<tree1->GetEntries();m++)
                             {
-                                rw=fun[LeptonIndex]->Eval(ptll);
+                                tree1->GetEntry(m);
+                                if(simple)
+                                {
+                                    rw=fun[RegionIndex]->Eval(ptll);
+                                }
+                                if(combined)
+                                {
+                                    rw=fun[1]->Eval(ptll);
+                                }
+                                tree2->Fill();
                             }
-                            if(combined)
-                            {
-                                rw=fun[1]->Eval(ptll);
-                            }
-                            treeTemp->Fill();
+                            delete tree1;
+                            
+                            frw->cd();
+                            tree2->Write();
                         }
-                        
-                        frw->cd();
-                        treeTemp->Write();
                     }
                 }
                 delete frw;
@@ -1019,6 +1020,8 @@ void analysis1()
         delete fun[1];
     }
     
+    if(docfw)
+    //if(false)
     {
         //Charge Flip root files
         TFile* f_cf_data;
@@ -1044,71 +1047,56 @@ void analysis1()
             FileName += TString::Itoa(ChannelIndex,10);
             FileName += ".root";
             TFile* fcfw = new TFile(FileName.Data(),"RECREATE");
-            for(unsigned int k=BGGroupData[0].lower;k<=BGGroupData[0].upper;k++)
+            
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                TString NameTemp = "tree_cfw_";
-                NameTemp += TString::Itoa(k,10);
-                
-                TTree* treeTemp = new TTree(NameTemp.Data(),NameTemp.Data());
-                treeTemp->Branch("cfw",&cfw,"cfw/D");
-                for(int m=0;m<tree1BG[ChannelIndex][k]->GetEntries();m++)
+                if(BGMCGroupData[j].GroupName == "Zee")
                 {
-                    tree1BG[ChannelIndex][k]->GetEntry(m);
-                    
-                    double pt1s = pt1;
-                    double pt2s = pt2;
-                    double eta1s = fabs(eta1);
-                    double eta2s = fabs(eta2);
-                    
-                    if(pt1s>=1000) pt1s = 999;
-                    if(pt2s>=1000) pt2s = 999;
-                    if(eta1s>=2.47) eta1s = 2.46;
-                    if(eta2s>=2.47) eta2s = 2.46;
-                    
-                    double data1 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta1s,pt1s));
-                    double data2 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta2s,pt2s));
-                    
-                    double mc1 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta1s,pt1s));
-                    double mc2 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta2s,pt2s));
-                    
-                    cfw = ( data1*(1-data2) + data2*(1-data1) )/( mc1*(1-mc2) + mc2*(1-mc1) );
-                    treeTemp->Fill();
+                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                    {
+                        TChain* tree1 = nullptr;
+                        initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                        
+                        TString NameTemp = "tree_cfw_";
+                        NameTemp += TString::Itoa(k,10);
+                        TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
+                        tree2->Branch("cfw",&cfw,"cfw/D");
+                        
+                        for(int m=0;m<tree1->GetEntries();m++)
+                        {
+                            tree1->GetEntry(m);
+                            
+                            double pt1s = pt1;
+                            double pt2s = pt2;
+                            double eta1s = fabs(eta1);
+                            double eta2s = fabs(eta2);
+                            
+                            if(pt1s>=1000) pt1s = 999;
+                            if(pt2s>=1000) pt2s = 999;
+                            if(eta1s>=2.47) eta1s = 2.46;
+                            if(eta2s>=2.47) eta2s = 2.46;
+                            
+                            double data1 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta1s,pt1s));
+                            double data2 = h_cf_data->GetBinContent(h_cf_data->FindBin(eta2s,pt2s));
+                            
+                            double mc1 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta1s,pt1s));
+                            double mc2 = h_cf_mc->GetBinContent(h_cf_mc->FindBin(eta2s,pt2s));
+                            
+                            cfw = ( data1*(1-data2) + data2*(1-data1) )/( mc1*(1-mc2) + mc2*(1-mc1) );
+                            tree2->Fill();
+                        }
+                        delete tree1;
+                        
+                        fcfw->cd();
+                        tree2->Write();
+                    }
                 }
-                
-                fcfw->cd();
-                treeTemp->Write();
             }
             delete fcfw;
         }
         delete f_cf_data;
         delete f_cf_mc;
     }
-    
-    //delete tree1
-    for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
-    {
-        for(unsigned int i=0;i<DataSampleID.size();i++)
-        {
-            delete tree1Data[ChannelIndex][i];
-        }
-        for(unsigned int i=0;i<BGSampleID.size();i++)
-        {
-            delete tree1BG[ChannelIndex][i];
-        }
-        for(unsigned int i=0;i<SigSampleID.size();i++)
-        {
-            delete tree1Sig[ChannelIndex][i];
-        }
-    }
-    
-    struct RegionData
-    {
-        TString RegionName;
-        std::vector<unsigned int> setOfChannel;
-        bool showData;
-        bool showSignificance;
-        TString Cut;
-    };
     
     std::vector<RegionData> RegionInfo;
     {
@@ -1118,148 +1106,315 @@ void analysis1()
         {
             element.RegionName = channel[ChannelIndex];
             element.setOfChannel.clear();
+            element.qFChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
             unsigned int OS = ChannelIndex;
             if(OS>=6) OS -= 6;
-            element.showData = OS<=2;
-            element.showSignificance = OS>=3;
+            element.isSS = OS>=3;
+            element.isSS_ee = OS==3;
+            if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
+            element.showData = !element.isSS;
+            element.showSignificance = element.isSS;
             element.Cut = "";
+            
             RegionInfo.push_back(element);
         }
         
+        
         //Control Region
+        element.isSS = true;
         element.showData = true;
         element.showSignificance = false;
         element.Cut = "&& mll>81.18 && mll<101.18";
         
         //SS_ee
+        element.isSS_ee = true;
+        
         element.RegionName = "CR_nonISR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
+        element.qFChannel.push_back(0);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(9);
+        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_ee";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
         element.setOfChannel.push_back(9);
+        element.qFChannel.push_back(0);
+        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         //SS_mumu
+        element.isSS_ee = false;
+        
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_mumu";
         element.setOfChannel.clear();
+        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
+        
+        //setOfBG
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            if(RegionInfo[RegionIndex].isSS)
+            {
+                if(RegionInfo[RegionIndex].isSS_ee)
+                {
+                    if(docfw)
+                    {
+                        RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
+                    }
+                    else
+                    {
+                        RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
+                    }
+                }
+                
+                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
+                
+                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
+            }
+            else
+            {
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
+            }
+        }
     }
     
-    
+    //Significance optimization
     if(doOptimize)
     {
-        //Significance
-        int CutVarIndex = 13;
+        int CutVarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "jetpt") CutVarIndex = i;
+        }
+        
+        int CountVarIndex = 0;
+        for(unsigned int i=0;i<Var.size();i++)
+        {
+            if(Var[i].VarName == "pt1") CountVarIndex = i;
+        }
+        
+        const int SigID = 18;
         
         //cut value
-        double jetptCut[] = {20,25,30,35,40,45,50,70,100,150,200};
-        //double jetptCut[] = {25,30,35,40,45,50,70,100,150,200};
+        const double jetptCut[] = {20,25,30,35,40,45,50,70,100,150,200};
+        //const double jetptCut[] = {25,30,35,40,45,50,70,100,150,200};
         const int cutN = sizeof(jetptCut)/sizeof(jetptCut[0]);
         
         for(int RegionIndex=4;RegionIndex<=4;RegionIndex++)
         //for(int RegionIndex=10;RegionIndex<=10;RegionIndex++)
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
-            double uncertainty[] = {0.1,0.2,0.3};
+            std::vector<TChain*> tree2Data;
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            
+            std::vector< std::vector<TChain*> > tree2BGMC;
+            std::vector< std::vector<double> > BGMCGroupXS;
+            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector<Group> BGGroup;
+            {
+                //For MC background
+                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    {
+                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        {
+                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<double> BGMCGroupXSElement;
+                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            {
+                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
+                            }
+                            std::vector<TChain*> tree2BGMCElement;
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            
+                            tree2BGMC.push_back(tree2BGMCElement);
+                            BGMCGroupXS.push_back(BGMCGroupXSElement);
+                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGMCGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                        }
+                    }
+                }
+                
+                //For data-driven background
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                    {
+                        if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                        {
+                            Group BGGroupElement;
+                            BGGroupElement.info = &(BGDataGroupData[j]);
+                            BGGroup.push_back(BGGroupElement);
+                        }
+                    }
+                }
+            }
+            
+            std::vector<TChain*> tree2Sig;
+            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
+            
+            std::vector<TChain*> tree2DataOS;
+            if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
+ 
+            const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
             double Significance[uncertaintyN][cutN];
             //uncertainty,cut value
             
-            double sumOfEvent[cutN][BGGroupData.size()+4][2];
+            double sumOfEvent[cutN][BGGroup.size()+4][2];
             //cut value,sample,expN/error
-            
-            int SigID = 18;
-            
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
-            std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
             
             //calculate sumOfEvent and Significance
             for(int u=0;u<uncertaintyN;u++)
             {
                 for(int q=0;q<cutN;q++)
                 {
-                    const int VarIndex = 0;
                     //initialize histograms
                     TString title;
-                    title += Var[VarIndex].VarTitle;
+                    title += Var[CountVarIndex].VarTitle;
                     
                     TString xaxis;
-                    xaxis += Var[VarIndex].VarTitle;
+                    xaxis += Var[CountVarIndex].VarTitle;
                     xaxis += " ";
-                    xaxis += Var[VarIndex].unit;
+                    xaxis += Var[CountVarIndex].unit;
                     
-                    //h2BG
-                    TH1F* h2BG[BGSampleID.size()];
-                    std::vector<TString> hName2BG;
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
+                    TH1F* h2Sig;
+                    
+                    //Background
+                    //For MC background
+                    for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        TString NameTemp = "BG_";
-                        NameTemp += TString::Itoa(j,10);
-                        h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                        hName2BG.push_back(NameTemp);
+                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+                        BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                        BGGroup[j].h2->SetLineColor(j+2);
+                        BGGroup[j].h2->SetFillColor(j+2);
+                        
+                        for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                        {
+                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+                            
+                            //fill histograms from trees
+                            TString temp = Var[CountVarIndex].VarName;
+                            temp += ">>BGMC";
+                            
+                            TString Cut = "weight*(";
+                            Cut += Var[CutVarIndex].VarName;
+                            Cut += "<=";
+                            Cut += TString::Itoa(jetptCut[q],10);;
+                            Cut += ")";
+
+                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            
+                            //normalization for BG
+                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                            
+                            BGGroup[j].h2->Add(hTemp);
+                            delete hTemp;
+                        }
                     }
                     
-                    //h2BGGruop
-                    Group BGGroup[BGGroupData.size()];
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
+                    //For data-driven background
+                    for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].info = &(BGGroupData[j]);
-                        TString NameTemp = BGGroupData[j].GroupName;
-                        BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+                        BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                        BGGroup[j].h2->SetLineColor(j+2);
+                        BGGroup[j].h2->SetFillColor(j+2);
+                        
+                        for(unsigned int k=0;k<DataSampleID.size();k++)
+                        {
+                            TH1F* hTemp = new TH1F("BGData",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+                            
+                            //fill histograms from trees
+                            TString temp = Var[CountVarIndex].VarName;
+                            temp += ">>BGData";
+                            
+                            TString Cut = "1";
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += "*qFwt";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += "*fLwt";
+                            }
+                            
+                            Cut += "*(1";
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += "&& fLwt==0";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += "&& fLwt!=0";
+                            }
+                            
+                            Cut += " && ";
+                            Cut += Var[CutVarIndex].VarName;
+                            Cut += "<=";
+                            Cut += TString::Itoa(jetptCut[q],10);;
+                            Cut += ")";
+                            
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            
+                            //Add MCData
+                            BGGroup[j].h2->Add(hTemp);
+                            delete hTemp;
+                        }
                     }
                     
                     //h2Sig
-                    TH1F* h2Sig;
-                    TString hName2Sig;
                     {
-                        hName2Sig = "Sig";
-                        h2Sig = new TH1F(hName2Sig.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                    }
-                    
-                    //Draw for BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
-                    {
-                        TString temp = Var[VarIndex].VarName;
-                        temp += ">>";
-                        temp += hName2BG[j];
-                        
-                        TString Cut = "weight*(";
-                        Cut += Var[CutVarIndex].VarName;
-                        Cut += "<=";
-                        Cut += TString::Itoa(jetptCut[q],10);;
-                        Cut += ")";
-                        tree2BG[j]->Draw(temp.Data(),Cut.Data());
-                    }
-                    
-                    //Draw for Signal
-                    {
-                        TString temp = Var[VarIndex].VarName;
-                        temp += ">>";
-                        temp += hName2Sig;
+                        h2Sig = new TH1F("Sig",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
+
+                        TString temp = Var[CountVarIndex].VarName;
+                        temp += ">>Sig";
                         
                         TString Cut = "weight*(";
                         Cut += Var[CutVarIndex].VarName;
@@ -1267,54 +1422,37 @@ void analysis1()
                         Cut += TString::Itoa(jetptCut[q],10);;
                         Cut += ")";
                         tree2Sig[SigID]->Draw(temp.Data(),Cut.Data());
-                    }
-                    
-                    //normalization for BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
-                    {
-                        h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
-                    }
-                    
-                    //add background
-                    sumOfEvent[q][BGGroupData.size()][0]=0;
-                    sumOfEvent[q][BGGroupData.size()][1]=0;
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
-                    {
-                        for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
-                        {
-                            BGGroup[j].h2->Add(h2BG[k]);
-                        }
                         
-                        //expected number of events for BG
-                        sumOfEvent[q][j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[q][j][1]);
-                        //cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
-                        sumOfEvent[q][BGGroupData.size()][0] += sumOfEvent[q][j][0];
-                        sumOfEvent[q][BGGroupData.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
-                        
+                        //normalization for Signal
+                        h2Sig->Scale(SigXS[SigID]/SignAOD[SigID] *sumDataL);
                     }
-                    //if(VarIndex==0) cout<<"Total BG: "<<sumOfEvent[q][BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGGroupData.size()][1])<<endl;
-                    
                     
                     //expected number of events
-                    h2Sig->Scale(SigXS[SigID]/SignAOD[SigID] *sumDataL);
-                    sumOfEvent[q][BGGroupData.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGGroupData.size()+2][1]);
-                    //cout<<"Signal: "<<sumOfEvent[q][BGGroupData.size()+2][0]<<" +/- "<<sumOfEvent[q][BGGroupData.size()+2][1]<<endl;
+                    sumOfEvent[q][BGGroup.size()][0]=0;
+                    sumOfEvent[q][BGGroup.size()][1]=0;
+                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    {
+                        //expected number of events for BG
+                        sumOfEvent[q][j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[q][j][1]);
+                        //cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[q][j][0]<<" +/- "<<sumOfEvent[q][j][1]<<endl;
+                        sumOfEvent[q][BGGroup.size()][0] += sumOfEvent[q][j][0];
+                        sumOfEvent[q][BGGroup.size()][1] += sumOfEvent[q][j][1]*sumOfEvent[q][j][1];
+                    }
+                    //cout<<"Total BG: "<<sumOfEvent[q][BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[q][BGGroup.size()][1])<<endl;
+                    
+                    //expected number of events for Signal
+                    sumOfEvent[q][BGGroup.size()+2][0] = h2Sig->IntegralAndError(0,-1,sumOfEvent[q][BGGroup.size()+2][1]);
+                    //cout<<"Signal: "<<sumOfEvent[q][BGGroup.size()+2][0]<<" +/- "<<sumOfEvent[q][BGGroup.size()+2][1]<<endl;
                     
                     //Significance
-                    sumOfEvent[q][BGGroupData.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGGroupData.size()+2][0],sumOfEvent[q][BGGroupData.size()][0],uncertainty[u]);
-                    //cout<<"Significance: "<<sumOfEvent[q][BGGroupData.size()+3][0]<<endl<<endl;
-                    Significance[u][q] = sumOfEvent[q][BGGroupData.size()+3][0];
-                    //cout<<"Signal: "<<sumOfEvent[q][BGGroupData.size()+2][0]<<", BG: "<<sumOfEvent[q][BGGroupData.size()][0]<<", Significance: "<<sumOfEvent[q][BGGroupData.size()+3][0]<<endl<<endl;
+                    sumOfEvent[q][BGGroup.size()+3][0] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[q][BGGroup.size()+2][0],sumOfEvent[q][BGGroup.size()][0],uncertainty[u]);
+                    //cout<<"Significance: "<<sumOfEvent[q][BGGroup.size()+3][0]<<endl<<endl;
+                    Significance[u][q] = sumOfEvent[q][BGGroup.size()+3][0];
+                    //cout<<"Signal: "<<sumOfEvent[q][BGGroup.size()+2][0]<<", BG: "<<sumOfEvent[q][BGGroup.size()][0]<<", Significance: "<<sumOfEvent[q][BGGroup.size()+3][0]<<endl<<endl;
                     
                     //delete
-                    //h2BG
-                    for(unsigned int j=0;j<BGSampleID.size();j++)
-                    {
-                        delete h2BG[j];
-                    }
-                    
                     //h2BGGruop
-                    for(unsigned int j=0;j<BGGroupData.size();j++)
+                    for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         delete BGGroup[j].h2;
                     }
@@ -1325,22 +1463,30 @@ void analysis1()
             }
             
             //delete tree2
-            for(unsigned int i=0;i<BGSampleID.size();i++)
+            for(unsigned int i=0;i<DataSampleID.size();i++)
             {
-                delete tree2BG[i];
+                delete tree2Data[i];
+                if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
+            }
+            for(unsigned int j=0;j<tree2BGMC.size();j++)
+            {
+                for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                {
+                    delete tree2BGMC[j][k];
+                }
             }
             for(unsigned int i=0;i<SigSampleID.size();i++)
             {
                 delete tree2Sig[i];
             }
             
+            //Significance graph
             TCanvas* c2 = new TCanvas();
             TString xaxis;
             xaxis += Var[CutVarIndex].VarTitle;
             xaxis += " ";
             xaxis += Var[CutVarIndex].unit;
             {
-                //Significance graph
                 double min = Significance[0][0];
                 double max = Significance[0][0];
                 TGraph* SignificanceGraph[uncertaintyN];
@@ -1360,7 +1506,14 @@ void analysis1()
                 
                 SignificanceGraph[0]->GetXaxis()->SetTitle(xaxis.Data());
                 SignificanceGraph[0]->GetYaxis()->SetTitle("Significance");
-                SignificanceGraph[0]->SetMinimum(min/1.1);
+                if(min > 0)
+                {
+                    SignificanceGraph[0]->SetMinimum(min/1.1);
+                }
+                else
+                {
+                    SignificanceGraph[0]->SetMinimum(min*1.1);
+                }
                 SignificanceGraph[0]->SetMaximum(max*1.1);
                 
                 //Legend
@@ -1413,14 +1566,14 @@ void analysis1()
             
             {
                 //number event for BG and Sig
-                double min = sumOfEvent[0][BGGroupData.size()][0];
-                double max = sumOfEvent[0][BGGroupData.size()][0];
+                double min = sumOfEvent[0][BGGroup.size()][0];
+                double max = sumOfEvent[0][BGGroup.size()][0];
                 double BGNumber[cutN];
                 double SigNumber[cutN];
                 for(int q=0;q<cutN;q++)
                 {
-                    BGNumber[q] = sumOfEvent[q][BGGroupData.size()][0];
-                    SigNumber[q] = sumOfEvent[q][BGGroupData.size()+2][0];
+                    BGNumber[q] = sumOfEvent[q][BGGroup.size()][0];
+                    SigNumber[q] = sumOfEvent[q][BGGroup.size()+2][0];
                     if(BGNumber[q] < min) min = BGNumber[q];
                     if(SigNumber[q] < min) min = SigNumber[q];
                     if(BGNumber[q] > max) max = BGNumber[q];
@@ -1485,7 +1638,6 @@ void analysis1()
         }
     }
     
-    
     struct SampleData
     {
         TString SampleName;
@@ -1493,176 +1645,153 @@ void analysis1()
     };
     
     std::vector<SampleData> BGVVData;
-    for(unsigned int i = BGGroupData[5].lower;i <= BGGroupData[5].upper;i++)
     {
-        SampleData element;
-        element.SampleName = BGSampleID[i].Data();
-        element.SampleName.Remove(0,19);
-        element.SampleName.ReplaceAll("_","\\_");
-        element.index = i;
-        BGVVData.push_back(element);
-    }
-    
-    {
-        double sumOfEvent[BGGroupData.size()+SigMassSplitting.size()+2][3];
-        //sample,expN/error/significance
-        
-        double sumOfEventVV[BGVVData.size()][2];
-        //sample,expN/error
-        
-        //print expected number of event
-        for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
-        //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+        unsigned int VVGroupIndex = 0;
+        for(unsigned int i=0;i<=BGMCGroupData.size();i++)
         {
-            std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
-            std::vector<TChain*> tree2BG;
-            initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
-            std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
-            
-            cout<<RegionInfo[RegionIndex].RegionName.Data()<<endl;
-            sumOfEvent[BGGroupData.size()][0]=0;
-            sumOfEvent[BGGroupData.size()][1]=0;
-            for(unsigned int j=0;j<BGGroupData.size();j++)
-            {
-                sumOfEvent[j][0]=0;
-                sumOfEvent[j][1]=0;
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
-                {
-                    double expN = 0;
-                    double error2 = 0;
-                    for(int m=0;m<tree2BG[k]->GetEntries();m++)
-                    {
-                        tree2BG[k]->GetEntry(m);
-                        expN += weight;
-                        error2 += weight*weight;
-                    }
-                    double cross = BGXS[k]/BGnAOD[k] *sumDataL;
-                    sumOfEvent[j][0] += expN *cross;
-                    sumOfEvent[j][1] += error2 *cross*cross;
-                    
-                    if(j==5)
-                    {
-                        int VVindex = k - BGGroupData[5].lower;
-                        sumOfEventVV[VVindex][0] = expN *cross;
-                        sumOfEventVV[VVindex][1] = TMath::Sqrt(error2) *cross;
-                        cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
-                    }
-                }
-                cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[j][1])<<endl;
-                sumOfEvent[BGGroupData.size()][0] += sumOfEvent[j][0];
-                sumOfEvent[BGGroupData.size()][1] += sumOfEvent[j][1];
-            }
-            cout<<"Total BG: "<<sumOfEvent[BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1])<<endl;
-            
-            sumOfEvent[BGGroupData.size()+1][0]=0;
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                sumOfEvent[BGGroupData.size()+1][0] += double(tree2Data[j]->GetEntries());
-            }
-            cout<<"Data: "<<sumOfEvent[BGGroupData.size()+1][0]<<endl<<endl;
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                double expN = 0;
-                double error2 = 0;
-                for(int m=0;m<tree2Sig[SigMassSplitting[i].ID]->GetEntries();m++)
-                {
-                    tree2Sig[SigMassSplitting[i].ID]->GetEntry(m);
-                    expN += weight;
-                    error2 += weight*weight;
-                }
-                double cross = SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL;
-                sumOfEvent[BGGroupData.size()+i+2][0] = expN *cross;
-                sumOfEvent[BGGroupData.size()+i+2][1] = TMath::Sqrt(error2) *cross;
-                sumOfEvent[BGGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroupData.size()+i+2][0],sumOfEvent[BGGroupData.size()][0],0.3);
-                
-                cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroupData.size()+i+2][2]<<endl;
-            }
-            cout<<endl;
-            
-            //delete tree2
-            for(unsigned int i=0;i<DataSampleID.size();i++)
-            {
-                delete tree2Data[i];
-            }
-            for(unsigned int i=0;i<BGSampleID.size();i++)
-            {
-                delete tree2BG[i];
-            }
-            for(unsigned int i=0;i<SigSampleID.size();i++)
-            {
-                delete tree2Sig[i];
-            }
+            if(BGMCGroupData[i].GroupName == "VV") VVGroupIndex = i;
+        }
+        for(unsigned int i = BGMCGroupData[VVGroupIndex].lower;i <= BGMCGroupData[VVGroupIndex].upper;i++)
+        {
+            SampleData element;
+            element.SampleName = BGMCSampleID[i].Data();
+            element.SampleName.Remove(0,19);
+            element.SampleName.ReplaceAll("_","\\_");
+            element.index = i;
+            BGVVData.push_back(element);
         }
     }
     
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
-        std::vector<TChain*> tree2BG;
-        initializeTree2(tree2BG,RegionInfo[RegionIndex].setOfChannel,BGSampleID,channel);
+        
+        std::vector< std::vector<TChain*> > tree2BGMC;
+        std::vector< std::vector<double> > BGMCGroupXS;
+        std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+        std::vector<Group> BGGroup;
+        {
+            //For MC background
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                {
+                    if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                    {
+                        std::vector<TString> BGMCGroupSampleID;
+                        std::vector<double> BGMCGroupXSElement;
+                        std::vector<unsigned int> BGMCGroupnAODElement;
+                        for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                        {
+                            BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                            BGMCGroupXSElement.push_back(BGMCXS[m]);
+                            BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
+                        }
+                        std::vector<TChain*> tree2BGMCElement;
+                        initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                        
+                        tree2BGMC.push_back(tree2BGMCElement);
+                        BGMCGroupXS.push_back(BGMCGroupXSElement);
+                        BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                        
+                        Group BGGroupElement;
+                        BGGroupElement.info = &(BGMCGroupData[j]);
+                        BGGroup.push_back(BGGroupElement);
+                        
+                        //Z pt reweighting
+                        if(dorw
+                           &&
+                           (
+                            RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                            RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                            RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                            RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                           )
+                           &&
+                           (
+                            BGGroupElement.info->GroupName == "Zee" ||
+                            BGGroupElement.info->GroupName == "Zmumu" ||
+                            BGGroupElement.info->GroupName == "Ztautau"
+                           )
+                          )
+                        {
+                            for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                            {
+                                TString NameTemp = "tree_rw_";
+                                NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                TChain* ch_rw = new TChain(NameTemp.Data());
+                                
+                                for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                                {
+                                    TString FileName = "skimming/rw_";
+                                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                                    FileName += ".root";
+                                    
+                                    ch_rw->Add(FileName.Data());
+                                }
+                                tree2BGMCElement[k]->AddFriend(NameTemp.Data());
+                            }
+                        }
+                        
+                        //for charge filp BG
+                        if(docfw
+                           &&
+                           (
+                            RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                            RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                            RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                           )
+                           &&
+                           BGGroupElement.info->GroupName == "Zee"
+                          )
+                        {
+                            for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                            {
+                                TString NameTemp = "tree_cfw_";
+                                NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                TChain* ch_cfw = new TChain(NameTemp.Data());
+                                
+                                for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
+                                {
+                                    TString FileName = "skimming/cfw_";
+                                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[m],10);
+                                    FileName += ".root";
+                                    
+                                    ch_cfw->Add(FileName.Data());
+                                }
+                                tree2BGMCElement[k]->AddFriend(NameTemp.Data());
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            
+            //For data-driven background
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                {
+                    if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                    {
+                        Group BGGroupElement;
+                        BGGroupElement.info = &(BGDataGroupData[j]);
+                        BGGroup.push_back(BGGroupElement);
+                    }
+                }
+            }
+        }
+        
         std::vector<TChain*> tree2Sig;
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
         
-        //Z pt reweighting
-        if(dorw
-           &&
-           (
-           RegionIndex==0 ||
-           RegionIndex==1 ||
-           RegionIndex==6 ||
-           RegionIndex==7
-           )
-          )
-        {
-            for(int i=0;i<=2;i++)
-            {
-                for(unsigned int k=BGGroupData[i].lower;k<=BGGroupData[i].upper;k++)
-                {
-                    TString NameTemp = "tree_rw_";
-                    NameTemp += TString::Itoa(k,10);
-                    TChain* ch_rw = new TChain(NameTemp.Data());
-                    
-                    for(unsigned int j=0;j<RegionInfo[RegionIndex].setOfChannel.size();j++)
-                    {
-                        TString FileName = "skimming/rw_";
-                        FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[j],10);
-                        FileName += ".root";
-                        
-                        ch_rw->Add(FileName.Data());
-                    }
-                    tree2BG[k]->AddFriend(NameTemp.Data());
-                }
-            }
-        }
-        
-        //for charge filp BG
-        if(RegionIndex>=12 && RegionIndex<=14)
-        {
-            for(unsigned int k=BGGroupData[0].lower;k<=BGGroupData[0].upper;k++)
-            {
-                TString NameTemp = "tree_cfw_";
-                NameTemp += TString::Itoa(k,10);
-                TChain* ch_cfw = new TChain(NameTemp.Data());
-                
-                for(unsigned int j=0;j<RegionInfo[RegionIndex].setOfChannel.size();j++)
-                {
-                    TString FileName = "skimming/cfw_";
-                    FileName += TString::Itoa(RegionInfo[RegionIndex].setOfChannel[j],10);
-                    FileName += ".root";
-                    
-                    ch_cfw->Add(FileName.Data());
-                }
-                tree2BG[k]->AddFriend(NameTemp.Data());
-            }
-        }
+        std::vector<TChain*> tree2DataOS;
+        if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
         
         //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -1679,84 +1808,15 @@ void analysis1()
             xaxis += " ";
             xaxis += Var[VarIndex].unit;
             
-            //h2Data
-            TH1F* h2Data[DataSampleID.size()];
-            std::vector<TString> hName2Data;
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                TString NameTemp = "Data_";
-                NameTemp += TString::Itoa(j,10);
-                h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Data.push_back(NameTemp);
-            }
-            
-            //h2DataSum
+            //Fill histograms from trees
             TH1F* h2DataSum;
-            {
-                TString NameTemp = "DataSum";
-                h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2DataSum->GetYaxis()->SetTitle("Number of events");
-                h2DataSum->SetMarkerColor(1);
-                h2DataSum->SetMarkerStyle(20);
-                h2DataSum->SetMarkerSize(1);
-                h2DataSum->SetLineColor(1);
-            }
-            
-            //h2BG
-            TH1F* h2BG[BGSampleID.size()];
-            std::vector<TString> hName2BG;
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                TString NameTemp = "BG_";
-                NameTemp += TString::Itoa(j,10);
-                h2BG[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2BG.push_back(NameTemp);
-            }
-            
-            //h2BGGruop
-            Group BGGroup[BGGroupData.size()];
-            for(unsigned int j=0;j<BGGroupData.size();j++)
-            {
-                BGGroup[j].info = &(BGGroupData[j]);
-                TString NameTemp = BGGroupData[j].GroupName;
-                BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                BGGroup[j].h2->SetLineColor(j+2);
-                BGGroup[j].h2->SetFillColor(j+2);
-            }
-            
-            //h2BGSum
-            TH1F* h2BGSum;
-            {
-                TString NameTemp = "BGSum";
-                h2BGSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            }
-            
-            //h2Sig
-            TH1F* h2Sig[SigSampleID.size()];
-            std::vector<TString> hName2Sig;
-            for(unsigned int j=0;j<SigSampleID.size();j++)
-            {
-                TString NameTemp = "Sig_";
-                NameTemp += TString::Itoa(j,10);
-                h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                hName2Sig.push_back(NameTemp);
-            }
-            
-            //h2SigSum
             TH1F* h2SigSum[SigMassSplitting.size()];
-            for(unsigned int j=0;j<SigMassSplitting.size();j++)
+            TH1F* h2Sig[SigSampleID.size()];
+            double sumOfEventVV[BGVVData.size()][2];
+            //sample,expN/error
+
             {
-                TString NameTemp = "SigSum_";
-                NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
-                h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
-                h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
-                h2SigSum[j]->SetLineStyle(1);
-            }
-            
-            //fill histograms form trees
-            {
+                //Common Cut
                 TString CommonCut = "";
                 if(Var[VarIndex].VarName=="jetpt"  ||
                    Var[VarIndex].VarName=="jeteta" ||
@@ -1788,8 +1848,28 @@ void analysis1()
                 
                 CommonCut += RegionInfo[RegionIndex].Cut;
                 
+                //h2DataSum
+                {
+                    TString NameTemp = "DataSum";
+                    h2DataSum = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2DataSum->GetYaxis()->SetTitle("Number of events");
+                    h2DataSum->SetMarkerColor(1);
+                    h2DataSum->SetMarkerStyle(20);
+                    h2DataSum->SetMarkerSize(1);
+                    h2DataSum->SetLineColor(1);
+                }
+                
+                //h2Data
+                TH1F* h2Data[DataSampleID.size()];
+                std::vector<TString> hName2Data;
                 for(unsigned int j=0;j<DataSampleID.size();j++)
                 {
+                    TString NameTemp = "Data_";
+                    NameTemp += TString::Itoa(j,10);
+                    h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    hName2Data.push_back(NameTemp);
+                    
+                    //Fill data
                     TString temp;
                     if(Var[VarIndex].VarName=="averageMu")
                     {
@@ -1804,6 +1884,7 @@ void analysis1()
                     
                     TString Cut = "(1";
                     Cut += CommonCut;
+                    Cut += "&& fLwt==0";
                     
                     if(optimize)
                     {
@@ -1812,60 +1893,180 @@ void analysis1()
                     }
                     Cut += ")";
                     tree2Data[j]->Draw(temp.Data(),Cut.Data());
+                    
+                    //Add data
+                    h2DataSum->Add(h2Data[j]);
                 }
                 
-                for(unsigned int j=0;j<BGSampleID.size();j++)
+                //Background
+                //For MC background
+                for(unsigned int j=0;j<tree2BGMC.size();j++)
                 {
-                    TString temp = Var[VarIndex].VarName;
-                    temp += ">>";
-                    temp += hName2BG[j];
+                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                    BGGroup[j].h2->SetLineColor(j+2);
+                    BGGroup[j].h2->SetFillColor(j+2);
                     
-                    TString Cut = "weight";
-                    
-                    //Z pt reweighting
-                    if(dorw
-                       &&
-                       (
-                       RegionIndex==0 ||
-                       RegionIndex==1 ||
-                       RegionIndex==6 ||
-                       RegionIndex==7
-                       )
-                       &&
-                       (
-                       j<=BGGroupData[0].upper ||
-                       j<=BGGroupData[1].upper ||
-                       j<=BGGroupData[2].upper
-                       )
-                      )
+                    for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                     {
-                        //Cut += "*rw";
+                        TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        
+                        //fill histograms from trees
+                        TString temp = Var[VarIndex].VarName;
+                        temp += ">>BGMC";
+                        
+                        //Weight
+                        TString Cut = "weight";
+                        
+                        //Z pt reweighting
+                        if(dorw
+                           &&
+                            (
+                             RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                             RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                             RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                             RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                            )
+                           &&
+                            (
+                             BGGroup[j].info->GroupName == "Zee" ||
+                             BGGroup[j].info->GroupName == "Zmumu" ||
+                             BGGroup[j].info->GroupName == "Ztautau"
+                            )
+                          )
+                        {
+                            Cut += "*rw";
+                        }
+                        
+                        //for charge filp BG
+                        if(docfw
+                           &&
+                           (
+                            RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                            RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                            RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                           )
+                           &&
+                           BGGroup[j].info->GroupName == "Zee"
+                          )
+                        {
+                            Cut += "*cfw";
+                        }
+                        
+                        //Cut
+                        Cut += "*(1";
+                        Cut += CommonCut;
+                        
+                        if(optimize)
+                        {
+                            Cut += " && jetpt<=";
+                            Cut += TString::Itoa(35,10);
+                        }
+                        Cut += ")";
+                        tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                        
+                        //normalization for BG
+                        hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                        
+                        //expN for BGVV
+                        if(VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
+                        {
+                            sumOfEventVV[k][0] = hTemp->IntegralAndError(0,-1,sumOfEventVV[k][1]);
+                            cout<<BGVVData[k].SampleName.Data()<<": "<<sumOfEventVV[k][0]<<" +/- "<<sumOfEventVV[k][1]<<endl;
+                        }
+                        
+                        BGGroup[j].h2->Add(hTemp);
+                        delete hTemp;
                     }
-                    
-                    //for charge filp BG
-                    if(RegionIndex>=12 && RegionIndex<=14 &&
-                       j>=BGGroupData[0].lower && j<=BGGroupData[0].upper)
-                    {
-                        Cut += "*cfw";
-                    }
-                    
-                    Cut += "*(1";
-                    Cut += CommonCut;
-                    
-                    if(optimize)
-                    {
-                        Cut += " && jetpt<=";
-                        Cut += TString::Itoa(35,10);
-                    }
-                    Cut += ")";
-                    tree2BG[j]->Draw(temp.Data(),Cut.Data());
                 }
                 
+                //For data-driven background
+                for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
+                {
+                    TString NameTemp = BGGroup[j].info->GroupName;
+                    BGGroup[j].h2 = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
+                    BGGroup[j].h2->SetLineColor(j+2);
+                    BGGroup[j].h2->SetFillColor(j+2);
+                    
+                    for(unsigned int k=0;k<DataSampleID.size();k++)
+                    {
+                        h2Data[k]->Scale(0);
+                        
+                        TString temp = Var[VarIndex].VarName;
+                        temp += ">>";
+                        temp += hName2Data[k];
+                        
+                        TString Cut = "1";
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            Cut += "*qFwt";
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            Cut += "*fLwt";
+                        }
+                        
+                        Cut += "*(1";
+                        Cut += CommonCut;
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            Cut += "&& fLwt==0";
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            Cut += "&& fLwt!=0";
+                        }
+                        
+                        if(optimize)
+                        {
+                            Cut += " && jetpt<=";
+                            Cut += TString::Itoa(35,10);
+                        }
+                        Cut += ")";
+                        
+                        if(BGGroup[j].info->GroupName == "charge flip")
+                        {
+                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                        }
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                        }
+                        
+                        //Add MCData
+                        BGGroup[j].h2->Add(h2Data[k]);
+                    }
+                }
+                
+                //delete h2Data
+                for(unsigned int j=0;j<DataSampleID.size();j++)
+                {
+                    delete h2Data[j];
+                }
+                
+                //h2SigSum
+                for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                {
+                    TString NameTemp = "SigSum_";
+                    NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
+                    h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
+                    h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
+                    h2SigSum[j]->SetLineStyle(1);
+                }
+                
+                //h2Sig
                 for(unsigned int j=0;j<SigSampleID.size();j++)
                 {
+                    TString NameTemp = "Sig_";
+                    NameTemp += TString::Itoa(j,10);
+                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    
+                    //Fill Signal
                     TString temp = Var[VarIndex].VarName;
                     temp += ">>";
-                    temp += hName2Sig[j];
+                    temp += NameTemp;
                     
                     TString Cut = "weight*(1";
                     Cut += CommonCut;
@@ -1880,74 +2081,8 @@ void analysis1()
                 }
             }
             
-            double sumOfEvent[BGGroupData.size()+SigMassSplitting.size()+2][3];
-            //sample,expN/error/significance
-            
-            double sumOfEventVV[BGVVData.size()][2];
-            //sample,expN/error
-            
-            //add data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                h2DataSum->Add(h2Data[j]);
-            }
-            
-            if(VarIndex==countVariable)
-            {
-                //expected number of events for Data
-                sumOfEvent[BGGroupData.size()+1][0] = h2DataSum->Integral(0,-1);
-                cout<<"Data: "<<sumOfEvent[BGGroupData.size()+1][0]<<endl;
-            }
-            
-            //normalization for BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                h2BG[j]->Scale(BGXS[j]/BGnAOD[j] *sumDataL);
-            }
-            
-            //add background
-            if(VarIndex==countVariable)
-            {
-                sumOfEvent[BGGroupData.size()][0]=0;
-                sumOfEvent[BGGroupData.size()][1]=0;
-            }
-            for(unsigned int j=0;j<BGGroupData.size();j++)
-            {
-                for(unsigned int k=BGGroupData[j].lower;k<=BGGroupData[j].upper;k++)
-                {
-                    BGGroup[j].h2->Add(h2BG[k]);
-                    
-                    //for BGVV
-                    if(VarIndex==countVariable && j==5)
-                    {
-                        int VVindex = k - BGGroupData[j].lower;
-                        sumOfEventVV[VVindex][0] = h2BG[k]->IntegralAndError(0,-1,sumOfEventVV[VVindex][1]);
-                    }
-                }
-                h2BGSum->Add(BGGroup[j].h2);
-                
-                if(VarIndex==countVariable)
-                {
-                    //expected number of events for BG
-                    sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                    cout<<BGGroupData[j].GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
-                    sumOfEvent[BGGroupData.size()][0] += sumOfEvent[j][0];
-                    sumOfEvent[BGGroupData.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
-                    
-                    //for BGVV
-                    if(j==5)
-                    {
-                        for(unsigned int VVindex=0;VVindex<BGVVData.size();VVindex++)
-                        {
-                            cout<<BGVVData[VVindex].SampleName.Data()<<": "<<sumOfEventVV[VVindex][0]<<" +/- "<<sumOfEventVV[VVindex][1]<<endl;
-                        }
-                    }
-                }
-            }
-            if(VarIndex==countVariable) cout<<"Total BG: "<<sumOfEvent[BGGroupData.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1])<<endl<<endl;
-            
-            //add Signal
-            int SigScale = 10;
+            //Add Signal for the same mass splitting
+            const int SigScale = 10;
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 unsigned int AOD = 0;
@@ -1959,22 +2094,64 @@ void analysis1()
                         AOD += SignAOD[j];
                     }
                 }
+                
                 //normalization for Signal
                 h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
             }
             
+            //Add BG
+            TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            std::vector<Group> vBGGroup;
+            for(unsigned int j=0;j<BGGroup.size();j++)
+            {
+                h2BGSum->Add(BGGroup[j].h2);
+                vBGGroup.push_back(BGGroup[j]);
+            }
+            
+            //sort
+            std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
+            
+            //stack
+            THStack stack;
+            for(unsigned int j=0;j<vBGGroup.size();j++)
+            {
+                stack.Add(vBGGroup[j].h2);
+            }
+            
             if(VarIndex==countVariable)
             {
+                double sumOfEvent[BGGroup.size()+SigMassSplitting.size()+2][3];
+                //sample,expN/error/significance
+                
+                //expected number of events for Data
+                sumOfEvent[BGGroup.size()+1][0] = h2DataSum->Integral(0,-1);
+                cout<<"Data: "<<sumOfEvent[BGGroup.size()+1][0]<<endl;
+                
+                //expected number of events for background
+                sumOfEvent[BGGroup.size()][0]=0;
+                sumOfEvent[BGGroup.size()][1]=0;
+                
+                for(unsigned int j=0;j<BGGroup.size();j++)
+                {
+                    //expected number of events for BG
+                    sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
+                    cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
+                    sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
+                    sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
+                }
+                cout<<"Total BG: "<<sumOfEvent[BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1])<<endl<<endl;
+        
+                //expected number of events for signal
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
                     h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGGroupData.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroupData.size()+i+2][1]);
+                    sumOfEvent[BGGroup.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                     
                     //Significance
-                    sumOfEvent[BGGroupData.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroupData.size()+i+2][0],sumOfEvent[BGGroupData.size()][0],0.3);
+                    sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
                     
-                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroupData.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroupData.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroupData.size()+i+2][2]<<endl;
+                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                 }
                 cout<<endl;
                 
@@ -1987,9 +2164,9 @@ void analysis1()
                 fout.open(PathName.Data());
                 fout<<setprecision(1)<<std::fixed;
                 
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGGroup.size();j++)
                 {
-                    fout<<BGGroupData[j].LatexName.Data();
+                    fout<<BGGroup[j].info->LatexName.Data();
                     fout<<" & $";
                     fout<<sumOfEvent[j][0];
                     fout<<"\\pm";
@@ -1998,15 +2175,15 @@ void analysis1()
                 }
                 
                 fout<<"Total BG & $";
-                fout<<sumOfEvent[BGGroupData.size()][0];
+                fout<<sumOfEvent[BGGroup.size()][0];
                 fout<<"\\pm";
-                fout<<TMath::Sqrt(sumOfEvent[BGGroupData.size()][1]);
+                fout<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
                 fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 
                 if(RegionInfo[RegionIndex].showData)
                 {
                     fout<<"Data & $";
-                    fout<<sumOfEvent[BGGroupData.size()+1][0];
+                    fout<<sumOfEvent[BGGroup.size()+1][0];
                     fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                 }
                 
@@ -2018,15 +2195,15 @@ void analysis1()
                     fout<<SigMass2[SigMassSplitting[i].ID];
                     fout<<") & $";
                     fout<<setprecision(1)<<std::fixed;
-                    fout<<sumOfEvent[BGGroupData.size()+i+2][0];
+                    fout<<sumOfEvent[BGGroup.size()+i+2][0];
                     fout<<"\\pm";
-                    fout<<sumOfEvent[BGGroupData.size()+i+2][1];
+                    fout<<sumOfEvent[BGGroup.size()+i+2][1];
                     fout<<"$ &";
                     if(RegionInfo[RegionIndex].showSignificance)
                     {
                         fout<<"$";
                         fout<<setprecision(3)<<std::fixed;
-                        fout<<sumOfEvent[BGGroupData.size()+i+2][2];
+                        fout<<sumOfEvent[BGGroup.size()+i+2][2];
                         fout<<"$";
                     }
                     fout<<"\\\\"<<endl<<"\\hline"<<endl;
@@ -2050,23 +2227,6 @@ void analysis1()
                     fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
                 }
                 fout.close();
-            }
-            
-            THStack stack;
-            {
-                //sort
-                std::vector<Group> vBGGroup;
-                for(unsigned int j=0;j<BGGroupData.size();j++)
-                {
-                    vBGGroup.push_back(BGGroup[j]);
-                }
-                std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
-                
-                //stack
-                for(unsigned int j=0;j<BGGroupData.size();j++)
-                {
-                    stack.Add(vBGGroup[j].h2);
-                }
             }
             
             {
@@ -2137,7 +2297,7 @@ void analysis1()
                 {
                     leg->AddEntry(h2DataSum,"Data","p");
                 }
-                for(unsigned int j=0;j<BGGroupData.size();j++)
+                for(unsigned int j=0;j<BGGroup.size();j++)
                 {
                     leg->AddEntry(BGGroup[j].h2,BGGroup[j].info->LegendName.Data(),"fl");
                 }
@@ -2279,23 +2439,11 @@ void analysis1()
             //c2->WaitPrimitive();
             
             //delete
-            //h2Data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
-            {
-                delete h2Data[j];
-            }
-            
             //h2DataSum
             delete h2DataSum;
             
-            //h2BG
-            for(unsigned int j=0;j<BGSampleID.size();j++)
-            {
-                delete h2BG[j];
-            }
-            
-            //h2BGGruop
-            for(unsigned int j=0;j<BGGroupData.size();j++)
+            //h2 for BGGruop
+            for(unsigned int j=0;j<BGGroup.size();j++)
             {
                 delete BGGroup[j].h2;
             }
@@ -2338,41 +2486,53 @@ void analysis1()
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
             delete tree2Data[i];
+            if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
         }
-        for(unsigned int i=0;i<BGSampleID.size();i++)
+        for(unsigned int j=0;j<tree2BGMC.size();j++)
         {
-            //Z pt reweighting
-            if(dorw
-               &&
-               (
-                RegionIndex==0 ||
-                RegionIndex==1 ||
-                RegionIndex==6 ||
-                RegionIndex==7
-               )
-               &&
-               (
-                i<=BGGroupData[0].upper ||
-                i<=BGGroupData[1].upper ||
-                i<=BGGroupData[2].upper
-               )
-              )
+            for(unsigned int k=0;k<tree2BGMC[j].size();k++)
             {
-                TString NameTemp = "tree_rw_";
-                NameTemp += TString::Itoa(i,10);
-                delete tree2BG[i]->GetFriend(NameTemp.Data());
+                //Z pt reweighting
+                if(dorw
+                   &&
+                   (
+                    RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
+                    RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
+                    RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
+                    RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                   )
+                   &&
+                   (
+                    BGGroup[j].info->GroupName == "Zee" ||
+                    BGGroup[j].info->GroupName == "Zmumu" ||
+                    BGGroup[j].info->GroupName == "Ztautau"
+                   )
+                  )
+                {
+                    TString NameTemp = "tree_rw_";
+                    NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                    delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
+                }
+                
+                //for charge filp BG
+                if(docfw
+                   &&
+                   (
+                    RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
+                    RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
+                    RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
+                   )
+                   &&
+                   BGGroup[j].info->GroupName == "Zee"
+                  )
+                {
+                    TString NameTemp = "tree_cfw_";
+                    NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                    delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
+                }
+                
+                delete tree2BGMC[j][k];
             }
-            
-            //for charge filp BG
-            if(RegionIndex>=12 && RegionIndex<=14 &&
-               i>=BGGroupData[0].lower && i<=BGGroupData[0].upper)
-            {
-                TString NameTemp = "tree_cfw_";
-                NameTemp += TString::Itoa(i,10);
-                delete tree2BG[i]->GetFriend(NameTemp.Data());
-            }
-            
-            delete tree2BG[i];
         }
         for(unsigned int i=0;i<SigSampleID.size();i++)
         {

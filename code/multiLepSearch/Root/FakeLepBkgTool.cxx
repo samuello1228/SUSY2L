@@ -219,6 +219,8 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
   else if ( m_methodEnum == kFAKE_FACTOR){
 
     int binF = -1;
+    double ff = 0.0;
+
     TH2D* hFakeFactor = NULL;
 
     weight = 1.0;
@@ -231,7 +233,15 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
 
       if (hFakeFactor){
         binF    = hFakeFactor->Fill( pt[0], fabs(eta[0]), 0. );
-        weight *= (binF==-1? 0.0 : hFakeFactor->GetBinContent(binF));
+        if (binF==-1){ ff=0.0;}
+        else{
+          ff = hFakeFactor->GetBinContent(binF);
+          if (nthSys==0 && abs(pdgID[0])==11){ ff += sigma * hFakeFactor->GetBinError(binF); } //nthSys==0 for stat sys on e
+          if (nthSys==1 && abs(pdgID[0])==13){ ff += sigma * hFakeFactor->GetBinError(binF); } //nthSys==1 for stat sys on u
+          if (ff<0.) {ff=0.;}
+          if (ff>1.) {ff=0.;}
+        }
+        weight *= ff;
       }
     }
 
@@ -243,7 +253,15 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
 
       if (hFakeFactor){
         binF    = hFakeFactor->Fill( pt[1], fabs(eta[1]), 0. );
-        weight *= (binF==-1? 0.0 : hFakeFactor->GetBinContent(binF));
+        if (binF==-1){ ff=0.0;}
+        else{
+          ff = hFakeFactor->GetBinContent(binF);
+          if (nthSys==0 && abs(pdgID[0])==11){ ff += sigma * hFakeFactor->GetBinError(binF); } //nthSys==0 for stat sys on e
+          if (nthSys==1 && abs(pdgID[0])==13){ ff += sigma * hFakeFactor->GetBinError(binF); } //nthSys==1 for stat sys on u
+          if (ff<0.) {ff=0.;}
+          if (ff>1.) {ff=0.;}
+        }
+        weight *= ff;
       }
     }
 
@@ -259,10 +277,6 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
     ATH_MSG_WARNING("isSig " << isSig[0] << " " << isSig[1]);
     weight = 0.0;
   }
-  
-  //dummy systematics for now
-  if (nthSys==0 && sigma== 1){ weight*=1.3; }
-  if (nthSys==0 && sigma==-1){ weight*=0.7; }
 
   return weight;
 }
