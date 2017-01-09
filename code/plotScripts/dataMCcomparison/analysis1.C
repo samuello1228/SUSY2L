@@ -35,7 +35,7 @@ bool docfw = 0;
 bool simple = 1;
 bool combined = 0;
 
-bool doOptimize = 1;
+bool doOptimize = 0;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -1645,18 +1645,25 @@ void analysis1()
     };
     
     std::vector<SampleData> BGVVData;
-    for(unsigned int i = BGMCGroupData[5].lower;i <= BGMCGroupData[5].upper;i++)
     {
-        SampleData element;
-        element.SampleName = BGMCSampleID[i].Data();
-        element.SampleName.Remove(0,19);
-        element.SampleName.ReplaceAll("_","\\_");
-        element.index = i;
-        BGVVData.push_back(element);
+        unsigned int VVGroupIndex = 0;
+        for(unsigned int i=0;i<=BGMCGroupData.size();i++)
+        {
+            if(BGMCGroupData[i].GroupName == "VV") VVGroupIndex = i;
+        }
+        for(unsigned int i = BGMCGroupData[VVGroupIndex].lower;i <= BGMCGroupData[VVGroupIndex].upper;i++)
+        {
+            SampleData element;
+            element.SampleName = BGMCSampleID[i].Data();
+            element.SampleName.Remove(0,19);
+            element.SampleName.ReplaceAll("_","\\_");
+            element.index = i;
+            BGVVData.push_back(element);
+        }
     }
     
-    if(false)
-    //if(true)
+    //if(false)
+    if(true)
     {
         double sumOfEvent[BGMCGroupData.size()+SigMassSplitting.size()+2][3];
         //sample,expN/error/significance
@@ -1665,7 +1672,7 @@ void analysis1()
         //sample,expN/error
         
         //print expected number of event
-        for(unsigned int RegionIndex=4;RegionIndex<=4;RegionIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             std::vector<TChain*> tree2Data;
@@ -1755,7 +1762,7 @@ void analysis1()
     //plot graph
     bool optimize = 0;
     unsigned int countVariable = 31;
-    for(unsigned int RegionIndex=15;RegionIndex<=14;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
