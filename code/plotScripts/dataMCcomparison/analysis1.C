@@ -1645,7 +1645,7 @@ void analysis1()
     std::vector<SampleData> BGVVData;
     {
         unsigned int VVGroupIndex = 0;
-        for(unsigned int i=0;i<=BGMCGroupData.size();i++)
+        for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
             if(BGMCGroupData[i].GroupName == "VV") VVGroupIndex = i;
         }
