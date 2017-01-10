@@ -267,11 +267,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
+        /*
         //mll > 60 GeV
         if(!(evts->l12_m>60))
         {
             continue;
         }
+        */
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("mll_60",1);
@@ -519,6 +521,7 @@ void skimming()
     TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
+    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     //SamplePath += "AnalysisBase-02-04-17-419618/";
@@ -526,13 +529,14 @@ void skimming()
     
     //TString tag = "v7.8";
     TString tag = "v8.0";
+    //TString tag = "v8.6";
     //TString tag = "v7.11";
     
     std::vector<nEvent> nSS;
     
     //Data
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "data/";
         //tag += "b.Data";
@@ -547,8 +551,8 @@ void skimming()
     }
     
     //Background
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
@@ -563,8 +567,8 @@ void skimming()
     }
     
     //Signal
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
