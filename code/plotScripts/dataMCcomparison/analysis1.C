@@ -1166,7 +1166,7 @@ void analysis1()
             
             if(element.isSS)
             {
-                //element.Cut = "&& ( mll<76.18 || mll>106.18 )";
+                //element.Cut = " && ( mll<76.18 || mll>106.18 )";
                 element.Cut = "";
             }
             else
@@ -1182,7 +1182,7 @@ void analysis1()
         element.isSS = true;
         element.showData = true;
         element.showSignificance = false;
-        element.Cut = "&& mll>81.18 && mll<101.18";
+        element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
         element.isSS_ee = true;
@@ -1232,9 +1232,81 @@ void analysis1()
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
+        //Signal region
+        TString ISR[2] = {"nonISR","ISR"};
+        TString MT[2] = {"mT_0_100","mT_100_inf"};
+        TString PTLL[2] = {"ptll_0_50","ptll_50_inf"};
+        TString MET[3] = {"MET_0_100","MET_100_150","MET_150_inf"};
+        TString lepton[3] = {"ee","mumu","emu"};
+        
+        TString MTCut[2] = {"mtm<100","mtm>=100"};
+        TString PTLLCut[2] = {"ptll<50","ptll>=50"};
+        TString METCut[3] = {"MET<100","MET>=100 && MET<150","MET>=150"};
+        
+        for(int i=0;i<2;i++)
+        {
+            for(int j=0;j<2;j++)
+            {
+                for(int k=0;k<2;k++)
+                {
+                    if(j==1 && k==1) continue;
+                    for(int l=0;l<3;l++)
+                    {
+                        for(int m=0;m<3;m++)
+                        {
+                            element.RegionName = "";
+                            element.Cut = "";
+                            
+                            element.RegionName += ISR[i];
+                            
+                            element.RegionName += "_";
+                            element.RegionName += MT[j];
+                            element.Cut += " && ";
+                            element.Cut += MTCut[j];
+                            
+                            if(j==0)
+                            {
+                                element.RegionName += "_";
+                                element.RegionName += PTLL[k];
+                                element.Cut += " && ";
+                                element.Cut += PTLLCut[k];
+                            }
+                            else
+                            {
+                                element.RegionName += "_ptll_no_cut";
+                            }
+                            
+                            element.RegionName += "_";
+                            element.RegionName += MET[l];
+                            element.Cut += " && ";
+                            element.Cut += METCut[l];
+                            
+                            element.RegionName += "_";
+                            element.RegionName += lepton[m];
+                            
+                            element.isSS = true;
+                            element.isSS_ee = m==0;
+                            
+                            const unsigned int ChannelIndex = 3 +6*i +m;
+                            element.setOfChannel.clear();
+                            element.setOfChannel.push_back(ChannelIndex);
+                            element.qFChannel.clear();
+                            if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
+                            
+                            element.showData = !element.isSS;
+                            element.showSignificance = element.isSS;
+                            
+                            RegionInfo.push_back(element);
+                        }
+                    }
+                }
+            }
+        }
+        
         //setOfBG
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
+            //cout<<RegionInfo[RegionIndex].RegionName.Data()<<", Cut: "<<RegionInfo[RegionIndex].Cut.Data()<<endl;
             if(RegionInfo[RegionIndex].isSS)
             {
                 if(RegionInfo[RegionIndex].isSS_ee)
@@ -1437,11 +1509,11 @@ void analysis1()
                             Cut += "*(1";
                             if(BGGroup[j].info->GroupName == "charge flip")
                             {
-                                Cut += "&& fLwt==0";
+                                Cut += " && fLwt==0";
                             }
                             if(BGGroup[j].info->GroupName == "fake lepton")
                             {
-                                Cut += "&& fLwt!=0";
+                                Cut += " && fLwt!=0";
                             }
                             
                             Cut += " && ";
@@ -1725,7 +1797,7 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
+    for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1853,8 +1925,8 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
-        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
+        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
@@ -1941,7 +2013,7 @@ void analysis1()
                     
                     TString Cut = "(1";
                     Cut += CommonCut;
-                    Cut += "&& fLwt==0";
+                    Cut += " && fLwt==0";
                     
                     if(optimize)
                     {
@@ -2067,11 +2139,11 @@ void analysis1()
                         Cut += CommonCut;
                         if(BGGroup[j].info->GroupName == "charge flip")
                         {
-                            Cut += "&& fLwt==0";
+                            Cut += " && fLwt==0";
                         }
                         if(BGGroup[j].info->GroupName == "fake lepton")
                         {
-                            Cut += "&& fLwt!=0";
+                            Cut += " && fLwt!=0";
                         }
                         
                         if(optimize)
