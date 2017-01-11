@@ -485,7 +485,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "mll";        element.VarTitle = "Dilepton invariant mass";           element.unit = "[GeV]";
-        element.bin=40;         element.xmin=60;                element.xmax=250;
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
