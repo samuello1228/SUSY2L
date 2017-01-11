@@ -59,6 +59,16 @@ TBranch* b_pt2;
 TBranch* b_eta1;
 TBranch* b_eta2;
 
+struct ChannelData
+{
+    TString ChannelName;
+    bool isSS;
+    bool isSS_ee;
+    unsigned int qFChannel;
+    std::vector<TString> setOfBGMC;
+    std::vector<TString> setOfBGData;
+};
+
 void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
 {
     tree = new TChain("tree");
@@ -81,7 +91,7 @@ void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
     
 }
 
-void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<TString>& channel)
+void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
 {
     for(unsigned int i=0;i<SampleID.size();i++)
     {
@@ -91,7 +101,7 @@ void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetO
             TString fileName = "skimming/skimming.";
             fileName += SampleID[i];
             fileName += "_";
-            fileName += channel[SetOfChannel[j]];
+            fileName += ChannelInfo[SetOfChannel[j]].ChannelName;
             fileName += ".root";
             
             treeTemp->Add(fileName.Data());
@@ -164,8 +174,9 @@ struct GlobalChi2
 void analysis1()
 {
     //channels
-    std::vector<TString> channel;
+    std::vector<ChannelData> ChannelInfo;
     {
+        ChannelData element;
         TString ISR[2] = {"nonISR","ISR"};
         TString sign[2] = {"OS","SS"};
         TString lepton[3] = {"ee","mumu","emu"};
@@ -175,13 +186,13 @@ void analysis1()
             {
                 for(int k=0;k<3;k++)
                 {
-                    TString element = "";
-                    element += ISR[i];
-                    element += "_";
-                    element += sign[j];
-                    element += "_";
-                    element += lepton[k];
-                    channel.push_back(element);
+                    element.ChannelName = "";
+                    element.ChannelName += ISR[i];
+                    element.ChannelName += "_";
+                    element.ChannelName += sign[j];
+                    element.ChannelName += "_";
+                    element.ChannelName += lepton[k];
+                    ChannelInfo.push_back(element);
                 }
             }
         }
@@ -264,7 +275,7 @@ void analysis1()
         NameTemp += BGMCSampleID[i];
         cout<<NameTemp<<": ";
         NameTemp += "_";
-        NameTemp += channel[0];
+        NameTemp += ChannelInfo[0].ChannelName;
         NameTemp += ".root";
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
@@ -389,7 +400,7 @@ void analysis1()
         NameTemp += SigSampleID[i];
         cout<<NameTemp<<": ";
         NameTemp += "_";
-        NameTemp += channel[0];
+        NameTemp += ChannelInfo[0].ChannelName;
         NameTemp += ".root";
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
@@ -485,7 +496,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "mll";        element.VarTitle = "Dilepton invariant mass";           element.unit = "[GeV]";
-        element.bin=40;         element.xmin=60;                element.xmax=250;
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
@@ -708,7 +719,7 @@ void analysis1()
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
@@ -732,7 +743,7 @@ void analysis1()
                                 BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
                             }
                             std::vector<TChain*> tree2BGMCElement;
-                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -983,7 +994,7 @@ void analysis1()
                         for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
                             TChain* tree1 = nullptr;
-                            initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                            initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
                             
                             TString NameTemp = "tree_rw_";
                             NameTemp += TString::Itoa(k,10);
@@ -1054,7 +1065,7 @@ void analysis1()
                     for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                     {
                         TChain* tree1 = nullptr;
-                        initializeTree1new(tree1,BGMCSampleID[k],channel[ChannelIndex]);
+                        initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
                         
                         TString NameTemp = "tree_cfw_";
                         NameTemp += TString::Itoa(k,10);
@@ -1101,9 +1112,9 @@ void analysis1()
     {
         RegionData element;
         
-        for(unsigned int ChannelIndex=0;ChannelIndex<channel.size();ChannelIndex++)
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
-            element.RegionName = channel[ChannelIndex];
+            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
             element.setOfChannel.clear();
             element.qFChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
@@ -1245,7 +1256,7 @@ void analysis1()
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
@@ -1269,7 +1280,7 @@ void analysis1()
                                 BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
                             }
                             std::vector<TChain*> tree2BGMCElement;
-                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -1298,10 +1309,10 @@ void analysis1()
             }
             
             std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
+            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
             
             std::vector<TChain*> tree2DataOS;
-            if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
+            if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
  
             const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
@@ -1676,11 +1687,11 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    //for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
-    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
-        initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
+        initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
         
         std::vector< std::vector<TChain*> > tree2BGMC;
         std::vector< std::vector<double> > BGMCGroupXS;
@@ -1704,7 +1715,7 @@ void analysis1()
                             BGMCGroupnAODElement.push_back(BGMCnAOD[m]);
                         }
                         std::vector<TChain*> tree2BGMCElement;
-                        initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,channel);
+                        initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                         
                         tree2BGMC.push_back(tree2BGMCElement);
                         BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -1799,10 +1810,10 @@ void analysis1()
         }
         
         std::vector<TChain*> tree2Sig;
-        initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,channel);
+        initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
         
         std::vector<TChain*> tree2DataOS;
-        if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,channel);
+        if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
         //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -2588,7 +2599,7 @@ void analysis1()
             fout<<"& Number of events & Significance \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/"<<channel[sign+SixChannel].Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -2629,7 +2640,7 @@ void analysis1()
             fout<<"& Number of events \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/BGVV_"<<channel[sign+SixChannel].Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/BGVV_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -2713,7 +2724,7 @@ void analysis1()
                    ) continue;
                 
                 fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[sign+SixChannel].Data()<<"}";
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<"}";
                 if(SixChannel==2) fout<<" \\\\";
                 fout<<endl;
             }
@@ -2809,7 +2820,7 @@ void analysis1()
                        ) continue;
                     
                     fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<channel[sign+SixChannel].Data()<<"}";
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<"}";
                     if(SixChannel==2) fout<<" \\\\";
                     fout<<endl;
                 }
