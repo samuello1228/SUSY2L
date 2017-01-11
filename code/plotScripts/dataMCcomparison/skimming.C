@@ -17,6 +17,7 @@ Double_t MET;
 Double_t mTtwo;
 Double_t mt1;
 Double_t mt2;
+Double_t mtm;
 Double_t HT;
 Double_t R2;
 Double_t l12_dPhi;
@@ -129,6 +130,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mt1",&mt1,"mt1/D");
         tree2[j]->Branch("mt2",&mt2,"mt2/D");
+        tree2[j]->Branch("mtm",&mt2,"mtm/D");
         tree2[j]->Branch("HT",&HT,"HT/D");
         tree2[j]->Branch("R2",&R2,"R2/D");
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
@@ -247,21 +249,21 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         int sigIndex[2];
         sigIndex[0] = 0;
         sigIndex[1] = 1;
-        //pt of leading lepton > 25 GeV
-        if(!(evts->leps_pt[sigIndex[0]]>25))
-        {
-            continue;
-        }
+        ID1 = evts->leps_ID[sigIndex[0]];
+        ID2 = evts->leps_ID[sigIndex[1]];
+        pt1 = evts->leps_pt[sigIndex[0]];
+        pt2 = evts->leps_pt[sigIndex[1]];
+        //pt of leading lepton
+        if(int(abs(ID1)/1000) == 11 && !(pt1>25)) continue;
+        if(int(abs(ID1)/1000) == 13 && !(pt1>20)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt1",1);
         }
         
-        //pt of subleading lepton > 20 GeV
-        if(!(evts->leps_pt[sigIndex[1]]>20))
-        {
-            continue;
-        }
+        //pt of subleading lepton
+        if(int(abs(ID2)/1000) == 11 && !(pt2>15)) continue;
+        if(int(abs(ID2)/1000) == 13 && !(pt2>10)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt2",1);
@@ -278,11 +280,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             h2[m]->Fill("mll_60",1);
         }
-        
-        ID1 = evts->leps_ID[sigIndex[0]];
-        ID2 = evts->leps_ID[sigIndex[1]];
-        pt1 = evts->leps_pt[sigIndex[0]];
-        pt2 = evts->leps_pt[sigIndex[1]];
+
         eta1 = evts->leps_eta[sigIndex[0]];
         eta2 = evts->leps_eta[sigIndex[1]];
         mll = evts->l12_m;
@@ -291,6 +289,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
+        if(mt1<mt2) mtm = mt1;
+        else mtm = mt2;
         HT = evts->sig_HT;
         R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
@@ -524,8 +524,8 @@ void skimming()
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
-    //SamplePath += "AnalysisBase-02-04-17-419618/";
-    SamplePath += "AnalysisBase-02-04-17-419618-wt/";
+    SamplePath += "AnalysisBase-02-04-17-419618/";
+    //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
     
     //TString tag = "v7.8";
     TString tag = "v8.0";
@@ -538,7 +538,7 @@ void skimming()
     //if(true)
     if(false)
     {
-        //SamplePath += "data/";
+        SamplePath += "data/";
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
