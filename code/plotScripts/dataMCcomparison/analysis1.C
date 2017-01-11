@@ -2409,7 +2409,10 @@ void analysis1()
                 ATLASLabel(0.3,0.88,"Internal");
                 
                 TLatex lt2;
-                lt2.DrawLatexNDC(0.3,0.83, "#sqrt{#it{s}} = 13 TeV, 10.6 fb^{-1}");
+                TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
+                NameTemp += TString::Itoa(sumDataL/1000,10);
+                NameTemp += " fb^{-1}";
+                lt2.DrawLatexNDC(0.3,0.83, NameTemp.Data());
                 lt2.SetTextSize(lt2.GetTextSize());
                 
                 TLatex lt1;
