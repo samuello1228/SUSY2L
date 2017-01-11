@@ -192,6 +192,44 @@ void analysis1()
                     element.ChannelName += sign[j];
                     element.ChannelName += "_";
                     element.ChannelName += lepton[k];
+                    
+                    element.isSS = j==1;
+                    element.isSS_ee = (j==1 && k==0);
+                    if(element.isSS_ee) element.qFChannel = ChannelInfo.size() - 3;
+                    
+                    
+                    element.setOfBGMC.clear();
+                    element.setOfBGData.clear();
+                    if(element.isSS)
+                    {
+                        if(element.isSS_ee)
+                        {
+                            if(docfw)
+                            {
+                                element.setOfBGMC.push_back("Zee");
+                            }
+                            else
+                            {
+                                element.setOfBGData.push_back("charge flip");
+                            }
+                        }
+                        
+                        element.setOfBGData.push_back("fake lepton");
+                        
+                        element.setOfBGMC.push_back("VV");
+                        element.setOfBGMC.push_back("Vgamma");
+                    }
+                    else
+                    {
+                        element.setOfBGMC.push_back("Zee");
+                        element.setOfBGMC.push_back("Zmumu");
+                        element.setOfBGMC.push_back("Ztautau");
+                        element.setOfBGMC.push_back("ttbar");
+                        element.setOfBGMC.push_back("Wt");
+                        element.setOfBGMC.push_back("VV");
+                        element.setOfBGMC.push_back("Vgamma");
+                    }
+
                     ChannelInfo.push_back(element);
                 }
             }
