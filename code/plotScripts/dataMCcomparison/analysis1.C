@@ -1797,7 +1797,7 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1925,8 +1925,8 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
-        for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
+        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
@@ -1976,8 +1976,8 @@ void analysis1()
                 }
                 
                 CommonCut += RegionInfo[RegionIndex].Cut;
+                //CommonCut += " && pt1>25 && pt2>20";
                 //CommonCut += " && mll>60";
-                CommonCut += " && pt1>25 && pt2>20";
                 
                 //h2DataSum
                 {
