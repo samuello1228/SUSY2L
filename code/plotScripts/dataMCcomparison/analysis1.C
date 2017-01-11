@@ -1977,6 +1977,7 @@ void analysis1()
                 
                 CommonCut += RegionInfo[RegionIndex].Cut;
                 //CommonCut += " && mll>60";
+                CommonCut += " && pt1>25 && pt2>20";
                 
                 //h2DataSum
                 {
