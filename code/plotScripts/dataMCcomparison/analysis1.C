@@ -1117,7 +1117,8 @@ void analysis1()
             
             if(element.isSS)
             {
-                element.Cut = "&& ( mll<76.18 || mll>106.18 )";
+                //element.Cut = "&& ( mll<76.18 || mll>106.18 )";
+                element.Cut = "";
             }
             else
             {
@@ -1675,8 +1676,8 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
-    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    //for(unsigned int RegionIndex=3;RegionIndex<=3;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,channel);
