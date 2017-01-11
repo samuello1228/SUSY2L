@@ -4,6 +4,12 @@
 ```sh
 git config --global user.name "Your name"
 git config --global user.email "Your email"
+git config --global core.editor vi
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.up rebase
+git config --global alias.ci commit
 ```
 
 ### 1. Create a branch from the master
