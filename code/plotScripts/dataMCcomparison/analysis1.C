@@ -1797,7 +1797,31 @@ void analysis1()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
-    for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
+    
+    //expN for SR
+    TString PathName_SR = "latex/data/expN/SR.txt";
+    fstream fout_SR;
+    fout_SR.open(PathName_SR.Data(), ios::out);
+    fout_SR<<std::setw(46)<<"The Name of Signal Region";
+    fout_SR<<std::setw(15)<<BGMCGroupData[5].GroupName.Data();
+    fout_SR<<std::setw(15)<<BGMCGroupData[6].GroupName.Data();
+    fout_SR<<std::setw(15)<<BGDataGroupData[0].GroupName.Data();
+    fout_SR<<std::setw(15)<<BGDataGroupData[1].GroupName.Data();
+    fout_SR<<std::setw(15)<<"Total BG";
+    
+    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+    {
+        TString GroupName = "Signal(";
+        GroupName += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
+        GroupName += ",";
+        GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
+        GroupName += ")";
+        fout_SR<<std::setw(18)<<GroupName.Data();
+    }
+    fout_SR<<endl;
+    fout_SR.close();
+    
+    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1925,8 +1949,8 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
-        for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
+        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
@@ -2356,6 +2380,41 @@ void analysis1()
                     fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
                 }
                 fout.close();
+                
+                //output SR.txt file
+                if(RegionIndex>=18)
+                {
+                    fout_SR.open(PathName_SR.Data(), ios::out | ios::app);
+                    
+                    fout_SR<<std::setw(46)<<RegionInfo[RegionIndex].RegionName;
+                    
+                    fout_SR<<setprecision(1)<<std::fixed;
+                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    {
+                        if(!RegionInfo[RegionIndex].isSS_ee && j==2) fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
+                        
+                        fout_SR<<std::setw(8)<<sumOfEvent[j][0];
+                        fout_SR<<"+/-";
+                        fout_SR<<std::setw(4)<<sumOfEvent[j][1];
+                    }
+                    
+                    fout_SR<<std::setw(8)<<sumOfEvent[BGGroup.size()][0];
+                    fout_SR<<"+/-";
+                    fout_SR<<std::setw(4)<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
+                    
+                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    {
+                        fout_SR<<setprecision(1)<<std::fixed;
+                        fout_SR<<std::setw(5)<<sumOfEvent[BGGroup.size()+i+2][0];
+                        fout_SR<<"+/-";
+                        fout_SR<<std::setw(3)<<sumOfEvent[BGGroup.size()+i+2][1];
+                        
+                        fout_SR<<setprecision(3)<<std::fixed;
+                        fout_SR<<std::setw(7)<<sumOfEvent[BGGroup.size()+i+2][2];
+                    }
+                    fout_SR<<endl;
+                    fout_SR.close();
+                }
             }
             
             {
