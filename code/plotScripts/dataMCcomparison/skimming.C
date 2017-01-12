@@ -295,7 +295,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
-        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        //weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
@@ -331,11 +332,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //jets
-        bool hasISR = false;
         nJet = 0;
         nBJet = 0;
         nCJet = 0;
         nFJet = 0;
+        int nISR = 0;
         int leadingBJetIndex = 0;
         int leadingCJetIndex = 0;
         int leadingFJetIndex = 0;
@@ -344,8 +345,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             nJet++;
             if(fabs(evts->jets_eta[k]) < 2.4)
             {
+                //ISR
+                if(evts->jets_pt[k] > 40) nISR++;
+                
                 //Central jets
-                hasISR = true;
                 if(evts->jets_jFlag[k] & 1<<5)
                 {
                     //b-tagged
@@ -439,7 +442,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             element.nw += weight;
         }
         
-        if(hasISR) channelIndex += 6;
+        if(nISR==0) {}
+        else if(nISR==1) channelIndex += 6;
+        else continue;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -518,8 +523,9 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    //TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
+    TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     
