@@ -1821,8 +1821,8 @@ void analysis1()
     fout_SR<<endl;
     fout_SR.close();
     
-    for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
+    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
