@@ -518,8 +518,9 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    //TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
+    TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     
