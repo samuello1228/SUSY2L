@@ -36,7 +36,8 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \normalsize
-\item used the charge flip and fake lepton background for the same sign regions.
+\item Used the charge flip and fake lepton background for the same sign regions.
+\item Applied Z mass window veto for the signal regions.
 \end{itemize}
 \end{frame}
 
@@ -61,6 +62,30 @@ Control Region
 \def \PathToPlot {../plot}
 \input{data/plot_CR.tex}
 
+\begin{frame}
+\begin{center}
+\huge
+Signal Region
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+Definition of the Signal Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
+\item Veto events inside the Z mass window: $76.18 < m_{ll} < 106.18$
+\end{enumerate}
+\includegraphics[width=1\textwidth]{data/SR.png}
+\end{frame}
+
+\input{data/expN_SS.tex}
+%\input{data/expN_BGVV_SS.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_SS.tex}
+
+
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
 
@@ -69,13 +94,16 @@ Control Region
 \begin{itemize}
 \item The control region for ee is good.
 \item Some background may be missing for $\mu\mu$ control region.
+\item The signal is small.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{plan}
+\frametitle{Plan}
 \begin{itemize}
-\item Apply the cuts of the signal regions.
+\item Use Drell-Yan samples to remove the cut $m_{ll} > 60$ GeV
+\item Use 30 fb$^{-1}$ Data
+\item Separte the SR into different bins?
 \end{itemize}
 \end{frame}
 
@@ -540,22 +568,12 @@ and $p_T>30$ GeV if the two leptons are $e\mu$
 \begin{frame}
 \begin{center}
 \huge
-nonISR
+opposite sign
 \end{center}
 \end{frame}
 
-\input{data/expN_nonISR.tex}
-\input{data/expN_BGVV_nonISR.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-ISR
-\end{center}
-\end{frame}
-
-\input{data/expN_ISR.tex}
-\input{data/expN_BGVV_ISR.tex}
+\input{data/expN_OS.tex}
+\input{data/expN_BGVV_OS.tex}
 
 \def \PathToPlot {../plot}
 \begin{frame}
@@ -590,21 +608,11 @@ ISR
 \begin{frame}
 \begin{center}
 \huge
-nonISR
+opposite sign
 \end{center}
 \end{frame}
 
 \def \PathToPlot {../plot}
-\input{data/plot_nonISR.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-ISR
-\end{center}
-\end{frame}
-
-\def \PathToPlot {../plot}
-\input{data/plot_ISR.tex}
+\input{data/plot_OS.tex}
 
 \end{document}
