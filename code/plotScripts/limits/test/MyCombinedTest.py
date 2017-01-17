@@ -115,8 +115,8 @@ with open(dir1+"/plotScripts/dataMCcomparison/latex/data/expN/SR.txt") as f1:
         rgs.append(line[0])
 
 ndata = nbkg_tot
-nsig = nsig_300
-nsigErr = nsig_300_Err
+nsig = nsig_100
+nsigErr = nsig_100_Err
 
 lumiError = 0.039 	# Relative luminosity uncertainty
 
@@ -176,7 +176,7 @@ bkgSample_cF.buildStatErrors(nbkg_cF_Err,"UserRegion",var)
 # bkgSample_cF.addSystematic(corb)
 # bkgSample_cF.addSystematic(ucb)
 
-bkgSample_FK = Sample("Bkg_FK",kRed)
+bkgSample_FK = Sample("Bkg_FK",kCyan)
 bkgSample_FK.setStatConfig(True)
 bkgSample_FK.buildHisto(nbkg_FK,"UserRegion",var,0.5)
 bkgSample_FK.buildStatErrors(nbkg_FK_Err,"UserRegion",var)
