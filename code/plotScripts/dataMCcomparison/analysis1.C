@@ -329,8 +329,9 @@ void analysis1()
     struct SigInfo
     {
         int MassDiff;
-        int ID;
+        unsigned int ID;
         int colour;
+        int statCount;
     };
     std::vector<SigInfo> SigMassSplitting;
     {
@@ -1818,7 +1819,7 @@ void analysis1()
         GroupName += ",";
         GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
         GroupName += ")";
-        fout_SR<<std::setw(18)<<GroupName.Data();
+        fout_SR<<std::setw(22)<<GroupName.Data();
     }
     fout_SR<<endl;
     fout_SR.close();
@@ -2234,7 +2235,11 @@ void analysis1()
                         Cut += TString::Itoa(35,10);
                     }
                     Cut += ")";
-                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                    double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    {
+                        if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
+                    }
                 }
             }
             
@@ -2415,6 +2420,7 @@ void analysis1()
                         
                         fout_SR<<setprecision(3)<<std::fixed;
                         fout_SR<<std::setw(7)<<sumOfEvent[BGGroup.size()+i+2][2];
+                        fout_SR<<std::setw(4)<<SigMassSplitting[i].statCount;
                     }
                     fout_SR<<endl;
                     fout_SR.close();
