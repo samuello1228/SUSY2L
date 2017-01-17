@@ -8,74 +8,9 @@ Signal samples:
 
 Background samples:
 
-Charge flip and fake lepton background are data driven. The GRL $data15_13TeV.periodAllYear_DetStatus-v73-pro19-08_DQDefects-00-01-02_PHYS_StandardGRL_All_Good_25ns.xml$ was used. The 3.2fb-1 data used contains the following run numbers:
-\begin{itemize}
-\item 276262
-\item 276329
-\item 276336
-\item 276416
-\item 276511
-\item 276689
-\item 276778
-\item 276790
-\item 276952
-\item 276954
-\item 278880
-\item 278912
-\item 278968
-\item 279169
-\item 279259
-\item 279279
-\item 279284
-\item 279345
-\item 279515
-\item 279598
-\item 279685
-\item 279764
-\item 279813
-\item 279867
-\item 279928
-\item 279932
-\item 279984
-\item 280231
-\item 280319
-\item 280368
-\item 280423
-\item 280464
-\item 280500
-\item 280520
-\item 280614
-\item 280673
-\item 280753
-\item 280853
-\item 280862
-\item 280950
-\item 280977
-\item 281070
-\item 281074
-\item 281075
-\item 281317
-\item 281385
-\item 281411
-\item 282625
-\item 282631
-\item 282712
-\item 282784
-\item 282992
-\item 283074
-\item 283155
-\item 283270
-\item 283429
-\item 283608
-\item 283780
-\item 284006
-\item 284154
-\item 284213
-\item 284285
-\item 284420
-\item 284427
-\item 284484
-\end{itemize}
+Charge flip and fake lepton background are data driven. The GRL $data16_13TeV.periodAllYear\_DetStatus-v823-pro20-15\_DQDefects-00-02-04\_PHYS\_StandardGRL\_All\_Good_25ns.xml$ was used. The 33.26fb-1 data used covers run 297730 to 311481
+
+%FIXME,  should not have a separate section for BDT evt selection, bkg and trig
 Wgamma, diboson and ttbar background are from following MC samples:\\
 \begin{itemize}
 \item 410066	MadGraphPythia8EvtGen\_A14NNPDF23LO\_ttW\_Np0
@@ -156,9 +91,11 @@ trielemuonTrigLH = ["HLT\_e12\_lhloose\_2mu10","HLT\_2e12\_lhloose\_mu10"]\\
 
 \subsection{Variables}
 BDT Training:\\
-We separate out two event types, the ISR region is defined as events having >=1 jets, and the nonISR region which are events eith no jets.
+We separate out two event types, the ISR region is defined as events having >=1 jets, and the nonISR region which are events with no jets.
 
-In both region we train a Boosted Decision Tree to classifying out signal event from background. The BDTD algo in ROOT's TMVA package was used for the job, where BDTD stands for Boosted Decision Tree with decorrelated variables. 
+The signals are grouped with the Slep mass splitting to 4 types; dm20, dm50 , dm100 and dm100up.
+
+With 2 event types and 4 signal types, we train 8 Boosted Decision Tree in total to classify signal event from background. The BDTD algo in ROOT's TMVA package was used for the job, where BDTD stands for Boosted Decision Tree with decorrelated variables. 
 
 In the nonISR region the following variables are used as input:
 \begin{itemize}
@@ -180,6 +117,7 @@ In the ISR region the following extra variables are also used:
 \item $p_{T,l1}/p_{T,leading jet}$
 \end{itemize}
 
+%FIXME, choose one particular BDT (eg ISR dm50) and update the plot
 The correlation of the BDT input variables for signal and background samples are show in fig\ref{fig:BDT_input_corr}
 
 \begin{figure}
@@ -228,6 +166,7 @@ The distribution of the BDT input for signal and background samples are show in 
 \label{fig:BDT_ISR_input2}
 \end{figure}
 
+%FIXME should use Gabriels setting from overtain study
 \subsection{Trainning}
 Configuration\\
 We have chosen the following setting for the BDTD algo:
@@ -240,6 +179,8 @@ We have chosen the following setting for the BDTD algo:
 \item nCuts=20
 \item VarTransform=Decorrelate
 \end{itemize}
+
+
 Trainning results:\\
 The distribution of the BDT output for signal and background samples are show in fig\ref{fig:BDT_output}
 
@@ -251,41 +192,68 @@ The distribution of the BDT output for signal and background samples are show in
 \end{figure}
 
 \subsection{Cut optimization}
-A cut on BDT output was apllied to define the signal region. Various cut values were tried to find the optimal point. Optimal was defined as having the smallest CLs. To obtain the CLs HistFitter was used. The event counts were projected to 10fb-1 and the expected CLs at that luminosity was calculated. Both the signal region and the control region was blinded during the calculation.
+A cut on BDT output was apllied to define the signal region. Various cut values were tried to find the optimal point. Optimal was defined as having the smallest CLs. To obtain the CLs HistFitter was used. The event counts were projected to 33fb-1 and the expected CLs at that luminosity was calculated. The signal region was blinded during the calculation.
 
-The result shows that the best cut is at 0.25 for nonISR and 0.3 for ISR region.
+The CLs at various BDT cat value for ISR region is shown in \ref{fig:ISR_BDTCut_CLs}.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline 
-BDTcut	&0.2	&0.25	&0.3	&0.35	&0.4 \\
-\hline 
-CLs	&0.075918	&0.036563	&0.026185	&0.086068	&0.289886\\
-CLb	&0.500004	&0.499982	&0.499977	&0.500076	&0.501916\\
-CLs+b	&0.037959	&0.018281	&0.013092	&0.043041	&0.145498\\
-\hline 
-\end{tabular} 
-\caption{CLs at various BDT cut for ISR region}
-\end{center}
-\end{table}
+\begin{figure}
+	\centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_ISR_Alldm_Cut0d1_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_ISR_Alldm_Cut0d2_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline 
-BDTcut	&0.2	&0.25	&0.3\\
-\hline 
-CLs	&0.128897	&0.103104&	0.215374\\
-CLb&	0.500049	&0.499999&	0.500589\\
-CLs+b	&0.064455&	0.051552&	0.107814\\
-\hline 
-\end{tabular} 
-\caption{CLs at various BDT cut for nonISR region}
-\end{center}
-\end{table}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_ISR_Alldm_Cut0d3_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_ISR_Alldm_CutOptimal_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+
+\caption{expected CLs for BDT cut at a)0.1 b)0.2 c)0.3 for ISR region. d) combines the three by choosing the best BDT cut at each grid point }
+\label{fig:ISR_BDTCut_CLs}
+\end{figure}
+
+\begin{figure}
+	\centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_nonISR_Alldm_Cut0d1_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_nonISR_Alldm_Cut0d2_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_nonISR_Alldm_Cut0d3_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_nonISR_Alldm_CutOptimal_Output_hypotest__1_harvest_list.eps}
+        \caption{}
+    \end{subfigure}
+
+\caption{expected CLs for BDT cut at a)0.1 b)0.2 c)0.3 for nonISR region. d) combines the three by choosing the best BDT cut at each grid point }
+\label{fig:nonISR_BDTCut_CLs}
+\end{figure}
+
 \subsection{Results}
-When both regions are combined, a CLs of 0.0034 was obtained.
+When both regions are combined, the exclusion plot in \ref{fig:comb_CLs} was obtained.
+
+%FIXME this table is for a particular signal sample only, replace or remove?
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{cutOpt/atlascls_m0m1_wband1_wfixSigXSecband1_showcms0_My2LSSAnalysis_Comb_Alldm_CutOptimal_Output_hypotest__1_harvest_list.eps}
+\caption{expected CLs after combining nonISR and ISR region}
+\label{fig:comb_CLs}
+\end{figure}
 
 \begin{table}
 \begin{center}
