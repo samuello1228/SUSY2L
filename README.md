@@ -54,7 +54,6 @@ Assign it to somebody that will check your changes and make independent tests
 
 (Done via web interface or terminal commands)
 
-
 ## Other
 ### Checkout submodule
 ```
