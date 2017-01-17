@@ -36,31 +36,13 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \normalsize
-\item Used the charge flip and fake lepton background for the same sign regions.
-\item Applied Z mass window veto for the signal regions.
+\item Use 33 fb$^{-1}$ Data
+\item No pile up weight is applied
+\item Separate the SR into 18*3 bins
+
+\item Get the number of event of signal before normalization
 \end{itemize}
 \end{frame}
-
-\begin{frame}
-\frametitle{Control Region}
-Definition of the Control Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$ or $\mu\mu$
-\item $81.18 < m_{ll} < 101.18$
-\end{enumerate}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Control Region
-\end{center}
-\end{frame}
-
-\input{data/expN_CR.tex}
-
-\def \PathToPlot {../plot}
-\input{data/plot_CR.tex}
 
 \begin{frame}
 \begin{center}
@@ -74,16 +56,27 @@ Signal Region
 Definition of the Signal Region.
 \begin{enumerate}
 \item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
-\item Veto events inside the Z mass window: $76.18 < m_{ll} < 106.18$
+\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
+\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
+\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
+\item The minimum $M_T$ of the two leptons
 \end{enumerate}
 \includegraphics[width=1\textwidth]{data/SR.png}
 \end{frame}
 
-\input{data/expN_SS.tex}
+\begin{frame}
+\frametitle{Result}
+\tiny
+https://gitlab.cern.ch/hku/SUSY2L/blob/master/code/ \\
+plotScripts/dataMCcomparison/latex/data/expN/SR.txt \\
+https://docs.google.com/spreadsheets/d/1T7FXh6uskJh4ZMcWxLInByJsAwVqD190krBeaDkWkks/edit
+\end{frame}
+
+%\input{data/expN_SS.tex}
 %\input{data/expN_BGVV_SS.tex}
 
 \def \PathToPlot {../plot}
-\input{data/plot_SS.tex}
+%\input{data/plot_SS.tex}
 
 
 %\def \PathToPlot {../plot}
@@ -92,18 +85,14 @@ Definition of the Signal Region.
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The control region for ee is good.
-\item Some background may be missing for $\mu\mu$ control region.
-\item The signal is small.
+\item Some bins have positive significance.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item Use Drell-Yan samples to remove the cut $m_{ll} > 60$ GeV
-\item Use 30 fb$^{-1}$ Data
-\item Separte the SR into different bins?
+\item Apply pile up weight
 \end{itemize}
 \end{frame}
 
@@ -566,14 +555,35 @@ and $p_T>30$ GeV if the two leptons are $e\mu$
 \end{frame}
 
 \begin{frame}
+\frametitle{Control Region}
+Definition of the Control Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$ or $\mu\mu$
+\item $81.18 < m_{ll} < 101.18$
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+Control Region
+\end{center}
+\end{frame}
+
+%\input{data/expN_CR.tex}
+
+\def \PathToPlot {../plot}
+%\input{data/plot_CR.tex}
+
+\begin{frame}
 \begin{center}
 \huge
 opposite sign
 \end{center}
 \end{frame}
 
-\input{data/expN_OS.tex}
-\input{data/expN_BGVV_OS.tex}
+%\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
 
 \def \PathToPlot {../plot}
 \begin{frame}
@@ -613,6 +623,6 @@ opposite sign
 \end{frame}
 
 \def \PathToPlot {../plot}
-\input{data/plot_OS.tex}
+%\input{data/plot_OS.tex}
 
 \end{document}

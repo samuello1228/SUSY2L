@@ -1,6 +1,6 @@
 #!/bin/bash
-tag=v8.0
-dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-303560_v80_Nicky.root
+tag=v8.6
+dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root
 
 #For background MC
 #mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c.root

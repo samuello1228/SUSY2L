@@ -3,7 +3,7 @@
 #source /afs/cern.ch/atlas/software/tools/pyAMI/setup.sh
 #
 #then:
-#python dataseID_to_name.py inputIDs.txt
+#python datasetID_to_name.py inputIDs.txt
 
 import sys
 
@@ -30,7 +30,8 @@ def Data16_criteria(tags):
   """
 
   #This DAOD tag is recommended for athena20.7
-  tarTags = ["p2667", "p2689"]
+  #tarTags = ["p2667", "p2689"]
+  tarTags = ["p2880"]
   if not any( [ t in tags for t in tarTags] ): return False
 
   return True
@@ -62,9 +63,9 @@ def MC15C_criteria(tags):
 #==============================================================
 #user specified options
 #==============================================================
-tagCriteria = MC15C_criteria
+#tagCriteria = MC15C_criteria
 #tagCriteria = Data15_criteria
-#tagCriteria = Data16_criteria
+tagCriteria = Data16_criteria
 inFile = open(sys.argv[1])
 
 #==============================================================
@@ -73,7 +74,8 @@ inFile = open(sys.argv[1])
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
-outputPath = "MCBG_sample_list.txt"
+#outputPath = "MCBG_sample_list.txt"
+outputPath = "Data_sample_list.txt"
 outputFile = open(outputPath,"w")
 
 for aLine in inFile:
@@ -83,15 +85,21 @@ for aLine in inFile:
 
   #read the line
   elements = aLine.split()
-  if len(elements)!=4: 
+  if len(elements)==4: 
+    phyType   = elements[0]
+    phyProc   = elements[1]
+    generator = elements[2]
+    runIDs    = elements[3].split(",")
+  elif len(elements)==1:
+    phyType   = "Data"
+    phyProc   = "NA"
+    generator = "NA"
+    runIDs    = elements[0].split(",")
+  else:
     print "#cannont understand line:"
     print "#" + aLine
     continue
 
-  phyType   = elements[0]
-  phyProc   = elements[1]
-  generator = elements[2]
-  runIDs    = elements[3].split(",")
 
   #interpret and expand runIDs range
   tmp = []
