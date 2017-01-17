@@ -21,6 +21,9 @@
 // #include "PATInterfaces/SystematicVariation.h" 
 // #include "PATInterfaces/SystematicsUtil.h"
 
+#include "xAODCore/tools/IOStats.h"
+#include "xAODCore/tools/ReadStats.h"
+
 #include <TError.h>
 #include <algorithm>
 #include <vector>
@@ -1086,6 +1089,8 @@ EL::StatusCode ssEvtSelection :: finalize ()
   // submission node after all your histogram outputs have been
   // merged.  This is different from histFinalize() in that it only
   // gets called on worker nodes that processed input events.
+
+ xAOD::IOStats::instance().stats().printSmartSlimmingBranchList();
 
  return EL::StatusCode::SUCCESS;
 }
