@@ -51,7 +51,7 @@ myInputParser.add_option('-d', "--dataList", help="list of DATA input ROOT file"
 myInputParser.add_option('-v', "--bdtCutVal", type="float", help="BDT cut value to use", default=0.1)
 myInputParser.add_option('-c', "--channel"  , help="Channel (ISR or nonISR)", default="nonISR")
 myInputParser.add_option('-m', "--dm"       , help="use BDT trained with for dm", default="50")
-myInputParser.add_option('-l', "--bkgLumi"     , type="float", help="lumi of data driven background", default=10.0643)
+myInputParser.add_option('-l', "--bkgLumi"     , type="float", help="lumi of data driven background", default=33.2572)
 (options, args) = myInputParser.parse_args(myUserArgs)
 
 #-------------------------------
@@ -78,7 +78,7 @@ configMgr.outputFileName = "results/"+configMgr.analysisName+"_Output.root"
 configMgr.inputLumi  = 0.001 # Luminosity of input TTree after weighting
 #configMgr.inputLumi  = 3.248 # Luminosity of input TTree after weighting
 #configMgr.outputLumi = 3.248 # Luminosity required for output histograms
-configMgr.outputLumi = 10.0643 # Luminosity required for output histograms
+configMgr.outputLumi = 33.2572 # Luminosity required for output histograms
 #configMgr.outputLumi = 0.1 # Luminosity required for output histograms
 configMgr.setLumiUnits("fb-1")
 configMgr.blindSR=True       #    !!!!!
@@ -148,66 +148,67 @@ def formTreeSys(sysName, upSuffix, dnSuffix, sysType):
   return Systematic( sysName, "", "_"+sysName+upSuffix, "_"+sysName+dnSuffix, "tree", sysType)
 
 reconSys = [
-             formTreeSys("EG_RESOLUTION_ALL"                              , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EG_SCALE_ALL"                                   , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR"              , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR"             , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR"            , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR"      , "__1up", "__1down", "overallSys"), 
-             formTreeSys("EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR"         , "__1up", "__1down", "overallSys"), 
-             formTreeSys("FT_EFF_B_systematics"                           , "__1up", "__1down", "overallSys"), 
-             formTreeSys("FT_EFF_C_systematics"                           , "__1up", "__1down", "overallSys"), 
-             formTreeSys("FT_EFF_Light_systematics"                       , "__1up", "__1down", "overallSys"), 
-             formTreeSys("FT_EFF_extrapolation"                           , "__1up", "__1down", "overallSys"), 
-             formTreeSys("FT_EFF_extrapolation_from_charm"                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_EtaIntercalibration_NonClosure"             , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_GroupedNP_1"                                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_GroupedNP_2"                                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_GroupedNP_3"                                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_JER_SINGLE_NP"                              , "__1up", "__1up"  , "histoSysOneSide"), #!!
-            #formTreeSys("JET_Rtrk_Baseline_Kin"                          , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_Baseline_Sub"                          , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_Modelling_Kin"                         , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_Modelling_Sub"                         , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_TotalStat_Kin"                         , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_TotalStat_Sub"                         , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_Tracking_Kin"                          , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("JET_Rtrk_Tracking_Sub"                          , "__1up", "__1down", "overallSys"), 
-             formTreeSys("JvtEfficiency"                                  ,    "Up",    "Down", "overallSys"),      #!!
-             formTreeSys("MET_SoftTrk_ResoPara"                           ,      "",        "", "histoSysOneSide"), #!!
-             formTreeSys("MET_SoftTrk_ResoPerp"                           ,      "",        "", "histoSysOneSide"), #!!
-             formTreeSys("MET_SoftTrk_Scale"                              ,    "Up",    "Down", "overallSys"),      #!!
-             formTreeSys("MUONS_ID"                                       , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUONS_MS"                                       , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUONS_SCALE"                                    , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_EFF_STAT"                                  , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_EFF_STAT_LOWPT"                            , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_EFF_SYS"                                   , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_EFF_SYS_LOWPT"                             , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_EFF_TrigStatUncertainty"                   , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_ISO_STAT"                                  , "__1up", "__1down", "overallSys"), 
-             formTreeSys("MUON_ISO_SYS"                                   , "__1up", "__1down", "overallSys"), 
-             formTreeSys("PH_EFF_ID_Uncertainty"                          , "__1up", "__1down", "overallSys"), 
-             formTreeSys("PH_EFF_TRKISO_Uncertainty"                      , "__1up", "__1down", "overallSys"), 
-             formTreeSys("PH_Iso_DDonoff"                                 ,      "",        "", "histoSysOneSide"), #!!
-             formTreeSys("PRW_DATASF"                                     , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEELECTRON_EFF_ELEOLR_TOTAL"             , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_ELEOLR_TOTAL"               , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_JETID_HIGHPT"               , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_JETID_TOTAL"                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_RECO_HIGHPT"                , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_RECO_TOTAL"                 , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_STATDATA2015"       , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_STATMC2015"         , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_SYST2015"           , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_TOTAL2016"          , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_SME_TES_DETECTOR"               , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_SME_TES_INSITU"                 , "__1up", "__1down", "overallSys"), 
-            #formTreeSys("TAUS_TRUEHADTAU_SME_TES_MODEL"                  , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EG_RESOLUTION_ALL"                              , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EG_SCALE_ALL"                                   , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EL_EFF_ID_TOTAL_1NPCOR_PLUS_UNCOR"              , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EL_EFF_Iso_TOTAL_1NPCOR_PLUS_UNCOR"             , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EL_EFF_Reco_TOTAL_1NPCOR_PLUS_UNCOR"            , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EL_EFF_TriggerEff_TOTAL_1NPCOR_PLUS_UNCOR"      , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("EL_EFF_Trigger_TOTAL_1NPCOR_PLUS_UNCOR"         , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("FT_EFF_B_systematics"                           , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("FT_EFF_C_systematics"                           , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("FT_EFF_Light_systematics"                       , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("FT_EFF_extrapolation"                           , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("FT_EFF_extrapolation_from_charm"                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_EtaIntercalibration_NonClosure"             , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_GroupedNP_1"                                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_GroupedNP_2"                                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_GroupedNP_3"                                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_JER_SINGLE_NP"                              , "__1up", "__1up"  , "histoSysOneSide"), #!!
+       #    #formTreeSys("JET_Rtrk_Baseline_Kin"                          , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_Baseline_Sub"                          , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_Modelling_Kin"                         , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_Modelling_Sub"                         , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_TotalStat_Kin"                         , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_TotalStat_Sub"                         , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_Tracking_Kin"                          , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("JET_Rtrk_Tracking_Sub"                          , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("JvtEfficiency"                                  ,    "Up",    "Down", "overallSys"),      #!!
+       #     formTreeSys("MET_SoftTrk_ResoPara"                           ,      "",        "", "histoSysOneSide"), #!!
+       #     formTreeSys("MET_SoftTrk_ResoPerp"                           ,      "",        "", "histoSysOneSide"), #!!
+       #     formTreeSys("MET_SoftTrk_Scale"                              ,    "Up",    "Down", "overallSys"),      #!!
+       #     formTreeSys("MUONS_ID"                                       , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUONS_MS"                                       , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUONS_SCALE"                                    , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_EFF_STAT"                                  , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_EFF_STAT_LOWPT"                            , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_EFF_SYS"                                   , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_EFF_SYS_LOWPT"                             , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_EFF_TrigStatUncertainty"                   , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_ISO_STAT"                                  , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("MUON_ISO_SYS"                                   , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("PH_EFF_ID_Uncertainty"                          , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("PH_EFF_TRKISO_Uncertainty"                      , "__1up", "__1down", "overallSys"), 
+       #     formTreeSys("PH_Iso_DDonoff"                                 ,      "",        "", "histoSysOneSide"), #!!
+       #     formTreeSys("PRW_DATASF"                                     , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEELECTRON_EFF_ELEOLR_TOTAL"             , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_ELEOLR_TOTAL"               , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_JETID_HIGHPT"               , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_JETID_TOTAL"                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_RECO_HIGHPT"                , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_RECO_TOTAL"                 , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_STATDATA2015"       , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_STATMC2015"         , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_SYST2015"           , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_EFF_TRIGGER_TOTAL2016"          , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_SME_TES_DETECTOR"               , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_SME_TES_INSITU"                 , "__1up", "__1down", "overallSys"), 
+       #    #formTreeSys("TAUS_TRUEHADTAU_SME_TES_MODEL"                  , "__1up", "__1down", "overallSys"), 
            ]
 
 qFlipSys = formTreeSys("CFLIP_SYS"                  , "__1up", "__1down", "overallSys")
-fLepSys  = formTreeSys("FAKE_LEP_SYS"               , "__1up", "__1down", "overallSys")
+fLepSys  = formTreeSys("FAKE_LEP_E_SYS"             , "__1up", "__1down", "overallSys")
+fLepSys  = formTreeSys("FAKE_LEP_U_SYS"             , "__1up", "__1down", "overallSys")
 
 #the input Lumi for mc is 0.001 but data driven bkg is obtained from 3.248fb-1 data
 #so need a scale factor to convert data driven bkg back to 0.001 inputLumi...
