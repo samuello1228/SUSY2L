@@ -1,0 +1,15 @@
+Index: Root/IsolationCorrection.cxx
+===================================================================
+--- Root/IsolationCorrection.cxx	(revision 789471)
++++ Root/IsolationCorrection.cxx	(working copy)
+@@ -48,8 +48,8 @@
+     m_corr_ddshift_2015_file = PathResolverFindCalibFile(corr_ddshift_2015_file);
+     m_corr_ddshift_file = PathResolverFindCalibFile(corr_ddshift_file);
+     m_corr_ddsmearing_file = PathResolverFindCalibFile(corr_ddsmearing_file);
+-    if (m_corr_ddshift_2015_file.find("v2") != std::string::npos) m_isv2 = true;
+-    if (m_corr_ddshift_2015_file.find("v3") != std::string::npos) m_isv3 = true;
++    if (m_corr_ddshift_2015_file.find("_2015_v3.root") != std::string::npos) m_isv3 = true;
++    else if (m_corr_ddshift_2015_file.find("_2015_v2.root") != std::string::npos) m_isv2 = true;
+   }
+ 
+   StatusCode IsolationCorrection::initialize() {

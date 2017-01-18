@@ -53,3 +53,10 @@ Assign it to somebody that will check your changes and make independent tests
 ### 5. Then you can tag this master
 
 (Done via web interface or terminal commands)
+
+## Other
+### Checkout submodule
+```
+git submodule init
+git submodule update
+```
