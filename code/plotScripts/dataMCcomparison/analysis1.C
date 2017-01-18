@@ -1833,7 +1833,7 @@ void analysis1()
     //h2SR
     std::vector< std::vector<TH1F*> > h2SRBG;
     std::vector< std::vector<TH1F*> > h2SRSig;
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0;i<4;i++)
     {
         std::vector<TH1F*> element;
         TH1F* hTemp;
@@ -1841,6 +1841,7 @@ void analysis1()
         if(i==0) LeptonName = "_ee";
         else if(i==1) LeptonName = "_mumu";
         else if(i==2) LeptonName = "_emu";
+        else if(i==3) LeptonName = "_combine";
         
         //h2SRBG
         //VV
@@ -1856,7 +1857,7 @@ void analysis1()
         element.push_back(hTemp);
         
         //charge flip
-        if(i==0)
+        if(i==0 || i==3)
         {
             hTemp = new TH1F((BGDataGroupData[0].GroupName+LeptonName).Data(),"",18,0,18);
             hTemp->SetLineColor(3);
@@ -1884,7 +1885,7 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=23;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
@@ -2814,8 +2815,32 @@ void analysis1()
     }
     
     //h2SR
-    THStack stackSR[3];
+    THStack stackSR[4];
+    
+    //For combined SR
     for(unsigned int i=0;i<3;i++)
+    {
+        //h2SRBG
+        h2SRBG[3][0]->Add(h2SRBG[i][0]);
+        h2SRBG[3][1]->Add(h2SRBG[i][1]);
+        if(i==0)
+        {
+            h2SRBG[3][2]->Add(h2SRBG[i][2]);
+            h2SRBG[3][3]->Add(h2SRBG[i][3]);
+        }
+        else
+        {
+            h2SRBG[3][3]->Add(h2SRBG[i][2]);
+        }
+        
+        //h2SRSig
+        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+        {
+            h2SRSig[3][j]->Add(h2SRSig[i][j]);
+        }
+    }
+    
+    for(unsigned int i=0;i<4;i++)
     {
         //Legend
         TLegend* leg;
@@ -2832,17 +2857,16 @@ void analysis1()
             leg->SetFillStyle(0);
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
-            if(i==0)
+            
+            leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
+            leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
+            if(i==0 || i==3)
             {
-                leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
                 leg->AddEntry(h2SRBG[i][2],BGDataGroupData[0].LegendName.Data(),"fl");
                 leg->AddEntry(h2SRBG[i][3],BGDataGroupData[1].LegendName.Data(),"fl");
             }
             else
             {
-                leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
                 leg->AddEntry(h2SRBG[i][2],BGDataGroupData[1].LegendName.Data(),"fl");
             }
             
@@ -2882,6 +2906,14 @@ void analysis1()
             stackSR[i].Add(h2SRBG[i][0]);
             stackSR[i].Add(h2SRBG[i][2]);
         }
+        else if(i==3)
+        {
+            //combine
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][3]);
+        }
         
         //Draw
         gStyle->SetOptStat(0);
@@ -2902,16 +2934,21 @@ void analysis1()
         if(i==0) NameTemp += "ee";
         else if(i==1) NameTemp += "mumu";
         else if(i==2) NameTemp += "emu";
+        else if(i==3) NameTemp += "combine";
         NameTemp += ".pdf";
         c2->Print(NameTemp,"pdf");
         delete c2;
     }
     
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0;i<4;i++)
     {
         for(unsigned int j=0;j<h2SRBG[i].size();j++)
         {
             delete h2SRBG[i][j];
+        }
+        for(unsigned int j=0;j<h2SRSig[i].size();j++)
+        {
+            delete h2SRSig[i][j];
         }
     }
     
