@@ -577,136 +577,10 @@ void analysis1()
         element.latexName = "Average number of interactions per bunch crossing";
         Var.push_back(element);
         
-        element.VarName = "nVtx";       element.VarTitle = "Number of vertices";                element.unit = "";
-        element.bin=30;         element.xmin=0;                 element.xmax=30;
-        element.log=0;          element.ymin=0;                 element.ymax=0;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the leading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the subleading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jetphi";     element.VarTitle = "phi of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "bjetpt";     element.VarTitle = "pT of the leading b-jet";           element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjeteta";    element.VarTitle = "eta of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjetphi";    element.VarTitle = "phi of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "nCJet";      element.VarTitle = "Number of central light jets";      element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "cjetpt";     element.VarTitle = "pT of the leading central light jets";                              element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjeteta";    element.VarTitle = "eta of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjetphi";    element.VarTitle = "phi of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "nFJet";      element.VarTitle = "Number of forward jets";            element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "fjetpt";     element.VarTitle = "pT of the leading forward jet";     element.unit = "[GeV]";
-        element.bin=40;         element.xmin=30;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjeteta";    element.VarTitle = "eta of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjetphi";    element.VarTitle = "phi of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "HT";         element.VarTitle = "HT";                                element.unit = "[GeV]";
-        element.bin=40;         element.xmin=65;                 element.xmax=500;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "R2";         element.VarTitle = "R2";                                element.unit = "";
-        element.bin=40;         element.xmin=0;                 element.xmax=1;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "l12_dPhi";    element.VarTitle = "phi difference between the two leptons";                           element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ difference between the two leptons";
         Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
@@ -1885,9 +1759,9 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=18;RegionIndex<=23;RegionIndex++)
+    for(unsigned int RegionIndex=18;RegionIndex<=23;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
