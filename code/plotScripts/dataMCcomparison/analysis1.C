@@ -2395,7 +2395,7 @@ void analysis1()
                                 //Significance
                                 double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
                                 
-                                fout_SR<<setprecision(3)<<std::fixed;
+                                fout<<setprecision(3)<<std::fixed;
                                 fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
                             }
                         }
