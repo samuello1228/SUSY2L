@@ -118,8 +118,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         f2[j]->cd();
         tree2[j] = new TTree(treeName.Data(),treeName.Data());
-        tree2[j]->Branch("ID1",&ID1,"ID1/I");
-        tree2[j]->Branch("ID2",&ID2,"ID2/I");
         tree2[j]->Branch("pt1",&pt1,"pt1/D");
         tree2[j]->Branch("pt2",&pt2,"pt2/D");
         tree2[j]->Branch("eta1",&eta1,"eta1/D");
@@ -128,34 +126,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mt1",&mt1,"mt1/D");
-        tree2[j]->Branch("mt2",&mt2,"mt2/D");
         tree2[j]->Branch("mtm",&mt2,"mtm/D");
-        tree2[j]->Branch("HT",&HT,"HT/D");
-        tree2[j]->Branch("R2",&R2,"R2/D");
-        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
-        tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
-        tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
-        tree2[j]->Branch("jetphi",&jetphi,"jetphi/D");
-        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
-        tree2[j]->Branch("bjetpt",&bjetpt,"bjetpt/D");
-        tree2[j]->Branch("bjeteta",&bjeteta,"bjeteta/D");
-        tree2[j]->Branch("bjetphi",&bjetphi,"bjetphi/D");
-        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
-        tree2[j]->Branch("cjetpt",&cjetpt,"cjetpt/D");
-        tree2[j]->Branch("cjeteta",&cjeteta,"cjeteta/D");
-        tree2[j]->Branch("cjetphi",&cjetphi,"cjetphi/D");
-        tree2[j]->Branch("nFJet",&nFJet,"nFJet/I");
-        tree2[j]->Branch("fjetpt",&fjetpt,"fjetpt/D");
-        tree2[j]->Branch("fjeteta",&fjeteta,"fjeteta/D");
-        tree2[j]->Branch("fjetphi",&fjetphi,"fjetphi/D");
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
         tree2[j]->Branch("averageMu",&averageMu,"averageMu/D");
-        tree2[j]->Branch("nVtx",&nVtx,"nVtx/I");
     }
     
     //histograms
@@ -524,10 +501,12 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 void skimming()
 {
     //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    TString SamplePath = "/srv/SUSY/ntuple/";
+    //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
+    TString SamplePath = "/Users/samuel/Atlas/ntuple/";
+    //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     SamplePath += "AnalysisBase-02-04-17-419618/";
@@ -573,16 +552,16 @@ void skimming()
     }
     
     //Signal
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,"Sig",4);
-        //for(unsigned int i=0;i<=1;i++)
-        for(unsigned int i=0;i<SigSampleName.size();i++)
+        for(unsigned int i=0;i<=1;i++)
+        //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }

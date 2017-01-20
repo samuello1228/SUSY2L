@@ -330,6 +330,7 @@ void analysis1()
     {
         int MassDiff;
         unsigned int ID;
+        TString IDName;
         int colour;
         int statCount;
     };
@@ -337,11 +338,11 @@ void analysis1()
     {
         SigInfo element;
         
-        element.MassDiff = 20;    element.ID = 2;   element.colour = 14;  SigMassSplitting.push_back(element);
-        element.MassDiff = 50;    element.ID = 18;  element.colour = 9;   SigMassSplitting.push_back(element);
-        element.MassDiff = 100;   element.ID = 19;  element.colour = 11;  SigMassSplitting.push_back(element);
-        element.MassDiff = 200;   element.ID = 20;  element.colour = 12;  SigMassSplitting.push_back(element);
-        element.MassDiff = 300;   element.ID = 21;  element.colour = 13;  SigMassSplitting.push_back(element);
+        element.MassDiff = 20;    element.ID = 2;   element.colour = 6;   SigMassSplitting.push_back(element);
+        element.MassDiff = 50;    element.ID = 18;  element.colour = 7;   SigMassSplitting.push_back(element);
+        element.MassDiff = 100;   element.ID = 19;  element.colour = 8;   SigMassSplitting.push_back(element);
+        element.MassDiff = 200;   element.ID = 20;  element.colour = 9;   SigMassSplitting.push_back(element);
+        element.MassDiff = 300;   element.ID = 21;  element.colour = 14;  SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -431,6 +432,16 @@ void analysis1()
             if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j]<<endl;
         }
         cout<<endl;
+    }
+    
+    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+    {
+        TString GroupName = "Signal(";
+        GroupName += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
+        GroupName += ",";
+        GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
+        GroupName += ")";
+        SigMassSplitting[i].IDName = GroupName;
     }
     
     //Get number of events in AOD
@@ -566,136 +577,10 @@ void analysis1()
         element.latexName = "Average number of interactions per bunch crossing";
         Var.push_back(element);
         
-        element.VarName = "nVtx";       element.VarTitle = "Number of vertices";                element.unit = "";
-        element.bin=30;         element.xmin=0;                 element.xmax=30;
-        element.log=0;          element.ymin=0;                 element.ymax=0;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the leading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the subleading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jetphi";     element.VarTitle = "phi of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "bjetpt";     element.VarTitle = "pT of the leading b-jet";           element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjeteta";    element.VarTitle = "eta of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjetphi";    element.VarTitle = "phi of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "nCJet";      element.VarTitle = "Number of central light jets";      element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "cjetpt";     element.VarTitle = "pT of the leading central light jets";                              element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjeteta";    element.VarTitle = "eta of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjetphi";    element.VarTitle = "phi of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "nFJet";      element.VarTitle = "Number of forward jets";            element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "fjetpt";     element.VarTitle = "pT of the leading forward jet";     element.unit = "[GeV]";
-        element.bin=40;         element.xmin=30;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjeteta";    element.VarTitle = "eta of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjetphi";    element.VarTitle = "phi of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "HT";         element.VarTitle = "HT";                                element.unit = "[GeV]";
-        element.bin=40;         element.xmin=65;                 element.xmax=500;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "R2";         element.VarTitle = "R2";                                element.unit = "";
-        element.bin=40;         element.xmin=0;                 element.xmax=1;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "l12_dPhi";    element.VarTitle = "phi difference between the two leptons";                           element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ difference between the two leptons";
         Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
@@ -1814,17 +1699,67 @@ void analysis1()
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
     {
-        TString GroupName = "Signal(";
-        GroupName += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
-        GroupName += ",";
-        GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
-        GroupName += ")";
-        fout_SR<<std::setw(22)<<GroupName.Data();
+        fout_SR<<std::setw(22)<<SigMassSplitting[i].IDName.Data();
     }
     fout_SR<<endl;
     fout_SR.close();
     
-    //for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
+    //h2SR
+    std::vector< std::vector<TH1F*> > h2SRBG;
+    std::vector< std::vector<TH1F*> > h2SRSig;
+    for(unsigned int i=0;i<4;i++)
+    {
+        std::vector<TH1F*> element;
+        TH1F* hTemp;
+        TString LeptonName;
+        if(i==0) LeptonName = "_ee";
+        else if(i==1) LeptonName = "_mumu";
+        else if(i==2) LeptonName = "_emu";
+        else if(i==3) LeptonName = "_combine";
+        
+        //h2SRBG
+        //VV
+        hTemp = new TH1F((BGMCGroupData[5].GroupName+LeptonName).Data(),"",18,0,18);
+        hTemp->SetLineColor(2);
+        hTemp->SetFillColor(2);
+        element.push_back(hTemp);
+        
+        //Vgamma
+        hTemp = new TH1F((BGMCGroupData[6].GroupName+LeptonName).Data(),"",18,0,18);
+        hTemp->SetLineColor(4);
+        hTemp->SetFillColor(4);
+        element.push_back(hTemp);
+        
+        //charge flip
+        if(i==0 || i==3)
+        {
+            hTemp = new TH1F((BGDataGroupData[0].GroupName+LeptonName).Data(),"",18,0,18);
+            hTemp->SetLineColor(3);
+            hTemp->SetFillColor(3);
+            element.push_back(hTemp);
+        }
+        
+        //fake lepton
+        hTemp = new TH1F((BGDataGroupData[1].GroupName+LeptonName).Data(),"",18,0,18);
+        hTemp->SetLineColor(5);
+        hTemp->SetFillColor(5);
+        element.push_back(hTemp);
+        
+        h2SRBG.push_back(element);
+        element.clear();
+        
+        //h2SRSig
+        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+        {
+            hTemp = new TH1F((SigMassSplitting[j].IDName+LeptonName).Data(),"",18,0,18);
+            hTemp->SetLineColor(SigMassSplitting[j].colour);
+            hTemp->SetLineStyle(1);
+            element.push_back(hTemp);
+        }
+        h2SRSig.push_back(element);
+    }
+    
+    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
@@ -2244,7 +2179,6 @@ void analysis1()
             }
             
             //Add Signal for the same mass splitting
-            const int SigScale = 10;
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 unsigned int AOD = 0;
@@ -2257,8 +2191,8 @@ void analysis1()
                     }
                 }
                 
-                //normalization for Signal
-                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
+                //preliminary normalization for h2SigSum
+                h2SigSum[i]->Scale(sumDataL/AOD);
             }
             
             //Add BG
@@ -2307,8 +2241,10 @@ void analysis1()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGGroup.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
+                    TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    hTemp.Add(h2SigSum[i]);
+                    hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
+                    sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                     
                     //Significance
                     sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
@@ -2425,6 +2361,54 @@ void analysis1()
                     fout_SR<<endl;
                     fout_SR.close();
                 }
+                
+                //h2SR
+                if(RegionIndex>=18)
+                {
+                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    {
+                        h2SRBG[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[j][0]);
+                    }
+                    for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                    {
+                        h2SRSig[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
+                    }
+                }
+                
+                //significance for all mass point
+                if(RegionIndex>=18)
+                {
+                    PathName = "latex/data/significance/";
+                    PathName += RegionInfo[RegionIndex].RegionName;
+                    PathName += ".txt";
+                    fout.open(PathName.Data());
+                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    {
+                        for(unsigned int k=0;k<SigMassSplitting.size();k++)
+                        {
+                            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[k].MassDiff)
+                            {
+                                //expected number of events
+                                double expN = h2SigSum[k]->Integral(0,-1);
+                                expN *= SigXS[j];
+                                
+                                //Significance
+                                double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
+                                
+                                fout_SR<<setprecision(3)<<std::fixed;
+                                fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
+                            }
+                        }
+                    }
+                    fout.close();
+                }
+            }
+            
+            //final normalization for h2SigSum for plotting
+            const int SigScale = 10;
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
             }
             
             {
@@ -2737,6 +2721,144 @@ void analysis1()
         for(unsigned int i=0;i<SigSampleID.size();i++)
         {
             delete tree2Sig[i];
+        }
+    }
+    
+    //h2SR
+    THStack stackSR[4];
+    
+    //For combined SR
+    for(unsigned int i=0;i<3;i++)
+    {
+        //h2SRBG
+        h2SRBG[3][0]->Add(h2SRBG[i][0]);
+        h2SRBG[3][1]->Add(h2SRBG[i][1]);
+        if(i==0)
+        {
+            h2SRBG[3][2]->Add(h2SRBG[i][2]);
+            h2SRBG[3][3]->Add(h2SRBG[i][3]);
+        }
+        else
+        {
+            h2SRBG[3][3]->Add(h2SRBG[i][2]);
+        }
+        
+        //h2SRSig
+        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+        {
+            h2SRSig[3][j]->Add(h2SRSig[i][j]);
+        }
+    }
+    
+    for(unsigned int i=0;i<4;i++)
+    {
+        //Legend
+        TLegend* leg;
+        {
+            Double_t xl1, yl1, xl2, yl2;
+            {
+                xl2=0.92;
+                yl2=0.95;
+                xl1=xl2-0.3;
+                yl1=yl2-0.2;
+            }
+            leg = new TLegend(xl1,yl1,xl2,yl2);
+            leg->SetNColumns(2);
+            leg->SetFillStyle(0);
+            leg->SetTextFont(42);
+            leg->SetBorderSize(0);
+            
+            leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
+            leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
+            if(i==0 || i==3)
+            {
+                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[0].LegendName.Data(),"fl");
+                leg->AddEntry(h2SRBG[i][3],BGDataGroupData[1].LegendName.Data(),"fl");
+            }
+            else
+            {
+                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[1].LegendName.Data(),"fl");
+            }
+            
+            
+            for(unsigned int j=0;j<SigMassSplitting.size();j++)
+            {
+                TString NameTemp = "";
+                NameTemp += "(";
+                NameTemp += TString::Itoa(SigMass1[SigMassSplitting[j].ID],10);
+                NameTemp += ", ";
+                NameTemp += TString::Itoa(SigMass2[SigMassSplitting[j].ID],10);
+                NameTemp += ")";
+                leg->AddEntry(h2SRSig[i][j],NameTemp.Data(),"l");
+            }
+        }
+        
+        //add h2SRBG
+        if(i==0)
+        {
+            //ee
+            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][3]);
+            stackSR[i].Add(h2SRBG[i][2]);
+        }
+        else if(i==1)
+        {
+            //mumu
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][0]);
+        }
+        else if(i==2)
+        {
+            //emu
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][2]);
+        }
+        else if(i==3)
+        {
+            //combine
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][3]);
+        }
+        
+        //Draw
+        gStyle->SetOptStat(0);
+        TCanvas* c2 = new TCanvas();
+        c2->cd();
+        c2->SetLogy(1);
+        stackSR[i].SetMinimum(1);
+        stackSR[i].Draw("hist");
+        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+        {
+            h2SRSig[i][j]->Draw("histsame");
+        }
+        leg->Draw();
+        
+        //export histograms in eps format
+        TString NameTemp = "plot/";
+        NameTemp += "SR_";
+        if(i==0) NameTemp += "ee";
+        else if(i==1) NameTemp += "mumu";
+        else if(i==2) NameTemp += "emu";
+        else if(i==3) NameTemp += "combine";
+        NameTemp += ".pdf";
+        c2->Print(NameTemp,"pdf");
+        delete c2;
+    }
+    
+    for(unsigned int i=0;i<4;i++)
+    {
+        for(unsigned int j=0;j<h2SRBG[i].size();j++)
+        {
+            delete h2SRBG[i][j];
+        }
+        for(unsigned int j=0;j<h2SRSig[i].size();j++)
+        {
+            delete h2SRSig[i][j];
         }
     }
     
