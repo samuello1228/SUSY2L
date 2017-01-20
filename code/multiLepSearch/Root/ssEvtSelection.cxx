@@ -599,7 +599,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 	dilepPair[0] = sig_Ls[0];
 	dilepPair[1] = sig_Ls[1];
         keep = true;
-        m_susyEvt->evt.flag = 1;
       } 
 
       //this catches 1SigLep1FakeLepSS -.-
@@ -624,7 +623,6 @@ EL::StatusCode ssEvtSelection :: execute ()
           if (baseLepSign==sigLepSign){
 	    dilepPair[1] = p;
             keep = true;
-            m_susyEvt->evt.flag = 2; 
 	    break;
 	  }
 	}
@@ -653,7 +651,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 	      dilepPair[0] = sel_Ls[0];
 	      dilepPair[1] = sel_Ls[1];
   	      keep = true;
-              m_susyEvt->evt.flag = 3;
 	      break;
 	    }
 	  }
@@ -664,7 +661,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 	    dilepPair[0] = sel_Ls[1];
 	    dilepPair[1] = sel_Ls[2];
   	    keep = true;
-            m_susyEvt->evt.flag = 3;
 	  }
 	}
       } 
@@ -766,6 +762,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->jets.resize(jet_Ls.size());
     int nSigJet = 0;
     int nBJet = 0;
+    int nISR = 0;
     int i=0;
     for(auto j0: jet_Ls){
       auto j = dynamic_cast<xAOD::Jet*>(j0);
@@ -782,6 +779,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_signal(*j)) {flag |= IS_SIGNAL;nSigJet++;}
       if(dec_bjet_loose(*j)) flag |= JT_BJET_LOOSE;
       if(m_objTool->IsBJet(*j)) {flag |= JT_BJET;nBJet++;}
+      if(m_susyEvt->jets[i].pt > 40 && m_susyEvt->jets[i].eta < 2.4) nISR++;
 
       m_susyEvt->sig.HT += j->pt()*iGeV;
       i++;
@@ -1053,6 +1051,34 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       /// event weight for fake Lep
       m_susyEvt->evt.fLwt = 0.;
+
+      //12 channel
+      m_susyEvt->evt.flag = 0;
+      if(totLs == 2)
+      {
+        if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
+           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+          m_susyEvt->evt.flag += 1;
+
+        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+          m_susyEvt->evt.flag += 3;
+
+        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
+                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+          m_susyEvt->evt.flag += 3;
+
+        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+          m_susyEvt->evt.flag += 2;
+
+        if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
+           (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
+          m_susyEvt->evt.flag += 3;
+
+        if(nISR==1) m_susyEvt->evt.flag += 6;
+        else if(nISR!=0) m_susyEvt->evt.flag = 0;
+      }
 
       /// fill events
       ATH_MSG_VERBOSE("Fill " << iSyst << " " << jSyst );
