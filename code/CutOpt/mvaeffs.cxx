@@ -150,6 +150,7 @@ TMVA::StatDialogMVAEffs::~StatDialogMVAEffs()
    fMain = 0;
 }
 
+/**
 // TMVA::StatDialogMVAEffs::StatDialogMVAEffs(const TGWindow* p, Float_t ns, Float_t nb) :
 //    fNSignal(ns),
 //    fNBackground(nb),
@@ -209,7 +210,7 @@ TMVA::StatDialogMVAEffs::~StatDialogMVAEffs()
 
 //    fCloseButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Close()");
 // }
-
+**/
 void TMVA::StatDialogMVAEffs::UpdateCanvases() 
 {
    if (fInfoList==0) return;
@@ -461,7 +462,7 @@ void TMVA::StatDialogMVAEffs::DrawHistograms()
       // Save to temp file
       ofstream tempFile("effs.csv");
       char tmp[100];
-      sprintf(tmp, "%.0f,%.0f,%1.2f,%1.3f", fNSignal, fNBackground, info->maxSignificance, info->sSig->GetXaxis()->GetBinCenter(maxbin));
+      sprintf(tmp, "%.0f,%.0f,%1.2f,%1.3f\n", fNSignal, fNBackground, info->maxSignificance, info->sSig->GetXaxis()->GetBinCenter(maxbin));
       tempFile << tmp;
       tempFile.close();
    }
@@ -518,15 +519,15 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
    }
 }
 
-void mvaeffs( TString fin , 
-              Bool_t useTMVAStyle=true, TString formula="S/sqrt(S+B)" )
+void mvaeffs( TString fin, int nSig , Bool_t useTMVAStyle=true, 
+               TString formula="S/sqrt(S+B)" )
 {
    TMVA::TMVAGlob::Initialize( useTMVAStyle );
    TFile* file = TMVA::TMVAGlob::OpenFile( fin );
    TTree* trainTree = (TTree*) file->Get("TrainTree");
    TTree* testTree = (TTree*) file->Get("TestTree");
 
-   int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
+   // int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
    int nBkg = trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\"");
 
    TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
