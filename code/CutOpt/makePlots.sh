@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Channel,ISR,Flavor,dm,NTrees,NodeSize,SigKS,BkgKS,SigChi2,BkgChi2,nSig,nBkg,SigmaMax,BDTcut" > checks.csv
+echo "Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2,nSig,nBkg,SigmaMax,BDTcut" > checks.csv
 
 for dir in $@
 do
@@ -14,17 +14,19 @@ do
 	do
 	    echo "## Now processing $dir/$file ##"
 
-	    ISR="";Flavor="";dm="";NTrees="";NodeSize="";
+	    ISR="";Flavor="";dm="";NTrees="";NodeSize="";Depth="";
 
 	   	dm=`echo $file | grep -o -E "dm[0-9+al]*" | sed 's/[^0-9+al]*//g'`
 	    NodeSize=`echo $dir | grep -o -E "NodeSize[0-9]+" | grep -o -E [0-9]+`
 	    NTrees=`echo $dir | grep -o -E "_[0-9]*_" | sed 's/[^0-9]*//g'`
 	    channel=`echo $file | grep -o -E "Channel[0-9]*" | sed 's/[^0-9]*//g'`
-	    if [ $(($channel/10)) -eq "1" ]; then
+	    Depth=`echo $dir | grep -o -E "Depth[0-9]" | sed 's/[^0-9]*//g'`
+
+	    if [ $((($channel%100)/10)) -eq "1" ]; then
 	    	ISR="yes"
-	    elif [ $(($channel/10)) -eq "0" ]; then
+	    elif [ $((($channel%100)/10)) -eq "0" ]; then
 	    	ISR="no"
-	    elif [ $(($channel/10)) -eq "2" ]; then
+	    elif [ $((($channel%100)/10)) -eq "2" ]; then
 	    	ISR="comb"
         fi
 
@@ -36,6 +38,8 @@ do
 	    	Flavor="uu"
 	    elif [ $((channel%10)) -eq "3" ]; then
 	    	Flavor="comb"
+	    elif [ $((channel%10)) -eq "4" ]; then
+	    	Flavor="ll"
         fi
 
 	    # if [ "$dm" != "+" ]; then
@@ -54,7 +58,7 @@ do
         # Draws signal/background efficiency curves
 	    root -l -b -q "mvaeffs.cxx(\"$dir/$file\")" >> $dir/cutInfo.txt
 
-	   	printf "$channel,$ISR,$Flavor,$dm,$NTrees,$NodeSize," >> checks.csv
+	   	printf "$channel,$ISR,$Flavor,$dm,$NTrees,$NodeSize,$Depth," >> checks.csv
 	   	printf `cat trainingtest.csv`","`cat effs.csv`"\n" >> checks.csv
 	    # echo >> checks.csv
 
