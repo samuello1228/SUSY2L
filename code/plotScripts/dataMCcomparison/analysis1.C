@@ -1759,10 +1759,10 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    for(unsigned int RegionIndex=18;RegionIndex<=23;RegionIndex++)
+    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
-    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
@@ -2179,7 +2179,6 @@ void analysis1()
             }
             
             //Add Signal for the same mass splitting
-            const int SigScale = 10;
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 unsigned int AOD = 0;
@@ -2192,8 +2191,8 @@ void analysis1()
                     }
                 }
                 
-                //normalization for Signal
-                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
+                //preliminary normalization for h2SigSum
+                h2SigSum[i]->Scale(sumDataL/AOD);
             }
             
             //Add BG
@@ -2242,8 +2241,10 @@ void analysis1()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGGroup.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
+                    TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    hTemp.Add(h2SigSum[i]);
+                    hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
+                    sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                     
                     //Significance
                     sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
@@ -2373,6 +2374,13 @@ void analysis1()
                         h2SRSig[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
                     }
                 }
+            }
+            
+            //final normalization for h2SigSum for plotting
+            const int SigScale = 10;
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
             }
             
             {
