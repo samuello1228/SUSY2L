@@ -1761,8 +1761,8 @@ void analysis1()
     
     //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
-    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
@@ -2373,6 +2373,34 @@ void analysis1()
                     {
                         h2SRSig[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
                     }
+                }
+                
+                //significance for all mass point
+                if(RegionIndex>=18)
+                {
+                    PathName = "latex/data/significance/";
+                    PathName += RegionInfo[RegionIndex].RegionName;
+                    PathName += ".txt";
+                    fout.open(PathName.Data());
+                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    {
+                        for(unsigned int k=0;k<SigMassSplitting.size();k++)
+                        {
+                            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[k].MassDiff)
+                            {
+                                //expected number of events
+                                double expN = h2SigSum[k]->Integral(0,-1);
+                                expN *= SigXS[j];
+                                
+                                //Significance
+                                double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
+                                
+                                fout_SR<<setprecision(3)<<std::fixed;
+                                fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
+                            }
+                        }
+                    }
+                    fout.close();
                 }
             }
             
