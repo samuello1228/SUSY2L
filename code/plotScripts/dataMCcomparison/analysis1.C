@@ -225,7 +225,6 @@ void analysis1()
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
                         element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                     }
@@ -480,14 +479,11 @@ void analysis1()
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
         
-        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 73;  element.upper = 74; BGMCGroupData.push_back(element);
-        
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 75;  element.upper = 88; BGMCGroupData.push_back(element);
+        element.lower = 73;  element.upper = 86; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
+        element.lower = 87;  element.upper = 106;BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -623,7 +619,6 @@ void analysis1()
             element.setOfBGMC.push_back("Zmumu");
             element.setOfBGMC.push_back("Ztautau");
             element.setOfBGMC.push_back("ttbar");
-            element.setOfBGMC.push_back("Wt");
             element.setOfBGMC.push_back("VV");
             element.setOfBGMC.push_back("Vgamma");
             
@@ -1220,7 +1215,6 @@ void analysis1()
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
             }
@@ -1787,8 +1781,8 @@ void analysis1()
     
     //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
-    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
