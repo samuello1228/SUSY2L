@@ -1691,10 +1691,24 @@ void analysis1()
     fstream fout_SR;
     fout_SR.open(PathName_SR.Data(), ios::out);
     fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    fout_SR<<std::setw(15)<<BGMCGroupData[5].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGMCGroupData[6].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[0].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[1].GroupName.Data();
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "VV") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "Vgamma") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "charge flip") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "fake lepton") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+
     fout_SR<<std::setw(15)<<"Total BG";
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1710,7 +1724,7 @@ void analysis1()
     for(unsigned int i=0;i<4;i++)
     {
         std::vector<TH1F*> element;
-        TH1F* hTemp;
+        TH1F* hTemp = nullptr;
         TString LeptonName;
         if(i==0) LeptonName = "_ee";
         else if(i==1) LeptonName = "_mumu";
@@ -1719,13 +1733,19 @@ void analysis1()
         
         //h2SRBG
         //VV
-        hTemp = new TH1F((BGMCGroupData[5].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "VV") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(2);
         hTemp->SetFillColor(2);
         element.push_back(hTemp);
         
         //Vgamma
-        hTemp = new TH1F((BGMCGroupData[6].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "Vgamma") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(4);
         hTemp->SetFillColor(4);
         element.push_back(hTemp);
@@ -1733,14 +1753,20 @@ void analysis1()
         //charge flip
         if(i==0 || i==3)
         {
-            hTemp = new TH1F((BGDataGroupData[0].GroupName+LeptonName).Data(),"",18,0,18);
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                if(BGDataGroupData[j].GroupName == "charge flip") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+            }
             hTemp->SetLineColor(3);
             hTemp->SetFillColor(3);
             element.push_back(hTemp);
         }
         
         //fake lepton
-        hTemp = new TH1F((BGDataGroupData[1].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGDataGroupData.size();j++)
+        {
+            if(BGDataGroupData[j].GroupName == "fake lepton") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(5);
         hTemp->SetFillColor(5);
         element.push_back(hTemp);
@@ -2768,16 +2794,32 @@ void analysis1()
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
             
-            leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-            leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                if(BGMCGroupData[j].GroupName == "VV") leg->AddEntry(h2SRBG[i][0],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            
             if(i==0 || i==3)
             {
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[0].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][3],BGDataGroupData[1].LegendName.Data(),"fl");
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "charge flip") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][3],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             else
             {
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[1].LegendName.Data(),"fl");
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             
             
