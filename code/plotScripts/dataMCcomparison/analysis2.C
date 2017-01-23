@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "evt2l.C"
-#include "PP1_evt2l.C"
+#include <TFile.h>
+#include <TChain.h>
 #include <TH1F.h>
 
 Int_t ID1;
@@ -73,12 +73,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(isPP1) tree1P->Add(fileName.Data());
     }
     
-    /*
-    evt2l *evts = new evt2l(tree1);
-    PP1_evt2l *evtsP = nullptr;
-    if(isPP1) evtsP = new PP1_evt2l(tree1P);
-    */
-    
     //channels
     std::vector<TString> channel;
     {
@@ -103,44 +97,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
     }
     
-    //create files for storing the resulting trees and histograms
-    TFile *f2[channel.size()];
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        TString fileName = "skimming/skimming.";
-        fileName += SampleName;
-        fileName += "_";
-        fileName += channel[j];
-        fileName += ".root";
-        f2[j] = new TFile(fileName.Data(),"RECREATE");
-    }
-    
-    //trees
-    TTree *tree2[channel.size()];
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        TString treeName = "tree_";
-        treeName += channel[j];
-        
-        f2[j]->cd();
-        tree2[j] = new TTree(treeName.Data(),treeName.Data());
-        tree2[j]->Branch("pt1",&pt1,"pt1/D");
-        tree2[j]->Branch("pt2",&pt2,"pt2/D");
-        tree2[j]->Branch("eta1",&eta1,"eta1/D");
-        tree2[j]->Branch("eta2",&eta2,"eta2/D");
-        tree2[j]->Branch("mll",&mll,"mll/D");
-        tree2[j]->Branch("ptll",&ptll,"ptll/D");
-        tree2[j]->Branch("MET",&MET,"MET/D");
-        tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mtm",&mt2,"mtm/D");
-        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
-        tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
-        tree2[j]->Branch("weight",&weight,"weight/D");
-        tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
-        tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
-        tree2[j]->Branch("averageMu",&averageMu,"averageMu/D");
-    }
-    
     //histograms
     TH1F* h2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
@@ -148,7 +104,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString hName2 = "hist_";
         hName2 += channel[j];
         
-        f2[j]->cd();
         h2[j] = new TH1F(hName2.Data(), "cut flow", 20, 0, 20);
         h2[j]->GetXaxis()->SetBinLabel(1,"AOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"ntuple");
@@ -157,8 +112,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(5,"fake");
         h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
         h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"mll_60");
-        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
     }
     
     //fill histograms
@@ -182,326 +136,78 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
     }
     
-    /*
-    
-    nEvent element;
-    element.name = SampleName;
-    element.n = 0;
-    element.nw = 0;
-    element.nAOD = h2[0]->GetBinContent(1);
-    
-    //loop over all entries
-    //for(int j=0;j<=10;j++)
-    for(int j=0;j<tree1->GetEntries();j++)
     {
-        if(j%100000==0)
-        {
-            cout<<"number of event: " <<j<<endl;
-        }
-        evts->GetEntry(j);
-        if(isPP1) evtsP->GetEntry(j);
+        int expN;
+        TString Cut = "1";
         
-        //trigger
-        if(evts->sig_trigCode==0)
+        Cut += " && sig.trigCode!=0";
+        expN = tree1->Draw("l12.m",Cut.Data());
+        for(unsigned int j=0;j<channel.size();j++)
         {
-            continue;
-        }
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("trigger",1);
+            h2[j]->Fill("trigger",expN);
         }
         
-        if(isPP1 && evtsP->evt_fLwt!=0)
+        Cut += " && Length$(leps)==2 && (leps[0].lFlag & 2) && (leps[1].lFlag & 2)";
+        expN = tree1->Draw("l12.m",Cut.Data());
+        for(unsigned int j=0;j<channel.size();j++)
         {
-            for(unsigned int m=0;m<channel.size();m++)
-            {
-                h2[m]->Fill("fake",1);
-            }
-        }
-        else
-        {
-            //exact 2 signal leptons
-            if(evts->leps_!=2) continue;
-            if(!(evts->leps_lFlag[0] & 1<<1)) continue;
-            if(!(evts->leps_lFlag[1] & 1<<1)) continue;
-            
-            for(unsigned int m=0;m<channel.size();m++)
-            {
-                h2[m]->Fill("=2SigLep",1);
-            }
+            h2[j]->Fill("=2SigLep",expN);
         }
         
-        int sigIndex[2];
-        sigIndex[0] = 0;
-        sigIndex[1] = 1;
-        ID1 = evts->leps_ID[sigIndex[0]];
-        ID2 = evts->leps_ID[sigIndex[1]];
-        pt1 = evts->leps_pt[sigIndex[0]];
-        pt2 = evts->leps_pt[sigIndex[1]];
-        //pt of leading lepton
-        if(int(abs(ID1)/1000) == 11 && !(pt1>25)) continue;
-        if(int(abs(ID1)/1000) == 13 && !(pt1>20)) continue;
-        for(unsigned int m=0;m<channel.size();m++)
+        Cut += " && ( ( int(abs(leps[0].ID)/1000) == 11 && leps[0].pt > 25 ) || ( int(abs(leps[0].ID)/1000) == 13 && leps[0].pt > 20 ) )";
+        expN = tree1->Draw("l12.m",Cut.Data());
+        for(unsigned int j=0;j<channel.size();j++)
         {
-            h2[m]->Fill("pt1",1);
+            h2[j]->Fill("pt1",expN);
         }
         
-        //pt of subleading lepton
-        if(int(abs(ID2)/1000) == 11 && !(pt2>15)) continue;
-        if(int(abs(ID2)/1000) == 13 && !(pt2>10)) continue;
-        for(unsigned int m=0;m<channel.size();m++)
+        Cut += " && ( ( int(abs(leps[1].ID)/1000) == 11 && leps[1].pt > 15 ) || ( int(abs(leps[1].ID)/1000) == 13 && leps[1].pt > 10 ) )";
+        expN = tree1->Draw("l12.m",Cut.Data());
+        for(unsigned int j=0;j<channel.size();j++)
         {
-            h2[m]->Fill("pt2",1);
+            h2[j]->Fill("pt2",expN);
         }
         
-     
-        //mll > 60 GeV
-        if(!(evts->l12_m>60))
+        for(unsigned int j=0;j<channel.size();j++)
         {
-            continue;
-        }
-     
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("mll_60",1);
-        }
-
-        eta1 = evts->leps_eta[sigIndex[0]];
-        eta2 = evts->leps_eta[sigIndex[1]];
-        mll = evts->l12_m;
-        ptll = evts->l12_pt;
-        MET = evts->sig_MetRel;
-        mTtwo = evts->sig_mT2;
-        mt1 = evts->leps_mT[sigIndex[0]];
-        mt2 = evts->leps_mT[sigIndex[1]];
-        if(mt1<mt2) mtm = mt1;
-        else mtm = mt2;
-        HT = evts->sig_HT;
-        R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = evts->l12_dPhi;
-        l12_MET_dPhi = evts->l12_MET_dPhi;
-        //weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
-        
-        if(isPP1) qFwt = evtsP->evt_qFwt;
-        else qFwt = evts->evt_qFwt;
-        
-        if(isPP1) fLwt = evtsP->evt_fLwt;
-        else fLwt = evts->evt_fLwt;
-        
-        averageMu = evts->evt_averageMu;
-        nVtx = evts->sig_nVtx;
-        
-        //SF or DF
-        int channelIndex = 0;
-        if(int(abs(ID1)/1000) == 11)
-        {
-            if(int(abs(ID2)/1000) == 11)
-            {
-            }
-            else if(int(abs(ID2)/1000) == 13)
-            {
-                channelIndex += 2;
-            }
-        }
-        else if(int(abs(ID1)/1000) == 13)
-        {
-            if(int(abs(ID2)/1000) == 11)
-            {
-                channelIndex += 2;
-            }
-            else if(int(abs(ID2)/1000) == 13)
-            {
-                channelIndex += 1;
-            }
+            TString ChannelCut = " && evt.flag == ";
+            ChannelCut += TString::Itoa(j+1,10);
+            ChannelCut = Cut + ChannelCut;
+            //cout<<ChannelCut<<endl;
+            expN = tree1->Draw("l12.m",ChannelCut.Data());
+            h2[j]->Fill(channel[j].Data(),expN);
         }
         
-        //jets
-        nJet = 0;
-        nBJet = 0;
-        nCJet = 0;
-        nFJet = 0;
-        int nISR = 0;
-        int leadingBJetIndex = 0;
-        int leadingCJetIndex = 0;
-        int leadingFJetIndex = 0;
-        for(int k=0;k<evts->jets_;k++)
         {
-            nJet++;
-            if(fabs(evts->jets_eta[k]) < 2.4)
-            {
-                //ISR
-                if(evts->jets_pt[k] > 40) nISR++;
-                
-                //Central jets
-                if(evts->jets_jFlag[k] & 1<<5)
-                {
-                    //b-tagged
-                    if(evts->jets_pt[k] > 20)
-                    {
-                        //Central b-jets
-                        nBJet++;
-                        if(nBJet==1) leadingBJetIndex = k;
-                    }
-                }
-                else
-                {
-                    //no b-tagged
-                    if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
-                       (channelIndex==2 && evts->jets_pt[k] > 30) )
-                    {
-                        //Central light jets
-                        nCJet++;
-                        if(nCJet==1) leadingCJetIndex = k;
-                    }
-                }
-            }
-            else
-            {
-                //Forward jets
-                if(evts->jets_pt[k] > 30)
-                {
-                    nFJet++;
-                    if(nFJet==1) leadingFJetIndex = k;
-                }
-            }
+            TString SSCut = " && ( (evt.flag >=4 && evt.flag <=6) || (evt.flag >=10 && evt.flag <=12) )";
+            SSCut = Cut + SSCut;
+            nEvent element;
+            element.name = SampleName;
+            element.nAOD = h2[0]->GetBinContent(1);
+            element.n = tree1->Draw("l12.m",SSCut.Data());;
+            element.nw = 0;
+            nSS.push_back(element);
         }
-        
-        if(nJet>0)
-        {
-            jetpt = evts->jets_pt[0];
-            jeteta = evts->jets_eta[0];
-            jetphi = evts->jets_phi[0];
-        }
-        else
-        {
-            jetpt = 0;
-            jeteta = 0;
-            jetphi = 0;
-        }
-        
-        if(nBJet>0)
-        {
-            bjetpt = evts->jets_pt[leadingBJetIndex];
-            bjeteta = evts->jets_eta[leadingBJetIndex];
-            bjetphi = evts->jets_phi[leadingBJetIndex];
-        }
-        else
-        {
-            bjetpt = 0;
-            bjeteta = 0;
-            bjetphi = 0;
-        }
-        
-        if(nCJet>0)
-        {
-            cjetpt = evts->jets_pt[leadingCJetIndex];
-            cjeteta = evts->jets_eta[leadingCJetIndex];
-            cjetphi = evts->jets_phi[leadingCJetIndex];
-        }
-        else
-        {
-            cjetpt = 0;
-            cjeteta = 0;
-            cjetphi = 0;
-        }
-        
-        if(nFJet>0)
-        {
-            fjetpt = evts->jets_pt[leadingFJetIndex];
-            fjeteta = evts->jets_eta[leadingFJetIndex];
-            fjetphi = evts->jets_phi[leadingFJetIndex];
-        }
-        else
-        {
-            fjetpt = 0;
-            fjeteta = 0;
-            fjetphi = 0;
-        }
-        
-        //separate the sample into channels
-        if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
-        {
-            channelIndex += 3;
-            element.n++;
-            element.nw += weight;
-        }
-        
-        if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
-        
-        h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
-        tree2[channelIndex]->Fill();
-    }
-    */
-    
-    TString Cut = "1";
-    
-    Cut += " && sig.trigCode!=0";
-    cout<<tree1->Draw("l12.m",Cut.Data())<<endl;
-    
-    Cut += " && Length$(leps)==2 && (leps[0].lFlag & 2) && (leps[1].lFlag & 2)";
-    cout<<tree1->Draw("l12.m",Cut.Data())<<endl;
-
-    Cut += " && ( ( int(abs(leps[0].ID)/1000) == 11 && leps[0].pt > 25 ) || ( int(abs(leps[0].ID)/1000) == 13 && leps[0].pt > 20 ) )";
-    cout<<tree1->Draw("l12.m",Cut.Data())<<endl;
-    
-    Cut += " && ( ( int(abs(leps[1].ID)/1000) == 11 && leps[1].pt > 15 ) || ( int(abs(leps[1].ID)/1000) == 13 && leps[1].pt > 10 ) )";
-    cout<<tree1->Draw("l12.m",Cut.Data())<<endl;
-    
-    cout<<endl;
-    
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        TString ChannelCut = " && evt.flag == ";
-        ChannelCut += TString::Itoa(j+1,10);
-        ChannelCut = Cut + ChannelCut;
-        //cout<<ChannelCut<<endl;
-        cout<<tree1->Draw("l12.m",ChannelCut.Data())<<endl;
     }
     
-    //save the resulting trees and histograms
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        f2[j]->cd();
-        tree2[j]->Write("tree");
-        h2[j]->Write("hist");
-    }
-    
-    /*
-    for(int k=1;k<=8;k++)
+    for(int k=1;k<=7;k++)
     {
         cout<<long(h2[1]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
-        cout<<int(h2[j]->GetBinContent(9))<<endl;
+        cout<<int(h2[j]->GetBinContent(8))<<endl;
     }
     cout<<endl;
-    */
-    
-    //cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
-    //nSS.push_back(element);
-    //delete
-    //delete evts;
-    //if(isPP1) delete evtsP;
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        delete tree2[j];
-    }
     
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete h2[j];
     }
+    
     delete tree1;
     if(isPP1) delete tree1P;
-    for(unsigned int j=0;j<channel.size();j++)
-    {
-        delete f2[j];
-    }
 }
 
 void GetSampleName(std::vector<TString>& SampleName, TString const type, int const skip)
