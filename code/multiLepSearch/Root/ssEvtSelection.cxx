@@ -24,6 +24,9 @@
 #include "xAODCore/tools/IOStats.h"
 #include "xAODCore/tools/ReadStats.h"
 
+#include <multiLepSearch/ChargeFlipBkgTool.h>
+#include <multiLepSearch/FakeLepBkgTool.h>
+
 #include <TError.h>
 #include <algorithm>
 #include <vector>
@@ -310,6 +313,27 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(m_objTool->setProperty("PRWLumiCalcFiles", CF_PRW_lcalcFiles));
   CHECK(m_objTool->initialize().isSuccess());
 
+  mChargeFlipBkgTool = new ChargeFlipBkgTool("MyQFlipTool");
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_data_signal_wSys.root"));
+  //CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb"));
+  CHECK(mChargeFlipBkgTool->initialize());
+
+  mFakeLepBkgTool = new FakeLepBkgTool("MyFLepTool");
+  //CHECK(mFakeLepBkgTool->setProperty("Method", "Matrix"));
+  //CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/RealFakeLepEff_dummy.root"));
+  //CHECK(mFakeLepBkgTool->setProperty("RealeEffHistoName", "RealeEff"));
+  //CHECK(mFakeLepBkgTool->setProperty("RealuEffHistoName", "RealuEff"));
+  //CHECK(mFakeLepBkgTool->setProperty("FakeeEffHistoName", "FakeeEff"));
+  //CHECK(mFakeLepBkgTool->setProperty("FakeuEffHistoName", "FakeuEff"));
+
+  CHECK(mFakeLepBkgTool->setProperty("Method", "FakeFactor"));
+  CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/fakefactor_2D_Data16.root"));
+  CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele"));
+  //CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele_v2")); //this histo has problem of bin error being just the sqrt of bin content
+  CHECK(mFakeLepBkgTool->setProperty("uFakeFactorHistoName", "h_ff_mu"));
+
+  CHECK(mFakeLepBkgTool->initialize());
+
   /// GRL
   if(!CF_isMC){
     m_grl = new GoodRunsListSelectionTool("GoodRunsListSelectionTool");
@@ -460,7 +484,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     else return sc;
 
     if(eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18)) {
-    //if(eventInfo->eventFlags(EventInfo::Core) & 0x40000) {
+    //if(eventInfo->eventFlags(EventInfo::Core) & 0x40000) 
       ATH_MSG_WARNING("This event is incompletely built. Skipping.");
       return sc;
     }
@@ -732,6 +756,45 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
 
     m_susyEvt->truths.clear();
+
+    // charge flip weight and pT correction (have to apply before other calculation that use lep pT)
+    m_susyEvt->evt.qFwt = 0.0;
+    if ((sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)){
+        //ugly code to get lep0 type and charge :(
+        xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
+        int sigLepSign0 = 0;
+        tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
+        if(tmpMu0) sigLepSign0 = tmpMu0->charge();
+        else{
+          tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
+          if(tmpE0) sigLepSign0 = tmpE0->charge();
+        }
+        //get lep1 type and charge
+        xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
+        int sigLepSign1 = 0;
+        tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
+        if(tmpMu1) sigLepSign1 = tmpMu1->charge();
+        else{
+          tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
+          if(tmpE1) sigLepSign1 = tmpE1->charge();
+        }
+        if (sigLepSign0!=sigLepSign1){
+          m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
+          auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
+          if(tmpPt.size()==2){
+            if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
+            if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
+            //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
+            //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
+          }
+        }
+    }
+    //fake lep weight
+    m_susyEvt->evt.fLwt = 0.0;
+    if ((sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
+      m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
+      //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
+    }
 
     //cross section
     if(CF_isMC) m_susyEvt->evt.Xsec = m_XsecDB->xsectTimesEff(eventInfo->mcChannelNumber());
@@ -1037,20 +1100,20 @@ EL::StatusCode ssEvtSelection :: execute ()
         m_susyEvt->evt.BtagSF = 1;
       }
 
-      /// get the weight for 1 lepton charge flip
-      m_susyEvt->evt.qFwt = 0;
-      for(unsigned int i=0; i<sel_Ls.size(); i++){
-        auto e = sel_Ls[i];
-        if(!( dec_signal(*e) && TMath::Abs(m_susyEvt->leps[i].ID) == 11000 )) continue;
-        int ibin = mh_ElChargeFlip->FindBin(e->eta(), e->pt()*iGeV);
-        if(ibin>0){
-          float wt = mh_ElChargeFlip->GetBinContent(ibin);
-          m_susyEvt->evt.qFwt = wt*(1-m_susyEvt->evt.qFwt)+(1-wt)*(m_susyEvt->evt.qFwt);
-        }
-      }
+      ///// get the weight for 1 lepton charge flip
+      //m_susyEvt->evt.qFwt = 0;
+      //for(unsigned int i=0; i<sel_Ls.size(); i++){
+      //  auto e = sel_Ls[i];
+      //  if(!( dec_signal(*e) && TMath::Abs(m_susyEvt->leps[i].ID) == 11000 )) continue;
+      //  int ibin = mh_ElChargeFlip->FindBin(e->eta(), e->pt()*iGeV);
+      //  if(ibin>0){
+      //    float wt = mh_ElChargeFlip->GetBinContent(ibin);
+      //    m_susyEvt->evt.qFwt = wt*(1-m_susyEvt->evt.qFwt)+(1-wt)*(m_susyEvt->evt.qFwt);
+      //  }
+      //}
 
-      /// event weight for fake Lep
-      m_susyEvt->evt.fLwt = 0.;
+      ///// event weight for fake Lep
+      //m_susyEvt->evt.fLwt = 0.;
 
       //12 channel
       m_susyEvt->evt.flag = 0;
@@ -1087,7 +1150,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     delete metcst;
     delete metcst_aux;
 
-  }
+  } //end iSyst for loop
   return EL::StatusCode::SUCCESS;
 }
 
