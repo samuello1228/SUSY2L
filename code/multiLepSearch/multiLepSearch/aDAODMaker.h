@@ -2,6 +2,12 @@
 #define multiLepSearch_aDAODMaker_H
 
 #include <EventLoop/Algorithm.h>
+#include "SUSYTools/SUSYObjDef_xAOD.h"
+
+//trigger
+// #include <TrigConfxAOD/xAODConfigTool.h>
+// #include <TrigDecisionTool/TrigDecisionTool.h>
+
 
 class aDAODMaker : public EL::Algorithm
 {
@@ -9,6 +15,11 @@ class aDAODMaker : public EL::Algorithm
   // that way they can be set directly from CINT and python.
 public:
   // float cutValue;
+  int CF_isMC;
+  std::vector< std::string > CF_grlFiles;
+  std::string CF_ConfigFile;
+  std::vector< std::string > CF_trigNames;
+
 
 
 
@@ -38,6 +49,7 @@ public:
  private:
   std::string m_name; //!
 
+  ST::SUSYObjDef_xAOD* m_objTool; //!
 
   // this is needed to distribute the algorithm to the workers
   ClassDef(aDAODMaker, 1);

@@ -93,7 +93,21 @@ EL::StatusCode aDAODMaker :: initialize ()
   TFile *file = wk()->getOutputFile("outputLabel");
   CHECK(event->writeTo(file));
 
-  event->setAuxItemList( "MuonsAux.", "truthType" );
+//   event->setAuxItemList( "MuonsAux.", "truthType" );
+
+  /// SUSYTools
+  m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
+  //m_objTool->msg().setLevel( MSG::ERROR );
+  //m_objTool->msg().setLevel( MSG::WARNING );
+
+  ST::ISUSYObjDef_xAODTool::DataSource ds = static_cast<ST::ISUSYObjDef_xAODTool::DataSource>(CF_isMC); 
+  CHECK(m_objTool->setProperty("DataSource",ds));
+  CHECK(m_objTool->setProperty("ConfigFile", CF_ConfigFile));
+//   CHECK(m_objTool->setProperty("PRWConfigFiles", CF_PRW_confFiles));
+//   CHECK(m_objTool->setProperty("PRWLumiCalcFiles", CF_PRW_lcalcFiles));
+  CHECK(m_objTool->initialize().isSuccess());
+
+
 
   return EL::StatusCode::SUCCESS;
 }
@@ -107,7 +121,46 @@ EL::StatusCode aDAODMaker :: execute ()
   // histograms and trees.  This is where most of your actual analysis
   // code will go.
   xAOD::TEvent* event = wk()->xaodEvent();
-  CHECK(event->copy("Muons"));
+//   CHECK(event->copy("Muons"));
+
+//     CHECK(m_objTool->ApplyPRWTool());
+
+    // Get the Electrons from the event
+    xAOD::ElectronContainer* electrons_copy(0);
+    xAOD::ShallowAuxContainer* electrons_copyaux(0);
+    electrons_copyaux->setShallowIO( false );
+    CHECK(m_objTool->GetElectrons(electrons_copy,electrons_copyaux));
+    CHECK(event->record(electrons_copy   , "ShallowCopiedElectrons"));
+    CHECK(event->record(electrons_copyaux, "ShallowCopiedElectronsAux."));
+
+//     CHECK(wk()->xaodStore()->record(electrons_copy   , "ShallowCopiedElectrons"));
+//     CHECK(wk()->xaodStore()->record(electrons_copyaux, "ShallowCopiedElectronsAux."));
+
+    /// photon Check
+//     xAOD::PhotonContainer* photons_copy(0);
+//     xAOD::ShallowAuxContainer* photons_copyaux(0);
+//     CHECK( m_objTool->GetPhotons(photons_copy,photons_copyaux) );
+//     CHECK(wk()->xaodStore()->record(photons_copy       , "ShallowCopiedPhotons"));
+//     CHECK(wk()->xaodStore()->record(photons_copyaux    , "ShallowCopiedPhotonsAux."));
+// 
+//     /// muon Check
+//     xAOD::MuonContainer* muons_copy(0);
+//     xAOD::ShallowAuxContainer* muons_copyaux(0);
+//     CHECK( m_objTool->GetMuons(muons_copy,muons_copyaux) );
+//     CHECK(wk()->xaodStore()->record(muons_copy       , "ShallowCopiedMuons"));
+//     CHECK(wk()->xaodStore()->record(muons_copyaux    , "ShallowCopiedMuonsAux."));
+// 
+//     ///jet
+//     xAOD::JetContainer* jets_copy(0);
+//     xAOD::ShallowAuxContainer* jets_copyaux(0);
+//     CHECK( m_objTool->GetJets(jets_copy,jets_copyaux) );
+//     CHECK(wk()->xaodStore()->record(jets_copy        , "ShallowCopiedJets"));
+//     CHECK(wk()->xaodStore()->record(jets_copyaux     , "ShallowCopiedJetsAux."));
+// 
+//     /// overlap removal
+//     CHECK( m_objTool->OverlapRemoval(electrons_copy, muons_copy, jets_copy) );
+
+
 
   /// Need electron, muon, tau, photon, jets, MET, truth?
 
