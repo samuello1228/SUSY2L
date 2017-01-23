@@ -518,7 +518,7 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
    }
 }
 
-void mvaeffs( TString fin, int nSig , Bool_t useTMVAStyle=true, 
+void mvaeffs( TString fin, double nSig , Bool_t useTMVAStyle=true, 
                TString formula="S/sqrt(S+B)" )
 {
    TMVA::TMVAGlob::Initialize( useTMVAStyle );
@@ -527,7 +527,7 @@ void mvaeffs( TString fin, int nSig , Bool_t useTMVAStyle=true,
    TTree* testTree = (TTree*) file->Get("TestTree");
 
    // int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
-   int nBkg = trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\"");
+   double nBkg = trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\"");
 
    TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
 
