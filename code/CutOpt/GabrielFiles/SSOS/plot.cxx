@@ -33,6 +33,22 @@ TDirectory* currentDir;
 TString outDir;
 double nOS, nSS;
 
+int GetFolksBin(int pdgID){
+	switch (abs(pdgID)){
+		case 11: return 0;
+		case 13: return 1;
+		case 15: return 2;
+		case 22: return 3;
+		case 1000011: return 4;
+		case 1000013: return 5;
+		case 1000023: return 6;
+		case 1000024: return 7;
+		case 40: return 9;
+		case 41: return 10;
+		default: return 8;
+	}
+}
+
 bool initializeHists(){
 	hMT2.name = "mT2";
 	hMT2.OS = new TH1D("hmT2_OS", ";mT2[GeV];Events/5 GeV", 20, 0, 100);
@@ -89,19 +105,32 @@ bool initializeHists(){
 	hl1Pt_JetPt_R.SS = new TH1D("hl1Pt_JetPt_R_SS", ";p_{T}^{l1}/p_T(leading jet);Events/0.25", 20, 0, 5);
 	v_hists.push_back(hl1Pt_JetPt_R);
 
-	hParents.name = "parents";
-	hParents.OS = new TH1D("hParents_OS", "Parent PDGID", 32, -2, 30);
-	hParents.SS = new TH1D("hParents_SS", "Parent PDGID", 32, -2, 30);
+	TH1D hFolks("hFolks", "", 11, 0, 11);
+	hFolks.GetXaxis()->SetBinLabel(1, "e");
+	hFolks.GetXaxis()->SetBinLabel(2, "#mu");
+	hFolks.GetXaxis()->SetBinLabel(3, "#tau");
+	hFolks.GetXaxis()->SetBinLabel(4, "#gamma");
+	hFolks.GetXaxis()->SetBinLabel(5, "#tilde{e_{L}}");
+	hFolks.GetXaxis()->SetBinLabel(6, "#tilde{#mu_{L}}");
+	hFolks.GetXaxis()->SetBinLabel(7, "#tilde{#chi}_{2}^{0}");
+	hFolks.GetXaxis()->SetBinLabel(8, "#tilde{#chi}_{1}^{#pm}");
+	hFolks.GetXaxis()->SetBinLabel(9, "oth");
+	hFolks.GetXaxis()->SetBinLabel(10, "No truth");
+	hFolks.GetXaxis()->SetBinLabel(11, "No truth parent");
+
+	hParents.name = "lep_parents";
+	hParents.OS = (TH1*) hFolks.Clone("hParents_OS"); hParents.OS->SetTitle("Parent PDGID");
+	hParents.SS = (TH1*) hFolks.Clone("hParents_SS"); hParents.SS->SetTitle("Parent PDGID");
 	v_hists.push_back(hParents);
 
-	hParents1.name = "parents1";
-	hParents1.OS = new TH1D("hParents1_OS", "Lep 1 Parent PDGID", 32, -2, 30);
-	hParents1.SS = new TH1D("hParents1_SS", "Lep 1 Parent PDGID", 32, -2, 30);
+	hParents1.name = "lep1_parents";
+	hParents1.OS = (TH1*) hFolks.Clone("hParents1_OS"); hParents1.OS->SetTitle("Lep 1 Parent PDGID");
+	hParents1.SS = (TH1*) hFolks.Clone("hParents1_SS"); hParents1.SS->SetTitle("Lep 1 Parent PDGID");
 	v_hists.push_back(hParents1);
 
-	hParents2.name = "parents2";
-	hParents2.OS = new TH1D("hParents2_OS", "Lep 2 Parent PDGID", 32, -2, 30);
-	hParents2.SS = new TH1D("hParents2_SS", "Lep 2 Parent PDGID", 32, -2, 30);
+	hParents2.name = "lep2_parents";
+	hParents2.OS = (TH1*) hFolks.Clone("hParents2_OS"); hParents2.OS->SetTitle("Lep 2 Parent PDGID");
+	hParents2.SS = (TH1*) hFolks.Clone("hParents2_SS"); hParents2.SS->SetTitle("Lep 2 Parent PDGID");
 	v_hists.push_back(hParents2);
 
 	return true;
@@ -206,19 +235,25 @@ void draw()
 		double yMax = max(h.OS->GetMaximum()/h.OS->GetSumOfWeights(), h.SS->GetMaximum()/h.SS->GetSumOfWeights());
 		char axisTitles[150];
 		sprintf(axisTitles, ";%s;%s", h.OS->GetXaxis()->GetTitle(), h.SS->GetYaxis()->GetTitle());
-		TH2F* frame = new TH2F("frame", axisTitles,
-			500, h.OS->GetXaxis()->GetXmin(), h.OS->GetXaxis()->GetXmax(),
-			500, 0, yMax*1.1);
-		frame->SetTitle("Normalized OS and SS "+h.name+" distributions");
-		frame->Draw();
+		// TH2F* frame = new TH2F("frame", axisTitles,
+		// 	500, h.OS->GetXaxis()->GetXmin(), h.OS->GetXaxis()->GetXmax(),
+		// 	500, 0, yMax*1.1);
+		// frame->SetTitle("Normalized OS and SS "+h.name+" distributions");
+		// frame->Draw();
+
+		TH1* temp = h.OS->DrawNormalized();
+		temp->GetYaxis()->SetRangeUser(0, yMax*1.1);
+		temp->SetTitle("Normalized OS and SS "+h.name+" distributions");
+		// temp->Draw();
 
 		TLegend l(0.75, 0.75, 0.9, 0.9);
 		l.AddEntry(h.OS, "OS", "l");
 		l.AddEntry(h.SS, "SS", "l");
 		
 		h.compNorm = (TH1*) h.OS->Clone(h.name+"_norm_ratio");
-		h.compNorm->Divide(h.OS->DrawNormalized("same"), h.SS->DrawNormalized("same"));
+		h.compNorm->Divide(temp, h.SS->DrawNormalized("same"));
 		l.Draw();
+		gPad->RedrawAxis();
 		h.compNorm->SetTitle(";;OS/SS");
 		c->cd(2)->SetGridy();
 
@@ -238,7 +273,7 @@ void draw()
 		l1->SetLineWidth(2);
 
 		c->Print(outDir+"/"+h.name+"_norm.pdf", "Title:"+h.name);
-		delete frame; frame=0;
+		// delete frame; frame=0;
 
 		///// REGULAR //////
 
@@ -268,18 +303,20 @@ void draw()
 
 		yMax = max(h.OS->GetMaximum(), h.SS->GetMaximum());
 		sprintf(axisTitles, ";%s;%s", h.OS->GetXaxis()->GetTitle(), h.SS->GetYaxis()->GetTitle());
-		frame = new TH2F("frame", axisTitles,
-			500, h.OS->GetXaxis()->GetXmin(), h.OS->GetXaxis()->GetXmax(),
-			500, 0, yMax*1.1);
-		frame->SetTitle("OS and SS "+h.name+" distributions"); 
-		frame->Draw();
-		h.OS->Draw("same");
+		// frame = new TH2F("frame", axisTitles,
+		// 	500, h.OS->GetXaxis()->GetXmin(), h.OS->GetXaxis()->GetXmax(),
+		// 	500, 0, yMax*1.1);
+		// frame->SetTitle("OS and SS "+h.name+" distributions"); 
+		// frame->Draw();
+		h.OS->SetTitle("OS and SS "+h.name+" distributions"); 
+		h.OS->GetYaxis()->SetRangeUser(0, yMax*1.1);
+		h.OS->Draw( );
 		h.SS->Draw("same");
 
 		l.Draw();
-
+		gPad->RedrawAxis();
 		c->Print(outDir+"/"+h.name+".pdf", "Title:"+h.name);
-		delete frame; frame = 0;
+		// delete frame; frame = 0;
 		delete c;
 		h.OS->SetTitle("");
 	}
@@ -312,9 +349,25 @@ int plot1(TString dm, int channel)
 		// weight *= evt2lTree->evt_MuSF;
 		// weight *= evt2lTree->evt_BtagSF;
 
-		int pdgID;
+		// if(evt2lTree->leps_truthI[0]>=0
+		// 	&& evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]>=0
+		// 	&& (GetFolksBin(evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]])==6 
+		// 		|| GetFolksBin(evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]])==7
+		// 		)
+		// 	)
+		// 	continue;
+		// if(evt2lTree->leps_truthI[1]>=0
+		// 	&& evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]>=0
+		// 	&& (GetFolksBin(evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]])==6 
+		// 		|| GetFolksBin(evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]])==7
+		// 		)
+		// 	)
+		// 	continue;
+
+		int pdgID, binNum;
 		if((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0))
 		{
+			binNum = GetFolksBin(pdgID);
 			hMT2.SS->Fill(evt2lTree->sig_mT2, weight);
 			hL12pt.SS->Fill(evt2lTree->l12_pt, weight);
 			hMET.SS->Fill(evt2lTree->sig_MetRel, weight);
@@ -324,23 +377,27 @@ int plot1(TString dm, int channel)
 			hLLdPhi.SS->Fill(evt2lTree->l12_dPhi, weight);
 			hMll.SS->Fill(evt2lTree->l12_m, weight);
 
-			if(int(channel%10)!=0){
+			if(int(channel/10)!=0){
 				hJetMet_dPhi.SS->Fill(evt2lTree->jets_MET_dPhi[0], weight);
 				hMET_JetPt_R.SS->Fill(evt2lTree->sig_MetRel/evt2lTree->jets_pt[0], weight);
 				hl1Pt_JetPt_R.SS->Fill(evt2lTree->leps_pt[0]/evt2lTree->jets_pt[0], weight);
 			}
 
-			if(evt2lTree->leps_truthI[0]<0) pdgID = -1;
-			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]<0) pdgID = -2;
-			else pdgID = evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]];
-			hParents.SS->Fill(pdgID, weight);
-			hParents1.SS->Fill(pdgID, weight);
+			// if(!hParents.SS) cout << "IT'S A TRAP" << endl;
 
-			if(evt2lTree->leps_truthI[1]<0) pdgID = -1;
-			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]<0) pdgID = -2;
+			if(evt2lTree->leps_truthI[0]<0) pdgID = 40;
+			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]<0) pdgID = 41;
+			else pdgID = evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]];
+			binNum = GetFolksBin(pdgID);
+			hParents.SS->Fill(binNum, weight);
+			hParents1.SS->Fill(binNum, weight);
+
+			if(evt2lTree->leps_truthI[1]<0) pdgID = 40;
+			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]<0) pdgID = 41;
 			else pdgID = evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]];
-			hParents.SS->Fill(pdgID, weight);
-			hParents2.SS->Fill(pdgID, weight);
+			binNum = GetFolksBin(pdgID);
+			hParents.SS->Fill(binNum, weight);
+			hParents2.SS->Fill(binNum, weight);
 		}
 		else
 		{
@@ -353,23 +410,25 @@ int plot1(TString dm, int channel)
 			hLLdPhi.OS->Fill(evt2lTree->l12_dPhi, weight);
 			hMll.OS->Fill(evt2lTree->l12_m, weight);
 
-			if(int(channel%10)!=0){
+			if(int(channel/10)!=0){
 				hJetMet_dPhi.OS->Fill(evt2lTree->jets_MET_dPhi[0], weight);
 				hMET_JetPt_R.OS->Fill(evt2lTree->sig_MetRel/evt2lTree->jets_pt[0], weight);
 				hl1Pt_JetPt_R.OS->Fill(evt2lTree->leps_pt[0]/evt2lTree->jets_pt[0], weight);
 			}
 
-			if(evt2lTree->leps_truthI[0]<0) pdgID = -1;
-			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]<0) pdgID = -2;
+			if(evt2lTree->leps_truthI[0]<0) pdgID = 40;
+			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]<0) pdgID = 41;
 			else pdgID = evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[0]]];
-			hParents.OS->Fill(pdgID, weight);
-			hParents1.OS->Fill(pdgID, weight);
+			binNum = GetFolksBin(pdgID);
+			hParents.OS->Fill(binNum, weight);
+			hParents1.OS->Fill(binNum, weight);
 
-			if(evt2lTree->leps_truthI[1]<0) pdgID = -1;
-			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]<0) pdgID = -2;
+			if(evt2lTree->leps_truthI[1]<0) pdgID = 40;
+			else if (evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]<0) pdgID = 41;
 			else pdgID = evt2lTree->truths_pdgId[evt2lTree->truths_motherI[evt2lTree->leps_truthI[1]]];
-			hParents.OS->Fill(pdgID, weight);
-			hParents2.OS->Fill(pdgID, weight);
+			binNum = GetFolksBin(pdgID);
+			hParents.OS->Fill(binNum, weight);
+			hParents2.OS->Fill(binNum, weight);
 		}
 	}
 	draw();
@@ -389,11 +448,12 @@ int plot(){
 	int channel2[] = {3, 13, 23};
 
 	for(TString i : dm) {
-		fOut << "\\section{$\\Delta m="<< i.Data() << "$ GeV}\n";
+		char temp[100];
+		sprintf(temp, "%s\\section{$\\Delta m=%s$ GeV}\n", (i=="all" ||i=="+")? "\%" : "" , i.Data());
+		fOut << temp;
 			for(int j : channel){ 
 			plot1(i, j);
-			char temp[100];
-			sprintf(temp, "\\drawPlots{%s}{%d}{%d}{%d}\n", i.Data(), j, (int) nOS, (int) nSS);
+			sprintf(temp, "%s \\drawPlots{%s}{%d}{%d}{%d}\n", (i=="all" ||i=="+")? "\%" : "" ,i.Data(), j, (int) nOS, (int) nSS);
 			fOut << temp;
 		} 
 		fOut << endl;

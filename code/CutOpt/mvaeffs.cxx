@@ -207,7 +207,6 @@ TMVA::StatDialogMVAEffs::~StatDialogMVAEffs()
 //    fDrawButton->Connect("Clicked()","TGNumberEntry",fSigInput, "ValueSet(Long_t)");
 //    fDrawButton->Connect("Clicked()","TGNumberEntry",fBkgInput, "ValueSet(Long_t)");
 //    fDrawButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Redraw()");   
-
 //    fCloseButton->Connect("Clicked()", "TMVA::StatDialogMVAEffs", this, "Close()");
 // }
 **/
