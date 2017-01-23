@@ -52,6 +52,32 @@ def loadXSec():
 	xSecFile.close()
 	return xSecDict
 
+def makeChanDict(ChanNs):
+	ChanDict = {
+		n: ChanNs[0],
+		0: ChanNs[1],
+		1: ChanNs[2],
+		2: ChanNs[3],
+		3: ChanNs[4],
+		4: ChanNs[5],
+		10: ChanNs[6],
+		11: ChanNs[7],
+		12: ChanNs[8],
+		13: ChanNs[9],
+		14: ChanNs[10]
+	}
+	
+def loadEffs():
+	effFile = open("CutEffs.csv")
+	effDict = {}
+
+	for line in effFile:
+		elements = line.split(',')
+		efficiency[(int(elements[0]), int(elements[1]))] = makeChanDict(elements[2:])
+
+	effFile.close()
+	return effDict
+
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
 
