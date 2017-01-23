@@ -779,7 +779,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_signal(*j)) {flag |= IS_SIGNAL;nSigJet++;}
       if(dec_bjet_loose(*j)) flag |= JT_BJET_LOOSE;
       if(m_objTool->IsBJet(*j)) {flag |= JT_BJET;nBJet++;}
-      if(m_susyEvt->jets[i].pt > 40 && m_susyEvt->jets[i].eta < 2.4) nISR++;
+      if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
       m_susyEvt->sig.HT += j->pt()*iGeV;
       i++;
