@@ -65,6 +65,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += ".";
         fileName += SampleName;
         fileName += "_myOutput.root/*.root*";
+        
+        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
         if(isPP1) tree1P->Add(fileName.Data());
@@ -412,16 +415,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //separate the sample into channels
+        
+        if(nISR==0) {}
+        else if(nISR==1) channelIndex += 6;
+        else continue;
+        
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             channelIndex += 3;
             element.n++;
             element.nw += weight;
         }
-        
-        if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
