@@ -122,7 +122,7 @@ if __name__ == '__main__':
 			for mass in C1masses: 
 				xSec = xSecDict[(mass, mass-dm)]
 				selEff = effDict[(mass, mass-dm)][channel%100]
-				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity*selEffch
+				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity*selEff
 				print "## mC1 = %d, mN1 = %d, chan = %d, nEvents %f\n" % (mass, mass-dm, channel, nEvents)
 				if nEvents <= 1: continue
 				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
