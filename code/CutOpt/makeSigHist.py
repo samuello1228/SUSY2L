@@ -2,6 +2,14 @@
 
 import ROOT,csv
 
+def makeSigDict():
+	with open("checksSig.csv") as sigFile:
+		reader = csv.reader(sigFile)
+		next(reader)
+		sigDict = {(int(row[0]), int(row[1]), int(row[2]), int(row[5]), int(row[6]), int(row[7])): float(row[11]) for row in reader}
+		# print sigDict
+	return sigDict
+
 def makeSigHist():
 	ROOT.gStyle.SetOptStat(0)
 	ROOT.gStyle.SetPalette(ROOT.kAquamarine)
@@ -11,24 +19,26 @@ def makeSigHist():
 
 	masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 	dms = (20, 50, 100)
-	channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+	channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+	nsizes = (5, 7, 10)
+	depths = (2, 3, 4, 5)
+	ntrees = (100, 200, 400, 600)
 
-	with open("checksSig.csv") as sigFile:
-		reader = csv.reader(sigFile)
-		next(reader)
-		sigDict = {(int(row[0]), int(row[1]), int(row[2])): float(row[11]) for row in reader}
-		# print sigDict
+	sigDict = makeSigDict()	
 
 	for mass in masses:
 		for dm in dms:
-			maxSig=0
-			for channel in channels:
-				if dm == 100: channel +=100
-				try:
-					sig = sigDict[(mass, mass-dm, channel)]
-				except KeyError:
-					continue
-				if sig > maxSig: maxSig = sig
+			maxSig=0.
+			for channel in channels: 
+				for nsize in nsizes: 
+					for depth in depths: 
+						for n in ntrees:
+							if dm == 100: channel +=100
+							try:
+								sig = sigDict[(mass, mass-dm, channel, n, nsize, depth)]
+							except KeyError:
+								continue
+							if sig > maxSig: maxSig = sig
 			hSig.Fill(mass, mass-dm, maxSig)
 	hSig.Draw("colz text")
 	line = ROOT.TLine()
