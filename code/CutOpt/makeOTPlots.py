@@ -128,7 +128,6 @@ if __name__ == '__main__':
 				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
 				outSig.write("%d,%d,%d,%s,%s,%d,%d,%d,%f," 
 					% (mass, mass-dm, channel, ISR, Flavor, NTrees, NodeSize, Depth, xSec[0]))
-				with open('effs.csv') as effFile:
-					outSig.write(effFile.readline())
+				outSig.write(effFile.readline())
 
 	outOT.close()
