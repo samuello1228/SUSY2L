@@ -53,34 +53,37 @@ def loadXSec():
 	return xSecDict
 
 def makeChanDict(ChanNs):
+	n = int(ChanNs[0])
 	ChanDict = {
-		n: ChanNs[0],
-		0: ChanNs[1],
-		1: ChanNs[2],
-		2: ChanNs[3],
-		3: ChanNs[4],
-		4: ChanNs[5],
-		10: ChanNs[6],
-		11: ChanNs[7],
-		12: ChanNs[8],
-		13: ChanNs[9],
-		14: ChanNs[10]
+		0: float(ChanNs[1])/n,
+		1: float(ChanNs[2])/n,
+		2: float(ChanNs[3])/n,
+		3: float(ChanNs[4])/n,
+		4: float(ChanNs[5])/n,
+		10: float(ChanNs[6])/n,
+		11: float(ChanNs[7])/n,
+		12: float(ChanNs[8])/n,
+		13: float(ChanNs[9])/n,
+		14: float(ChanNs[10])/n
 	}
-	
+	return ChanDict
+
 def loadEffs():
 	effFile = open("CutEffs.csv")
 	effDict = {}
-
+	next(effFile)
 	for line in effFile:
 		elements = line.split(',')
-		efficiency[(int(elements[0]), int(elements[1]))] = makeChanDict(elements[2:])
+		effDict[(int(elements[0]), int(elements[1]))] = makeChanDict(elements[2:])
+		# print (int(elements[0]), int(elements[1]))
 
 	effFile.close()
 	return effDict
 
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
-luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
-
+# luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
+luminosity = 35000
+channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
 
 if __name__ == '__main__':
 	outOT = open("checksOT.csv", "w")
@@ -90,6 +93,7 @@ if __name__ == '__main__':
 	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,xSec,nSig,nBkg,MaxSig,BDTcut\n")
 
 	xSecDict = loadXSec()
+	effDict = loadEffs()
 
 	for directory in sys.argv[1:]:
 		directory = directory.rstrip('/')
@@ -115,11 +119,13 @@ if __name__ == '__main__':
 
 			if not(notOvertrained(overtrainingNums)): continue
 
-			# TODO: Missing preselection efficiency
-			for mass in C1masses:
+			for mass in C1masses: 
 				xSec = xSecDict[(mass, mass-dm)]
-				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity
-				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d)"' % (directory, file, int(nEvents)), shell=True)
+				selEff = effDict[(mass, mass-dm)][channel%100]
+				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity*selEffch
+				print "## mC1 = %d, mN1 = %d, chan = %d, nEvents %f\n" % (mass, mass-dm, channel, nEvents)
+				if nEvents <= 1: continue
+				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
 				outSig.write("%d,%d,%d,%s,%s,%d,%d,%d,%f," 
 					% (mass, mass-dm, channel, ISR, Flavor, NTrees, NodeSize, Depth, xSec[0]))
 				with open('effs.csv') as effFile:
