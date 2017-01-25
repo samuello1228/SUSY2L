@@ -30,6 +30,8 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
+#include <TGraph2D.h>
+
 bool dorw = 0;
 bool docfw = 0;
 bool simple = 1;
@@ -225,7 +227,6 @@ void analysis1()
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
                         element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                     }
@@ -480,14 +481,11 @@ void analysis1()
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
         
-        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 73;  element.upper = 74; BGMCGroupData.push_back(element);
-        
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 75;  element.upper = 88; BGMCGroupData.push_back(element);
+        element.lower = 73;  element.upper = 86; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
+        element.lower = 87;  element.upper = 106;BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -623,7 +621,6 @@ void analysis1()
             element.setOfBGMC.push_back("Zmumu");
             element.setOfBGMC.push_back("Ztautau");
             element.setOfBGMC.push_back("ttbar");
-            element.setOfBGMC.push_back("Wt");
             element.setOfBGMC.push_back("VV");
             element.setOfBGMC.push_back("Vgamma");
             
@@ -1220,7 +1217,6 @@ void analysis1()
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
             }
@@ -1691,10 +1687,24 @@ void analysis1()
     fstream fout_SR;
     fout_SR.open(PathName_SR.Data(), ios::out);
     fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    fout_SR<<std::setw(15)<<BGMCGroupData[5].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGMCGroupData[6].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[0].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[1].GroupName.Data();
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "VV") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "Vgamma") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "charge flip") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "fake lepton") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+
     fout_SR<<std::setw(15)<<"Total BG";
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1710,7 +1720,7 @@ void analysis1()
     for(unsigned int i=0;i<4;i++)
     {
         std::vector<TH1F*> element;
-        TH1F* hTemp;
+        TH1F* hTemp = nullptr;
         TString LeptonName;
         if(i==0) LeptonName = "_ee";
         else if(i==1) LeptonName = "_mumu";
@@ -1719,13 +1729,19 @@ void analysis1()
         
         //h2SRBG
         //VV
-        hTemp = new TH1F((BGMCGroupData[5].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "VV") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(2);
         hTemp->SetFillColor(2);
         element.push_back(hTemp);
         
         //Vgamma
-        hTemp = new TH1F((BGMCGroupData[6].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "Vgamma") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(4);
         hTemp->SetFillColor(4);
         element.push_back(hTemp);
@@ -1733,14 +1749,20 @@ void analysis1()
         //charge flip
         if(i==0 || i==3)
         {
-            hTemp = new TH1F((BGDataGroupData[0].GroupName+LeptonName).Data(),"",18,0,18);
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                if(BGDataGroupData[j].GroupName == "charge flip") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+            }
             hTemp->SetLineColor(3);
             hTemp->SetFillColor(3);
             element.push_back(hTemp);
         }
         
         //fake lepton
-        hTemp = new TH1F((BGDataGroupData[1].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGDataGroupData.size();j++)
+        {
+            if(BGDataGroupData[j].GroupName == "fake lepton") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(5);
         hTemp->SetFillColor(5);
         element.push_back(hTemp);
@@ -1759,9 +1781,9 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
+    for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -2382,6 +2404,10 @@ void analysis1()
                     PathName += RegionInfo[RegionIndex].RegionName;
                     PathName += ".txt";
                     fout.open(PathName.Data());
+                    
+                    TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,200,700,10,100,500);
+                    TGraph2D* g2 = new TGraph2D();
+
                     for(unsigned int j=0;j<SigSampleID.size();j++)
                     {
                         for(unsigned int k=0;k<SigMassSplitting.size();k++)
@@ -2395,12 +2421,37 @@ void analysis1()
                                 //Significance
                                 double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
                                 
-                                fout_SR<<setprecision(3)<<std::fixed;
+                                fout<<setprecision(3)<<std::fixed;
                                 fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
+                                
+                                //2D plot
+                                if(significance>0)
+                                    g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
                             }
                         }
                     }
                     fout.close();
+                    
+                    gStyle->SetPalette(1);
+                    gStyle->SetPadRightMargin(0.16);
+                    TCanvas* c2 = new TCanvas();
+                    c2->cd();
+                    h2->Draw();
+                    g2->Draw("colzsame");
+
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
+                    lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                    
+                    TString NameTemp = "plot/";
+                    NameTemp += "SR_";
+                    NameTemp += RegionInfo[RegionIndex].RegionName;
+                    NameTemp += ".pdf";
+                    c2->Print(NameTemp,"pdf");
+                    
+                    delete h2;
+                    delete g2;
+                    delete c2;
                 }
             }
             
@@ -2768,16 +2819,32 @@ void analysis1()
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
             
-            leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-            leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                if(BGMCGroupData[j].GroupName == "VV") leg->AddEntry(h2SRBG[i][0],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            
             if(i==0 || i==3)
             {
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[0].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][3],BGDataGroupData[1].LegendName.Data(),"fl");
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "charge flip") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][3],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             else
             {
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[1].LegendName.Data(),"fl");
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             
             

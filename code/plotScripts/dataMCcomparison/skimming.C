@@ -64,7 +64,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
-        fileName += "_myOutput.root/*.root";
+        fileName += "_myOutput.root/*.root*";
+        
+        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
         if(isPP1) tree1P->Add(fileName.Data());
@@ -412,16 +415,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //separate the sample into channels
+        
+        if(nISR==0) {}
+        else if(nISR==1) channelIndex += 6;
+        else continue;
+        
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             channelIndex += 3;
             element.n++;
             element.nw += weight;
         }
-        
-        if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -509,11 +513,13 @@ void skimming()
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
-    SamplePath += "AnalysisBase-02-04-17-419618/";
+    //SamplePath += "AnalysisBase-02-04-17-419618/";
     //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
+    SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
     
     //TString tag = "v7.8";
-    TString tag = "v8.0";
+    //TString tag = "v8.0";
+    TString tag = "v8.4";
     //TString tag = "v8.6";
     //TString tag = "v7.11";
     
