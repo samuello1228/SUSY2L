@@ -99,6 +99,9 @@ class Plot{
       hData->Draw("sameE");
       hData->Draw("sameaxis");
      }
+
+    string x(hData->GetTitle());
+    if(x.find("_logy")!=std::string::npos) pPad1->SetLogy();
     lg->Draw();
 
     /// show ratio if needed
@@ -109,30 +112,6 @@ class Plot{
       data_copy->Draw("E");
 
       auto xxs = data_copy->GetXaxis();
-      // ratio plot cosmetics
-      int firstbin = xxs->GetFirst();
-      int lastbin =  xxs->GetLast();
-      double xmax =  xxs->GetBinUpEdge(lastbin) ;
-      double xmin =  xxs->GetBinLowEdge(firstbin) ;
-
-      TLine* l = new TLine(xmin,1.,xmax,1.);
-      TLine* l2 = new TLine(xmin,0.5,xmax,0.5);
-      TLine* l3 = new TLine(xmin,1.5,xmax,1.5);
-      TLine* l4 = new TLine(xmin,2.,xmax,2.);
-      TLine* l5 = new TLine(xmin,2.5,xmax,2.5);
-      l->SetLineWidth(1);
-      l->SetLineStyle(2);
-      l2->SetLineStyle(3);
-      l3->SetLineStyle(3);
-      l4->SetLineStyle(3);
-      l5->SetLineStyle(3);
-
-      l->Draw("same");
-      l2->Draw("same");
-      l3->Draw("same");
-      l4->Draw("same");
-      l5->Draw("same");
-
       auto yxs = data_copy->GetYaxis();
       yxs->SetTitle("Data / SM");
       yxs->SetLabelSize(0.13);
@@ -148,6 +127,33 @@ class Plot{
       xxs->SetTickLength(0.06);
       yxs->CenterTitle(); 
 
+      pPad2->SetGridy();
+      // ratio plot cosmetics
+//       int firstbin = xxs->GetFirst();
+//       int lastbin =  xxs->GetLast();
+//       double xmax =  xxs->GetBinUpEdge(lastbin) ;
+//       double xmin =  xxs->GetBinLowEdge(firstbin) ;
+// 
+//       TLine* l = new TLine(xmin,1.,xmax,1.);
+//       TLine* l2 = new TLine(xmin,0.5,xmax,0.5);
+//       TLine* l3 = new TLine(xmin,1.5,xmax,1.5);
+//       TLine* l4 = new TLine(xmin,2.,xmax,2.);
+//       TLine* l5 = new TLine(xmin,2.5,xmax,2.5);
+//       l->SetLineWidth(1);
+//       l->SetLineStyle(2);
+//       l2->SetLineStyle(3);
+//       l3->SetLineStyle(3);
+//       l4->SetLineStyle(3);
+//       l5->SetLineStyle(3);
+// 
+//       l->Draw("same");
+//       l2->Draw("same");
+//       l3->Draw("same");
+//       l4->Draw("same");
+//       l5->Draw("same");
+
+
+
       float scale = (0.295-0.001)/(1-0.305);
       auto yxs1 = hData->GetYaxis();
       yxs1->SetLabelSize(0.13*scale);
@@ -158,7 +164,7 @@ class Plot{
 
     }
 
-//     pCanvas->cd();
+    pCanvas->cd();
     pCanvas->Update();
   }
 

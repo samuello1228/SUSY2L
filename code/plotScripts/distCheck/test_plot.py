@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 import os, sys, re
 from ROOT import *
-from rootUtil import useAtlasStyle, waitRootCmd, savehistory
-
-# gROOT.LoadMacro('Sample.C+')
-
+from rootUtil import useAtlasStyle, waitRootCmd, savehistory, get_default_fig_dir
 gROOT.LoadMacro('Plot.C+')
 from ROOT import Plot, Sample
-
-
 funlist=[]
+
+sDir = get_default_fig_dir()
+sTag = 'test_'
+sDirectly = False
+if gROOT.IsBatch(): sDirectly = True
 
 def useStyle(sample, style, size=None):
     for i in range(size if size else len(style)): sample.style[i]=style[i]
@@ -55,14 +55,12 @@ def test():
     p1.sSig.push_back(s3b)
 
 #     p1.test()
-    p1.showPlot('leps.pt', TH1F('h1','lep_pt;Leading lepton p_{T} [GeV];Events / 3 GeV',100, 0, 300))
-    gPad.Update()
-    waitRootCmd()
+    p1.showPlot('leps.pt', TH1F('h1','lep_pt_logy;Leading lepton p_{T} [GeV];Events / 3 GeV',100, 0, 300))
+    waitRootCmd(sDir+sTag+"leps_pt", sDirectly)
 
     p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+    waitRootCmd(sDir+sTag+"l12_m", sDirectly)
 
-    gPad.Update()
-    waitRootCmd()
 funlist.append(test)
 
 if __name__ == '__main__':
