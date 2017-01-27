@@ -106,7 +106,7 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB
   ECIDS_Medium97_OP=0.28087;
   ECIDS_Tight95_OP=0.0670415;
   ECIDS_Tight97_OP=-0.325856;
-  ECIDS_trainingFile="ECIDS_20161125for2017Moriond.root";
+  ECIDS_trainingFile=PathResolverFindCalibFile("$ROOTCOREBIN/data/ElectronPhotonSelectorTools/ECIDS_20161125for2017Moriond.root");
 }
 
 
@@ -1252,11 +1252,11 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   // ChargeIDSelector
   l.ElChargeID = 0;
   l.ElChargeID |=  ECIDS_Loose95 ? (bool) ECIDS_Loose95 ->accept(el) : false ;
-  l.ElChargeID |= (ECIDS_Loose97 ? (bool) ECIDS_Loose97 ->accept(el) : false ) << 1;
-  l.ElChargeID |= (ECIDS_Medium95? (bool) ECIDS_Medium95->accept(el) : false ) << 2;
-  l.ElChargeID |= (ECIDS_Medium97? (bool) ECIDS_Medium97->accept(el) : false ) << 3;
-  l.ElChargeID |= (ECIDS_Tight95 ? (bool) ECIDS_Tight95 ->accept(el) : false ) << 4;
-  l.ElChargeID |= (ECIDS_Tight97 ? (bool) ECIDS_Tight97 ->accept(el) : false ) << 5;
+  // l.ElChargeID |= (ECIDS_Loose97 ? (bool) ECIDS_Loose97 ->accept(el) : false ) << 1;
+  // l.ElChargeID |= (ECIDS_Medium95? (bool) ECIDS_Medium95->accept(el) : false ) << 2;
+  // l.ElChargeID |= (ECIDS_Medium97? (bool) ECIDS_Medium97->accept(el) : false ) << 3;
+  // l.ElChargeID |= (ECIDS_Tight95 ? (bool) ECIDS_Tight95 ->accept(el) : false ) << 4;
+  // l.ElChargeID |= (ECIDS_Tight97 ? (bool) ECIDS_Tight97 ->accept(el) : false ) << 5;
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
