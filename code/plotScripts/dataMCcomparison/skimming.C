@@ -331,11 +331,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //jets
-        bool hasISR = false;
         nJet = 0;
         nBJet = 0;
         nCJet = 0;
         nFJet = 0;
+        int nISR = 0;
         int leadingBJetIndex = 0;
         int leadingCJetIndex = 0;
         int leadingFJetIndex = 0;
@@ -344,8 +344,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             nJet++;
             if(fabs(evts->jets_eta[k]) < 2.4)
             {
+                //ISR
+                if(evts->jets_pt[k] > 40) nISR++;
+                
                 //Central jets
-                hasISR = true;
                 if(evts->jets_jFlag[k] & 1<<5)
                 {
                     //b-tagged
@@ -439,7 +441,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             element.nw += weight;
         }
         
-        if(hasISR) channelIndex += 6;
+        if(nISR==0) {}
+        else if(nISR==1) channelIndex += 6;
+        else continue;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
