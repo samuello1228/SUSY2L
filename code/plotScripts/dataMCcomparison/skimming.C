@@ -275,8 +275,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
-        //weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
+        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        //weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
@@ -505,22 +505,25 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 void skimming()
 {
     //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    //TString SamplePath = "/srv/SUSY/ntuple/";
+    TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
-    TString SamplePath = "/Users/samuel/Atlas/ntuple/";
+    //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     //SamplePath += "AnalysisBase-02-04-17-419618/";
     //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
-    SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
+    //SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
+    SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
+    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2-v8d7/";
     
     //TString tag = "v7.8";
     //TString tag = "v8.0";
-    TString tag = "v8.4";
-    //TString tag = "v8.6";
+    //TString tag = "v8.4";
+    TString tag = "v8.6";
+    //TString tag = "v8.7";
     //TString tag = "v7.11";
     
     std::vector<nEvent> nSS;
@@ -529,7 +532,7 @@ void skimming()
     //if(true)
     if(false)
     {
-        SamplePath += "data/";
+        //SamplePath += "data/";
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
@@ -537,7 +540,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],true,nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
         }
     }
     
@@ -558,16 +561,16 @@ void skimming()
     }
     
     //Signal
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,"Sig",4);
-        for(unsigned int i=0;i<=1;i++)
-        //for(unsigned int i=0;i<SigSampleName.size();i++)
+        //for(unsigned int i=0;i<=1;i++)
+        for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }

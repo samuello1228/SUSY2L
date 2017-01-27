@@ -579,7 +579,7 @@ void analysis1()
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        Var.push_back(element);
+        //Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
@@ -1781,9 +1781,9 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
+    for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -1911,9 +1911,9 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
-        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-        //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
+        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;
