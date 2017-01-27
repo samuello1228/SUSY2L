@@ -1781,9 +1781,9 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
+    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -2407,7 +2407,7 @@ void analysis1()
                     
                     TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,200,700,10,100,500);
                     TGraph2D* g2 = new TGraph2D();
-
+                    int pointN = 0;
                     for(unsigned int j=0;j<SigSampleID.size();j++)
                     {
                         for(unsigned int k=0;k<SigMassSplitting.size();k++)
@@ -2426,32 +2426,40 @@ void analysis1()
                                 
                                 //2D plot
                                 if(significance>0)
+                                {
                                     g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
+                                    pointN++;
+                                }
                             }
                         }
                     }
                     fout.close();
                     
-                    gStyle->SetPalette(1);
-                    gStyle->SetPadRightMargin(0.16);
-                    TCanvas* c2 = new TCanvas();
-                    c2->cd();
-                    h2->Draw();
-                    g2->Draw("colzsame");
-
-                    TLatex lt1;
-                    lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
-                    lt1.SetTextSize(lt1.GetTextSize()*0.3);
-                    
-                    TString NameTemp = "plot/";
-                    NameTemp += "SR_";
-                    NameTemp += RegionInfo[RegionIndex].RegionName;
-                    NameTemp += ".pdf";
-                    c2->Print(NameTemp,"pdf");
+                    //if(pointN>=3)
+                    if(RegionIndex==43)
+                    {
+                        gStyle->SetPalette(1);
+                        gStyle->SetPadRightMargin(0.16);
+                        TCanvas* c2 = new TCanvas();
+                        c2->cd();
+                        h2->Draw();
+                        g2->Draw("colzsame");
+                        
+                        TLatex lt1;
+                        lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
+                        lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                        
+                        TString NameTemp = "plot/";
+                        NameTemp += "SR_";
+                        NameTemp += RegionInfo[RegionIndex].RegionName;
+                        NameTemp += ".eps";
+                        c2->Print(NameTemp,"eps");
+                        
+                        delete c2;
+                    }
                     
                     delete h2;
                     delete g2;
-                    delete c2;
                 }
             }
             
@@ -2912,8 +2920,8 @@ void analysis1()
         else if(i==1) NameTemp += "mumu";
         else if(i==2) NameTemp += "emu";
         else if(i==3) NameTemp += "combine";
-        NameTemp += ".pdf";
-        c2->Print(NameTemp,"pdf");
+        NameTemp += ".eps";
+        c2->Print(NameTemp,"eps");
         delete c2;
     }
     
