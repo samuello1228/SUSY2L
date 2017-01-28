@@ -336,9 +336,11 @@ void analysis1()
     {
         SigInfo element;
         
-        element.MassDiff = 50;    element.ID = 18;  element.colour = 9;  SigMassSplitting.push_back(element);
+        element.MassDiff = 20;    element.ID = 2;   element.colour = 14;  SigMassSplitting.push_back(element);
+        element.MassDiff = 50;    element.ID = 18;  element.colour = 9;   SigMassSplitting.push_back(element);
         element.MassDiff = 100;   element.ID = 19;  element.colour = 11;  SigMassSplitting.push_back(element);
         element.MassDiff = 200;   element.ID = 20;  element.colour = 12;  SigMassSplitting.push_back(element);
+        element.MassDiff = 300;   element.ID = 21;  element.colour = 13;  SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -1821,6 +1823,7 @@ void analysis1()
     fout_SR<<endl;
     fout_SR.close();
     
+    //for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
