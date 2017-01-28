@@ -71,8 +71,6 @@
 363410  Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_CFilterBVeto        4.7405e-06      0.9751          0.2635  1.0
 363411  Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_BFilter             4.6041e-06      0.9751          0.1556  1.0
 410000  PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad                     696.11  1.1949  0.543           1.
-410015  PowhegPythiaEvtGen_P2012_Wt_dilepton_top                                3.5835  1.054   1.              1.
-410016  PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop                            3.5814  1.054   1.              1.
 361063	Sherpa_CT10_llll		12.849		0.91	1.	1.
 361064	Sherpa_CT10_lllvSFMinus		1.8446		0.91	1.	1.
 361065	Sherpa_CT10_lllvOFMinus		3.6235		0.91	1.	1.
