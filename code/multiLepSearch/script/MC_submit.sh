@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v8.6
+tag=v8.8
 dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root
 
 #For background MC

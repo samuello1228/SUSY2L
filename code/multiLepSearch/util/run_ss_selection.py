@@ -149,7 +149,9 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
 
     #trigger
     #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py?rev=723073
-    dielectronTrigLH = ["HLT_2e12_lhloose_L12EM10VH"]
+    #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled#Egamma_MET
+    
+    dielectronTrigLH = ["HLT_e17_lhloose_nod0_2e9_lhloose_nod0"]
     dimuonTrig = ["HLT_mu18_mu8noL1"]
     elemuonTrigLH = ["HLT_e17_lhloose_mu14"]
 
@@ -157,7 +159,7 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
     for i in elemuonTrigLH: alg.CF_trigNames.push_back(i)
  
-    dielectronTrigLH = ["HLT_2e15_lhvloose_nod0_L12EM13VH"]
+    dielectronTrigLH = ["HLT_2e17_lhvloose_nod0"]
     dimuonTrig = ["HLT_mu20_mu8noL1"]
     elemuonTrigLH = ["HLT_e17_lhloose_nod0_mu14"]
 
