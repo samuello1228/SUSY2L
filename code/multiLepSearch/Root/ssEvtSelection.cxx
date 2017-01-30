@@ -623,6 +623,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	dilepPair[0] = sig_Ls[0];
 	dilepPair[1] = sig_Ls[1];
         keep = true;
+        m_susyEvt->evt.flag = 1;
       } 
 
       //this catches 1SigLep1FakeLepSS -.-
@@ -647,6 +648,7 @@ EL::StatusCode ssEvtSelection :: execute ()
           if (baseLepSign==sigLepSign){
 	    dilepPair[1] = p;
             keep = true;
+            m_susyEvt->evt.flag = 2;
 	    break;
 	  }
 	}
@@ -675,6 +677,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	      dilepPair[0] = sel_Ls[0];
 	      dilepPair[1] = sel_Ls[1];
   	      keep = true;
+              m_susyEvt->evt.flag = 3;
 	      break;
 	    }
 	  }
@@ -685,6 +688,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	    dilepPair[0] = sel_Ls[1];
 	    dilepPair[1] = sel_Ls[2];
   	    keep = true;
+            m_susyEvt->evt.flag = 3;
 	  }
 	}
       } 
