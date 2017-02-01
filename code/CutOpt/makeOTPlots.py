@@ -90,7 +90,12 @@ if __name__ == '__main__':
 	outOT.write("Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2\n")
 
 	outSig = open("checksSig.csv", "w")
-	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,xSec,nSig,nBkg,MaxSig,BDTcut\n")
+	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,xSec,")
+	outSig.write("nSig,nBkg,BDTopt,nSig(BDTopt),nBkg(BDTopt),sigma(BDTopt),")
+	outSig.write("nSig(0),nBkg(0),sigma(0),")
+	outSig.write("nSig(0.1),nBkg(0.1),sigma(0.1),")
+	outSig.write("nSig(0.2),nBkg(0.2),sigma(0.2),")
+	outSig.write("nSig(0.3),nBkg(0.3),sigma(0.3)\n")
 
 	xSecDict = loadXSec()
 	effDict = loadEffs()
