@@ -151,7 +151,7 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
     #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
     
-    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose"]
+    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
     for i in electronTrig: alg.CF_trigNames.push_back(i)
 
     dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
