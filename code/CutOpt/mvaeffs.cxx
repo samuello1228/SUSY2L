@@ -461,8 +461,28 @@ void TMVA::StatDialogMVAEffs::DrawHistograms()
       // Save to temp file
       ofstream tempFile("effs.csv");
       char tmp[100];
-      sprintf(tmp, "%.0f,%.0f,%1.2f,%1.3f\n", fNSignal, fNBackground, info->maxSignificance, info->sSig->GetXaxis()->GetBinCenter(maxbin));
+      // Write nSignal and nBkg
+      sprintf(tmp, "%.0f,%.0f,", fNSignal, fNBackground);
       tempFile << tmp;
+
+      // Optimal cut sigE bgdE
+      sprintf(tmp, "%1.2f,%1.2f,%1.2f,%1.3f,", 
+         info->sSig->GetXaxis()->GetBinCenter(maxbin), 
+         fNSignal*info->sigE->GetBinContent(maxbin),
+         fNBackground*info->bkgE->GetBinContent(maxbin),
+         info->maxSignificance);
+      tempFile << tmp;
+
+      // BDT = 0… 0.3
+      for(float i=0; i<=0.3; i+=0.1){
+         sprintf(tmp, "%1.2f,%1.2f,%1.2f,%1.3f,", 
+            fNSignal*info->sigE->GetBinContent(info->sigE->GetBin(i)),
+            fNBackground*info->bkgE->GetBinContent(info->bgdE->GetBin(i)),
+            info->sSig->GetBinContent(info->sSig->GetBin(i)));
+         tempFile << tmp;
+      }
+
+      tempFile << "\n";
       tempFile.close();
    }
 }
@@ -528,7 +548,7 @@ void mvaeffs( TString fin, double nSig , double lumi, Bool_t useTMVAStyle=true,
 
    // int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
    // Luminosity hack
-   double nBkg = lumi/10064.3 * trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\"");
+   double nBkg = lumi/10064.3 * (trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\""));
 
    TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
 
