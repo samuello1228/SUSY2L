@@ -148,24 +148,24 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger
-    #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py?rev=723073
-    #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled#Egamma_MET
+    #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
+    #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
     
-    dielectronTrigLH = ["HLT_e17_lhloose_nod0_2e9_lhloose_nod0"]
-    dimuonTrig = ["HLT_mu18_mu8noL1"]
-    elemuonTrigLH = ["HLT_e17_lhloose_mu14"]
+    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose"]
+    for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    for i in dielectronTrigLH: alg.CF_trigNames.push_back(i)
+    dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
+    for i in dielectronTrig: alg.CF_trigNames.push_back(i)
+
+    muonTrig = ["HLT_mu24_ivarloose","HLT_mu24_ivarmedium","HLT_mu26_ivarmedium"]
+    for i in muonTrig: alg.CF_trigNames.push_back(i)
+
+    dimuonTrig = ["HLT_2mu10","HLT_2mu14"]
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
-    for i in elemuonTrigLH: alg.CF_trigNames.push_back(i)
+
+    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14"]
+    for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
-    dielectronTrigLH = ["HLT_2e17_lhvloose_nod0"]
-    dimuonTrig = ["HLT_mu20_mu8noL1"]
-    elemuonTrigLH = ["HLT_e17_lhloose_nod0_mu14"]
-
-    for i in dielectronTrigLH: alg.CF_trigNames.push_back(i)
-    for i in dimuonTrig: alg.CF_trigNames.push_back(i)
-    for i in elemuonTrigLH: alg.CF_trigNames.push_back(i)
     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch

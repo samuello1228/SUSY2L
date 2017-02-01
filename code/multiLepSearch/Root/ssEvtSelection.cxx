@@ -198,6 +198,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hTrigs = new TH1D("hTrigs", "n pass trigger", CF_trigNames.size(), 0, CF_trigNames.size());
   for(unsigned int i=0; i<CF_trigNames.size(); i++){
     m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames[i].c_str());
+    std::cout<<CF_trigNames[i].c_str()<<std::endl;
   }
   m_hTrigs->SetDirectory(outputFile);
   return EL::StatusCode::SUCCESS;
@@ -1033,10 +1034,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       }
 
       //Scale factor
-      int theYear;
-      if(CF_isMC) theYear = m_objTool->treatAsYear();
-      else theYear = -999;
-
       if(CF_isMC){
         if( study == "ss" )
         {
