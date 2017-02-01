@@ -157,13 +157,13 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
     for i in dielectronTrig: alg.CF_trigNames.push_back(i)
 
-    muonTrig = ["HLT_mu24_ivarloose","HLT_mu24_ivarmedium","HLT_mu26_ivarmedium"]
+    muonTrig = ["HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
     for i in muonTrig: alg.CF_trigNames.push_back(i)
 
-    dimuonTrig = ["HLT_2mu10","HLT_2mu14"]
+    dimuonTrig = ["HLT_2mu10","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
 
-    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14"]
+    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
     for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
     alg.study = options.study
