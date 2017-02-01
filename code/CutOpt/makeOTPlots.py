@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import sys, os, subprocess
-from os import listdir, path
-from os.path import isdir
+from os import listdir, path, mkdir, rename
+from os.path import isdir, isfile
 import re
 import overtraining
 from subprocess import call
@@ -28,8 +28,8 @@ def notOvertrained(overtrainingNums):
 	BkgKS = overtrainingNums[1]
 	SigChi2 = overtrainingNums[2]
 	BkgChi2 = overtrainingNums[3]
-	return (SigKS > 0.05 and BkgKS > 0.05 and SigChi2 > 0.05 and BkgChi2 > 0.05 
-		and SigKS < 0.95 and BkgKS < 0.95 and SigChi2 < 0.95 and BkgChi2 < 0.95)
+	return (SigKS > 0.05 and BkgKS > 0.05 and SigKS < 0.95 and BkgKS < 0.95 ) 
+			# and (SigChi2 > 0.05 and BkgChi2 > 0.05 and SigChi2 < 0.95 and BkgChi2 < 0.95)
 
 def loadXSec():
 	xSecFile = open("SigSample.txt", "r")
@@ -100,6 +100,9 @@ if __name__ == '__main__':
 		if not(isdir(directory)): continue
 		files = listdir(directory)
 
+		plotDir = "%s/plots" % directory
+		if not isdir(plotDir): mkdir(plotDir)
+
 		for file in files:
 			if not(file.endswith(".root")):	continue
 
@@ -117,6 +120,11 @@ if __name__ == '__main__':
 			overtrainingNums = overtraining.runCheck("%s/%s" % (directory, file))
 			outOT.write("%1.3f,%1.3f,%1.3f,%1.3f\n" % overtrainingNums)
 
+			overtrainPlotname = "%s/dm%d_Channel%d.eps" % (plotDir, dm, channel)
+			if isfile("plots/overtrain_BDTD.eps"):
+				os.rename("plots/overtrain_BDTD.eps", overtrainPlotname)
+			else: open(overtrainPlotname, 'a').close()
+			
 			if not(notOvertrained(overtrainingNums)): continue
 
 			for mass in C1masses: 
@@ -128,6 +136,8 @@ if __name__ == '__main__':
 				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
 				outSig.write("%d,%d,%d,%s,%s,%d,%d,%d,%f," 
 					% (mass, mass-dm, channel, ISR, Flavor, NTrees, NodeSize, Depth, xSec[0]))
-				outSig.write(effFile.readline())
+				with open("effs.csv") as effFile:
+					outSig.write(effFile.readline())
+				os.rename("plots/mvaeffs_BDTD.eps", "%s/%d_%d_Channel%d.eps" % (plotDir, mass, mass-dm, channel))
 
 	outOT.close()
