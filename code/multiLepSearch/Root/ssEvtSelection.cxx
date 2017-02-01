@@ -877,46 +877,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.MetRel = m_susyEvt->sig.Met;
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
 
-    //trigger matching
-    int theYear;
-    if(CF_isMC) theYear = m_objTool->treatAsYear();
-    else theYear = -999;
+
     m_susyEvt->evt.trig = 0;
-    /*
-    for(unsigned int i=0;i<sel_Ls.size(); i++){
-      for(unsigned int j=0;j<sel_Ls.size(); j++){
-        if(i==j) continue;
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 11000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 11000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[0])) m_susyEvt->evt.trig |= 1<<0;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[3])) m_susyEvt->evt.trig |= 1<<0;
-        }
-
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 13000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 13000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[1])) m_susyEvt->evt.trig |= 1<<1;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[4])) m_susyEvt->evt.trig |= 1<<1;
-        }
-
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 11000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 13000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[2])) m_susyEvt->evt.trig |= 1<<2;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[5])) m_susyEvt->evt.trig |= 1<<2;
-        }
-      }
-    }
-    */
-    ///*
     //for cutflow
     for(unsigned int i=0;i<electrons_copy->size(); i++){
       for(unsigned int j=i+1;j<electrons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),electrons_copy->at(j),CF_trigNames[0])) m_susyEvt->evt.trig |= 1<<0;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),electrons_copy->at(j),CF_trigNames[3])) m_susyEvt->evt.trig |= 1<<0;
+          m_susyEvt->evt.trig |= 1<<0;
         }
       }
     }
@@ -925,8 +893,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=i+1;j<muons_copy->size(); j++){
         if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(muons_copy->at(i),muons_copy->at(j),CF_trigNames[1])) m_susyEvt->evt.trig |= 1<<1;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(muons_copy->at(i),muons_copy->at(j),CF_trigNames[4])) m_susyEvt->evt.trig |= 1<<1;
+          m_susyEvt->evt.trig |= 1<<1;
         }
       }
     }
@@ -935,14 +902,11 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=0;j<muons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),muons_copy->at(j),CF_trigNames[2])) m_susyEvt->evt.trig |= 1<<2;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),muons_copy->at(j),CF_trigNames[5])) m_susyEvt->evt.trig |= 1<<2;
+          m_susyEvt->evt.trig |= 1<<2;
         }
       }
     }
-    //*/
 
-    //cutflow 
     if(study == "ss")
     {
         if(totLs == 2 && sig_Ls.size() == 2)
@@ -1069,27 +1033,15 @@ EL::StatusCode ssEvtSelection :: execute ()
       }
 
       //Scale factor
+      int theYear;
+      if(CF_isMC) theYear = m_objTool->treatAsYear();
+      else theYear = -999;
+
       if(CF_isMC){
         if( study == "ss" )
         {
-          //if(m_susyEvt->evt.trig & 1<<0)
-          if(false)
-          {
-            if(theYear==2015) m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,false,false,true,false,CF_trigNames[0]);
-            else m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,false,false,true,false,CF_trigNames[3]);
-            m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-          } 
-          else if(m_susyEvt->evt.trig & 1<<1)
-          {
-            m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
-            if(theYear==2015) m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,false,false,CF_trigNames[1]);
-            else m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,false,false,CF_trigNames[4]);
-          }
-          else
-          {
-            m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
-            m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-          }  
+          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
+          m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
         }
         else if(study == "3l")
         {
