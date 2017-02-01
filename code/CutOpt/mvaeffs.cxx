@@ -457,33 +457,6 @@ void TMVA::StatDialogMVAEffs::DrawHistograms()
          TMVAGlob::imgconv( c, Form("plots/mvaeffs_%s", info->methodTitle.Data()) ); 
       }
       countCanvas++;
-
-      // Save to temp file
-      ofstream tempFile("effs.csv");
-      char tmp[100];
-      // Write nSignal and nBkg
-      sprintf(tmp, "%.0f,%.0f,", fNSignal, fNBackground);
-      tempFile << tmp;
-
-      // Optimal cut sigE bgdE
-      sprintf(tmp, "%1.2f,%1.2f,%1.2f,%1.3f,", 
-         info->sSig->GetXaxis()->GetBinCenter(maxbin), 
-         fNSignal*info->sigE->GetBinContent(maxbin),
-         fNBackground*info->bkgE->GetBinContent(maxbin),
-         info->maxSignificance);
-      tempFile << tmp;
-
-      // BDT = 0… 0.3
-      for(float i=0; i<=0.3; i+=0.1){
-         sprintf(tmp, "%1.2f,%1.2f,%1.2f,%1.3f,", 
-            fNSignal*info->sigE->GetBinContent(info->sigE->GetBin(i)),
-            fNBackground*info->bkgE->GetBinContent(info->bgdE->GetBin(i)),
-            info->sSig->GetBinContent(info->sSig->GetBin(i)));
-         tempFile << tmp;
-      }
-
-      tempFile << "\n";
-      tempFile.close();
    }
 }
 
@@ -536,6 +509,33 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
                     info->origBgdE->GetBinContent( maxbin ) )
            << endl;
    }
+
+   // Save to temp file
+   ofstream tempFile("effs.csv");
+   char tmp[100];
+   // Write nSignal and nBkg
+   sprintf(tmp, "%.0f,%.0f,", fNSignal, fNBackground);
+   tempFile << tmp;
+
+   // Optimal cut sigE bgdE
+   sprintf(tmp, "%1.2f,%1.2f,%1.2f,%1.3f,", 
+      info->sSig->GetXaxis()->GetBinCenter(maxbin), 
+      fNSignal*info->origSigE->GetBinContent(maxbin),
+      fNBackground*info->origBgdE->GetBinContent(maxbin),
+      info->maxSignificance);
+   tempFile << tmp;
+
+   // BDT = 0… 0.3
+   for(float i=0; i<0.4; i+=0.1){
+      sprintf(tmp, "%1.2f,%1.2f,%1.3f,", 
+         fNSignal*info->origSigE->GetBinContent(info->origSigE->FindBin(i)),
+         fNBackground*info->origBgdE->GetBinContent(info->origBgdE->FindBin(i)),
+         info->sSig->GetBinContent(info->sSig->FindBin(i)));
+      tempFile << tmp;
+   }
+
+   tempFile << "\n";
+   tempFile.close();
 }
 
 void mvaeffs( TString fin, double nSig , double lumi, Bool_t useTMVAStyle=true, 

@@ -82,7 +82,7 @@ def loadEffs():
 
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 # luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
-luminosity = 35000
+luminosity = 33000
 channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
 
 if __name__ == '__main__':
