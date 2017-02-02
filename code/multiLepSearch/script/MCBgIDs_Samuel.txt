@@ -3,17 +3,17 @@ Boson+jets      Z+jets;ee               Sherpa                  363388-363411
 Boson+jets      Z+jets;mumu             Sherpa                  363364-363387
 Boson+jets      Z+jets;tautau           Sherpa                  363102-363122,363361-363363
 #
-diboson		ZZ->llll		Sherpa			361063
-diboson 	WZ->lllv		Sherpa			361064-361067
-diboson		WW->llvv		Sherpa			361068
+diboson		ZZ->llll		Sherpa			363490
+diboson 	WZ->lllv		Sherpa			363491
+diboson		WW->llvv		Sherpa			363492
 diboson		WW->llvvjj(ss_EW4)	Sherpa			361069
 diboson		WW->llvvjj(ss_EW6)	Sherpa			361070
 diboson		WZ->lllvjj(EW6) 	Sherpa			361071
 diboson		ZZ->lllljj(EW6)		Sherpa			361072
 diboson		ZZ->llll(gg)		Sherpa			361073
 diboson		WW->llvv(gg)		Sherpa			361077
-diboson		WZ->qqll		Sherpa			361084 	  	
-diboson		ZZ->qqll		Sherpa			361086
+diboson		WZ->qqll		Sherpa			363358 	  	
+diboson		ZZ->qqll		Sherpa			363356
 #
 Vgamma		Z(ee)+gamma		Sherpa			301535,301899-301901
 Vgamma		Z(mm)+gamma		Sherpa			301536,301902-301904
