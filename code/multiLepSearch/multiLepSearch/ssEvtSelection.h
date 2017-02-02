@@ -88,19 +88,9 @@ public:
   MCTruthClassifier* m_truthClassifier; //!
 
   // ElectronChargeIDSelector
-  AsgElectronChargeIDSelectorTool* ECIDS_Loose95; //!
-  AsgElectronChargeIDSelectorTool* ECIDS_Loose97; //!
-  AsgElectronChargeIDSelectorTool* ECIDS_Medium95; //!
-  AsgElectronChargeIDSelectorTool* ECIDS_Medium97; //!
-  AsgElectronChargeIDSelectorTool* ECIDS_Tight95; //!
-  AsgElectronChargeIDSelectorTool* ECIDS_Tight97; //!
+  AsgElectronChargeIDSelectorTool* ECIDSTool; //!
 
-  double ECIDS_Loose95_OP; //!
-  double ECIDS_Loose97_OP; //!
-  double ECIDS_Medium95_OP; //!
-  double ECIDS_Medium97_OP; //!
-  double ECIDS_Tight95_OP; //!
-  double ECIDS_Tight97_OP; //!
+  double ECIDS_OP; //!
   std::string ECIDS_trainingFile; //!
 
   // this is a standard constructor

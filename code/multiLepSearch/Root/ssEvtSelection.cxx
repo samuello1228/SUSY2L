@@ -100,13 +100,8 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB
 
   // ElectronChargeIDSelector working points
   // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
-  ECIDS_Loose95_OP=0.10083; 
-  ECIDS_Loose97_OP=-0.288961;
-  ECIDS_Medium95_OP=0.106639;
-  ECIDS_Medium97_OP=0.28087;
-  ECIDS_Tight95_OP=0.0670415;
-  ECIDS_Tight97_OP=-0.325856;
-  ECIDS_trainingFile=PathResolverFindCalibFile("$ROOTCOREBIN/data/ElectronPhotonSelectorTools/ECIDS_20161125for2017Moriond.root");
+  ECIDS_OP=-0.28087;
+  ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
 }
 
 
@@ -331,35 +326,11 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
 
-  ECIDS_Loose95 = new AsgElectronChargeIDSelectorTool("ECIDS_loose");
-  CHECK(ECIDS_Loose95->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Loose95->setProperty("CutOnBDT", ECIDS_Loose95_OP));
-  CHECK(ECIDS_Loose95->initialize());
-
-  ECIDS_Loose97 = new AsgElectronChargeIDSelectorTool("ECIDS_loose");
-  CHECK(ECIDS_Loose97->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Loose97->setProperty("CutOnBDT", ECIDS_Loose97_OP));
-  CHECK(ECIDS_Loose97->initialize());
-
-  ECIDS_Medium95 = new AsgElectronChargeIDSelectorTool("ECIDS_medium");
-  CHECK(ECIDS_Medium95->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Medium95->setProperty("CutOnBDT", ECIDS_Medium95_OP));
-  CHECK(ECIDS_Medium95->initialize());
-
-  ECIDS_Medium97 = new AsgElectronChargeIDSelectorTool("ECIDS_medium");
-  CHECK(ECIDS_Medium97->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Medium97->setProperty("CutOnBDT", ECIDS_Medium97_OP));
-  CHECK(ECIDS_Medium97->initialize());
-
-  ECIDS_Tight95 = new AsgElectronChargeIDSelectorTool("ECIDS_tight");
-  CHECK(ECIDS_Tight95->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Tight95->setProperty("CutOnBDT", ECIDS_Tight95_OP));
-  CHECK(ECIDS_Tight95->initialize());
-
-  ECIDS_Tight97 = new AsgElectronChargeIDSelectorTool("ECIDS_tight");
-  CHECK(ECIDS_Tight97->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDS_Tight97->setProperty("CutOnBDT", ECIDS_Tight97_OP));
-  CHECK(ECIDS_Tight97->initialize());
+  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool");
+  CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
+  CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
+  CHECK(ECIDSTool->initialize());
 
   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
@@ -1251,12 +1222,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 
   // ChargeIDSelector
   l.ElChargeID = 0;
-  l.ElChargeID |=  ECIDS_Loose95 ? (bool) ECIDS_Loose95 ->accept(el) : false ;
-  // l.ElChargeID |= (ECIDS_Loose97 ? (bool) ECIDS_Loose97 ->accept(el) : false ) << 1;
-  // l.ElChargeID |= (ECIDS_Medium95? (bool) ECIDS_Medium95->accept(el) : false ) << 2;
-  // l.ElChargeID |= (ECIDS_Medium97? (bool) ECIDS_Medium97->accept(el) : false ) << 3;
-  // l.ElChargeID |= (ECIDS_Tight95 ? (bool) ECIDS_Tight95 ->accept(el) : false ) << 4;
-  // l.ElChargeID |= (ECIDS_Tight97 ? (bool) ECIDS_Tight97 ->accept(el) : false ) << 5;
+  l.ElChargeID =  ECIDSTool ? (bool) ECIDSTool->accept(el) : false ;
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
