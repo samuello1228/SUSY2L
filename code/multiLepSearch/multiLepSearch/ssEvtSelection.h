@@ -28,6 +28,9 @@
 // MCTruthClassifier
 #include "MCTruthClassifier/MCTruthClassifier.h"
 
+// ElectronChargeIDSelector
+#include "ElectronPhotonSelectorTools/AsgElectronChargeIDSelectorTool.h"
+
 class GoodRunsListSelectionTool;
 class TH1;
 
@@ -86,6 +89,12 @@ public:
 
   // MCTruthClassifier
   MCTruthClassifier* m_truthClassifier; //!
+
+  // ElectronChargeIDSelector
+  AsgElectronChargeIDSelectorTool* ECIDSTool; //!
+
+  double ECIDS_OP; //!
+  std::string ECIDS_trainingFile; //!
 
   // this is a standard constructor
   ssEvtSelection (std::string name="ss2lSelection");

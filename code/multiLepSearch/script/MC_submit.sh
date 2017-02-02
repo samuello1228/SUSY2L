@@ -1,15 +1,16 @@
 #!/bin/bash
-tag=v8.6
+tag=v8.10
 dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root
 
 #For background MC
-#mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c.root
-mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_July27_afterFix.root
-file=../multiLepSearch/script/MCBG_sample_list.txt
+#mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_July27_afterFix.root
+mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jan31.root
+#file=../multiLepSearch/script/MCBG_sample_list.txt
 #file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt
+#file=../multiLepSearch/script/MCBG_llll.txt
 
 k=${tag}.MCBG
 #k=${tag}.MCZee
