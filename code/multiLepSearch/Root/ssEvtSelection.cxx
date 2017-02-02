@@ -104,6 +104,10 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB
   // MCTC, TruthLink, dR
   mcTruthMatch = "MCTC"; 
 
+  // ElectronChargeIDSelector working points
+  // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
+  ECIDS_OP=-0.28087;
+  ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
 }
 
 
@@ -349,6 +353,12 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
+
+  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool");
+  CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
+  CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
+  CHECK(ECIDSTool->initialize());
 
   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
@@ -1256,6 +1266,10 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
   }
+
+  // ChargeIDSelector
+  l.ElChargeID = 0;
+  l.ElChargeID =  ECIDSTool ? (bool) ECIDSTool->accept(el) : false ;
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1313,6 +1327,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
+  l.ElChargeID = 63;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
