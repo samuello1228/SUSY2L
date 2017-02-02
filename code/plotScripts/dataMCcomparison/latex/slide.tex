@@ -36,30 +36,77 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \normalsize
-\item Applied charge flip MC correction to Zee samples
+\item histogram for SR
+\item significance 2D plot
+\item some data samples are missing in /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-18-4bd95dc2/, but still intact in /afs/cern.ch/work/y/ychan/public/SUSY\_NTUP/v8d6/data/
+\item plan to remove unused variables in our ntuple.
+\item plan to calculate the systematic uncertainties, started to simplify the ntuple workflow: add flag for separating 12 channel, and add charge flip weight and fake lepton weight in the ntuple making process.
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Control Region}
-Definition of the Control Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$ or $\mu\mu$
-\item $81.18 < m_{ll} < 101.18$
-\end{enumerate}
 \end{frame}
 
 \begin{frame}
 \begin{center}
 \huge
-Control Region
+Signal Region
 \end{center}
 \end{frame}
 
-\input{data/expN_CR.tex}
+\begin{frame}
+\frametitle{Signal Region}
+Definition of the Signal Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
+\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
+\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
+\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
+\item The minimum $M_T$ of the two leptons
+\end{enumerate}
+\includegraphics[width=1\textwidth]{data/SR.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+Note:
+\begin{enumerate}
+\item No pile up weight is applied.
+\item Add all signal samples with the same mass splitting to calculate signal numbers.
+\item Charge flip BG for emu channel is missing.
+\end{enumerate}
+\end{frame}
+
+%\def \PathToPlot {../plot}
+
+\begin{frame}
+\frametitle{Signal Region (ee)}
+\includegraphics[width=1\textwidth]{../plot/SR_ee.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (mumu)}
+\includegraphics[width=1\textwidth]{../plot/SR_mumu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (emu)}
+\includegraphics[width=1\textwidth]{../plot/SR_emu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (combine)}
+\includegraphics[width=1\textwidth]{../plot/SR_combine.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
+\includegraphics[width=1\textwidth]{../plot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
+\end{frame}
+
+%\input{data/expN_SS.tex}
+%\input{data/expN_BGVV_SS.tex}
 
 \def \PathToPlot {../plot}
-\input{data/plot_CR.tex}
+%\input{data/plot_SS.tex}
+
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -67,16 +114,17 @@ Control Region
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The correction reduces the Zee charge flip BG \\
-For non-ISR, from 32609 to 27124 \\
-For ISR, from 22924 to 19508
+\item ?
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{plan}
+\frametitle{Plan}
 \begin{itemize}
-\item more checking for Zee charge flip background.
+\item Add charge flip BG for emu channel
+\item Apply pile up weight
+\item plan to remove unused variables in our ntuple.
+\item plan to calculate the systematic uncertainties, and to simplify the ntuple workflow
 \end{itemize}
 \end{frame}
 
@@ -539,24 +587,35 @@ and $p_T>30$ GeV if the two leptons are $e\mu$
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\huge
-nonISR
-\end{center}
+\frametitle{Control Region}
+Definition of the Control Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$ or $\mu\mu$
+\item $81.18 < m_{ll} < 101.18$
+\end{enumerate}
 \end{frame}
-
-\input{data/expN_nonISR.tex}
-\input{data/expN_BGVV_nonISR.tex}
 
 \begin{frame}
 \begin{center}
 \huge
-ISR
+Control Region
 \end{center}
 \end{frame}
 
-\input{data/expN_ISR.tex}
-\input{data/expN_BGVV_ISR.tex}
+%\input{data/expN_CR.tex}
+
+\def \PathToPlot {../plot}
+%\input{data/plot_CR.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+opposite sign
+\end{center}
+\end{frame}
+
+%\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
 
 \def \PathToPlot {../plot}
 \begin{frame}
@@ -591,21 +650,11 @@ ISR
 \begin{frame}
 \begin{center}
 \huge
-nonISR
+opposite sign
 \end{center}
 \end{frame}
 
 \def \PathToPlot {../plot}
-\input{data/plot_nonISR.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-ISR
-\end{center}
-\end{frame}
-
-\def \PathToPlot {../plot}
-\input{data/plot_ISR.tex}
+%\input{data/plot_OS.tex}
 
 \end{document}

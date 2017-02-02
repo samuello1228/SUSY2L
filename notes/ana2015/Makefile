@@ -10,8 +10,8 @@
 TEXLIVE  = 2015
 LATEX    = latex
 PDFLATEX = pdflatex
-BIBTEX   = bibtex
-# BIBTEX = biber
+# BIBTEX   = bibtex
+BIBTEX = biber
 DVIPS    = dvips
 DVIPDF   = dvipdf
 

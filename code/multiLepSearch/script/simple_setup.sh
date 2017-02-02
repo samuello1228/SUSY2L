@@ -1,8 +1,9 @@
-mkdir AnalysisBase-02-04-17
-cd AnalysisBase-02-04-17
+mkdir AnalysisBase-02-04-24
+cd AnalysisBase-02-04-24
 
-#https://svnweb.cern.ch/trac/atlasinst/browser/Institutes/Michigan/SUSY/code/multiLepSearch/
-svn co -r 414670 svn+ssh://svn.cern.ch/reps/atlasinst/Institutes/Michigan/SUSY/code/multiLepSearch
+#https://gitlab.cern.ch/hku/SUSY2L/tree/master/code/multiLepSearch
+git clone https://:@gitlab.cern.ch:8443/hku/SUSY2L.git
+cd SUSY2L/code/
 
 setupATLAS
 #localSetupRucioClients
@@ -10,9 +11,7 @@ setupATLAS
 #localSetupPandaClient currentJedi
 
 #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/SUSYPhys/SUSYTools/tags/
-rcSetup Base,2.4.17
-svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/MuonID/MuonIDAnalysis/MuonEfficiencyCorrections/tags/MuonEfficiencyCorrections-03-03-08 MuonEfficiencyCorrections
-svn co svn+ssh://svn.cern.ch/reps/atlasoff/PhysicsAnalysis/ElectronPhotonID/ElectronPhotonFourMomentumCorrection/tags/ElectronPhotonFourMomentumCorrection-00-02-13 ElectronPhotonFourMomentumCorrection
+rcSetup Base,2.4.24
 
 rc find_packages
 rc clean
@@ -27,6 +26,8 @@ cd run
 ../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/mc15_13TeV.361064.Sherpa_CT10_lllvSFMinus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666_tid08648281_00/DAOD_SUSY2.08648288._000002.pool.root.1 --outputTag test1 -o t1 -w -a 1 --nevents 10000 --study ss
 
 ../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/mc15_13TeV.361064.Sherpa_CT10_lllvSFMinus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666_tid08648281_00/DAOD_SUSY2.08648288._000002.pool.root.1 --outputTag test1 -o t1 -w -a 1 --study ss
+
+../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/user/c/clo/work/sample/mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5.merge.DAOD_SUSY2.e5129_a766_a821_r7676_p2688/DAOD_SUSY2.09019173._000001.pool.root.1 --outputTag test1 -o t1 -w -a 1 --study ss
 
 root -l t1/data-myOutput/test.root
 

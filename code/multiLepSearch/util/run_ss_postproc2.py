@@ -104,7 +104,8 @@ for aFile in inputFiles:
   if options.isMC:
     mcSumW = sumWdict.get(sampleID, -1)
     xSECxEff = xsecDB.xsectTimesEff(sampleID)
-    if options.isSig: xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) + xsecDB.xsectTimesEff(sampleID, 127)
+    #if options.isSig: xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) + xsecDB.xsectTimesEff(sampleID, 127)
+    if options.isSig: xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) #125 is 125+127 at the DB (for Slep0d95 only)
     if xSECxEff<0:
       print "No xSEC available for inputName %s skipped" % aFile
       continue

@@ -97,17 +97,18 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
       if (bin==-1) ATH_MSG_ERROR("No flipProb defined for this e: " << fabs(eta[i]) << " " << pt[i] );
   }
   
-  double weight = 0.0;
+  double weight = 0.0, ptot = 0.0;
   if (prob.size() >2){
     ATH_MSG_ERROR("More then 2 signal e in input, use only first 2");
-    weight = prob[0]+prob[1]-2*prob[0]*prob[1];
+    ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   }else if (prob.size()==2){
     ATH_MSG_DEBUG("2P: " << prob[0] << " " << prob[1]);
-    weight = prob[0]+prob[1]-2*prob[0]*prob[1];
+    ptot = prob[0]+prob[1]-2*prob[0]*prob[1];
   }else if (prob.size()==1){
     ATH_MSG_DEBUG("1P: " << prob[0] );
-    weight = prob[0];
+    ptot = prob[0];
   }
+  weight = ptot/(1.-ptot);
 
   if (sigma==0) return weight;
 
@@ -130,15 +131,18 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
 
   if(prob.size()>=2){
     // Uncertainty calc based on w = p0 + p1 - 2*p0*p1
-    uncertainty = sqrt(pow(unc[0]/prob[0],2)*(prob[0]*prob[0]+2)+pow(unc[1]/prob[1],2)*(prob[1]*prob[1]+2));
+    uncertainty = 1./pow(1.-ptot,2) * sqrt( pow((1.-2*prob[1])*unc[0],2) + pow((1.-2*prob[0])*unc[1],2) );
+    //ATH_MSG_ERROR("prob: " << prob[0] << " " << prob[1]);
+    //ATH_MSG_ERROR("unc: " << unc[0] << " " << unc[1] << " " << uncertainty);
   } else if(prob.size()==1) {
-    uncertainty = unc[0];
+    uncertainty = 1./pow(1.-ptot,2) * unc[0];
   }
 
   return weight + sigma*uncertainty;
 }
 //**********************************************************************
 
+//this do not modify the input pList
 std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<xAOD::IParticle*> &pList, int sigma, int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt -- with IParticle");
@@ -196,6 +200,7 @@ std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<xAOD::IParticl
   return correctedPt;
 }
 
+//this modify the input pt
 std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<double> &eta, std::vector<double> &pt, int sigma, int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt -- with vector eta & pt");
@@ -209,6 +214,7 @@ std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<double> &eta, 
   return pt;
 }
 
+//this do not modify the input pt
 double ChargeFlipBkgTool::GetCorrectedPt(const double &eta, const double &pt, const int sigma, const int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt");

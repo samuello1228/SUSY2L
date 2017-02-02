@@ -28,8 +28,14 @@
 // MCTruthClassifier
 #include "MCTruthClassifier/MCTruthClassifier.h"
 
+// ElectronChargeIDSelector
+#include "ElectronPhotonSelectorTools/AsgElectronChargeIDSelectorTool.h"
+
 class GoodRunsListSelectionTool;
 class TH1;
+
+class ChargeFlipBkgTool;
+class FakeLepBkgTool;
 
 class ssEvtSelection : public EL::Algorithm
 {
@@ -84,6 +90,12 @@ public:
   // MCTruthClassifier
   MCTruthClassifier* m_truthClassifier; //!
 
+  // ElectronChargeIDSelector
+  AsgElectronChargeIDSelectorTool* ECIDSTool; //!
+
+  double ECIDS_OP; //!
+  std::string ECIDS_trainingFile; //!
+
   // this is a standard constructor
   ssEvtSelection (std::string name="ss2lSelection");
 
@@ -122,6 +134,9 @@ public:
   ST::SUSYObjDef_xAOD* m_objTool; //!
   SUSY::CrossSectionDB* m_XsecDB;  //!
 //   CP::MuonSelectionTool* m_muonSelTool; //!
+
+  ChargeFlipBkgTool* mChargeFlipBkgTool; //!
+  FakeLepBkgTool*    mFakeLepBkgTool;  //!
 
   //////// trigger
   //TrigConf::xAODConfigTool *configTool;//!
