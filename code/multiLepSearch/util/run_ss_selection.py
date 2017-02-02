@@ -108,7 +108,8 @@ elif options.samplesDir:
             if not m1:
                 print d, 'excluded'
                 continue
-            tag = m1.group(1)
+#             tag = m1.group(1)
+            tag = '_'.join(m1.groups())
             print tag, d,
             sample = ROOT.SH.SampleLocal(tag)
             files = [d+'/'+f for f in os.listdir(d) if f.find('.root')!=-1]
