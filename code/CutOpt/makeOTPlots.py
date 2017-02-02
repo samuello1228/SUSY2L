@@ -89,6 +89,9 @@ if __name__ == '__main__':
 	outOT = open("checksOT.csv", "w")
 	outOT.write("Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2\n")
 
+	outViableOT = open("viableOT.csv", "w")
+	outViableOT.write("Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2\n")
+
 	outSig = open("checksSig.csv", "w")
 	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,xSec,")
 	outSig.write("nSig,nBkg,BDTopt,nSig(BDTopt),nBkg(BDTopt),sigma(BDTopt),")
@@ -132,6 +135,10 @@ if __name__ == '__main__':
 			
 			if not(notOvertrained(overtrainingNums)): continue
 
+			outViableOT.write("%s,%s,%s,%s,%s,%s,%s," 
+				% (channel, ISR, Flavor, dm, NTrees, NodeSize, Depth))
+			outViableOT.write("%1.3f,%1.3f,%1.3f,%1.3f\n" % overtrainingNums)
+
 			for mass in C1masses: 
 				xSec = xSecDict[(mass, mass-dm)]
 				selEff = effDict[(mass, mass-dm)][channel%100]
@@ -146,3 +153,5 @@ if __name__ == '__main__':
 				os.rename("plots/mvaeffs_BDTD.eps", "%s/%d_%d_Channel%d.eps" % (plotDir, mass, mass-dm, channel))
 
 	outOT.close()
+	outViableOT.close()
+	outSig.close()
