@@ -71,8 +71,6 @@
 363410  Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_CFilterBVeto        4.7405e-06      0.9751          0.2635  1.0
 363411  Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_BFilter             4.6041e-06      0.9751          0.1556  1.0
 410000  PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad                     696.11  1.1949  0.543           1.
-410015  PowhegPythiaEvtGen_P2012_Wt_dilepton_top                                3.5835  1.054   1.              1.
-410016  PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop                            3.5814  1.054   1.              1.
 361063	Sherpa_CT10_llll		12.849		0.91	1.	1.
 361064	Sherpa_CT10_lllvSFMinus		1.8446		0.91	1.	1.
 361065	Sherpa_CT10_lllvOFMinus		3.6235		0.91	1.	1.
@@ -85,8 +83,8 @@
 361072	Sherpa_CT10_lllljj_EW6		0.031496	0.91	1.	1.
 361073	Sherpa_CT10_ggllll		0.02095		0.91	1.	1.
 361077	Sherpa_CT10_ggllvv		0.85492		0.91	1.	1.
-361084	Sherpa_CT10_WqqZll		3.7583		0.91	1.	1.
-361086	Sherpa_CT10_ZqqZll		16.59		0.91	0.14253	1.
+361094  Sherpa_CT10_WqqZll_SHv21_improved               3.4234  0.91    1.0000E+00      1.0
+361096  Sherpa_CT10_ZqqZll_SHv21_improved               16.445  0.91    1.4307E-01      1.0
 301535	Sherpa_CT10_eegammaPt10_35	52.706		1.	1.	 1.
 301536	Sherpa_CT10_mumugammaPt10_35	52.708		1.	1.	 1.
 301890	Sherpa_CT10_enugammaPt35_70	15.348		1.	1.	 1.

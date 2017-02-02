@@ -29,5 +29,10 @@ RootCoreBin
 *.toc
 *.vrb
 code/plotScripts/dataMCcomparison/skimming/*.root
-code/plotScripts/dataMCcomparison/plot
+code/plotScripts/dataMCcomparison/plot/*.eps
+code/plotScripts/dataMCcomparison/plot/*.pdf
+code/plotScripts/dataMCcomparison/latex/data/expN_BGVV*
+code/plotScripts/dataMCcomparison/latex/data/expN/BGVV*
+code/plotScripts/dataMCcomparison/latex/slide.pdf
+code/plotScripts/dataMCcomparison/latex/slide.nav
 code/run

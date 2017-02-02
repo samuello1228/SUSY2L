@@ -4,6 +4,12 @@
 ```sh
 git config --global user.name "Your name"
 git config --global user.email "Your email"
+git config --global core.editor vi
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.up rebase
+git config --global alias.ci commit
 ```
 
 ### 1. Create a branch from the master
@@ -47,3 +53,10 @@ Assign it to somebody that will check your changes and make independent tests
 ### 5. Then you can tag this master
 
 (Done via web interface or terminal commands)
+
+## Other
+### Checkout submodule
+```
+git submodule init
+git submodule update
+```

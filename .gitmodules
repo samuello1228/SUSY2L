@@ -1,0 +1,6 @@
+[submodule "code/susyAnaScripts"]
+	path = code/susyAnaScripts
+	url = https://:@gitlab.cern.ch:8443/dzhang/at-susyAnaScripts.git
+[submodule "code/HistFitter"]
+	path = code/HistFitter
+	url = https://:@gitlab.cern.ch:8443/HistFitter/HistFitter.git

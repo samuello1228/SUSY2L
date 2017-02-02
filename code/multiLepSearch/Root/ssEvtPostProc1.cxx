@@ -173,7 +173,7 @@ int ssEvtPostProc1 :: runLoop ()
         eta.clear();
 	pt.clear();
 
-        for (int idx=0;idx<rawSusyEvts->leps.size();idx++){
+        for (uint idx=0;idx<rawSusyEvts->leps.size();idx++){
           if (abs(rawSusyEvts->leps[idx].ID)==11000){
 	    eta.push_back( rawSusyEvts->leps[idx].eta );
 	    pt.push_back( rawSusyEvts->leps[idx].pt );
@@ -203,7 +203,7 @@ int ssEvtPostProc1 :: runLoop ()
 
           //cout << "pT corr " << pt[0] << " " << pt[1] << " " << ptCorr[0] << " " << ptCorr[1] << endl;
 
-          for (int idx=0;idx<pt.size();idx++){
+          for (uint idx=0;idx<pt.size();idx++){
             outSusyEvts                  ->leps[idx].pt = ptCorr   [idx];
             outSusyEvts_CFLIP_SYS__1up   ->leps[idx].pt = ptCorr1up[idx];
             outSusyEvts_CFLIP_SYS__1dn   ->leps[idx].pt = ptCorr1dn[idx];

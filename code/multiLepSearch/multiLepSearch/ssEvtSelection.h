@@ -34,6 +34,9 @@
 class GoodRunsListSelectionTool;
 class TH1;
 
+class ChargeFlipBkgTool;
+class FakeLepBkgTool;
+
 class ssEvtSelection : public EL::Algorithm
 {
   // put your configuration variables here as public variables.
@@ -131,6 +134,9 @@ public:
   ST::SUSYObjDef_xAOD* m_objTool; //!
   SUSY::CrossSectionDB* m_XsecDB;  //!
 //   CP::MuonSelectionTool* m_muonSelTool; //!
+
+  ChargeFlipBkgTool* mChargeFlipBkgTool; //!
+  FakeLepBkgTool*    mFakeLepBkgTool;  //!
 
   //////// trigger
   //TrigConf::xAODConfigTool *configTool;//!
