@@ -5,6 +5,9 @@
 #Boson+jets      W+jets;ee               Sherpa                  364170-364183
 #Boson+jets      W+jets;mumu             Sherpa                  364156-364169
 #Boson+jets      W+jets;tautau           Sherpa                  364184-364197
+#Boson+jets      DY;ee                   Sherpa                  364204-364209
+#Boson+jets      DY;mumu                 Sherpa                  364198-364203
+#Boson+jets      DY;tautau               Sherpa                  364210-364215
 #
 #diboson         ZZ->llll                Sherpa                  363490
 #diboson         WZ->lllv                Sherpa                  363491
