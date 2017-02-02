@@ -30,6 +30,8 @@
 #include "RooStats/NumberCountingUtils.h"
 #include "RooStats/RooStatsUtils.h"
 
+#include <TGraph2D.h>
+
 bool dorw = 0;
 bool docfw = 0;
 bool simple = 1;
@@ -225,7 +227,6 @@ void analysis1()
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
                         element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                     }
@@ -480,14 +481,11 @@ void analysis1()
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
         
-        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 73;  element.upper = 74; BGMCGroupData.push_back(element);
-        
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 75;  element.upper = 88; BGMCGroupData.push_back(element);
+        element.lower = 73;  element.upper = 86; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 89;  element.upper = 108;BGMCGroupData.push_back(element);
+        element.lower = 87;  element.upper = 106;BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -577,137 +575,11 @@ void analysis1()
         element.latexName = "Average number of interactions per bunch crossing";
         Var.push_back(element);
         
-        element.VarName = "nVtx";       element.VarTitle = "Number of vertices";                element.unit = "";
-        element.bin=30;         element.xmin=0;                 element.xmax=30;
-        element.log=0;          element.ymin=0;                 element.ymax=0;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the leading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the subleading lepton";
-        Var.push_back(element);
-        
-        element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "jetphi";     element.VarTitle = "phi of the leading jet";            element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading jet";
-        Var.push_back(element);
-        
-        element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "bjetpt";     element.VarTitle = "pT of the leading b-jet";           element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjeteta";    element.VarTitle = "eta of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "bjetphi";    element.VarTitle = "phi of the leading b-jet";          element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading b-jet";
-        Var.push_back(element);
-        
-        element.VarName = "nCJet";      element.VarTitle = "Number of central light jets";      element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "cjetpt";     element.VarTitle = "pT of the leading central light jets";                              element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjeteta";    element.VarTitle = "eta of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "cjetphi";    element.VarTitle = "phi of the leading central light jets";                             element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading central light jet";
-        Var.push_back(element);
-        
-        element.VarName = "nFJet";      element.VarTitle = "Number of forward jets";            element.unit = "";
-        element.bin=8;          element.xmin=0;                 element.xmax=8;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "fjetpt";     element.VarTitle = "pT of the leading forward jet";     element.unit = "[GeV]";
-        element.bin=40;         element.xmin=30;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjeteta";    element.VarTitle = "eta of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-3;                element.xmax=3;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\eta$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "fjetphi";    element.VarTitle = "phi of the leading forward jet";    element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ of the leading forward jet";
-        Var.push_back(element);
-        
-        element.VarName = "HT";         element.VarTitle = "HT";                                element.unit = "[GeV]";
-        element.bin=40;         element.xmin=65;                 element.xmax=500;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "R2";         element.VarTitle = "R2";                                element.unit = "";
-        element.bin=40;         element.xmin=0;                 element.xmax=1;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
-        Var.push_back(element);
-        
-        element.VarName = "l12_dPhi";    element.VarTitle = "phi difference between the two leptons";                           element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ difference between the two leptons";
-        Var.push_back(element);
+        //Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
@@ -749,7 +621,6 @@ void analysis1()
             element.setOfBGMC.push_back("Zmumu");
             element.setOfBGMC.push_back("Ztautau");
             element.setOfBGMC.push_back("ttbar");
-            element.setOfBGMC.push_back("Wt");
             element.setOfBGMC.push_back("VV");
             element.setOfBGMC.push_back("Vgamma");
             
@@ -1346,7 +1217,6 @@ void analysis1()
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
             }
@@ -1817,10 +1687,24 @@ void analysis1()
     fstream fout_SR;
     fout_SR.open(PathName_SR.Data(), ios::out);
     fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    fout_SR<<std::setw(15)<<BGMCGroupData[5].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGMCGroupData[6].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[0].GroupName.Data();
-    fout_SR<<std::setw(15)<<BGDataGroupData[1].GroupName.Data();
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "VV") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    {
+        if(BGMCGroupData[i].GroupName == "Vgamma") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+    }
+    
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "charge flip") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+    for(unsigned int i=0;i<BGDataGroupData.size();i++)
+    {
+        if(BGDataGroupData[i].GroupName == "fake lepton") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
+    }
+
     fout_SR<<std::setw(15)<<"Total BG";
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1833,39 +1717,52 @@ void analysis1()
     //h2SR
     std::vector< std::vector<TH1F*> > h2SRBG;
     std::vector< std::vector<TH1F*> > h2SRSig;
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0;i<4;i++)
     {
         std::vector<TH1F*> element;
-        TH1F* hTemp;
+        TH1F* hTemp = nullptr;
         TString LeptonName;
         if(i==0) LeptonName = "_ee";
         else if(i==1) LeptonName = "_mumu";
         else if(i==2) LeptonName = "_emu";
+        else if(i==3) LeptonName = "_combine";
         
         //h2SRBG
         //VV
-        hTemp = new TH1F((BGMCGroupData[5].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "VV") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(2);
         hTemp->SetFillColor(2);
         element.push_back(hTemp);
         
         //Vgamma
-        hTemp = new TH1F((BGMCGroupData[6].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        {
+            if(BGMCGroupData[j].GroupName == "Vgamma") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(4);
         hTemp->SetFillColor(4);
         element.push_back(hTemp);
         
         //charge flip
-        if(i==0)
+        if(i==0 || i==3)
         {
-            hTemp = new TH1F((BGDataGroupData[0].GroupName+LeptonName).Data(),"",18,0,18);
+            for(unsigned int j=0;j<BGDataGroupData.size();j++)
+            {
+                if(BGDataGroupData[j].GroupName == "charge flip") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+            }
             hTemp->SetLineColor(3);
             hTemp->SetFillColor(3);
             element.push_back(hTemp);
         }
         
         //fake lepton
-        hTemp = new TH1F((BGDataGroupData[1].GroupName+LeptonName).Data(),"",18,0,18);
+        for(unsigned int j=0;j<BGDataGroupData.size();j++)
+        {
+            if(BGDataGroupData[j].GroupName == "fake lepton") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
+        }
         hTemp->SetLineColor(5);
         hTemp->SetFillColor(5);
         element.push_back(hTemp);
@@ -1884,9 +1781,9 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=18;RegionIndex<=18;RegionIndex++)
+    for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
-    for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
@@ -2014,9 +1911,9 @@ void analysis1()
         std::vector<TChain*> tree2DataOS;
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
-        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-        //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
+        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;
@@ -2304,7 +2201,6 @@ void analysis1()
             }
             
             //Add Signal for the same mass splitting
-            const int SigScale = 10;
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 unsigned int AOD = 0;
@@ -2317,8 +2213,8 @@ void analysis1()
                     }
                 }
                 
-                //normalization for Signal
-                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID]/AOD *sumDataL *SigScale);
+                //preliminary normalization for h2SigSum
+                h2SigSum[i]->Scale(sumDataL/AOD);
             }
             
             //Add BG
@@ -2367,8 +2263,10 @@ void analysis1()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    h2Sig[SigMassSplitting[i].ID]->Scale(SigXS[SigMassSplitting[i].ID]/SignAOD[SigMassSplitting[i].ID] *sumDataL);
-                    sumOfEvent[BGGroup.size()+i+2][0] = h2Sig[SigMassSplitting[i].ID]->IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
+                    TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    hTemp.Add(h2SigSum[i]);
+                    hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
+                    sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                     
                     //Significance
                     sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
@@ -2498,6 +2396,78 @@ void analysis1()
                         h2SRSig[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
                     }
                 }
+                
+                //significance for all mass point
+                if(RegionIndex>=18)
+                {
+                    PathName = "latex/data/significance/";
+                    PathName += RegionInfo[RegionIndex].RegionName;
+                    PathName += ".txt";
+                    fout.open(PathName.Data());
+                    
+                    TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,200,700,10,100,500);
+                    TGraph2D* g2 = new TGraph2D();
+                    int pointN = 0;
+                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    {
+                        for(unsigned int k=0;k<SigMassSplitting.size();k++)
+                        {
+                            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[k].MassDiff)
+                            {
+                                //expected number of events
+                                double expN = h2SigSum[k]->Integral(0,-1);
+                                expN *= SigXS[j];
+                                
+                                //Significance
+                                double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
+                                
+                                fout<<setprecision(3)<<std::fixed;
+                                fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
+                                
+                                //2D plot
+                                if(significance>0)
+                                {
+                                    g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
+                                    pointN++;
+                                }
+                            }
+                        }
+                    }
+                    fout.close();
+                    
+                    //if(pointN>=3)
+                    if(RegionIndex==43)
+                    {
+                        gStyle->SetPalette(1);
+                        gStyle->SetPadRightMargin(0.16);
+                        TCanvas* c2 = new TCanvas();
+                        c2->cd();
+                        h2->Draw();
+                        g2->Draw("colzsame");
+                        
+                        TLatex lt1;
+                        lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
+                        lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                        
+                        TString NameTemp = "plot/";
+                        NameTemp += "SR_";
+                        NameTemp += RegionInfo[RegionIndex].RegionName;
+                        NameTemp += ".eps";
+                        c2->Print(NameTemp,"eps");
+                        
+                        delete c2;
+                    }
+                    
+                    delete h2;
+                    delete g2;
+                }
+            }
+            
+            //final normalization for h2SigSum for plotting
+            const int SigScale = 10;
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
             }
             
             {
@@ -2814,8 +2784,32 @@ void analysis1()
     }
     
     //h2SR
-    THStack stackSR[3];
+    THStack stackSR[4];
+    
+    //For combined SR
     for(unsigned int i=0;i<3;i++)
+    {
+        //h2SRBG
+        h2SRBG[3][0]->Add(h2SRBG[i][0]);
+        h2SRBG[3][1]->Add(h2SRBG[i][1]);
+        if(i==0)
+        {
+            h2SRBG[3][2]->Add(h2SRBG[i][2]);
+            h2SRBG[3][3]->Add(h2SRBG[i][3]);
+        }
+        else
+        {
+            h2SRBG[3][3]->Add(h2SRBG[i][2]);
+        }
+        
+        //h2SRSig
+        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+        {
+            h2SRSig[3][j]->Add(h2SRSig[i][j]);
+        }
+    }
+    
+    for(unsigned int i=0;i<4;i++)
     {
         //Legend
         TLegend* leg;
@@ -2832,18 +2826,33 @@ void analysis1()
             leg->SetFillStyle(0);
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
-            if(i==0)
+            
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[0].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][3],BGDataGroupData[1].LegendName.Data(),"fl");
+                if(BGMCGroupData[j].GroupName == "VV") leg->AddEntry(h2SRBG[i][0],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            for(unsigned int j=0;j<BGMCGroupData.size();j++)
+            {
+                if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
+            }
+            
+            if(i==0 || i==3)
+            {
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "charge flip") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][3],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             else
             {
-                leg->AddEntry(h2SRBG[i][0],BGMCGroupData[5].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][1],BGMCGroupData[6].LegendName.Data(),"fl");
-                leg->AddEntry(h2SRBG[i][2],BGDataGroupData[1].LegendName.Data(),"fl");
+                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                {
+                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                }
             }
             
             
@@ -2882,6 +2891,14 @@ void analysis1()
             stackSR[i].Add(h2SRBG[i][0]);
             stackSR[i].Add(h2SRBG[i][2]);
         }
+        else if(i==3)
+        {
+            //combine
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][3]);
+        }
         
         //Draw
         gStyle->SetOptStat(0);
@@ -2902,16 +2919,21 @@ void analysis1()
         if(i==0) NameTemp += "ee";
         else if(i==1) NameTemp += "mumu";
         else if(i==2) NameTemp += "emu";
-        NameTemp += ".pdf";
-        c2->Print(NameTemp,"pdf");
+        else if(i==3) NameTemp += "combine";
+        NameTemp += ".eps";
+        c2->Print(NameTemp,"eps");
         delete c2;
     }
     
-    for(unsigned int i=0;i<3;i++)
+    for(unsigned int i=0;i<4;i++)
     {
         for(unsigned int j=0;j<h2SRBG[i].size();j++)
         {
             delete h2SRBG[i][j];
+        }
+        for(unsigned int j=0;j<h2SRSig[i].size();j++)
+        {
+            delete h2SRSig[i][j];
         }
     }
     

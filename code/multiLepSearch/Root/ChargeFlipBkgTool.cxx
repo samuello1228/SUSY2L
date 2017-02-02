@@ -142,6 +142,7 @@ double ChargeFlipBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, int
 }
 //**********************************************************************
 
+//this do not modify the input pList
 std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<xAOD::IParticle*> &pList, int sigma, int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt -- with IParticle");
@@ -199,6 +200,7 @@ std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<xAOD::IParticl
   return correctedPt;
 }
 
+//this modify the input pt
 std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<double> &eta, std::vector<double> &pt, int sigma, int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt -- with vector eta & pt");
@@ -212,6 +214,7 @@ std::vector<double> ChargeFlipBkgTool::GetCorrectedPt(std::vector<double> &eta, 
   return pt;
 }
 
+//this do not modify the input pt
 double ChargeFlipBkgTool::GetCorrectedPt(const double &eta, const double &pt, const int sigma, const int nthSys) const
 {
   ATH_MSG_DEBUG("GetCorrectedPt");

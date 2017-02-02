@@ -64,7 +64,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
-        fileName += "_myOutput.root/*.root";
+        fileName += "_myOutput.root/*.root*";
+        
+        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
         if(isPP1) tree1P->Add(fileName.Data());
@@ -118,8 +121,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         f2[j]->cd();
         tree2[j] = new TTree(treeName.Data(),treeName.Data());
-        tree2[j]->Branch("ID1",&ID1,"ID1/I");
-        tree2[j]->Branch("ID2",&ID2,"ID2/I");
         tree2[j]->Branch("pt1",&pt1,"pt1/D");
         tree2[j]->Branch("pt2",&pt2,"pt2/D");
         tree2[j]->Branch("eta1",&eta1,"eta1/D");
@@ -128,34 +129,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mt1",&mt1,"mt1/D");
-        tree2[j]->Branch("mt2",&mt2,"mt2/D");
         tree2[j]->Branch("mtm",&mt2,"mtm/D");
-        tree2[j]->Branch("HT",&HT,"HT/D");
-        tree2[j]->Branch("R2",&R2,"R2/D");
-        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
-        tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
-        tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
-        tree2[j]->Branch("jetphi",&jetphi,"jetphi/D");
-        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
-        tree2[j]->Branch("bjetpt",&bjetpt,"bjetpt/D");
-        tree2[j]->Branch("bjeteta",&bjeteta,"bjeteta/D");
-        tree2[j]->Branch("bjetphi",&bjetphi,"bjetphi/D");
-        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
-        tree2[j]->Branch("cjetpt",&cjetpt,"cjetpt/D");
-        tree2[j]->Branch("cjeteta",&cjeteta,"cjeteta/D");
-        tree2[j]->Branch("cjetphi",&cjetphi,"cjetphi/D");
-        tree2[j]->Branch("nFJet",&nFJet,"nFJet/I");
-        tree2[j]->Branch("fjetpt",&fjetpt,"fjetpt/D");
-        tree2[j]->Branch("fjeteta",&fjeteta,"fjeteta/D");
-        tree2[j]->Branch("fjetphi",&fjetphi,"fjetphi/D");
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
         tree2[j]->Branch("averageMu",&averageMu,"averageMu/D");
-        tree2[j]->Branch("nVtx",&nVtx,"nVtx/I");
     }
     
     //histograms
@@ -295,8 +275,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
-        //weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
+        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        //weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
@@ -435,16 +415,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //separate the sample into channels
+        
+        if(nISR==0) {}
+        else if(nISR==1) channelIndex += 6;
+        else continue;
+        
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             channelIndex += 3;
             element.n++;
             element.nw += weight;
         }
-        
-        if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -528,14 +509,21 @@ void skimming()
     //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
     //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
+    //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
+    //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
     //SamplePath += "AnalysisBase-02-04-17-414981/";
-    SamplePath += "AnalysisBase-02-04-17-419618/";
+    //SamplePath += "AnalysisBase-02-04-17-419618/";
     //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
+    //SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
+    SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
+    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2-v8d7/";
     
     //TString tag = "v7.8";
-    TString tag = "v8.0";
-    //TString tag = "v8.6";
+    //TString tag = "v8.0";
+    //TString tag = "v8.4";
+    TString tag = "v8.6";
+    //TString tag = "v8.7";
     //TString tag = "v7.11";
     
     std::vector<nEvent> nSS;
@@ -544,7 +532,7 @@ void skimming()
     //if(true)
     if(false)
     {
-        SamplePath += "data/";
+        //SamplePath += "data/";
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
@@ -552,7 +540,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],true,nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
         }
     }
     
