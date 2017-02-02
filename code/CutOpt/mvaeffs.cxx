@@ -530,7 +530,7 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
       sprintf(tmp, "%1.2f,%1.2f,%1.3f,", 
          fNSignal*info->origSigE->GetBinContent(info->origSigE->FindBin(i)),
          fNBackground*info->origBgdE->GetBinContent(info->origBgdE->FindBin(i)),
-         info->sSig->GetBinContent(info->sSig->FindBin(i)));
+         info->sSig->GetBinContent(info->sSig->FindBin(i))*info->maxSignificance);
       tempFile << tmp;
    }
 
