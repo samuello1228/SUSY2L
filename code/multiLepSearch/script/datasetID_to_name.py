@@ -32,6 +32,7 @@ def Data16_criteria(tags):
   #This DAOD tag is recommended for athena20.7
   #tarTags = ["p2667", "p2689"]
   tarTags = ["p2880"]
+  #tarTags = ["p2950"]
   if not any( [ t in tags for t in tarTags] ): return False
 
   return True
@@ -44,6 +45,8 @@ def MC15C_criteria(tags):
 
   and DAOD related pTags as in
   https://twiki.cern.ch/twiki/bin/view/AtlasProtected/SUSYxAODDerivationsr20#Recommended_p_tags
+  https://twiki.cern.ch/twiki/bin/view/AtlasProtected/DerivationProductionTeam
+  https://twiki.cern.ch/twiki/bin/view/AtlasProtected/CentralMC15ProductionList
   """
 
   #One of the following must be present
@@ -55,7 +58,9 @@ def MC15C_criteria(tags):
   if "r7676" not in tags: return False
 
   #This DAOD tag is recommended for athena20.7
-  tarTags = ["p2666","p2688"]
+  #tarTags = ["p2666","p2688"]
+  tarTags = ["p2879"]
+  #tarTags = ["p2949"]
   if not any( [ t in tags for t in tarTags] ): return False
 
   return True
@@ -63,9 +68,9 @@ def MC15C_criteria(tags):
 #==============================================================
 #user specified options
 #==============================================================
-#tagCriteria = MC15C_criteria
+tagCriteria = MC15C_criteria
 #tagCriteria = Data15_criteria
-tagCriteria = Data16_criteria
+#tagCriteria = Data16_criteria
 inFile = open(sys.argv[1])
 
 #==============================================================
@@ -74,8 +79,8 @@ inFile = open(sys.argv[1])
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
-#outputPath = "MCBG_sample_list.txt"
-outputPath = "Data_sample_list.txt"
+outputPath = "MCBG_sample_list.txt"
+#outputPath = "Data_sample_list.txt"
 outputFile = open(outputPath,"w")
 
 for aLine in inFile:

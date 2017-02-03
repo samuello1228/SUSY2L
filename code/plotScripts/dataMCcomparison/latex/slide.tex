@@ -36,11 +36,11 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \normalsize
-\item Use 33 fb$^{-1}$ Data
-\item No pile up weight is applied
-\item Separate the SR into 18*3 bins
-
-\item Get the number of event of signal before normalization
+\item histogram for SR
+\item significance 2D plot
+\item some data samples are missing in /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-18-4bd95dc2/, but still intact in /afs/cern.ch/work/y/ychan/public/SUSY\_NTUP/v8d6/data/
+\item plan to remove unused variables in our ntuple.
+\item plan to calculate the systematic uncertainties, started to simplify the ntuple workflow: add flag for separating 12 channel, and add charge flip weight and fake lepton weight in the ntuple making process.
 \end{itemize}
 \end{frame}
 
@@ -65,11 +65,40 @@ Definition of the Signal Region.
 \end{frame}
 
 \begin{frame}
-\frametitle{Result}
-\tiny
-https://gitlab.cern.ch/hku/SUSY2L/blob/master/code/ \\
-plotScripts/dataMCcomparison/latex/data/expN/SR.txt \\
-https://docs.google.com/spreadsheets/d/1T7FXh6uskJh4ZMcWxLInByJsAwVqD190krBeaDkWkks/edit
+\frametitle{Signal Region}
+Note:
+\begin{enumerate}
+\item No pile up weight is applied.
+\item Add all signal samples with the same mass splitting to calculate signal numbers.
+\item Charge flip BG for emu channel is missing.
+\end{enumerate}
+\end{frame}
+
+%\def \PathToPlot {../plot}
+
+\begin{frame}
+\frametitle{Signal Region (ee)}
+\includegraphics[width=1\textwidth]{../plot/SR_ee.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (mumu)}
+\includegraphics[width=1\textwidth]{../plot/SR_mumu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (emu)}
+\includegraphics[width=1\textwidth]{../plot/SR_emu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (combine)}
+\includegraphics[width=1\textwidth]{../plot/SR_combine.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
+\includegraphics[width=1\textwidth]{../plot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
 \end{frame}
 
 %\input{data/expN_SS.tex}
@@ -85,14 +114,17 @@ https://docs.google.com/spreadsheets/d/1T7FXh6uskJh4ZMcWxLInByJsAwVqD190krBeaDkW
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item Some bins have positive significance.
+\item ?
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
+\item Add charge flip BG for emu channel
 \item Apply pile up weight
+\item plan to remove unused variables in our ntuple.
+\item plan to calculate the systematic uncertainties, and to simplify the ntuple workflow
 \end{itemize}
 \end{frame}
 
