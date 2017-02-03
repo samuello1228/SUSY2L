@@ -1327,7 +1327,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
-  l.ElChargeID = 63;
+  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
