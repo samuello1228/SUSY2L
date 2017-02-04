@@ -24,7 +24,7 @@ parser.add_option("--nFilesPerNode", type=int, help="number of files per node in
 parser.add_option("--grl", help="good run list", default='multiLepSearch/GRL/physics_25ns_20.7.xml')
 parser.add_option("--conf", help="selection configuration file", default='multiLepSearch/sel_conf/SUSYTools_multilepAna.txt')
 parser.add_option("--dataPRW", help='data pileup reweighting file list', default= 'multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root')
-parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='multiLepSearch/prw_MC/merged_prw_mc15c_Jan31.root')
+parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='dev/SUSYTools/merged_prw_mc15c_latest.root')
 parser.add_option("--test", help="test run", action='store_true', default=False)
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
