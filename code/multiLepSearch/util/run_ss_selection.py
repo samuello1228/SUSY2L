@@ -32,6 +32,7 @@ parser.add_option("--sampleList", help="sample list", default=None)
 parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l"),default ="3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
+parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
 
 
 (options, args) = parser.parse_args()
@@ -170,7 +171,7 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch
-
+alg.useChargeIDSelector = options.ChargeID
 
 # alg.CF_nLepCutExactly = 2
 # alg.CF_nLepCutMin = 2

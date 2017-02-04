@@ -57,6 +57,7 @@ public:
   std::string CF_derivationName;
   std::string study;
   std::string mcTruthMatch;
+  bool useChargeIDSelector;
   int doSys;
   //int CF_nLepCutExactly;
   //int CF_nLepCutMin;
