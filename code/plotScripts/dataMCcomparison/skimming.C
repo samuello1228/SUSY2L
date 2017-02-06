@@ -206,7 +206,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        if(isPP1 && evtsP->evt_fLwt!=0)
+        if(isPP1) fLwt = evtsP->evt_fLwt;
+        else fLwt = evts->evt_fLwt;
+        
+        if(!evts->evt_isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -279,9 +282,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
-        
-        if(isPP1) fLwt = evtsP->evt_fLwt;
-        else fLwt = evts->evt_fLwt;
         
         averageMu = evts->evt_averageMu;
         nVtx = evts->sig_nVtx;
