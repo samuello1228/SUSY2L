@@ -24,7 +24,7 @@ parser.add_option("--nFilesPerNode", type=int, help="number of files per node in
 parser.add_option("--grl", help="good run list", default='multiLepSearch/GRL/physics_25ns_20.7.xml')
 parser.add_option("--conf", help="selection configuration file", default='multiLepSearch/sel_conf/SUSYTools_multilepAna.txt')
 parser.add_option("--dataPRW", help='data pileup reweighting file list', default= 'multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root')
-parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='multiLepSearch/prw_MC/merged_prw_mc15c_July27_afterFix.root')
+parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='dev/SUSYTools/merged_prw_mc15c_latest.root')
 parser.add_option("--test", help="test run", action='store_true', default=False)
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
@@ -32,6 +32,7 @@ parser.add_option("--sampleList", help="sample list", default=None)
 parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l"),default ="3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
+parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
 
 
 (options, args) = parser.parse_args()
@@ -108,7 +109,8 @@ elif options.samplesDir:
             if not m1:
                 print d, 'excluded'
                 continue
-            tag = m1.group(1)
+#             tag = m1.group(1)
+            tag = '_'.join(m1.groups())
             print tag, d,
             sample = ROOT.SH.SampleLocal(tag)
             files = [d+'/'+f for f in os.listdir(d) if f.find('.root')!=-1]
@@ -148,26 +150,28 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger
-    #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py?rev=723073
-    dielectronTrigLH = ["HLT_2e12_lhloose_L12EM10VH"]
-    dimuonTrig = ["HLT_mu18_mu8noL1"]
-    elemuonTrigLH = ["HLT_e17_lhloose_mu14"]
+    #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
+    #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
+    
+    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
+    for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    for i in dielectronTrigLH: alg.CF_trigNames.push_back(i)
+    dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
+    for i in dielectronTrig: alg.CF_trigNames.push_back(i)
+
+    muonTrig = ["HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
+    for i in muonTrig: alg.CF_trigNames.push_back(i)
+
+    dimuonTrig = ["HLT_2mu10","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
-    for i in elemuonTrigLH: alg.CF_trigNames.push_back(i)
+
+    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
+    for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
-    dielectronTrigLH = ["HLT_2e15_lhvloose_nod0_L12EM13VH"]
-    dimuonTrig = ["HLT_mu20_mu8noL1"]
-    elemuonTrigLH = ["HLT_e17_lhloose_nod0_mu14"]
-
-    for i in dielectronTrigLH: alg.CF_trigNames.push_back(i)
-    for i in dimuonTrig: alg.CF_trigNames.push_back(i)
-    for i in elemuonTrigLH: alg.CF_trigNames.push_back(i)
     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch
-
+alg.useChargeIDSelector = options.ChargeID
 
 # alg.CF_nLepCutExactly = 2
 # alg.CF_nLepCutMin = 2

@@ -104,6 +104,10 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB
   // MCTC, TruthLink, dR
   mcTruthMatch = "MCTC"; 
 
+  // ElectronChargeIDSelector working points
+  // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
+  ECIDS_OP=-0.28087;
+  ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
 }
 
 
@@ -198,6 +202,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hTrigs = new TH1D("hTrigs", "n pass trigger", CF_trigNames.size(), 0, CF_trigNames.size());
   for(unsigned int i=0; i<CF_trigNames.size(); i++){
     m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames[i].c_str());
+    std::cout<<CF_trigNames[i].c_str()<<std::endl;
   }
   m_hTrigs->SetDirectory(outputFile);
   return EL::StatusCode::SUCCESS;
@@ -348,6 +353,12 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
+
+  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool_medium");
+  CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
+  CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
+  CHECK(ECIDSTool->initialize());
 
   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
@@ -623,6 +634,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	dilepPair[0] = sig_Ls[0];
 	dilepPair[1] = sig_Ls[1];
         keep = true;
+        m_susyEvt->evt.flag = 1;
       } 
 
       //this catches 1SigLep1FakeLepSS -.-
@@ -647,6 +659,7 @@ EL::StatusCode ssEvtSelection :: execute ()
           if (baseLepSign==sigLepSign){
 	    dilepPair[1] = p;
             keep = true;
+            m_susyEvt->evt.flag = 2;
 	    break;
 	  }
 	}
@@ -675,6 +688,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	      dilepPair[0] = sel_Ls[0];
 	      dilepPair[1] = sel_Ls[1];
   	      keep = true;
+              m_susyEvt->evt.flag = 3;
 	      break;
 	    }
 	  }
@@ -685,6 +699,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 	    dilepPair[0] = sel_Ls[1];
 	    dilepPair[1] = sel_Ls[2];
   	    keep = true;
+            m_susyEvt->evt.flag = 3;
 	  }
 	}
       } 
@@ -873,46 +888,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.MetRel = m_susyEvt->sig.Met;
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
 
-    //trigger matching
-    int theYear;
-    if(CF_isMC) theYear = m_objTool->treatAsYear();
-    else theYear = -999;
+
     m_susyEvt->evt.trig = 0;
-    /*
-    for(unsigned int i=0;i<sel_Ls.size(); i++){
-      for(unsigned int j=0;j<sel_Ls.size(); j++){
-        if(i==j) continue;
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 11000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 11000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[0])) m_susyEvt->evt.trig |= 1<<0;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[3])) m_susyEvt->evt.trig |= 1<<0;
-        }
-
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 13000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 13000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[1])) m_susyEvt->evt.trig |= 1<<1;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[4])) m_susyEvt->evt.trig |= 1<<1;
-        }
-
-        if(TMath::Abs(m_susyEvt->leps[i].ID) == 11000 && dec_signal(*sel_Ls[i]) &&// sel_Ls[i]->pt() > 25000 && 
-           TMath::Abs(m_susyEvt->leps[j].ID) == 13000 && dec_signal(*sel_Ls[j]) )//&& sel_Ls[j]->pt() > 20000 )
-        {
-          if(theYear==2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[2])) m_susyEvt->evt.trig |= 1<<2;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(sel_Ls[i],sel_Ls[j],CF_trigNames[5])) m_susyEvt->evt.trig |= 1<<2;
-        }
-      }
-    }
-    */
-    ///*
     //for cutflow
     for(unsigned int i=0;i<electrons_copy->size(); i++){
       for(unsigned int j=i+1;j<electrons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),electrons_copy->at(j),CF_trigNames[0])) m_susyEvt->evt.trig |= 1<<0;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),electrons_copy->at(j),CF_trigNames[3])) m_susyEvt->evt.trig |= 1<<0;
+          m_susyEvt->evt.trig |= 1<<0;
         }
       }
     }
@@ -921,8 +904,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=i+1;j<muons_copy->size(); j++){
         if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(muons_copy->at(i),muons_copy->at(j),CF_trigNames[1])) m_susyEvt->evt.trig |= 1<<1;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(muons_copy->at(i),muons_copy->at(j),CF_trigNames[4])) m_susyEvt->evt.trig |= 1<<1;
+          m_susyEvt->evt.trig |= 1<<1;
         }
       }
     }
@@ -931,14 +913,11 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=0;j<muons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          if(theYear==2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),muons_copy->at(j),CF_trigNames[2])) m_susyEvt->evt.trig |= 1<<2;
-          else if(theYear!=2015 && m_objTool->IsTrigMatched(electrons_copy->at(i),muons_copy->at(j),CF_trigNames[5])) m_susyEvt->evt.trig |= 1<<2;
+          m_susyEvt->evt.trig |= 1<<2;
         }
       }
     }
-    //*/
 
-    //cutflow 
     if(study == "ss")
     {
         if(totLs == 2 && sig_Ls.size() == 2)
@@ -1068,24 +1047,8 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(CF_isMC){
         if( study == "ss" )
         {
-          //if(m_susyEvt->evt.trig & 1<<0)
-          if(false)
-          {
-            if(theYear==2015) m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,false,false,true,false,CF_trigNames[0]);
-            else m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,false,false,true,false,CF_trigNames[3]);
-            m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-          } 
-          else if(m_susyEvt->evt.trig & 1<<1)
-          {
-            m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
-            if(theYear==2015) m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,false,false,CF_trigNames[1]);
-            else m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,false,false,CF_trigNames[4]);
-          }
-          else
-          {
-            m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
-            m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-          }  
+          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
+          m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
         }
         else if(study == "3l")
         {
@@ -1303,6 +1266,10 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
   }
+
+  // ChargeIDSelector
+  l.ElChargeID = 0;
+  l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1360,6 +1327,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
+  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }

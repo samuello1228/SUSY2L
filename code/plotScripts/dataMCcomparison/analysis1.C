@@ -1781,10 +1781,10 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
+    for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
-    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
@@ -1912,8 +1912,8 @@ void analysis1()
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
-        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-        //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;

@@ -515,14 +515,14 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-17-414981/";
     //SamplePath += "AnalysisBase-02-04-17-419618/";
     //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
-    SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
-    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
+    //SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
+    SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
     //SamplePath += "AnalysisBase-02-04-18-4bd95dc2-v8d7/";
     
     //TString tag = "v7.8";
     //TString tag = "v8.0";
-    TString tag = "v8.4";
-    //TString tag = "v8.6";
+    //TString tag = "v8.4";
+    TString tag = "v8.6";
     //TString tag = "v8.7";
     //TString tag = "v7.11";
     
@@ -540,7 +540,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],true,nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
         }
     }
     
