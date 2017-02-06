@@ -227,6 +227,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
                         element.setOfBGMC.push_back("ttbar");
+                        element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                     }
@@ -624,6 +625,7 @@ void analysis1()
             element.setOfBGMC.push_back("Zmumu");
             element.setOfBGMC.push_back("Ztautau");
             element.setOfBGMC.push_back("ttbar");
+            element.setOfBGMC.push_back("Wt");
             element.setOfBGMC.push_back("VV");
             element.setOfBGMC.push_back("Vgamma");
             
@@ -1220,6 +1222,7 @@ void analysis1()
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
+                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
                 RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
             }
