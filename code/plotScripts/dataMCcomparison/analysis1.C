@@ -470,22 +470,25 @@ void analysis1()
     {
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 48;  element.upper = 71; BGMCGroupData.push_back(element);
+        element.lower = 14;  element.upper = 27; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 24;  element.upper = 47; BGMCGroupData.push_back(element);
+        element.lower = 0;   element.upper = 13; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 0;   element.upper = 23; BGMCGroupData.push_back(element);
+        element.lower = 28;  element.upper = 41; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 72;  element.upper = 72; BGMCGroupData.push_back(element);
+        element.lower = 42;  element.upper = 42; BGMCGroupData.push_back(element);
+
+        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
+        element.lower = 43;  element.upper = 44; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 73;  element.upper = 86; BGMCGroupData.push_back(element);
+        element.lower = 45;  element.upper = 55; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 87;  element.upper = 106;BGMCGroupData.push_back(element);
+        element.lower = 56;  element.upper = 75;BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -1781,10 +1784,10 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
+    //for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
-    //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+    for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
@@ -1912,8 +1915,8 @@ void analysis1()
         if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
-        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;
