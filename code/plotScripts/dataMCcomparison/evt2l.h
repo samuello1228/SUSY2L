@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov  6 20:55:43 2016 by ROOT version 6.04/14
+// Tue Feb  7 03:22:43 2017 by ROOT version 6.06/08
 // from TTree evt2l/a angles tree
-// found on file: root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root
+// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-26-a73a6eda/user.clo.v8.10.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10626828._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -75,6 +75,7 @@ public :
    Int_t           leps_truthType[kMaxleps];   //[leps_]
    Int_t           leps_truthOrig[kMaxleps];   //[leps_]
    Int_t           leps_isTight[kMaxleps];   //[leps_]
+   Bool_t          leps_ElChargeID[kMaxleps];   //[leps_]
    UInt_t          leps_Q[kMaxleps];   //[leps_]
    UInt_t          leps_lFlag[kMaxleps];   //[leps_]
    UInt_t          leps_nBHits[kMaxleps];   //[leps_]
@@ -155,6 +156,7 @@ public :
    TBranch        *b_leps_truthType;   //!
    TBranch        *b_leps_truthOrig;   //!
    TBranch        *b_leps_isTight;   //!
+   TBranch        *b_leps_ElChargeID;   //!
    TBranch        *b_leps_Q;   //!
    TBranch        *b_leps_lFlag;   //!
    TBranch        *b_leps_nBHits;   //!
@@ -203,9 +205,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-26-a73a6eda/user.clo.v8.10.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10626828._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("root://eosatlas//eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-17-419618/user.clo.v8.0.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.9782572._000001.myOutput.root");
+         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-26-a73a6eda/user.clo.v8.10.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10626828._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -286,6 +288,7 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("leps.truthType", leps_truthType, &b_leps_truthType);
    fChain->SetBranchAddress("leps.truthOrig", leps_truthOrig, &b_leps_truthOrig);
    fChain->SetBranchAddress("leps.isTight", leps_isTight, &b_leps_isTight);
+   fChain->SetBranchAddress("leps.ElChargeID", leps_ElChargeID, &b_leps_ElChargeID);
    fChain->SetBranchAddress("leps.Q", leps_Q, &b_leps_Q);
    fChain->SetBranchAddress("leps.lFlag", leps_lFlag, &b_leps_lFlag);
    fChain->SetBranchAddress("leps.nBHits", leps_nBHits, &b_leps_nBHits);
