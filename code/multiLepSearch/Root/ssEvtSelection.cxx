@@ -835,10 +835,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     int i=0;
     for(auto j0: jet_Ls){
       auto j = dynamic_cast<xAOD::Jet*>(j0);
-      //unused variables
-      m_susyEvt->jets[i].e = 0;
-
-      //
+      
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
