@@ -65,7 +65,7 @@ struct ChannelData
 {
     TString ChannelName;
     bool isSS;
-    bool isSS_ee;
+    bool isSS_qF;
     unsigned int qFChannel;
     std::vector<TString> setOfBGMC;
     std::vector<TString> setOfBGData;
@@ -196,15 +196,15 @@ void analysis1()
                     element.ChannelName += lepton[k];
                     
                     element.isSS = j==1;
-                    element.isSS_ee = (j==1 && k==0);
-                    if(element.isSS_ee) element.qFChannel = ChannelInfo.size() - 3;
+                    element.isSS_qF = (j==1 && (k==0 || k==2));
+                    if(element.isSS_qF) element.qFChannel = ChannelInfo.size() - 3;
                     
                     
                     element.setOfBGMC.clear();
                     element.setOfBGData.clear();
                     if(element.isSS)
                     {
-                        if(element.isSS_ee)
+                        if(element.isSS_qF)
                         {
                             if(docfw)
                             {
@@ -600,7 +600,7 @@ void analysis1()
         bool showData;
         bool showSignificance;
         bool isSS;
-        bool isSS_ee;
+        bool isSS_qF;
         std::vector<unsigned int> qFChannel;
         TString Cut;
         std::vector<TString> setOfBGMC;
@@ -1049,9 +1049,10 @@ void analysis1()
             unsigned int OS = ChannelIndex;
             if(OS>=6) OS -= 6;
             element.isSS = OS>=3;
-            element.isSS_ee = OS==3;
-            if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
+            element.isSS_qF = (OS==3 || OS==5);
+            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
             element.showData = !element.isSS;
+            //element.showData = true;
             element.showSignificance = element.isSS;
             
             if(element.isSS)
@@ -1075,7 +1076,7 @@ void analysis1()
         element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
-        element.isSS_ee = true;
+        element.isSS_qF = true;
         
         element.RegionName = "CR_nonISR_SS_ee";
         element.setOfChannel.clear();
@@ -1101,7 +1102,7 @@ void analysis1()
         RegionInfo.push_back(element);
         
         //SS_mumu
-        element.isSS_ee = false;
+        element.isSS_qF = false;
         
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
@@ -1175,13 +1176,13 @@ void analysis1()
                             element.RegionName += lepton[m];
                             
                             element.isSS = true;
-                            element.isSS_ee = m==0;
+                            element.isSS_qF = (m==0 || m==2);
                             
                             const unsigned int ChannelIndex = 3 +6*i +m;
                             element.setOfChannel.clear();
                             element.setOfChannel.push_back(ChannelIndex);
                             element.qFChannel.clear();
-                            if(element.isSS_ee) element.qFChannel.push_back(ChannelIndex-3);
+                            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
                             
                             element.showData = !element.isSS;
                             element.showSignificance = element.isSS;
@@ -1199,7 +1200,7 @@ void analysis1()
             //cout<<RegionInfo[RegionIndex].RegionName.Data()<<", Cut: "<<RegionInfo[RegionIndex].Cut.Data()<<endl;
             if(RegionInfo[RegionIndex].isSS)
             {
-                if(RegionInfo[RegionIndex].isSS_ee)
+                if(RegionInfo[RegionIndex].isSS_qF)
                 {
                     if(docfw)
                     {
@@ -1312,7 +1313,7 @@ void analysis1()
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
             
             std::vector<TChain*> tree2DataOS;
-            if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+            if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
  
             const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
@@ -1484,7 +1485,7 @@ void analysis1()
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
                 delete tree2Data[i];
-                if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
+                if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
             }
             for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
@@ -1753,7 +1754,7 @@ void analysis1()
         element.push_back(hTemp);
         
         //charge flip
-        if(i==0 || i==3)
+        if(i!=1)
         {
             for(unsigned int j=0;j<BGDataGroupData.size();j++)
             {
@@ -1915,7 +1916,7 @@ void analysis1()
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
         
         std::vector<TChain*> tree2DataOS;
-        if(RegionInfo[RegionIndex].isSS_ee) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+        if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -2364,7 +2365,7 @@ void analysis1()
                     fout_SR<<setprecision(1)<<std::fixed;
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
-                        if(!RegionInfo[RegionIndex].isSS_ee && j==2) fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
+                        if(!RegionInfo[RegionIndex].isSS_qF && j==2) fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
                         
                         fout_SR<<std::setw(8)<<sumOfEvent[j][0];
                         fout_SR<<"+/-";
@@ -2735,7 +2736,7 @@ void analysis1()
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
             delete tree2Data[i];
-            if(RegionInfo[RegionIndex].isSS_ee) delete tree2DataOS[i];
+            if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
         }
         for(unsigned int j=0;j<tree2BGMC.size();j++)
         {
@@ -2798,7 +2799,7 @@ void analysis1()
         //h2SRBG
         h2SRBG[3][0]->Add(h2SRBG[i][0]);
         h2SRBG[3][1]->Add(h2SRBG[i][1]);
-        if(i==0)
+        if(i==0 || i==2)
         {
             h2SRBG[3][2]->Add(h2SRBG[i][2]);
             h2SRBG[3][3]->Add(h2SRBG[i][3]);
@@ -2842,7 +2843,7 @@ void analysis1()
                 if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
             }
             
-            if(i==0 || i==3)
+            if(i!=1)
             {
                 for(unsigned int j=0;j<BGDataGroupData.size();j++)
                 {
@@ -2893,8 +2894,9 @@ void analysis1()
         else if(i==2)
         {
             //emu
-            stackSR[i].Add(h2SRBG[i][1]);
             stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][1]);
+            stackSR[i].Add(h2SRBG[i][3]);
             stackSR[i].Add(h2SRBG[i][2]);
         }
         else if(i==3)
