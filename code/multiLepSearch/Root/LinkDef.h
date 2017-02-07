@@ -7,10 +7,6 @@
 
 #include <multiLepSearch/obj_def.h>
 #include <multiLepSearch/susyEvts.h>
-#include <multiLepSearch/ljetEvts.h>
-// #include <multiLepSearch/anaHelper.h>
-#include <multiLepSearch/ljetSelection.h>
-#include <multiLepSearch/evtSelection.h>
 #include <multiLepSearch/dilepSelection.h>
 #include <multiLepSearch/dilep_objDef.h>
 #include <vector>
@@ -25,8 +21,6 @@
 #endif
 
 #ifdef __CINT__
-#pragma link C++ class evtSelection+;
-#pragma link C++ class ljetSelection+;
 #pragma link C++ class dilepSelection+;
 // #pragma link C++ class anaHelper+;
 #endif
