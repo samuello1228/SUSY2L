@@ -1380,12 +1380,12 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.matchI = -1;
   t.motherI = -1;
 
+  /*
   std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
   res = m_truthClassifier->particleTruthClassifier(p);
   t.particleType = res.first;
   t.particleOrigin = res.second;
-
-
+  */
 
   /// add parents if exist
   if(pLevel){

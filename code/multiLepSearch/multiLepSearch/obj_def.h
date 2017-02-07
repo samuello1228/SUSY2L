@@ -86,10 +86,8 @@ struct TR_PAR:PAR0{
   int barcode;
   int motherI;
   int matchI;
-  int particleType;
-  int particleOrigin;
 };
-const string TR_PAR_s = PAR0_s+"pdgId/I:barcode/I:motherI/I:matchI/I:particleType/I:particleOrigin/I";
+const string TR_PAR_s = PAR0_s+"pdgId/I:barcode/I:motherI/I:matchI/I";
 
 enum FLAGS{
   PASS_GRL = 1<<0,
