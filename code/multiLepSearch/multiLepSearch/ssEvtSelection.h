@@ -133,7 +133,6 @@ public:
   std::vector<susyEvts*   > m_susyEvtList; //!
   susyEvts* m_susyEvt; //!
   ST::SUSYObjDef_xAOD* m_objTool; //!
-  SUSY::CrossSectionDB* m_XsecDB;  //!
 //   CP::MuonSelectionTool* m_muonSelTool; //!
 
   ChargeFlipBkgTool* mChargeFlipBkgTool; //!

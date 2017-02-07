@@ -81,18 +81,11 @@ struct J_PAR:PAR{
 const string J_PAR_s = PAR_s+":jFlag/I:e/F";
 
 struct EVT{
-  unsigned long int run;
   unsigned long int event;
-  unsigned long int lumiBlock;
   unsigned long int actualMu;
-  unsigned int index;
-  unsigned int cuts;
-  unsigned int trig;
   unsigned int isMC;
   int flag;
-  int pass;
   float averageMu;
-  float Xsec;
   float weight;
   float pwt;
   float ElSF;
@@ -101,7 +94,7 @@ struct EVT{
   float qFwt;
   float fLwt;
  };
-const string EVT_s = "run/l:event/l:lumiBlock/l:actualMu/l:index/i:cuts/i:trig/i:isMC/i:flag/I:pass/I:averageMu/F:Xsec/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:fLwt/F";
+const string EVT_s = "event/l:actualMu/l:isMC/i:flag/I:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:fLwt/F";
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
   float Met;

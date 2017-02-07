@@ -63,7 +63,7 @@ ClassImp(ssEvtSelection)
 
 
 
-ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB(0),m_grl(0),mh_ElChargeFlip(0){
+ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0),mh_ElChargeFlip(0){
   // Here you put any code for the base initialization of variables,
   // e.g. initialize all pointers to 0.  Note that you should only put
   // the most basic initialization here, since this method will be
@@ -363,9 +363,6 @@ EL::StatusCode ssEvtSelection :: initialize ()
   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
   Info("chargeMisID", "nbinsX = %d", mh_ElChargeFlip->GetNbinsX());
-
-  //cross section tool
-  if(CF_isMC) m_XsecDB = new SUSY::CrossSectionDB("SUSYTools/susy_crosssections_13TeV.txt",true);
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -754,17 +751,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     ////////////////////////
     
     //unused variables
-    m_susyEvt->evt.index = 0;
-    m_susyEvt->evt.cuts = 0;
-    m_susyEvt->evt.pass = 0;
     m_susyEvt->sig.nEl = 0;
     m_susyEvt->sig.nMu = 0;
     m_susyEvt->sig.nTau = 0;
 
     //event information
-    m_susyEvt->evt.run = eventInfo->runNumber();
+    //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
-    m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
+    //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
@@ -810,9 +804,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
-
-    //cross section
-    if(CF_isMC) m_susyEvt->evt.Xsec = m_XsecDB->xsectTimesEff(eventInfo->mcChannelNumber());
 
     /// met
     xAOD::MissingETContainer* metcst = new xAOD::MissingETContainer();
@@ -889,13 +880,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
 
 
-    m_susyEvt->evt.trig = 0;
+    unsigned int dilepFlag = 0;
     //for cutflow
     for(unsigned int i=0;i<electrons_copy->size(); i++){
       for(unsigned int j=i+1;j<electrons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<0;
+          dilepFlag |= 1<<0;
         }
       }
     }
@@ -904,7 +895,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=i+1;j<muons_copy->size(); j++){
         if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<1;
+          dilepFlag |= 1<<1;
         }
       }
     }
@@ -913,7 +904,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=0;j<muons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<2;
+          dilepFlag |= 1<<2;
         }
       }
     }
@@ -922,7 +913,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     {
         if(totLs == 2 && sig_Ls.size() == 2)
         {
-          if(m_susyEvt->evt.trig > 0)
+          if(dilepFlag > 0)
           {
             m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
           }
@@ -938,7 +929,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         }      
         else if(totLs == 3 && sig_Ls.size() == 3)
         {
-          if(m_susyEvt->evt.trig > 0)
+          if(dilepFlag > 0)
           {
             m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
           }
