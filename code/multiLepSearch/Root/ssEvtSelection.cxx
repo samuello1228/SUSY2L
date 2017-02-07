@@ -47,12 +47,12 @@ static SG::AuxElement::Accessor<char> dec_bjet_loose("bjet_loose");
 static SG::AuxElement::Accessor<char> dec_bjet("bjet");
 static SG::AuxElement::Accessor<char> dec_cosmic("cosmic");
 typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
-static SG::AuxElement::Accessor< int > acc_truthType("truthType");
-static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
+//static SG::AuxElement::Accessor< int > acc_truthType("truthType");
+//static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
 // static SG::AuxElement::Accessor< float > acc_truthProb("truthMatchProbability"); // only ID track
 static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
-static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
-static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
+//static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
+//static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
 
 const float iGeV = 0.001;
 const float GeV = 1000;
@@ -862,7 +862,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       fillLepton(sel_Ls[i], m_susyEvt->leps[i], i);
       m_susyEvt->leps[i].MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
-      if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
+      //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
       m_susyEvt->leps[i].mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
@@ -1160,16 +1160,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 {
   l.ID = 11000;
   l.ID *= el->charge();
-  l.author = el->author();
+  //l.author = el->author();
 
   //isolation
-  if(!el->isolationValue(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(el)", "topoetcone20 failed."); 
-  if(!el->isolationValue(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(el)", "topoetcone30 failed."); 
-  if(!el->isolationValue(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(el)", "topoetcone40 failed."); 
-  if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
-  if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
-  if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
+  //if(!el->isolationValue(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(el)", "topoetcone20 failed."); 
+  //if(!el->isolationValue(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(el)", "topoetcone30 failed."); 
+  //if(!el->isolationValue(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(el)", "topoetcone40 failed."); 
+  //if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
+  //if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
+  //if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
 
+  /*
   //track
   const xAOD::TrackParticle* trk = el->trackParticle(0);
   if(trk)
@@ -1188,12 +1189,13 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   //l.nSCTHoles    =el->trackParticleSummaryIntValue(numberOfSCTHoles);
   l.nTRTHits     =el->trackParticleSummaryIntValue(numberOfTRTHits);
   l.nTRTOutliers =el->trackParticleSummaryIntValue(numberOfTRTOutliers);
-  
+  */
+
   if(CF_isMC)
   {
     if (mcTruthMatch == "TruthLink") {
-      l.truthType = acc_truthType(*el);
-      l.truthOrig = acc_truthOrig(*el);
+      //l.truthType = acc_truthType(*el);
+      //l.truthOrig = acc_truthOrig(*el);
 
       /// save truth match and parents if exist, otherwise save -1.
       auto tl = acc_truthLink(*el);
@@ -1211,11 +1213,11 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
 
     else if (mcTruthMatch == "MCTC"){
-      std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      res = m_truthClassifier->particleTruthClassifier(el);
+      //std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+      //res = m_truthClassifier->particleTruthClassifier(el);
 
-      l.truthType = res.first;
-      l.truthOrig = res.second;
+      //l.truthType = res.first;
+      //l.truthOrig = res.second;
 
       auto truthP = m_truthClassifier->getGenPart();
       if (truthP) {
@@ -1269,16 +1271,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
 {
   l.ID = 13000;
   l.ID *= mu->charge();
-  l.author = mu->author();
+  //l.author = mu->author();
 
   //isolation
-  if(!mu->isolation(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(mu)", "topoetcone20 failed."); 
-  if(!mu->isolation(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(mu)", "topoetcone30 failed."); 
-  if(!mu->isolation(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(mu)", "topoetcone40 failed."); 
-  if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
-  if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
-  if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
+  //if(!mu->isolation(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(mu)", "topoetcone20 failed."); 
+  //if(!mu->isolation(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(mu)", "topoetcone30 failed."); 
+  //if(!mu->isolation(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(mu)", "topoetcone40 failed."); 
+  //if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
+  //if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
+  //if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
 
+  /*
   //track
   const xAOD::TrackParticle* trk = mu->primaryTrackParticle();
   if(trk)
@@ -1298,14 +1301,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   l.nSCTHoles   = mu->summaryValue(n, numberOfSCTHoles)   ?n:0;
   l.nTRTHits    = mu->summaryValue(n, numberOfTRTHits)    ?n:0;
   l.nTRTOutliers= mu->summaryValue(n, numberOfTRTOutliers)?n:0;
+  */
 
   /// truth
   if(CF_isMC)
   {
+    /*
     if(trk){
-    l.truthType = acc_truthType(*trk);
-    l.truthOrig = acc_truthOrig(*trk);
+      l.truthType = acc_truthType(*trk);
+      l.truthOrig = acc_truthOrig(*trk);
     }
+    */
 
     /// save truth match and parents if exist, otherwise save -1.
     auto tl = acc_truthLink(*mu);
@@ -1325,24 +1331,12 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
 
 void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
 {
-  l.topoetcone20 *= iGeV;
-  l.topoetcone30 *= iGeV;
-  l.topoetcone40 *= iGeV;
-  l.ptcone20 *= iGeV;
-  l.ptcone30 *= iGeV;
-  l.ptcone40 *= iGeV;
-
-  //unused variables
-  l.truthProb = 0;
-  l.SF_Loose = 0;
-  l.SF_Medium = 0;
-  l.SF_Tight = 0;
-  l.wt1 = 0;
-  l.wt2 = 0;
-  l.wt3 = 0;
-  l.Q = 0;
-  l.wt2 = 0;
-  l.wt2 = 0;
+  //l.topoetcone20 *= iGeV;
+  //l.topoetcone30 *= iGeV;
+  //l.topoetcone40 *= iGeV;
+  //l.ptcone20 *= iGeV;
+  //l.ptcone30 *= iGeV;
+  //l.ptcone40 *= iGeV;
 
   // 
   l.pt = p->pt()*iGeV;
@@ -1356,8 +1350,8 @@ void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
   if(dec_signal(*p)) flag |= IS_SIGNAL;
   if(dec_passOR(*p)) flag |= IS_PASSOR;
 
-  l.z0sinTheta = dec_z0sinTheta(*p);
-  l.d0sig = dec_d0sig(*p);
+  //l.z0sinTheta = dec_z0sinTheta(*p);
+  //l.d0sig = dec_d0sig(*p);
 }
 
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsigned int index)
