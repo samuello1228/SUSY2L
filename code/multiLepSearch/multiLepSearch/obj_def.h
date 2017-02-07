@@ -71,14 +71,8 @@ struct SIGNATURE{
   float MetY;
   float mT2;
   float HT;
-  unsigned nEl;
-  unsigned nMu;
-  unsigned nTau;
-  unsigned nJet;
-  unsigned nPV;
-  unsigned nVtx;
 };
-const string SIGNATURE_s = "trigCode/l:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT:nEl/i:nMu/i:nTau/i:nJet/i:nPV/i:nVtx/i";
+const string SIGNATURE_s = "trigCode/l:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F";
 
 struct TR_PAR:PAR0{
   int pdgId; 

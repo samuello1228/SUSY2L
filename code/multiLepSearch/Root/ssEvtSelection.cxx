@@ -499,12 +499,12 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_hCutFlow->Fill("CoreFlag", 1);
 
     // Primary vertex
-    m_susyEvt->sig.nPV=0;
-    m_susyEvt->sig.nVtx=0;
+    unsigned int nPV=0;
+    //m_susyEvt->sig.nVtx=0;
     const xAOD::VertexContainer* vertices(0);
     if( wk()->xaodEvent()->retrieve( vertices, "PrimaryVertices" ).isSuccess() ) {
       for( const auto& vx : *vertices ) {
-        m_susyEvt->sig.nVtx++;
+        //m_susyEvt->sig.nVtx++;
         if(vx->vertexType() != xAOD::VxType::PriVtx) continue;
         int nTrk = 0;
         for(size_t i=0; i<vx->nTrackParticles(); i++){
@@ -512,13 +512,13 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(trk && trk->pt()>CF_vxTrkPtMin) nTrk++;
         }
         if(nTrk<CF_vxTrkNMin) continue;
-        m_susyEvt->sig.nPV++;
+        nPV++;
       }
     }else{
       Error("Failed to retrieve VertexContainer %s, returning NULL", "PrimaryVertices");
     }
 
-    if(m_susyEvt->sig.nPV<1) return sc;
+    if(nPV<1) return sc;
     m_hCutFlow->Fill("PV", 1);
 
     CHECK(m_objTool->ApplyPRWTool());
@@ -750,11 +750,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Save informations
     ////////////////////////
     
-    //unused variables
-    m_susyEvt->sig.nEl = 0;
-    m_susyEvt->sig.nMu = 0;
-    m_susyEvt->sig.nTau = 0;
-
     //event information
     //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
@@ -827,7 +822,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
 
     m_susyEvt->sig.HT = 0;
-    m_susyEvt->sig.nJet = jet_Ls.size();
+    //m_susyEvt->sig.nJet = jet_Ls.size();
     m_susyEvt->jets.resize(jet_Ls.size());
     int nSigJet = 0;
     int nBJet = 0;
