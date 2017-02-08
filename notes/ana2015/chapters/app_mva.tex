@@ -167,6 +167,39 @@ The distribution of the BDT input for signal and background samples are show in 
 \end{figure}
 
 %FIXME should use Gabriels setting from overtain study
+\FloatBarrier
+\subsection{BDT parameter selection}
+In order to find the best performing BDT parameters, a scan of different BDT parameters were done in various channels for each mass splitting. 
+
+\subsubsection*{Channels}
+\begin{itemize}
+\item $\Delta m$ = 20, 50, 100 GeV
+\item ISR or noISR
+\item ee or $\mu\mu$ or e$\mu$ or SF or all flavors
+\end{itemize}
+
+\subsubsection*{BDT parameters scanned}
+\begin{itemize}
+\item NTrees = 100, 200, 400, 600
+\item TreeDepth = 2, 3, 4, 5
+\item MinNodeSize = 5\%, 7\%, 10\%
+\end{itemize}
+
+\subsubsection*{Samples used}
+The backgrounds were derived from the MC samples and data-driven methods as specified in a previous part of this appendix. 
+
+The signal samples with the same mass splitting were used to train the respective BDTs in order to maximize the number of available signal samples for training.
+
+\input{chapters/app_mva_files.tex}
+\normalsize
+
+\subsubsection*{Overtraining checks}
+The BDT response curves (an example of which is shown in Fig ) were required to pass the Kolmogorov-Smirnov test. The distributions must return a KS p-value of between 0.05 and 0.95, which corresponds to $2\sigma$ exclusion.
+
+ 
+
+
+\FloatBarrier
 \subsection{Training}
 Configuration\\
 We have chosen the following setting for the BDTD algo:
