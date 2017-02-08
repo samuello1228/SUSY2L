@@ -1,3 +1,9 @@
+data15_13TeV.periodD.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodE.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodF.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodG.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodH.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodJ.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
 data16_13TeV.00297730.physics_Main.merge.DAOD_SUSY2.f694_m1583_p2880
 data16_13TeV.00298595.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
 data16_13TeV.00298609.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
