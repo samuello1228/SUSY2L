@@ -24,7 +24,7 @@
 #Vgamma          Z(ee)+gamma             Sherpa                  301535,301899-301901
 #Vgamma          Z(mm)+gamma             Sherpa                  301536,301902-301904
 #Vgamma          Z(tt)+gamma             Sherpa                  301905-301907       
-#Vgamma          W+gamma                 Sherpa                  301887-301898
+#Vgamma          W+gamma                 Sherpa                  301890-301898
 #
 #top             ttbar                   PowhegPythia8EvtGen     410000
 #top             Wt                      PowhegPythia8EvtGen     410015,410016 
