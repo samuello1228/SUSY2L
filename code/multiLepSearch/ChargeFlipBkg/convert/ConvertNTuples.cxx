@@ -24,12 +24,13 @@
 #include "TLorentzVector.h"
 #include "TString.h"
 #include "TPRegexp.h"
+#include "TChain.h"
 
 using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = true;
+bool isMC = false;
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -147,7 +148,7 @@ int getOrigElecI(const susyEvts* mEvts, int i){
 bool convert(TString file){
 
   TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
-  TPRegexp reFile("user.clo.[0-9]{7}._[0-9]{6}.myOutput.root.?[0-9]?$");
+  TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
   // TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
   // TPRegexp reFile("user.ggallard.[0-9]{7}._[0-9]{6}.myOutput.root.?[0-9]?$");
   outDir = file(reDir).Data();
@@ -179,7 +180,6 @@ bool convert(TString file){
   float MCPileupWeight; 
   float Zcand_M; 
   unsigned long int trigCode;
-  unsigned int cuts;
 
   // Electron 1
   int elCand1_charge; 
@@ -197,15 +197,11 @@ bool convert(TString file){
   float elCand2_phi;
   float elCand2_E;
   int elCand2_ID;
-  bool elCand1_qID;
+  bool elCand2_qID;
 
   // Variables for cuts (SUSY)
   int elCand1_flag;
   int elCand2_flag; 
-
-  // Variables for cuts (both)
-  float elCand1_d0significance;  // = d0 / sig_d0 
-  float elCand2_d0significance; 
 
   // Truth pt
   float elCand1_truthPt;
@@ -235,7 +231,6 @@ bool convert(TString file){
   NEWBRANCH(MCPileupWeight, F);
   NEWBRANCH(Zcand_M, F);
   NEWBRANCH(trigCode,l);
-  NEWBRANCH(cuts,i);
 
   NEWBRANCH(elCand1_charge, I);
   NEWBRANCH(elCand1_pt, F);
@@ -255,9 +250,6 @@ bool convert(TString file){
 
   NEWBRANCH(elCand1_flag,I);
   NEWBRANCH(elCand2_flag,I);
-  NEWBRANCH(elCand1_d0significance, F);
-  NEWBRANCH(elCand2_d0significance, F);
-
   
   NEWBRANCH(elCand1_truthPt,F);
   NEWBRANCH(elCand2_truthPt,F);
@@ -289,7 +281,7 @@ bool convert(TString file){
   for(long int i=0; i<nEntries; i++){
     loadbar(i+1,nEntries);
     mEvts->GetEntry(i);
-
+    
     // Require exactly two leptons, and the leptons are electrons
     if(mEvts->leps.size()!=2) continue;
     if (int(fabs(mEvts->leps[0].ID/1000))!=11 || int(fabs(mEvts->leps[1].ID/1000))!=11) continue;
@@ -297,13 +289,11 @@ bool convert(TString file){
     MCEvtWeight = mEvts->evt.weight*mEvts->evt.ElSF*mEvts->evt.MuSF;
     MCPileupWeight = mEvts->evt.pwt;
     trigCode = mEvts->sig.trigCode;
-    cuts = mEvts->evt.cuts;
 
     elCand1_pt = mEvts->leps[0].pt;
     elCand1_cl_eta = mEvts->leps[0].eta;
     elCand1_charge = (mEvts->leps[0].ID > 0) - (mEvts->leps[0].ID < 0); // Charge = sign(ID)
     elCand1_flag = mEvts->leps[0].lFlag;
-    elCand1_d0significance = mEvts->leps[0].d0/mEvts->leps[0].d0Err;
     elCand1_phi = mEvts->leps[0].phi;
     elCand1_ID = mEvts->leps[0].ID;
     elCand1_E = pt2E(elCand1_pt, elCand1_cl_eta);
@@ -337,7 +327,6 @@ bool convert(TString file){
     elCand2_cl_eta = mEvts->leps[1].eta;
     elCand2_charge = (mEvts->leps[1].ID > 0) - (mEvts->leps[1].ID < 0); // Charge = sign(ID)
     elCand2_flag = mEvts->leps[1].lFlag;
-    elCand2_d0significance = mEvts->leps[1].d0/mEvts->leps[1].d0Err;
     elCand2_phi = mEvts->leps[1].phi;
     elCand2_ID = mEvts->leps[1].ID;
     elCand2_E = pt2E(elCand2_pt, elCand2_cl_eta);
