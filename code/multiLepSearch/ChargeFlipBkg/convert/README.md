@@ -1,5 +1,5 @@
 # README: ConvertNTuples 
-Last update: 7 September 2016
+Last update: 10 January 2017 
 
 Part of the [ChargeFlipBkg](../) code package developed by Gabriel Gallardo for the UM/HK EWK SUSY SS 2L analysis. 
 
@@ -10,7 +10,7 @@ Takes UM/HK SUSY NTuples as input and creates NTuples of an [acceptable format](
 ## Execution
 
 ### STEP 1: List files in text file 
-Do not specify full path, just the filenames
+Paths such as `root://eosatlas/eos/atlas/user/...` are acceptable
 ```sh
 find /path/to/root/files > convert/myFiles.txt
 ```
@@ -21,7 +21,7 @@ Example entry:
 mc: $(PROG) myFiles.txt
     ./$(PROG) myFiles.txt /full/path/to/destination/
 ```
-
+Check also that the `isMC` falg is properly set in ConvertNTuples
 ### STEP 3: Convert NTuples
 Following the previous example:
 `make mc`
@@ -32,7 +32,6 @@ float MCEvtWeight;
 float MCPileupWeight; 
 float Zcand_M; 
 unsigned long int trigCode;
-unsigned int cuts;
 
 // Electron 1
 int elCand1_charge; 
@@ -41,6 +40,7 @@ float elCand1_cl_eta;
 float elCand1_phi;
 float elCand1_E;
 int elCand1_ID;
+int elCand1_qID; // true if passes CFT
 
 // Electron 2
 int elCand2_charge; 
@@ -49,14 +49,13 @@ float elCand2_cl_eta;
 float elCand2_phi;
 float elCand2_E;
 int elCand2_ID;
+int elCand2_qID; // true if passes CFT
 
 // Variables for cuts (SUSY)
 int elCand1_flag;
 int elCand2_flag; 
 
 // Variables for cuts (both)
-float elCand1_d0significance;  // = d0 / sig_d0 
-float elCand2_d0significance; 
 
 // Truth pt
 float elCand1_truthPt;
