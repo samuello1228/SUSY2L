@@ -1,4 +1,4 @@
-#include "susyEvts.h"
+#include "multiLepSearch/susyEvts.h"
 
 TTree* susyEvts::makeTree(TString treename)
 {
@@ -12,22 +12,91 @@ TTree* susyEvts::makeTree(TString treename)
   return tree2;
 }
 
-void susyEvts::getTree(TChain* tr)
+TTree* susyEvts::makeWeightOnlyTree(TString treename, susyEvts* parent)
+{
+  // Make a Tree with only the "evt" branch which store varied event weights (due to applied systematics)
+  // other branch contents are identical to the parent NominalTree
+  tree2 = new TTree(treename, "a angles tree");
+  tree2->Branch("evt", &evt, EVT_s.c_str());
+
+  if      (parent->tree2){ 
+    tree2->SetDirectory(parent->tree2->GetDirectory());
+    tree2->AddFriend( parent->tree2 );
+  }
+  else if (parent->tree1){ 
+    //why tree1 and tree2...
+    tree2->SetDirectory(parent->tree1->GetDirectory());
+    tree2->AddFriend( parent->tree1 );
+  } 
+
+  return tree2;
+}
+
+TTree* susyEvts::makePtCorrTree(TString treename, susyEvts* parent)
+{
+  // Make a Tree for Charge flip weight and PtCorrection
+  // "evt" for weight
+  // "leps" for the changed pt
+  // "l12" for the new l12.m as lepton pt changed
+  // "sig" for the new HT, mT2 var as lepton pt changed
+  // other branch contents are identical to the parent NominalTree
+  tree2 = new TTree(treename, "a angles tree");
+  tree2->Branch("evt", &evt, EVT_s.c_str());
+  tree2->Branch("leps", &vleps);
+  tree2->Branch("l12", &l12, R_PAR_s.c_str());
+  tree2->Branch("sig", &sig, SIGNATURE_s.c_str());
+
+  if      (parent->tree2){ 
+    tree2->SetDirectory(parent->tree2->GetDirectory());
+    tree2->AddFriend( parent->tree2 );
+  }
+  else if (parent->tree1){ 
+    //why tree1 and tree2...
+    tree2->SetDirectory(parent->tree1->GetDirectory());
+    tree2->AddFriend( parent->tree1 );
+  } 
+
+  return tree2;
+}
+
+TTree* susyEvts::makeKinematicsSysTree(TString treename, susyEvts* parent)
+{
+  // Make a Tree with every field
+  // except the truth branch contents are identical to the parent NominalTree
+  tree2 = new TTree(treename, "a angles tree");
+  tree2->Branch("evt", &evt, EVT_s.c_str());
+  tree2->Branch("leps", &vleps);
+  tree2->Branch("l12", &l12, R_PAR_s.c_str());
+  tree2->Branch("jets", &vjets);
+  tree2->Branch("sig", &sig, SIGNATURE_s.c_str());
+
+  if      (parent->tree2){ 
+    tree2->SetDirectory(parent->tree2->GetDirectory());
+    tree2->AddFriend( parent->tree2 );
+  }
+  else if (parent->tree1){ 
+    //why tree1 and tree2...
+    tree2->SetDirectory(parent->tree1->GetDirectory());
+    tree2->AddFriend( parent->tree1 );
+  } 
+
+  return tree2;
+}
+
+void susyEvts::getTree(TTree* tr)
 {
   tree1 = tr;
-  tree1->SetBranchAddress("evt", &evt);
+  tree1->SetBranchAddress("evt", (ULong64_t*)&evt); //no idea why have to match 1st data member of EVT in obj_def.h
   tree1->SetBranchAddress("leps", &vleps);
-  tree1->SetBranchAddress("l12", &l12);
+  tree1->SetBranchAddress("l12", (float*)&l12);
   tree1->SetBranchAddress("jets", &vjets);
   tree1->SetBranchAddress("truths", &vtruths);
-  tree1->SetBranchAddress("sig", &sig);
+  tree1->SetBranchAddress("sig", (ULong64_t*)&sig);
 }
 
 Int_t susyEvts::Next(){
-  if(m_el == m_elist->GetN()) return -1;
-  Int_t treenum=0;
-  Long64_t treeEntry = m_elist->GetEntryAndTree(m_el,treenum);
-  Long64_t chainEntry = treeEntry+tree1->GetTreeOffset()[treenum];
+  if(m_el >= tree1->GetEntriesFast()) return -1;
+  int readBytes = tree1->GetEntry(m_el);
   m_el++;
-  return tree1->GetEntry(chainEntry);
+  return readBytes;
 }

@@ -147,7 +147,7 @@ int getOrigElecI(const susyEvts* mEvts, int i){
 bool convert(TString file){
 
   TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
-  TPRegexp reFile("user.clo.[0-9]{7}._[0-9]{6}.myOutput.root$");
+  TPRegexp reFile("user.clo.[0-9]{7}._[0-9]{6}.myOutput.root.?[0-9]?$");
   // TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
   // TPRegexp reFile("user.ggallard.[0-9]{7}._[0-9]{6}.myOutput.root.?[0-9]?$");
   outDir = file(reDir).Data();
@@ -188,6 +188,7 @@ bool convert(TString file){
   float elCand1_phi;
   float elCand1_E;
   int elCand1_ID;
+  bool elCand1_qID;
 
   // Electron 2
   int elCand2_charge; 
@@ -196,6 +197,7 @@ bool convert(TString file){
   float elCand2_phi;
   float elCand2_E;
   int elCand2_ID;
+  bool elCand1_qID;
 
   // Variables for cuts (SUSY)
   int elCand1_flag;
@@ -241,6 +243,7 @@ bool convert(TString file){
   NEWBRANCH(elCand1_phi, F);
   NEWBRANCH(elCand1_E, F);
   NEWBRANCH(elCand1_ID,I);
+  NEWBRANCH(elCand1_qID,O);
 
   NEWBRANCH(elCand2_charge, I);
   NEWBRANCH(elCand2_pt, F);
@@ -248,6 +251,7 @@ bool convert(TString file){
   NEWBRANCH(elCand2_phi, F);
   NEWBRANCH(elCand2_E, F);
   NEWBRANCH(elCand2_ID,I);
+  NEWBRANCH(elCand2_qID,O);
 
   NEWBRANCH(elCand1_flag,I);
   NEWBRANCH(elCand2_flag,I);
@@ -303,7 +307,7 @@ bool convert(TString file){
     elCand1_phi = mEvts->leps[0].phi;
     elCand1_ID = mEvts->leps[0].ID;
     elCand1_E = pt2E(elCand1_pt, elCand1_cl_eta);
-
+    elCand1_qID = mEvts->leps[0].ElChargeID;
     TLorentzVector p1;
     p1.SetPtEtaPhiM(elCand1_pt, elCand1_cl_eta, elCand1_phi, 0.000511);
 
@@ -337,6 +341,7 @@ bool convert(TString file){
     elCand2_phi = mEvts->leps[1].phi;
     elCand2_ID = mEvts->leps[1].ID;
     elCand2_E = pt2E(elCand2_pt, elCand2_cl_eta);
+    elCand2_qID = mEvts->leps[1].ElChargeID;
 
     TLorentzVector p2;
     p2.SetPtEtaPhiM(elCand2_pt, elCand2_cl_eta, elCand2_phi, 0.000511);
