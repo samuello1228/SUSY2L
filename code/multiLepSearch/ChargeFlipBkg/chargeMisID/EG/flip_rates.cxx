@@ -115,7 +115,6 @@ public:
   float Zcand_M;
 
   unsigned long int trigCode;
-  unsigned int cuts;
   
   // Electron 1
   int elCand1_charge;
@@ -216,7 +215,6 @@ void connect_input(Input &ip, TChain &events) {
     CONNECT(elCand1_flag);
     CONNECT(elCand2_flag);
     CONNECT(trigCode);
-    CONNECT(cuts);
     CONNECT(elCand1_ID);
     CONNECT(elCand2_ID);
     CONNECT(elCand1_origCharge);
@@ -615,7 +613,6 @@ void binData(TChain &events,
       CUTFLOW(0);
 
       if(ip.trigCode<=0) continue;
-      // if(ip.cuts!=1) continue;
 
       // Select electrons only
       if (int(fabs(ip.elCand1_ID/1000))!=11 || int(fabs(ip.elCand2_ID/1000))!=11) continue;
@@ -869,13 +866,6 @@ void binMC(TChain &events, Input &ip, row &etas, row &pts, float lZcand_M, float
   TH2* hN = (TH2*) hTruth->Clone("hMC_N");
   TH2* hNflipped = (TH2*) hTruth->Clone("hMC_Nflipped");
 
-  TH3* hDPT = new TH3D("hDPT", "#Delta p_{T} for all electrons;Reco |#eta|;Reco p_{T};#Delta p_{T} (GeV)", nEtaBins, EtaEdges, nPtBins, PtEdges, ndPTedges-1, dPTbins);
-
-  TH3* hDPTok = (TH3D*) hDPT->Clone("hDPTok");
-  hDPTok->SetTitle("#Delta p_{T} for charge ok electrons");
-
-  TH3* hDPTflipped = (TH3D*) hDPT->Clone("hDPTflipped");
-  hDPTflipped->SetTitle("#Delta p_{T} for charge flipped electrons");
 
   char fName[100];
   sprintf(fName, "MCTruth_%d_%d.root", (int) lZcand_M, (int) rZcand_M);
@@ -883,9 +873,6 @@ void binMC(TChain &events, Input &ip, row &etas, row &pts, float lZcand_M, float
   hTruth->SetDirectory(fOut);
   hN->SetDirectory(fOut);
   hNflipped->SetDirectory(fOut);
-  hDPT->SetDirectory(fOut);
-  hDPTok->SetDirectory(fOut);
-  hDPTok->SetDirectory(fOut);
 
 
   float elCand1_eta, elCand1_pt, elCand2_eta, elCand2_pt, Zcand_M;
@@ -929,10 +916,6 @@ void binMC(TChain &events, Input &ip, row &etas, row &pts, float lZcand_M, float
       if(ip.elCand2_origCharge != ip.elCand2_charge) hNflipped->Fill(elCand2_eta, elCand2_pt, weight);
     }
 
-    double deltaPt = evt2lTree.leps_pt[i] - evt2lTree.truths_pt[tp];
-    hDPT->Fill(evt2lTree.leps_eta[i], evt2lTree.leps_pt[i], deltaPt, w);
-    if(hasFlipped) hDPTflipped->Fill(evt2lTree.leps_eta[i], evt2lTree.leps_pt[i], deltaPt, w);
-    else hDPTok->Fill(evt2lTree.leps_eta[i], evt2lTree.leps_pt[i], deltaPt, w);
   }
 
   hTruth->Sumw2();
