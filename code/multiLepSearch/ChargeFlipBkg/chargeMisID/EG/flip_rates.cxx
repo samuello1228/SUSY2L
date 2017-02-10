@@ -46,6 +46,8 @@ inputType in=SUSY;
 enum sel{LOOSEBASELINE, SIGNAL};
 sel selection=SIGNAL;
 
+bool passQID=true;
+
 //##################################
 //# Choose the bool for MC or DATA! #
 
@@ -123,7 +125,8 @@ public:
   float elCand1_phi;
   int elCand1_ID;
   int elCand1_origCharge;
-  
+  bool elCand1_qID;
+ 
   // Electron 2
   int elCand2_charge;
   float elCand2_pt;
@@ -131,7 +134,7 @@ public:
   float elCand2_phi;
   int elCand2_ID;
   int elCand2_origCharge;
-  
+  bool elCand2_qID; 
 
   // == Variables for cuts (EGamma)
   int isTagTag;
@@ -215,7 +218,8 @@ void connect_input(Input &ip, TChain &events) {
     CONNECT(elCand2_ID);
     CONNECT(elCand1_origCharge);
     CONNECT(elCand2_origCharge);
-
+    CONNECT(elCand1_qID);
+    CONNECT(elCand2_qID);
   }
 
   #undef CONNECT
@@ -505,20 +509,22 @@ void binData(TChain &events,
   std::vector<TH1D*> hEta;
   std::vector<TH1D*> hPt;
   std::vector<TH1D*> hMass;
-  TH1I* hCutflow = new TH1I("hCutflow", "Number of events passed", 8, 0, 8);
+  TH1I* hCutflow = new TH1I("hCutflow", "Number of events passed", 9, 0, 9);
   hCutflow->GetXaxis()->SetBinLabel(1, "Total");
   hCutflow->GetXaxis()->SetBinLabel(2, "Trig+GRL+2e");
   hCutflow->GetXaxis()->SetBinLabel(3, "Pass LooseBaseline");
   hCutflow->GetXaxis()->SetBinLabel(4, "Pass Signal");
-  hCutflow->GetXaxis()->SetBinLabel(5, "Zmass+SB");
-  hCutflow->GetXaxis()->SetBinLabel(6, "Zmass");
-  hCutflow->GetXaxis()->SetBinLabel(7, "Left SB");
-  hCutflow->GetXaxis()->SetBinLabel(8, "Right SB");
+  hCutflow->GetXaxis()->SetBinLabel(5, "Pass qID");
+  hCutflow->GetXaxis()->SetBinLabel(6, "Zmass+SB");
+  hCutflow->GetXaxis()->SetBinLabel(7, "Zmass");
+  hCutflow->GetXaxis()->SetBinLabel(8, "Left SB");
+  hCutflow->GetXaxis()->SetBinLabel(9, "Right SB");
 
   hEta.push_back(new TH1D("hEtaAll", "Eta distribution of all electrons", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaPreselected", "Eta distribution of preselected electrons", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaLoose", "Eta distribution of electrons in LooseBaseline pairs", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaSignal", "Eta distribution of electrons in Signal pairs", 200, -2.47, 2.47));
+  hEta.push_back(new TH1D("hEtaSignalQID", "Eta distribution of electrons in Signal pairs passing QID", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaSignalZSB", "Eta distribution of electrons in Signal pairs within Zmass+SB window", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaSignalZ", "Eta distribution of electrons in Signal pairs within Zmass window", 200, -2.47, 2.47));
   hEta.push_back(new TH1D("hEtaSignalLSB", "Eta distribution of electrons in Signal pairs within left SB", 200, -2.47, 2.47));
@@ -528,6 +534,7 @@ void binData(TChain &events,
   hPt.push_back(new TH1D("hPtPreselected", "Pt distribution of preselected electrons", 200, 20, 200));
   hPt.push_back(new TH1D("hPtLoose", "Pt distribution of electrons in LooseBaseline pairs", 200, 20, 200));
   hPt.push_back(new TH1D("hPtSignal", "Pt distribution of electrons in Signal pairs", 200, 20, 200));
+  hPt.push_back(new TH1D("hPtSignalQID", "Pt distribution of electrons in Signal pairs passing QID", 200, 20, 200));
   hPt.push_back(new TH1D("hPtSignalZSB", "Pt distribution of electrons in Signal pairs within Zmass+SB window", 200, 20, 200));
   hPt.push_back(new TH1D("hPtSignalZ", "Pt distribution of electrons in Signal pairs within Zmass window", 200, 20, 200));
   hPt.push_back(new TH1D("hPtSignalLSB", "Pt distribution of electrons in Signal pairs within left SB", 200, 20, 200));
@@ -537,6 +544,7 @@ void binData(TChain &events,
   hMass.push_back(new TH1D("hMassPreselected", "Mass distribution of preselected electrons", 200, 20, 200));
   hMass.push_back(new TH1D("hMassLoose", "Mass distribution of electrons in LooseBaseline pairs", 200, 20, 200));
   hMass.push_back(new TH1D("hMassSignal", "Mass distribution of electrons in Signal pairs", 200, 20, 200));
+  hMass.push_back(new TH1D("hMassSignalQID", "Mass distribution of electrons in Signal pairs passing QID", 200, 20, 200));
   hMass.push_back(new TH1D("hMassSignalZSB", "Mass distribution of electrons in Signal pairs within Zmass+SB window", 200, 20, 200));
   hMass.push_back(new TH1D("hMassSignalZ", "Mass distribution of electrons in Signal pairs within Zmass window", 200, 20, 200));
   hMass.push_back(new TH1D("hMassSignalLSB", "Mass distribution of electrons in Signal pairs within left SB", 200, 20, 200));
@@ -631,20 +639,23 @@ void binData(TChain &events,
         if(!((ip.elCand2_flag & 2)/2)) continue;
       }
       CUTFLOW(3);
+
+      if(passQID && !(ip.elCand1_qID && ip.elCand2_qID)) continue;
+      CUTFLOW(4);
     }
 
     //=========================================================================================
 
     if (is_out_Zcand_M(Zcand_M, lZcand_M, rZcand_M, bl, br)) continue;
 
-    CUTFLOW(4);
+    CUTFLOW(5);
 
     if (is_out_eta_pt(elCand1_eta, elCand1_pt, elCand2_eta, elCand2_pt, MINETA, MAXETA, MINPT, MAXPT))
       continue;
 
-    if(Zcand_M>=lZcand_M && Zcand_M<=rZcand_M) CUTFLOW(5);
-    if(Zcand_M>=lZcand_M-bl && Zcand_M<lZcand_M) CUTFLOW(6);
-    if(Zcand_M>rZcand_M && Zcand_M<=rZcand_M+br) CUTFLOW(7);
+    if(Zcand_M>=lZcand_M && Zcand_M<=rZcand_M) CUTFLOW(6);
+    if(Zcand_M>=lZcand_M-bl && Zcand_M<lZcand_M) CUTFLOW(7);
+    if(Zcand_M>rZcand_M && Zcand_M<=rZcand_M+br) CUTFLOW(8);
 
     bid1 = bin_id(eta_bin(elCand1_eta), pt_bin(elCand1_pt), NPT);
     bid2 = bin_id(eta_bin(elCand2_eta), pt_bin(elCand2_pt), NPT);
