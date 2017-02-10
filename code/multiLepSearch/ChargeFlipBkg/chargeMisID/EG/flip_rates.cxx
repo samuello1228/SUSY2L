@@ -154,8 +154,6 @@ public:
   int elCand2_flag;
 
   // == Variables for cuts (both)
-  float elCand1_d0significance; // = d0 / sig_d0
-  float elCand2_d0significance;
 
   // == Truth pt
   // float elCand1_truthPt;
@@ -188,8 +186,6 @@ void connect_input(Input &ip, TChain &events) {
   CONNECT(elCand2_charge);
   CONNECT(elCand2_phi);
 
-  CONNECT(elCand1_d0significance);
-  CONNECT(elCand2_d0significance);
 
   // Variables for cuts
   if(in==EGAMMA){  
