@@ -30,7 +30,7 @@ using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = false;
+bool isMC = true;
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -88,12 +88,12 @@ int getOrigElecI(const susyEvts* mEvts, int i){
     return tp;
   } else if (mEvts->truths[tp].pdgId==22){
     tempOut << "Photon found." << endl;
-    cout << flush << '\r' << tempOut.str() << flush;
+    // cout << flush << '\r' << tempOut.str() << flush;
     return -2;
   }
   else{ 
     tempOut << "Not electron" << endl;
-    cout << flush << '\r' << tempOut.str() << flush;
+    // cout << flush << '\r' << tempOut.str() << flush;
     return -1;
   }
 }
@@ -147,10 +147,10 @@ int getOrigElecI(const susyEvts* mEvts, int i){
 
 bool convert(TString file){
 
-  TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
-  TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
-  // TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
-  // TPRegexp reFile("user.ggallard.[0-9]{7}._[0-9]{6}.myOutput.root.?[0-9]?$");
+  // TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
+  // TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
+  TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
+  TPRegexp reFile("user.ggallard.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
   outDir = file(reDir).Data();
   outDir = outDir(0,outDir.First('/'));
   TString outFilename = file(reFile).Data();
