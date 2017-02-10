@@ -6,7 +6,7 @@
 #include <fstream>
 #include "../common/common.C"
 
-bool signalOnly = false;
+bool signalOnly = true;
 bool applyPRW = true;
 
 int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-MCconverted.txt"){
