@@ -1996,7 +1996,7 @@ void analysis1()
                     TString temp;
                     if(Var[VarIndex].VarName=="averageMu")
                     {
-                        temp = "averageMu/1.16";
+                        temp = "averageMu/1.09";
                     }
                     else
                     {
