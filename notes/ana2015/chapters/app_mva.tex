@@ -194,10 +194,38 @@ The signal samples with the same mass splitting were used to train the respectiv
 \normalsize
 
 \subsubsection*{Overtraining checks}
-The BDT response curves (an example of which is shown in Fig ) were required to pass the Kolmogorov-Smirnov test. The distributions must return a KS p-value of between 0.05 and 0.95, which corresponds to $2\sigma$ exclusion.
+The BDT response curves were required to pass the Kolmogorov-Smirnov test. The distributions must return a KS p-value of between 0.05 and 0.95, which corresponds to $2\sigma$ exclusion.
 
- 
+\subsubsection*{Selection of best-performing BDT parameters}
+The performances of various BDTs were listed and ordered by mass splitting, mass point, and significance (defined in this step to be $\sigma = \frac{S}{\sqrt{S+B}}$) and the parameters which gave the best sensitivity were chosen to produce the exclusion contours.
 
+\underline{For $\Delta m=20$ GeV}
+\csvreader[longtable=c c | c c c c c c c ,
+    table head = dm & $m_{C1}$ & Flavor & ISR & NTrees & MinNodeSize & Depth & BDT cut & $\sigma$\\\hline\endhead,filter equal={\csvcoliii}{20}]%
+    {figures/app/sigChecks.csv}{}%
+    {\csvcoliii & \csvcoli & \csvcolv & \csvcoliv & \csvcolvii & \csvcolviii & \csvcolix & \csvcolxiii & \csvcolxvi}
+
+\underline{For $\Delta m=50$ GeV}
+\csvreader[longtable=c c | c c c c c c c ,
+    table head = dm & $m_{C1}$ & Flavor & ISR & NTrees & MinNodeSize & Depth & BDT cut & $\sigma$\\\hline\endhead,filter equal={\csvcoliii}{50}]%
+    {figures/app/sigChecks.csv}{}%
+    {\csvcoliii & \csvcoli & \csvcolv & \csvcoliv & \csvcolvii & \csvcolviii & \csvcolix & \csvcolxiii & \csvcolxvi}
+
+    \underline{For $\Delta m=100$ GeV}
+\csvreader[longtable=c c | c c c c c c c ,
+    table head = dm & $m_{C1}$ & Flavor & ISR & NTrees & MinNodeSize & Depth & BDT cut & $\sigma$\\\hline\endhead,filter equal={\csvcoliii}{100}]%
+    {figures/app/sigChecks.csv}{}%
+    {\csvcoliii & \csvcoli & \csvcolv & \csvcoliv & \csvcolvii & \csvcolviii & \csvcolix & \csvcolxiii & \csvcolxvi}
+
+Hence the parameters summarized below were selected:
+
+\begin{tabular}{c | c c c c c c }
+\textbf{dm} & Flavor& ISR & NTrees & MinNodeSize & Depth & BDTcut\\
+\hline
+20  & comb & no & 400 & 5 & 2 & 0.42 \\ 
+50  & em &no &100 & 10 &2 & 0.5\\
+100 & comb&no &200& 10& 2 &0.4
+\end{tabular}
 
 \FloatBarrier
 \subsection{Training}
