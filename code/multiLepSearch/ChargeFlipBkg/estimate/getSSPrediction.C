@@ -26,11 +26,12 @@ TString defaultNTupleList="../common/inFileList-DataYL.txt";
 //TString defaultMisIdfile="~/ChargeFlipBkg/chargeMisID/latest/80.000000_100.000000_20.000000_20.000000_DATA.root";
 TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-TString misIDhistname="hFlipProb_stat";
+TString misIDhistname="hFlipProb_data";
 // TString misIDhistname="hFlipProb";
 TString defaultdPtfile="../common/dPT_signal.root";
 bool onlySignal=true;
 bool applyPtCorrection=true;
+bool passQID=true;
 
 // ========= INFRASTRUCTURE =========== //
 class Histos;
@@ -127,6 +128,10 @@ class Histos
 
       Ratio->Draw("p e");
       Ratio->SetDirectory(fOut);
+      
+      TLine line;
+      line.SetStyle(2);
+      line.DrawLine(RatioX->GetXmin(), 1, RatioX->GetXmax(), 1); 
 
       c->Print(name+".pdf", "Title:"+name);
    }
@@ -206,6 +211,9 @@ void getSSPrediction(const TString outputDir=defaultOut,
 
       // Select Zee events
       if(fabs(evt2lTree->l12_m - 91)>10) continue;
+
+      // Select events which pass electron ChargeFlipTagger
+      if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
 
       bool SSevent = ((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0));
 
