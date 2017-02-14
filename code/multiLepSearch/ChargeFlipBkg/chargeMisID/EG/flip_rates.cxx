@@ -906,7 +906,8 @@ void binMC(TChain &events, Input &ip, row &etas, row &pts, float lZcand_M, float
 
     if (is_out_eta_pt(elCand1_eta, elCand1_pt, elCand2_eta, elCand2_pt, -2.47, 2.47, 20, 1000))
       continue;
-
+      
+    if(passQID && !(ip.elCand1_qID && ip.elCand2_qID)) continue;
     double weight = 1;
     weight *= ip.MCEvtWeight;
     if(applyPRW) weight *= ip.MCPileupWeight;
