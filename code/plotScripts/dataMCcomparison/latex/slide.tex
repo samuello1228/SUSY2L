@@ -36,20 +36,15 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \small
-\item update the trigger list: fixed the great disagreement between Data and MC
-\item use new tool: AnalysisBase-02-04-26
-\item use new MC samples: p2879
-\item the ntuple workflow is simplified: added charge flip weight and fake lepton weight in the ntuple making process.
+\item remove unused variables in our ntuple
+\item use both 2015 and 2016 data (3212.96 + 33257.2) /pb
+\item update the prw SF for data (change from 1.16 to 1.09)
 \item Data and MC BG: \\
-/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-a73a6eda/
+/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/
 \item MC signal: \\
 /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/
-\item create a list of variables in our ntuple, please help fill in the spreadsheet: \\
-\tiny
-https://docs.google.com/spreadsheets/ \\
-d/1f20TdUDXi5nJsF9AeI18BptOintL-nSuUVUbcVmbkTU/edit\#gid=670053435
-\small
-\item add charge flip BG for emu channel
+\item understand some peak of VV BG: the pileup profiles in SUSYTools for 361071 and 361072 have problem
+\item apply Z mass veto on SR
 \end{itemize}
 \end{frame}
 
@@ -63,6 +58,13 @@ d/1f20TdUDXi5nJsF9AeI18BptOintL-nSuUVUbcVmbkTU/edit\#gid=670053435
 \caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
 \end{figure}
 \end{frame}
+
+\begin{frame}
+\frametitle{pileup profiles for VV BG (361071)}
+\includegraphics[width=0.5\textwidth]{data/photo/peak.pdf}
+\includegraphics[width=0.5\textwidth]{data/photo/zoom.pdf}
+\end{frame}
+
 
 \begin{frame}
 \begin{center}
@@ -93,13 +95,17 @@ Definition of the Signal Region.
 \item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
 \item The minimum $M_T$ of the two leptons
 \end{enumerate}
-\includegraphics[width=1\textwidth]{data/SR.png}
+\includegraphics[width=1\textwidth]{data/photo/SR.png}
 \end{frame}
 
 \begin{frame}
 \frametitle{Signal Region}
 The CMS result:
-\includegraphics[width=1\textwidth]{data/result.png}
+\includegraphics[width=1\textwidth]{data/photo/result.png}
+\end{frame}
+
+\begin{frame}
+\includegraphics[width=0.7\textwidth]{data/photo/BG.png}
 \end{frame}
 
 \def \PathToPlot {../plot}
@@ -134,15 +140,16 @@ The CMS result:
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item ?
+\item The background is still large after the Z mass veto
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item plan to remove unused variables in our ntuple.
-\item plan to calculate the systematic uncertainties
+\item use the new charge flip weight(not ready in the last week)
+\item simplify trigger list
+\item use new signal samples
 \end{itemize}
 \end{frame}
 
@@ -248,7 +255,23 @@ MGPy8EG_A14N23LO_C1N2_Slep_1000_800_0p95_2L5
 GRL (33.3 fb$^{-1}$):\\
 \tiny
 \begin{verbatim}
-physics_25ns_20.7.xml
+GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
+GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\small
+Data Sample Name(p2880 tag):
+\tiny
+\begin{verbatim}
+data15_13TeV.periodD.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodE.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodF.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodG.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodH.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodJ.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
 \end{verbatim}
 \end{frame}
 
