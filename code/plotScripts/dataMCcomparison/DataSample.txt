@@ -1,3 +1,9 @@
+periodD physics_Main 0
+periodE physics_Main 0
+periodF physics_Main 0
+periodG physics_Main 0
+periodH physics_Main 0
+periodJ physics_Main 3212.96
 00297730 physics_Main 3.357087
 00298595 physics_Main 0.291281
 00298609 physics_Main 1.945918
