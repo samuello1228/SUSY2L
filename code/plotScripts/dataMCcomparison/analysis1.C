@@ -1147,6 +1147,7 @@ void analysis1()
                         {
                             element.RegionName = "";
                             element.Cut = "";
+                            element.Cut = " && (mll<76.18 || mll>106.18)";
                             
                             element.RegionName += ISR[i];
                             
@@ -1788,7 +1789,7 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=6;RegionIndex<=6;RegionIndex++)
+    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
@@ -1996,7 +1997,7 @@ void analysis1()
                     TString temp;
                     if(Var[VarIndex].VarName=="averageMu")
                     {
-                        temp = "averageMu/1.16";
+                        temp = "averageMu/1.09";
                     }
                     else
                     {
