@@ -471,25 +471,25 @@ void analysis1()
     {
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 14;  element.upper = 27; BGMCGroupData.push_back(element);
+        element.lower = 20;  element.upper = 39; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 0;   element.upper = 13; BGMCGroupData.push_back(element);
+        element.lower = 0;   element.upper = 19; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 28;  element.upper = 41; BGMCGroupData.push_back(element);
+        element.lower = 40;  element.upper = 59; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 42;  element.upper = 42; BGMCGroupData.push_back(element);
+        element.lower = 60;  element.upper = 60; BGMCGroupData.push_back(element);
 
         element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 43;  element.upper = 44; BGMCGroupData.push_back(element);
+        element.lower = 61;  element.upper = 62; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 45;  element.upper = 55; BGMCGroupData.push_back(element);
+        element.lower = 63;  element.upper = 73; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 56;  element.upper = 75;BGMCGroupData.push_back(element);
+        element.lower = 74;  element.upper = 93;BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
