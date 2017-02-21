@@ -19,6 +19,7 @@ class Plot{
   TCanvas* pCanvas;
   TPad* pPad1;
   TPad* pPad2;
+  TString mCut;
 
   void showPlot(TString var, TH1F* h1){
 
@@ -58,11 +59,15 @@ class Plot{
     auto lg = new TLegend(0.6,0.7,0.9,0.88);
     lg->SetFillStyle(0);
     /// get histograms
-    auto hData = sData->getHistFromTree(var, h1, "");
+    auto sgData = dynamic_cast< SampleGroup* >(sData);
+    TH1F* hData(nullptr);
+    if(sgData) hData = sgData->getHistFromTree(var, h1, mCut);
+    else hData = sData->getHistFromTree(var, h1, mCut);
     lg->AddEntry(hData, sData->leg, "p");
     hData->Draw("E");
 
     bool updateData(false);
+
     /// Stack SM
     TH1F* htotal(nullptr);
     if(sSM.size()>0){
@@ -70,7 +75,13 @@ class Plot{
 
       THStack *hs = new THStack("hs","");
       for(auto& s: sSM){
-        auto hx = s->getHistFromTree(var, h1, "");
+
+        SampleGroup* sg = dynamic_cast< SampleGroup* >(s);
+        if(sg) std::cout <<  "xxxxxxxxxxxxxxxxxxxx" << std::endl;
+        TH1F* hx(nullptr);
+        if(sg) hx = sg->getHistFromTree(var, h1, mCut);
+        else hx = s->getHistFromTree(var, h1, mCut);
+
         hs->Add(hx);
         lg->AddEntry(hx, s->leg, "f");
 
@@ -89,7 +100,11 @@ class Plot{
     /// Stack SM
     if(sSig.size()>0){
       for(auto& s: sSig){
-        auto hx = s->getHistFromTree(var, h1, "");
+        auto sg = dynamic_cast< SampleGroup* >(s);
+        TH1F* hx(nullptr);
+        if(sg) hx = sg->getHistFromTree(var, h1, mCut);
+        else hx = s->getHistFromTree(var, h1, mCut);
+
         hx->Draw("histsame");
         lg->AddEntry(hx, s->leg, "l");
        }
