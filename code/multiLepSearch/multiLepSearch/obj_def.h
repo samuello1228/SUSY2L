@@ -60,9 +60,15 @@ struct EVT{
   float MuSF;
   float BtagSF;
   float qFwt;
+  float qFwt_sys_1up;
+  float qFwt_sys_1dn;
   float fLwt;
+  float fLwt_e_sys_1up;
+  float fLwt_e_sys_1dn;
+  float fLwt_u_sys_1up;
+  float fLwt_u_sys_1dn;
  };
-const string EVT_s = "event/l:actualMu/l:isMC/i:flag/I:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:fLwt/F";
+const string EVT_s = "event/l:actualMu/l:isMC/i:flag/I:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
   float Met;
