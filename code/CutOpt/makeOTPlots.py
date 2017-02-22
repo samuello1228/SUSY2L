@@ -80,9 +80,56 @@ def loadEffs():
 	effFile.close()
 	return effDict
 
+def addTreesToTMVA(fileList, isMC, isSig):
+  fileList = open(fileList,"r")
+  for aLine in fileList:
+    elements = aLine.split("#")[0]
+    if elements=="": continue
+    elements = elements.split()
+    infname = elements[0]
+    inFile = ROOT.TFile.Open( infname )
+    openedInFileList.append(inFile)
+  
+    treeWeight = 1.0
+    print infname
+
+    if isMC:
+
+      match = re.search(".[0-9]{6}.", infname)
+      if not match:
+        print "Cannot infer datasetID from filename %s , skipped" %ntupName
+        continue
+
+      sampleID = int(match.group()[1:-1])
+      mcSumW = sumWdict.get(sampleID, -1)
+      xSECxEff = -1.
+      if isSig:
+        #xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) + xsecDB.xsectTimesEff(sampleID, 127)
+        xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) #for Slep0d95 I set 125 to be actually 125+127 in SUSYTools/data
+      else:
+        xSECxEff = xsecDB.xsectTimesEff(sampleID)
+      print "mc :", sampleID, mcSumW, xSECxEff
+
+      if isSig:
+        treeWeight = 1.0 * options.inputLumi / mcSumW #treat diff SUSY scenario with equal weight
+      else:
+        treeWeight = xSECxEff * options.inputLumi / mcSumW
+  
+    if treeWeight<=0 : 
+      print "Encounter <=0 weight sample %s , skipped" % infname
+      continue
+  
+    inTree  = inFile.Get( options.nominalTreeName )
+    if inTree.GetEntries()==0: continue
+    if isSig:
+      factory.AddSignalTree( inTree, treeWeight )
+    else:
+      factory.AddBackgroundTree( inTree, treeWeight )
+
+  fileList.close()
+
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
-# luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
-luminosity = 33000
+luminosity = 33257.2
 channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
 
 if __name__ == '__main__':
