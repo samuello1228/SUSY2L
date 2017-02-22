@@ -1,0 +1,9 @@
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392833.MGPy8EG_A14N23LO_C1N2_Slep_800_750_0p95_2L5_myOutput.root/user.ychan.9201292._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392835.MGPy8EG_A14N23LO_C1N2_Slep_900_850_0p95_2L5_myOutput.root/user.ychan.9201294._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392843.MGPy8EG_A14N23LO_C1N2_Slep_400_350_0p95_2L5_myOutput.root/user.ychan.9201306._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392831.MGPy8EG_A14N23LO_C1N2_Slep_700_650_0p95_2L5_myOutput.root/user.ychan.9201290._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392853.MGPy8EG_A14N23LO_C1N2_Slep_600_550_0p95_2L5_myOutput.root/user.ychan.9201320._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392847.MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5_myOutput.root/user.ychan.9201312._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392840.MGPy8EG_A14N23LO_C1N2_Slep_300_250_0p95_2L5_myOutput.root/user.ychan.9201301._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392837.MGPy8EG_A14N23LO_C1N2_Slep_1000_950_0p95_2L5_myOutput.root/user.ychan.9201297._000001.myOutput.root
+/home/Shared/SUSY/ychan/sig/user.ychan.v7.11.MCSig.392838.MGPy8EG_A14N23LO_C1N2_Slep_200_150_0p95_2L5_myOutput.root/user.ychan.9201298._000001.myOutput.root

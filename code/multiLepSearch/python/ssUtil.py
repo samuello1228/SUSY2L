@@ -44,10 +44,10 @@ def loadSampleDict( sampleListFile ):
   phyType phyProc generator runIDs
 
   eg.
-  #Type		Process			Generator(Nominal) 	id
-  #diboson	WZ->qqll		Sherpa			361084 	  	
-  diboson	WW->llvv(gg)		Sherpa			361077
-  diboson	Z(ee)+gamma		Sherpa			301535,301899-301901
+  #Type   Process     Generator(Nominal)  id
+  #diboson  WZ->qqll    Sherpa      361084      
+  diboson WW->llvv(gg)    Sherpa      361077
+  diboson Z(ee)+gamma   Sherpa      301535,301899-301901
   
   """
   outputDict = {}
@@ -81,9 +81,9 @@ def loadSampleDict( sampleListFile ):
 
     for runID in runIDs:
       outputDict[runID] = { "phyType"  : elements[0],
-		            "phyProc"  : elements[1],
-			    "generator": elements[2],
-			  }
+                "phyProc"  : elements[1],
+          "generator": elements[2],
+        }
   return outputDict
 
 def guessSampleType( filename ):
@@ -158,6 +158,12 @@ isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==
 nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
 #zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
 zMassCut     = "!(int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
+eeCut        = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11)"
+emuCut       = "((int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11))"
+mumuCut      = "(int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13)"
+
+# For diagnostics
+# isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
 
 sigLepCut    = "((leps.lFlag[0] & 2) + (leps.lFlag[1] & 2) )==4" # see obj_def.h in multilepSearch, IS_SIGNAL = 2th bit in lFlag
 ssCut = "((leps[0].ID>0) == (leps[1].ID>0))"
@@ -167,8 +173,39 @@ lepptCut = "(leps.pt[0]>25.) && (leps.pt[1]>20.)"
 l12mCut = "(l12.m>60.)"
 
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
+ptMllCut = "%s && %s" % (lepptCut, l12mCut)
 
-def getCut(useISR):
-  #myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, exact2LepCut, lepptCut, l12mCut, sigLepSSWithDataBkgCut]])
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, isrCut if useISR else nonisrCut, zMassCut, exact2LepCut, sigLepSSWithDataBkgCut]])
+def getCut(ch):
+  lepFlav = "1"
+  whichISR = "1"
+
+  if type(ch) is int:
+    # Channels:
+    #    noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
+    #      ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
+    #  combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
+    # SFOSveto: +100
+    # useISR = True if int(ch/10)==1 else False
+
+    if int(int(ch%100)/10)==0:
+      whichISR=nonisrCut
+    elif int(int(ch%100)/10)==1:
+      whichISR=isrCut
+
+    if ch%10==0:
+      lepFlav = eeCut
+    elif ch%10==1:
+      lepFlav = emuCut
+    elif ch%10==2:
+      lepFlav = mumuCut
+    elif ch%10==4:
+      lepFlav = "%s || %s" % (eeCut, mumuCut)
+
+    if int(ch/100)==1:
+      lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
+
+  elif type(ch) is bool:
+    whichISR = isrCut if ch else nonisrCut
+
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
   return myCut
