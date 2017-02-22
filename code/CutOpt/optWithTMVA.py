@@ -13,9 +13,9 @@ parser = OptionParser()
 parser.add_option('-b', "--bkgList" , help="list of BKG input ROOT file", default=None)
 parser.add_option('-s', "--sigList" , help="list of SIG input ROOT file", default=None)
 parser.add_option('-d', "--dataList", help="list of DATA input ROOT file", default=None)
-parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in input file", default="PP1_evt2l")
+parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in input file", default="evt2l")
 parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList samples. Affects weight ratio between MC & data driven bkg", 
-      type="float", default=10064.3)
+      type="float", default=33257.2)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
 parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR",type="int", default=None)
 parser.add_option("--NodeSize", help="minimum node size (in %) of the trees", type="int", default=5)
@@ -89,6 +89,8 @@ def addTreesToTMVA(fileList, isMC, isSig):
       continue
   
     inTree  = inFile.Get( options.nominalTreeName )
+    if inTree.GetEntries()==0: continue
+    
     if isSig:
       factory.AddSignalTree( inTree, treeWeight )
     else:
