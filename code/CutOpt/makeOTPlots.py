@@ -1,11 +1,30 @@
 #!/usr/bin/env python
 
-import sys, os, subprocess
+import sys, os, subprocess, ssUtil, ROOT
 from os import listdir, path, mkdir, rename
 from os.path import isdir, isfile
 import re
 import overtraining
 from subprocess import call
+ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
+from ROOT.SUSY import CrossSectionDB
+xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
+
+#####
+# Config variables
+#####
+C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
+luminosity = 33257.2
+channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
+MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
+dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
+#####
+
+sampleIdDB = {}
+sumWdict = {}
+sumWdict.update( ssUtil.getSumWfromNTUPList( sigFilesTxt ) )
+sumWdict.update( ssUtil.getSumWfromNTUPList( options.MCbkgFilesTxt ) )
 
 def whichISR(nISR):
 	return {
@@ -68,6 +87,21 @@ def makeChanDict(ChanNs):
 	}
 	return ChanDict
 
+def makeSampleIdDB():
+	fileList = open(sigFilesTxt,"r").readlines()
+	# print fileList
+	for aLine in fileList:
+		if "MGPy8EG" not in aLine or "root/user" not in aLine: continue
+		# if (re.search("MCSig.[0-9]{6}", aLine)) is None: continue
+		sampleID = int((re.search("12.[0-9]{6}", aLine).group()).split('.')[1])
+		masses = re.search("Slep_[0-9]{3,4}_[0-9]{1,4}", aLine).group()
+		print masses
+		mC1 = int(masses.split('_')[1])
+		mN1 = int(masses.split('_')[2])
+		sampleIdDB[(mC1, mN1)] = sampleID
+	print sampleIdDB
+
+
 def loadEffs():
 	effFile = open("CutEffs.csv")
 	effDict = {}
@@ -80,57 +114,59 @@ def loadEffs():
 	effFile.close()
 	return effDict
 
-def addTreesToTMVA(fileList, isMC, isSig):
-  fileList = open(fileList,"r")
-  for aLine in fileList:
-    elements = aLine.split("#")[0]
-    if elements=="": continue
-    elements = elements.split()
-    infname = elements[0]
-    inFile = ROOT.TFile.Open( infname )
-    openedInFileList.append(inFile)
-  
-    treeWeight = 1.0
-    print infname
+def getNsig(mC1,mN1,chan):
+	xSECxEff = xsecDB.xsectTimesEff(sampleIdDB[(mC1,mN1)], 125)
+	mcSumW = sumWdict.get(sampleIdDB[(mC1,mN1)], -1)
+	if mcSumW < 0: 
+		print "mcSumW <0!"
+		return 0
 
-    if isMC:
+	tc = ROOT.TChain("evt2l")
+	for line in open(sigFilesTxt).readlines():
+		tc.Add(line)
 
-      match = re.search(".[0-9]{6}.", infname)
-      if not match:
-        print "Cannot infer datasetID from filename %s , skipped" %ntupName
-        continue
+	treeWeight = xSECxEff * luminosity / mcSumW
+	if treeWeight<=0:
+		print "Encounter <=0 weight sample %s , skipped" % infname 
+		return 0
+	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
+	return treeWeight*tc.GetEntries("%s*(%s)"% (weight, ssUtil.getCut(chan)))
 
-      sampleID = int(match.group()[1:-1])
-      mcSumW = sumWdict.get(sampleID, -1)
-      xSECxEff = -1.
-      if isSig:
-        #xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) + xsecDB.xsectTimesEff(sampleID, 127)
-        xSECxEff = xsecDB.xsectTimesEff(sampleID, 125) #for Slep0d95 I set 125 to be actually 125+127 in SUSYTools/data
-      else:
-        xSECxEff = xsecDB.xsectTimesEff(sampleID)
-      print "mc :", sampleID, mcSumW, xSECxEff
+def getNbkg(chan):
+	nBkg = 0
+	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
+	for line in open(MCbkgFilesTxt).readlines():
+		match = re.search(".[0-9]{6}.", line)
+		if not match:
+			print "Cannot infer datasetID from filename %s , skipped" % line
+			continue
 
-      if isSig:
-        treeWeight = 1.0 * options.inputLumi / mcSumW #treat diff SUSY scenario with equal weight
-      else:
-        treeWeight = xSECxEff * options.inputLumi / mcSumW
-  
-    if treeWeight<=0 : 
-      print "Encounter <=0 weight sample %s , skipped" % infname
-      continue
-  
-    inTree  = inFile.Get( options.nominalTreeName )
-    if inTree.GetEntries()==0: continue
-    if isSig:
-      factory.AddSignalTree( inTree, treeWeight )
-    else:
-      factory.AddBackgroundTree( inTree, treeWeight )
+		sampleID = int(match.group()[1:-1])
+		mcSumW = sumWdict.get(sampleID, -1)
+		xSECxEff = -1.
+		xSECxEff = xsecDB.xsectTimesEff(sampleID)
 
-  fileList.close()
+		treeWeight = xSECxEff * options.inputLumi / mcSumW
 
-C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
-luminosity = 33257.2
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+		if treeWeight<=0 : 
+			print "Encounter <=0 weight sample %s , skipped" % line
+			continue
+		tc = ROOT.TChain("evt2l")
+		tc.Add(line)
+		
+		nBkg += treeWeight*tc.GetEntries("%s*(%s)"% (weight, ssUtil.getCut(chan)))
+
+	tc = ROOT.TChain("evt2l")
+	for line in open (dataBkgFilesTxt).readlines():
+		tc.Add(line)
+	nBkg += tc.GetEntries("%s * (fLwt+qFwt) * (%s)" % (weight, ssUtil.getCut(chan)))
+	return nBkg
+
+xSecDict = loadXSec()
+effDict = loadEffs()
+nBkgDict = {}
+for chan in channels:
+	nBkgDict[chan]=getNbkg(chan)
 
 if __name__ == '__main__':
 	outOT = open("checksOT.csv", "w")
@@ -146,9 +182,6 @@ if __name__ == '__main__':
 	outSig.write("nSig(0.1),nBkg(0.1),sigma(0.1),")
 	outSig.write("nSig(0.2),nBkg(0.2),sigma(0.2),")
 	outSig.write("nSig(0.3),nBkg(0.3),sigma(0.3)\n")
-
-	xSecDict = loadXSec()
-	effDict = loadEffs()
 
 	for directory in sys.argv[1:]:
 		directory = directory.rstrip('/')
