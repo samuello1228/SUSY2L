@@ -1,4 +1,5 @@
 #include<TChain.h>
+#include <TError.h>
 #include<TH1F.h>
 #include<string>
 #include<iostream>
@@ -12,7 +13,7 @@ using std::string;
 class Sample{
  public:
    Sample(string _name="sample1"):name(_name),tag("s1_"){};
-   Sample(string _name, string _tag, string _info, string _leg):name(_name),tag(_tag),info(_info),leg(_leg),mode(0),style{-1,-1,-1,-1,-1,-1,-1,-1,-1}{
+   Sample(string _name, string _tag, string _info, string _leg):name(_name),tag(_tag),info(_info),leg(_leg),mode(0),style{-1,-1,-1,-1,-1,-1,-1,-1,-1},tree1(nullptr){
    };
    virtual ~Sample(){};
 
@@ -23,8 +24,8 @@ class Sample{
    int mode;
 
    int style[9]; // lc, lw, lz, mc, ms, mz, fc, fs
-   vector<TH1F*> hists;
    TChain* tree1;
+   vector<TH1F*> hists;
 
    float weight = -1;
    TString wtExp;
@@ -70,9 +71,10 @@ class Sample{
 
 class SampleGroup: public Sample{
  public:
-   SampleGroup(string _name="sample1"):Sample(_name){};
-   SampleGroup(string _name, string _tag, string _info, string _leg):Sample(_name, _tag, _info, _leg){
+   SampleGroup(string _name="sample1"):Sample(_name),status(-1){};
+   SampleGroup(string _name, string _tag, string _info, string _leg):Sample(_name, _tag, _info, _leg),status(-1){
    };
+   int status;
    std::vector< Sample* > sampleList;
 
    TH1F* getHistFromTree(TString var, TH1F* h1, TString cut, TString opt="", bool dress=true){
@@ -89,6 +91,22 @@ class SampleGroup: public Sample{
 
      hists.push_back(hx); 
      return hx;
+    }
+
+   void setUpOwnChain(TChain* ch1=nullptr,std::string chainName="evt2l"){
+     Info("setUpOwnChain", "start");
+     if(ch1) tree1 = ch1;
+     else if(tree1){
+       tree1 = new TChain(chainName.c_str());
+       Info("setUpOwnChain", "creating new chain:%s", chainName.c_str());
+      }
+
+     Info("setUpOwnChain", "Add");
+     for(auto& s: sampleList){
+       tree1->Add(s->tree1);
+     Info("setUpOwnChain", "adding %lld, now %lld", s->tree1->GetEntries(), tree1->GetEntries());
+      }
+     status = 0;
     }
  };
 

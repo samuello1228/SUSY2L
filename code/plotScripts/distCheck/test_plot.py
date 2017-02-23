@@ -84,6 +84,7 @@ def test2():
     useStyle(sampleG['Vgamma'],(4,1,1,4,20,1,4))
     useStyle(sampleG['Top'],(5,1,1,5,20,1,5))
     useStyle(sampleG['ZJet'],(2,1,1,2,20,1,2))
+    sampleG['Data'].setUpOwnChain(TChain('evt2l'))
 
     p1 = Plot()
     p1.mode = 1
@@ -92,13 +93,14 @@ def test2():
     p1.sSM.push_back(sampleG['Top'])
     p1.sSM.push_back(sampleG['VV'])
     p1.sSM.push_back(sampleG['ZJet'])
-    p1.mCut = 'evt.weight'
+    p1.mCut = 'evt.weight*(evt.flag==2&&l12.m<20)'
 
 #     p1.test()
-    p1.showPlot('leps.pt', TH1F('h1','lep_pt_logy;Leading lepton p_{T} [GeV];Events / 3 GeV',100, 0, 300))
-    waitRootCmd(sDir+sTag+"leps_pt", sDirectly)
+#     p1.showPlot('leps.pt', TH1F('h1','lep_pt_logy;Leading lepton p_{T} [GeV];Events / 3 GeV',100, 0, 300))
+#     waitRootCmd(sDir+sTag+"leps_pt", sDirectly)
 
-    p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+#     p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+    p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 20))
     waitRootCmd(sDir+sTag+"l12_m", sDirectly)
 
 

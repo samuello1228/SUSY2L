@@ -33,6 +33,7 @@ parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
 parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
+parser.add_option("--extraOptions", help="extra options", default=None)
 
 
 (options, args) = parser.parse_args()
@@ -66,15 +67,16 @@ if options.inputFiles:
     sh_all.add (sample);
 elif options.inputList:
     if options.driver == 'grid':
-        with open(options.inputList) as fin1:
-            for line in fin1.readlines():
-                if line[0] == '#':
-                    print line, 'skipped'
-                    continue
-	        line = line.split()[0]
-                if line.find('*') == -1:
-                    ROOT.SH.addGrid(sh_all, line.rstrip())
-                else: ROOT.SH.addGrid(sh_all, line.rstrip())
+        for ds in options.inputList.split(','):
+            with open(ds) as fin1:
+                for line in fin1.readlines():
+                    if line[0] == '#':
+                        print line, 'skipped'
+                        continue
+                    line = line.split()[0]
+                    if line.find('*') == -1:
+                        ROOT.SH.addGrid(sh_all, line.rstrip())
+                    else: ROOT.SH.scanRucio(sh_all, line.rstrip())
     else: 
         ROOT.SH.readFileList(sh_all, options.inputTag, options.inputList);
 elif options.inputDir:
@@ -86,7 +88,10 @@ elif options.inputDir:
     for file in files: sample.add(file)
     sh_all.add (sample)
 elif options.inputDS:
-    ROOT.SH.addGrid(sh_all, options.inputDS)
+#     ROOT.SH.addGrid(sh_all, options.inputDS)
+    if options.inputDS.find('*') == -1:
+        ROOT.SH.addGrid(sh_all, options.inputDS)
+    else: ROOT.SH.scanRucio(sh_all, options.inputDS)
 elif options.samplesDir:
     dir0 = options.samplesDir
     if dir0[-1] != '/': dir0+='/'
@@ -153,19 +158,19 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
     #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
     
-    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
+    electronTrig = ["HLT_e24_lhmedium_L1EM20VH","HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
     for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
+    dielectronTrig = ["HLT_2e12_lhloose_L12EM10VH","HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
     for i in dielectronTrig: alg.CF_trigNames.push_back(i)
 
-    muonTrig = ["HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
+    muonTrig = ["HLT_mu20_iloose_L1MU15","HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
     for i in muonTrig: alg.CF_trigNames.push_back(i)
 
-    dimuonTrig = ["HLT_2mu10","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
+    dimuonTrig = ["HLT_2mu10","HLT_mu18_mu8noL1","HLT_mu18_2mu4noL1","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
 
-    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
+    elemuonTrig = ["HLT_e17_lhloose_mu14","HLT_e24_lhmedium_L1EM20VHI_mu8noL1","HLT_e7_lhmedium_mu24","HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
     for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
     alg.study = options.study
@@ -259,9 +264,13 @@ elif (options.driver == "grid"):
         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[2]%.%in:name[3]%")
 #         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[4]%")
         driver.options().setString("nc_outputSampleName", outname)
+        if options.extraOptions:
+            # "--allowTaskDuplication"
+            driver.options().setString("nc_EventLoop_SubmitFlags", options.extraOptions);
         if options.test:
             driver.options().setDouble(ROOT.EL.Job.optGridNFiles, 4)
             driver.options().setDouble(ROOT.EL.Job.optGridNFilesPerJob, 2)
 #         driver.options().setDouble("nc_disableAutoRetry", 1)
+#         useContElementBoundary
         logging.info("submit job")
         driver.submitOnly(job, options.outputDir)
