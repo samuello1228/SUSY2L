@@ -546,9 +546,9 @@ void mvaeffs( TString fin, double nSig , double lumi, Bool_t useTMVAStyle=true,
    TTree* trainTree = (TTree*) file->Get("TrainTree");
    TTree* testTree = (TTree*) file->Get("TestTree");
 
-   // int nSig = trainTree->GetEntries("className==\"Signal\"")+testTree->GetEntries("className==\"Signal\"");
-   // Luminosity hack
-   double nBkg = lumi/10064.3 * (trainTree->GetEntries("className==\"Background\"")+testTree->GetEntries("className==\"Background\""));
+   // nSig = lumi/10064.3 * (trainTree->GetEntries("(1-classID)*weight")+testTree->GetEntries("(1-classID)*weight"));
+   // Luminosity hack, apply weights
+   double nBkg = lumi/10064.3 * (trainTree->GetEntries("classID*weight")+testTree->GetEntries("classID*weight"));
 
    TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
 
