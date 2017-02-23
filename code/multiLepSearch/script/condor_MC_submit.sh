@@ -15,14 +15,14 @@ k=${tag}.MC
 #file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt
 #file=../multiLepSearch/script/MCBG_llll.txt
 # file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-# file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-file=remaining.txt
-fix=".2"
+file=../multiLepSearch/script/MCBG_sample_list.txt
+# file=remaining.txt
+fix=".3"
 
-# ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0
+../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0
 
 # Add extra option for "broken" jobs resubmission
-../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0 --extraOptions "--allowTaskDuplication"
+# ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0 --extraOptions "--allowTaskDuplication"
 
 # ../multiLepSearch/util/run_ss_selection.py --driver grid --inputDS mc15_13TeV.*.MGPy8EG_A14N23LO_C1N2_Slep_*_0p95_2L5.merge.DAOD_SUSY2.*_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0
 ################

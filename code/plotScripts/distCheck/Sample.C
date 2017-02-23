@@ -94,17 +94,16 @@ class SampleGroup: public Sample{
     }
 
    void setUpOwnChain(TChain* ch1=nullptr,std::string chainName="evt2l"){
-     Info("setUpOwnChain", "start");
+     Info("setUpOwnChain", "sample group: %s", name.c_str());
      if(ch1) tree1 = ch1;
      else if(tree1){
        tree1 = new TChain(chainName.c_str());
        Info("setUpOwnChain", "creating new chain:%s", chainName.c_str());
       }
 
-     Info("setUpOwnChain", "Add");
      for(auto& s: sampleList){
        tree1->Add(s->tree1);
-     Info("setUpOwnChain", "adding %lld, now %lld", s->tree1->GetEntries(), tree1->GetEntries());
+     Info("setUpOwnChain", "adding %lld, now %lld (+%s)", s->tree1->GetEntries(), tree1->GetEntries(), s->name.c_str());
       }
      status = 0;
     }

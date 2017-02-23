@@ -13,10 +13,12 @@ class sampleInfo:
         if filename: self.loadFile(filename, tag)
     def loadAll(self):
 #         dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/r20_evtSelect/RootCoreBin/data/SUSYTools/mc15_13TeV/'
-        dir1 = '../../RootCoreBin/data/SUSYTools/mc15_13TeV/'
+#         dir1 = '../../RootCoreBin/data/SUSYTools/mc15_13TeV/'
+        dir1 = '/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/dev/SUSYTools/mc15_13TeV/'
         self.loadFile(dir1+'Backgrounds.txt')
         self.loadFile(dir1+'MGPy8EG_A14N23LO_C1N2_WZ_XX_YY.txt')
         self.loadFile(dir1+'MGPy8EG_A14N23LO_C1N2_Slep_XX_YY.txt')
+        self.loadFile('../../multiLepSearch/script/SigXsec.txt')
 
     def setDefaultTree(tag):
         self.tree = self.trees[tag]

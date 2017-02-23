@@ -756,7 +756,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     ////////////////////////
     
     //event information
-    m_susyEvt->evt.run = eventInfo->runNumber();
+//     m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
 //     m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
@@ -1087,6 +1087,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       }
 
       //// get trigger info, if passed, and the SF
+      m_susyEvt->evt.run = m_objTool->GetRunNumber();
       auto trigCut = getTriggerConf(m_objTool->GetRunNumber());
 //       if(!trigCut){
 //         Info("trigCut", "not coverd run: %lld", m_objTool->GetRunNumber());
@@ -1434,29 +1435,34 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
 
 void ssEvtSelection::setupTriggers(){
   /// try di lepton trigger for now
-//   m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_e24_lhmedium_L1EM20VH", "HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14","HLT_e24_lhmedium_L1EM20VHI_mu8noL1"},{"HLT_mu20_iloose_L1MU15","HLT_mu18_mu8noL1"}}); /// 2015 data
+  /// 2015
   m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
+  /// 2016: A-D3
+  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+  /// 2016: D4-
+  m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-  /// 2016: A
-  m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+//   /// 2016: A
+//   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+// 
+//   /// 2016: B-D3
+//   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+// 
+//   /// 2016: D4-E
+//   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: F
+//   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: G1-G2
+//   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: G3-I3
+//   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: I4-
+//   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-  /// 2016: B-D3
-  m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-
-  /// 2016: D4-E
-  m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-  /// 2016: F
-  m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-  /// 2016: G1-G2
-  m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-  /// 2016: G3-I3
-  m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-  /// 2016: I4-
-  m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
 //   /// 2016: temp
 //   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
@@ -1467,7 +1473,6 @@ void ssEvtSelection::setupTriggers(){
       if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
       if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
       if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
-
       m1 *= 2;
      }
    }
