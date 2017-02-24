@@ -18,7 +18,7 @@ class sampleInfo:
         self.loadFile(dir1+'Backgrounds.txt')
         self.loadFile(dir1+'MGPy8EG_A14N23LO_C1N2_WZ_XX_YY.txt')
         self.loadFile(dir1+'MGPy8EG_A14N23LO_C1N2_Slep_XX_YY.txt')
-        self.loadFile('../../multiLepSearch/script/SigXsec.txt')
+        self.loadFile('../../multiLepSearch/data/xsect/SigXsec.txt')
 
     def setDefaultTree(tag):
         self.tree = self.trees[tag]
