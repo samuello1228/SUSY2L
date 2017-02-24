@@ -14,9 +14,9 @@ ChargeFlipBkgTool::
 ChargeFlipBkgTool( const string& myname )
 : AsgTool(myname) {
   declareProperty("InputRatesFileName" , m_inputRatesFileName = "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root");
-  declareProperty("InputRatesHistoName", m_inputRatesHistoName= "hFlipProb_stat"      );
-  declareProperty("InputRatesSysHistoName", m_inputRatesSysHistoName = "hFlipProb_sys");
-  declareProperty("InputDPtFileName", m_inputDPtFileName      = "$ROOTCOREBIN/data/multiLepSearch/root_files/dPT_loose.root");
+  declareProperty("InputRatesHistoName", m_inputRatesHistoName= "hFlipProb_data"      );
+  declareProperty("InputRatesSysHistoName", m_inputRatesSysHistoName = "hFlipProb_AllSys");
+  declareProperty("InputDPtFileName", m_inputDPtFileName      = "$ROOTCOREBIN/data/multiLepSearch/root_files/dPThistos.root");
   declareProperty("InputDPtOkHistoName", m_inputDPtOkHistoName= "hDPTok_pxy" );
   declareProperty("InputDPtFlippedHistoName", m_inputDPtFlippedHistoName = "hDPTflipped_pxy");
 
