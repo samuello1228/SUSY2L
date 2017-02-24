@@ -136,7 +136,7 @@ basicBDTVars = [
                  ( "mTl1"   , "leps.mT[0]" ),
                  ( "mTl2"   , "leps.mT[1]" ),
                  ( "ll_dPhi", "l12.dPhi"   ),
-                 ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100 + l12.m"),
+                 ( "l12m"   , "l12.m"),
                ]
 
 #ISR region
@@ -156,11 +156,11 @@ trigCut   = "sig.trigCode!=0"
 
 isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==0
 nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
-#zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
-zMassCut     = "!(int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) )"
-eeCut        = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11)"
-emuCut       = "((int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11))"
-mumuCut      = "(int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13)"
+zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
+# zMassCut     = "!(int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) )"
+eeCut        = "int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11"
+emuCut       = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11)"
+mumuCut      = "int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13"
 
 # For diagnostics
 # isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
@@ -204,10 +204,14 @@ def getCut(ch):
     if int(ch/100)==1:
       lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
 
+    # lepFlav = "1"
+
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
   ptMllCut = "1"
 
   myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
+
+  # return zMassCut
   return myCut
