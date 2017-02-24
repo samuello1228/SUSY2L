@@ -763,6 +763,8 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     // charge flip weight and pT correction (have to apply before other calculation that use lep pT)
     m_susyEvt->evt.qFwt = 0.0;
+    m_susyEvt->evt.qFwt_sys_1up = 0.0;
+    m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if ((sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)){
         //ugly code to get lep0 type and charge :(
         xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
@@ -784,6 +786,8 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
         if (sigLepSign0!=sigLepSign1){
           m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
+          m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
+          m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
           auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
           if(tmpPt.size()==2){
             if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
@@ -795,8 +799,16 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     //fake lep weight
     m_susyEvt->evt.fLwt = 0.0;
+    m_susyEvt->evt.fLwt_e_sys_1up = 0.0; 
+    m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
+    m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
+    m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
     if ((sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
+      m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
+      m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
+      m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
+      m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
 
