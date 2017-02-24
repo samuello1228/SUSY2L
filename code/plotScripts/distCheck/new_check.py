@@ -29,7 +29,7 @@ def checkCompare():
     sI1.Unit_fb = True
     sI1.loadAll()
 
-    Lumi = 3.2;
+    Lumi = 36.1;
     ### get weights
     for s in samples:
         sx = samples[s]
@@ -71,14 +71,18 @@ def checkCompare():
     p1.sSM.push_back(sampleG['ZJet'])
     p1.sSig.push_back(sampleG['dM20'])
     p1.sSig.push_back(sampleG['dM100'])
-    p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>10&&(sig.trigCode&sig.trigMask)!=0&&evt.run<296939)'
+#     p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>10&&(sig.trigCode&sig.trigMask)!=0&&evt.run<296939)'
+    p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>81&&l12.m<101)'
 
 #     p1.test()
 #     p1.showPlot('leps.pt', TH1F('h1','lep_pt_logy;Leading lepton p_{T} [GeV];Events / 5 GeV',60, 0, 300))
 #     waitRootCmd(sDir+sTag+"leps_pt", sDirectly)
+    p1.showPlot('sig.trigMask', TH1F('h1','sig_trigMask;Trigger Mask;Events',60, 0, 70000000))
+    waitRootCmd(sDir+sTag+"sig_trigMask", sDirectly)
 
-    p1.showPlot('leps.eta', TH1F('h1','lep_eta_logy;lepton #eta;Events / 0.1',50, -2.5, 2.5))
-    waitRootCmd(sDir+sTag+"leps_eta", sDirectly)
+
+#     p1.showPlot('leps.eta', TH1F('h1','lep_eta_logy;lepton #eta;Events / 0.1',50, -2.5, 2.5))
+#     waitRootCmd(sDir+sTag+"leps_eta", sDirectly)
 
 
 #     p1.showPlot('l12.m', TH1F('h1','l12_m;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))

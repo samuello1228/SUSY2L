@@ -1057,26 +1057,37 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       ///// event weight for fake Lep
       //m_susyEvt->evt.fLwt = 0.;
+      //// get trigger info, if passed, and the SF
+      auto& sEvt = m_susyEvt->evt;
+      sEvt.run = m_objTool->GetRunNumber();
+      auto trigCut = getTriggerConf(sEvt.run);
 
       //12 channel
       m_susyEvt->evt.flag = 0;
       if(totLs == 2)
       {
         if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 1;
+          m_susyEvt->sig.trigMask = trigCut->ee_mask;
+         }
 
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
           m_susyEvt->evt.flag += 3;
+          m_susyEvt->sig.trigMask = trigCut->em_mask;
+        }
 
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 3;
-
+          m_susyEvt->sig.trigMask = trigCut->em_mask;
+         }
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
           m_susyEvt->evt.flag += 2;
+          m_susyEvt->sig.trigMask = trigCut->mm_mask;
+         }
 
         if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
            (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
@@ -1086,16 +1097,6 @@ EL::StatusCode ssEvtSelection :: execute ()
         else if(nISR!=0) m_susyEvt->evt.flag = 0;
       }
 
-      //// get trigger info, if passed, and the SF
-      m_susyEvt->evt.run = m_objTool->GetRunNumber();
-      auto trigCut = getTriggerConf(m_objTool->GetRunNumber());
-//       if(!trigCut){
-//         Info("trigCut", "not coverd run: %lld", m_objTool->GetRunNumber());
-//        }else{
-//          Info("trigCut", "run: %lu, mask=%lu", m_objTool->GetRunNumber(), trigCut->mask);
-//        }
-
-      auto& sEvt = m_susyEvt->evt;
       //Scale factor
       if(CF_isMC){
         if( study == "ss" )
@@ -1103,15 +1104,12 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(sEvt.flag%3 == 1){ // ee
             sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, trigCut->eeTrig[0]);
             sEvt.MuSF = 1;
-            m_susyEvt->sig.trigMask = trigCut->ee_mask;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
-            m_susyEvt->sig.trigMask = trigCut->mm_mask;
           }else if(sEvt.flag%3 == 0){ // emu
             sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, trigCut->emTrig[0]);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->emTrig[0]);
-            m_susyEvt->sig.trigMask = trigCut->em_mask;
           }
          }
         else if(study == "3l")
@@ -1120,7 +1118,6 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
-
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;

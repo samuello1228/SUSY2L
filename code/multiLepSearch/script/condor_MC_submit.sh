@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v10.1
+tag=v11.0
 
 grl=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
@@ -15,11 +15,11 @@ k=${tag}.MC
 #file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt
 #file=../multiLepSearch/script/MCBG_llll.txt
 # file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-file=../multiLepSearch/script/MCBG_sample_list.txt
-# file=remaining.txt
-fix=".3"
-
-../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0
+# file=../multiLepSearch/script/MCBG_sample_list.txt
+# # file=remaining.txt
+# fix=".3"
+# 
+# ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0
 
 # Add extra option for "broken" jobs resubmission
 # ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k}BG${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0 --extraOptions "--allowTaskDuplication"
@@ -33,10 +33,7 @@ fix=".3"
 # ../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2 --samplePattern ".*/mc15_13TeV.(41001\d.PowhegPythiaEvtGen_P2012_Wt_dilepton.*).merge.DAOD_SUSY2.(.*)" --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k} -a 1 --study ss --mcMatch TruthLink --doSys 0
 
 ###############################################
-# k=${tag}.MCSig
-# mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
-# 
-# ../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2 --samplePattern ".*/mc15_13TeV.(\d*\..*).0p95_2L5.merge.DAOD_SUSY2.(.*)" --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 1
+# ../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2 --samplePattern ".*/mc15_13TeV.(\d*\..*).0p95_2L5.merge.DAOD_SUSY2.(.*)" --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k} -a 1 --study ss --mcMatch TruthLink --doSys 1
 
 ## For testing
-# ../multiLepSearch/util/run_ss_selection.py -d /net/s3_datad/Data15/MC15/SUSY2/mc15_13TeV.392880.MGPy8EG_A14N23LO_C1N2_Slep_900_0_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 1
+../multiLepSearch/util/run_ss_selection.py -d /net/s3_datad/Data15/MC15/SUSY2/mc15_13TeV.392880.MGPy8EG_A14N23LO_C1N2_Slep_900_0_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 0
