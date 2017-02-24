@@ -1,30 +1,38 @@
 #!/usr/bin/env python
 
-import sys, os, subprocess, ssUtil, ROOT
+import sys, os, subprocess, ROOT, csv, overtraining, re
 from os import listdir, path, mkdir, rename
 from os.path import isdir, isfile
-import re
-import overtraining
 from subprocess import call
-ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
-from ROOT.SUSY import CrossSectionDB
-xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
+from csv import reader
+from ROOT import TChain
 
 #####
 # Config variables
 #####
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 33257.2
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
 MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
 dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
+
+bkgDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/"
 #####
 
 sampleIdDB = {}
+
+# Load cross section database
+ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
+from ROOT.SUSY import CrossSectionDB
+xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
+
+import ssUtil
+
+# Load MC sum-of-weights dictionary
 sumWdict = {}
 sumWdict.update( ssUtil.getSumWfromNTUPList( sigFilesTxt ) )
-sumWdict.update( ssUtil.getSumWfromNTUPList( options.MCbkgFilesTxt ) )
+sumWdict.update( ssUtil.getSumWfromNTUPList( MCbkgFilesTxt ) )
 
 def whichISR(nISR):
 	return {
@@ -101,7 +109,6 @@ def makeSampleIdDB():
 		sampleIdDB[(mC1, mN1)] = sampleID
 	print sampleIdDB
 
-
 def loadEffs():
 	effFile = open("CutEffs.csv")
 	effDict = {}
@@ -123,6 +130,7 @@ def getNsig(mC1,mN1,chan):
 
 	tc = ROOT.TChain("evt2l")
 	for line in open(sigFilesTxt).readlines():
+		line = line.split('\n')[0]
 		tc.Add(line)
 
 	treeWeight = xSECxEff * luminosity / mcSumW
@@ -132,41 +140,63 @@ def getNsig(mC1,mN1,chan):
 	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
 	return treeWeight*tc.GetEntries("%s*(%s)"% (weight, ssUtil.getCut(chan)))
 
-def getNbkg(chan):
-	nBkg = 0
-	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
-	for line in open(MCbkgFilesTxt).readlines():
-		match = re.search(".[0-9]{6}.", line)
-		if not match:
-			print "Cannot infer datasetID from filename %s , skipped" % line
-			continue
+def getNbkg():
+	# Initialize nBkgDict
+	import ssUtil
+	from ssUtil import getCut
 
-		sampleID = int(match.group()[1:-1])
-		mcSumW = sumWdict.get(sampleID, -1)
-		xSECxEff = -1.
-		xSECxEff = xsecDB.xsectTimesEff(sampleID)
+	nBkgDict = {}
+	weight = "(ElSF * MuSF * BtagSF * weight * pwt)*(isMC? 1 : (fLwt+qFwt))"
 
-		treeWeight = xSECxEff * options.inputLumi / mcSumW
+	for chan in channels:
+		nBkgDict[chan] = 0
 
-		if treeWeight<=0 : 
-			print "Encounter <=0 weight sample %s , skipped" % line
-			continue
+	fileList = listdir(bkgDir)
+	nFiles = len(fileList)
+	n = 0
+	for line in fileList:
+		n += 1
+		print "Folder %d of %d: %s" % (n, nFiles, line)
+
+		treeWeight = 1
+
+		if "physics" not in line:
+			match = re.search(".[0-9]{6}.", line) # Find dataset ID
+			if not match:
+				print "Cannot infer datasetID from filename %s , skipped" % line
+				continue
+
+			sampleID = int(match.group()[1:-1])
+			mcSumW = sumWdict.get(sampleID, -1) # Get sum of weights
+			xSECxEff = -1.
+			xSECxEff = xsecDB.xsectTimesEff(sampleID) # Get xSec * filterEff
+
+			treeWeight = xSECxEff * luminosity / mcSumW # Weight this tree
+			if treeWeight<=0 : 
+				print "Encounter <=0 weight sample %s , skipped" % line
+				continue
+
 		tc = ROOT.TChain("evt2l")
-		tc.Add(line)
-		
-		nBkg += treeWeight*tc.GetEntries("%s*(%s)"% (weight, ssUtil.getCut(chan)))
+		for f in listdir("%s/%s" % (bkgDir, line)):
+			if f.endswith(".root"):
+				tc.Add("%s/%s/%s" % (bkgDir,line,f))
 
-	tc = ROOT.TChain("evt2l")
-	for line in open (dataBkgFilesTxt).readlines():
-		tc.Add(line)
-	nBkg += tc.GetEntries("%s * (fLwt+qFwt) * (%s)" % (weight, ssUtil.getCut(chan)))
-	return nBkg
+		GetEntries=tc.GetEntries
+		for chan in channels:
+			num = GetEntries(getCut(chan)) 
+			print chan, GetEntries(), num, treeWeight*num
+		if n>4: break
+
+	return nBkgDict
 
 xSecDict = loadXSec()
 effDict = loadEffs()
-nBkgDict = {}
-for chan in channels:
-	nBkgDict[chan]=getNbkg(chan)
+nBkgDict = getNbkg()
+# tc = ROOT.TChain("evt2l")
+# tc.Add('/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/user.clo.v8.13.00307732.physics_Main_myOutput.root/*.root')
+# print tc.GetEntries(), tc.GetEntries(ssUtil.getCut(0))
+# nSigDict = getNsig()
+
 
 if __name__ == '__main__':
 	outOT = open("checksOT.csv", "w")
