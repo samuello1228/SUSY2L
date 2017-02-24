@@ -8,6 +8,7 @@
 
 bool signalOnly = true;
 bool applyPRW = true;
+bool passQID = false;
 
 int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-MCconverted.txt"){
 
@@ -122,6 +123,9 @@ int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user
 
 	CONNECT(elCand1_dRwOrig)
 	CONNECT(elCand2_dRwOrig)
+
+	CONNECT(elCand1_qID);
+	CONNECT(elCand2_qID);
 	#undef CONNECT
 
 
@@ -135,6 +139,9 @@ int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user
 		if(signalOnly){
 			if(!((event.elCand1_flag & 2)/2)) continue;
 			if(!((event.elCand2_flag & 2)/2)) continue;
+		}
+		if(passQID){
+			if(!event.elCand2_qID || !event.elCand1_qID) continue;
 		}
 
 		double w = event.MCEvtWeight;
