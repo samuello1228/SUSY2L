@@ -42,6 +42,9 @@ namespace COMMON{
 
 		float elCand1_dRwOrig;
 		float elCand2_dRwOrig;
+
+      bool elCand1_qID;
+      bool elCand2_qID;
 	};
 
    struct vars{

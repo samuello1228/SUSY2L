@@ -321,8 +321,8 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(m_objTool->initialize().isSuccess());
 
   mChargeFlipBkgTool = new ChargeFlipBkgTool("MyQFlipTool");
-  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_data_signal_wSys.root"));
-  //CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb"));
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeFlipRates.root"));
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb_data"));
   CHECK(mChargeFlipBkgTool->initialize());
 
   mFakeLepBkgTool = new FakeLepBkgTool("MyFLepTool");

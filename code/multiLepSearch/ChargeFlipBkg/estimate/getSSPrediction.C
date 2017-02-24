@@ -23,15 +23,17 @@
 // ========= CONFIGURATION =========== //
 TString defaultOut="outputDirYL-PtCorr";
 TString defaultNTupleList="../common/inFileList-DataYL.txt";
-//TString defaultMisIdfile="~/ChargeFlipBkg/chargeMisID/latest/80.000000_100.000000_20.000000_20.000000_DATA.root";
-TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
+TString defaultMisIdfile="../QID-on/rates_wSys.root";
+// TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-TString misIDhistname="hFlipProb_stat";
+TString misIDhistname="hFlipProb_MCtruth";
+// TString misIDhistname="hFlipProb_MCLH";
 // TString misIDhistname="hFlipProb";
-TString defaultdPtfile="../common/dPT_signal.root";
+TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
 bool onlySignal=true;
 bool applyPtCorrection=true;
-
+bool passQID=true;
+bool ZWindowOnly = false;
 // ========= INFRASTRUCTURE =========== //
 class Histos;
 evt2l* evt2lTree=0;
@@ -127,6 +129,10 @@ class Histos
 
       Ratio->Draw("p e");
       Ratio->SetDirectory(fOut);
+      
+      TLine line;
+      line.SetLineStyle(2);
+      line.DrawLine(RatioX->GetXmin(), 1, RatioX->GetXmax(), 1); 
 
       c->Print(name+".pdf", "Title:"+name);
    }
@@ -182,9 +188,9 @@ void getSSPrediction(const TString outputDir=defaultOut,
    }
 
    // Initialize histograms here ----------------------------------------
-   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/GeV", 20, 70, 110);
-   Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/GeV", 50, 20, 200);
-   Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/GeV", 50, 20, 200);
+   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
+   Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
    Histos hSubleadingEta("hSubleadingEta", "subleading |#eta|", "Subleading |#eta|", "", 40, -2.47, 2.47);
    Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading |#phi|", "", 40, -3.15, 3.15);
@@ -205,7 +211,10 @@ void getSSPrediction(const TString outputDir=defaultOut,
       if(onlySignal && !(((evt2lTree->leps_lFlag[0] & 2)/2) && ((evt2lTree->leps_lFlag[1] & 2)/2))) continue;
 
       // Select Zee events
-      if(fabs(evt2lTree->l12_m - 91)>10) continue;
+      if(ZWindowOnly && fabs(evt2lTree->l12_m - 91)>10) continue;
+
+      // Select events which pass electron ChargeFlipTagger
+      if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
 
       bool SSevent = ((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0));
 
