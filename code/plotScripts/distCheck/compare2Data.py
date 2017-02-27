@@ -85,21 +85,22 @@ def compare():
 def checkTrigger():
     '''Check the effect of trigger requirement. Done with data only, as MC jobs are not finished yet'''
     dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
-    ch1 = makeChain(dir1+'v10.0.data/fetch/data-myOutput/*.root','evt2l')
+    ch1 = makeChain(dir1+'v11.1.data/fetch/data-myOutput/*.root','evt2l')
 
     pm1 = plotMaker(ch1,"")
     pm1.cmsInfo = '13 TeV, 36 fb^{-1}'
 
-#     for channel in [(1, 'ee'), (2,'mumu'), (3, 'emu')]:
+    for channel in [(1, 'ee'), (2,'mumu'), (3, 'emu')]:
 #     for channel in [(2,'mumu'), (3, 'emu')]:
-    for channel in [(3, 'emu'),(4, 'ee FSR')]:
+#     for channel in [(3, 'emu'),(4, 'ee FSR')]:
         pm1.cut0 = 'evt.flag==%d'%channel[0]
         pm1.sampleInfo = channel[1]
         pm1.sTag = "trigCheck_"+channel[1]+"_"
 
         cuts = [("cut0", "", "No Cut", 1)]
         cuts += [("cut1", "(sig.trigCode&sig.trigMask)!=0", "Trigger", 1)]
-        pm1.compareCuts(('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200)), cuts, '', False)
+#         pm1.compareCuts(('l12.m', TH1F('h1','l12_m;m_{ll} [GeV];Events / 2 GeV',100, 0, 200)), cuts, '', False)
+        pm1.compareCuts(('leps.pt', TH1F('h1','l12_pt;p_{T} [GeV];Events / 2 GeV',100, 0, 200)), cuts, '', False)
 
 if __name__ == '__main__':
     savehistory('.')
