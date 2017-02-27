@@ -13,7 +13,7 @@ static SG::AuxElement::Decorator<char> dec_signal("signal");
 ChargeFlipBkgTool::
 ChargeFlipBkgTool( const string& myname )
 : AsgTool(myname) {
-  declareProperty("InputRatesFileName" , m_inputRatesFileName = "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root");
+  declareProperty("InputRatesFileName" , m_inputRatesFileName = "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeFlipRates.root");
   declareProperty("InputRatesHistoName", m_inputRatesHistoName= "hFlipProb_data"      );
   declareProperty("InputRatesSysHistoName", m_inputRatesSysHistoName = "hFlipProb_AllSys");
   declareProperty("InputDPtFileName", m_inputDPtFileName      = "$ROOTCOREBIN/data/multiLepSearch/root_files/dPThistos.root");
