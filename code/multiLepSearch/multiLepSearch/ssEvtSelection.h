@@ -158,7 +158,6 @@ public:
   GoodRunsListSelectionTool *m_grl; //!
   //std::map<OFLAGS, CP::IsolationSelectionTool* > m_isoTools; //!
 //   CP::IsolationSelectionTool* m_isoTool; //!
-  TH1* mh_ElChargeFlip; //!
 
  private:
   // this is needed to distribute the algorithm to the workers
