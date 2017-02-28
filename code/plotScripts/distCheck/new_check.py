@@ -59,20 +59,29 @@ def checkCompare():
     useStyle(sampleG['Top'],(5,1,1,5,20,1,5))
     useStyle(sampleG['ZJet'],(2,1,1,2,20,1,2))
     useStyle(sampleG['dM20'],(3,2,2))
-    useStyle(sampleG['dM100'],(5,9,2))
-
+    useStyle(sampleG['dM100'],(6,9,2))
 
     p1 = Plot()
     p1.mode = 1
     p1.sData = s1
-    p1.sSM.push_back(sampleG['Top'])
     p1.sSM.push_back(sampleG['VV'])
-#     p1.sSM.push_back(sampleG['Vgamma'])
+    p1.sSM.push_back(sampleG['Vgamma'])
+    p1.sSM.push_back(sampleG['Top'])
     p1.sSM.push_back(sampleG['ZJet'])
     p1.sSig.push_back(sampleG['dM20'])
     p1.sSig.push_back(sampleG['dM100'])
 #     p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>10&&(sig.trigCode&sig.trigMask)!=0&&evt.run<296939)'
-    p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>10&&(sig.trigCode&sig.trigMask)!=0)'
+
+#     for x in [(1, 'ee noISR', 'ee_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (2, '#mu#mu noISR','mumu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+    for x in [(3, 'e#mu noISR', 'emu_noISR'),(4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+        p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag=='+str(x[0])+'&&(sig.trigCode&sig.trigMask)!=0)'
+        p1.showInfo = x[1]
+        sTag = 'preSel_'+x[2]
+
+        p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+        waitRootCmd(sDir+sTag+"l12_m", sDirectly)
+
+
 #     p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>81&&l12.m<101)'
 
 #     p1.test()

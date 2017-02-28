@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v11.0
+tag=v13.0
 
 grl=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
@@ -26,6 +26,11 @@ k=${tag}.MC
 
 # ../multiLepSearch/util/run_ss_selection.py --driver grid --inputDS mc15_13TeV.*.MGPy8EG_A14N23LO_C1N2_Slep_*_0p95_2L5.merge.DAOD_SUSY2.*_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0
 ################
+file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt,../multiLepSearch/script/MCSig_sample_p2949.txt
+
+fix=""
+../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2/ --sampleList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k}${fix} -a 1 --study ss --mcMatch TruthLink --doSys 0
+################
 
 
 # # ../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2 --samplePattern ".*/mc15_13TeV.361627.(.*).merge.DAOD_SUSY2.e4093_s2608_s2183_r7772_r7676_p2879" --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k} -a 1 --study ss --mcMatch TruthLink --doSys 1
@@ -36,4 +41,5 @@ k=${tag}.MC
 # ../multiLepSearch/util/run_ss_selection.py --driver condor --samplesDir /net/s3_datad/Data15/MC15/SUSY2 --samplePattern ".*/mc15_13TeV.(\d*\..*).0p95_2L5.merge.DAOD_SUSY2.(.*)" --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o output/${k} -a 1 --study ss --mcMatch TruthLink --doSys 1
 
 ## For testing
-../multiLepSearch/util/run_ss_selection.py -d /net/s3_datad/Data15/MC15/SUSY2/mc15_13TeV.392880.MGPy8EG_A14N23LO_C1N2_Slep_900_0_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 0
+# ../multiLepSearch/util/run_ss_selection.py -d /net/s3_datad/Data15/MC15/SUSY2/mc15_13TeV.364131.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879/ --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 0
+# ../multiLepSearch/util/run_ss_selection.py -d /net/s3_datad/Data15/MC15/SUSY2/mc15_13TeV.392880.MGPy8EG_A14N23LO_C1N2_Slep_900_0_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949 --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch TruthLink --doSys 0

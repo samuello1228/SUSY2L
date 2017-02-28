@@ -96,17 +96,18 @@ elif options.samplesDir:
     dir0 = options.samplesDir
     if dir0[-1] != '/': dir0+='/'
     if options.sampleList:
-        with open(options.sampleList) as fin1:
-            for line in fin1.readlines():
-                if line[0] == '#':
-                    print line, 'skipped'
-                    continue
-                s = line.rstrip().split(':')
-                sample = ROOT.SH.SampleLocal(s[0])
-                d = dir0+s[-1]
-                print s[0],d
-                for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)): sample.add(d+'/'+f)
-                sh_all.add(sample)
+        for samp1 in options.sampleList.split(','):
+            with open(samp1) as fin1:
+                for line in fin1.readlines():
+                    if line[0] == '#':
+                        print line, 'skipped'
+                        continue
+                    s = line.rstrip().split(':')
+                    sample = ROOT.SH.SampleLocal(s[0])
+                    d = dir0+s[-1]
+                    print s[0],d
+                    for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)): sample.add(d+'/'+f)
+                    sh_all.add(sample)
     else:
         dirs = [dir0+d for d in os.listdir(dir0) if os.path.isdir(dir0+d)]
         for d in dirs:

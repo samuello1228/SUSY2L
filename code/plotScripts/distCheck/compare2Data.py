@@ -82,7 +82,7 @@ def compare():
     p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
     waitRootCmd(sDir+sTag+"l12_m", sDirectly)
 
-def checkTrigger():
+def checkTrigger0():
     '''Check the effect of trigger requirement. Done with data only, as MC jobs are not finished yet'''
     dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
     ch1 = makeChain(dir1+'v11.1.data/fetch/data-myOutput/*.root','evt2l')
@@ -101,6 +101,33 @@ def checkTrigger():
         cuts += [("cut1", "(sig.trigCode&sig.trigMask)!=0", "Trigger", 1)]
 #         pm1.compareCuts(('l12.m', TH1F('h1','l12_m;m_{ll} [GeV];Events / 2 GeV',100, 0, 200)), cuts, '', False)
         pm1.compareCuts(('leps.pt', TH1F('h1','l12_pt;p_{T} [GeV];Events / 2 GeV',100, 0, 200)), cuts, '', False)
+
+
+def checkTrigger():
+    '''Check the effect of trigger requirement. Done with data only, as MC jobs are not finished yet'''
+    dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
+    s1 = Sample('newdata','newdata_','Pseudo-data2','Without Trigger')
+    s1.tree1 = TChain('evt2l')
+    s1.tree1.Add(dir1+'v11.1.data/fetch/data-myOutput/*.root')
+
+
+    s2 = Sample('data','data_','data','With Trigger')
+    s2.tree1 = s1.tree1
+    s2.sCuts = "(sig.trigCode&sig.trigMask)!=0"
+    useStyle(s2, (2,1,1,2,20,1,2))
+
+    p1 = Plot()
+    p1.mode = 1
+    p1.sData = s1
+    p1.sSM.push_back(s2)
+    p1.mCut = ''
+
+    p1.showPlot('l12.m', TH1F('h1','l12_pt;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+    waitRootCmd(sDir+sTag+"l12_m", sDirectly)
+
+    p1.showPlot('leps.pt', TH1F('h1','leps.pt;p_{T} [GeV];Events / 2 GeV',100, 0, 200))
+    waitRootCmd(sDir+sTag+"leps_pt", sDirectly)
+
 
 if __name__ == '__main__':
     savehistory('.')

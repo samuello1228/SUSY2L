@@ -20,6 +20,7 @@ class Sample{
    std::string name;
    std::string tag;
    std::string info;
+   TString sCuts{""};
    TString leg;
    int mode;
 
@@ -41,6 +42,11 @@ class Sample{
    }
 
    TH1F* getHistFromTree(TString var, TH1F* h1, TString cut, TString opt="", bool dress=true){
+     if(sCuts != ""){
+       if(cut != "") cut += "&&";
+       cut += sCuts;
+      }
+
      TString hname(tag+h1->GetName());
      if(mode==0) gDirectory->Delete(hname);
 

@@ -310,6 +310,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
   //m_objTool->msg().setLevel( MSG::ERROR );
   //m_objTool->msg().setLevel( MSG::WARNING );
+//   m_objTool->msg().setLevel( MSG::VERBOSE );
 
   for(auto x: CF_PRW_confFiles){Info("CF_PRW_confFiles", "%s", x.c_str());}
 
@@ -362,9 +363,9 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
   CHECK(ECIDSTool->initialize());
 
-  TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
-  mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
-  Info("chargeMisID", "nbinsX = %d", mh_ElChargeFlip->GetNbinsX());
+//   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
+//   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
+//   Info("chargeMisID", "nbinsX = %d", mh_ElChargeFlip->GetNbinsX());
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -1102,14 +1103,14 @@ EL::StatusCode ssEvtSelection :: execute ()
         if( study == "ss" )
         {
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, trigCut->eeTrig[0]);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, trigCut->emTrig[0]);
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->emTrig[0]);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
           }
          }
         else if(study == "3l")
@@ -1435,9 +1436,14 @@ void ssEvtSelection::setupTriggers(){
   /// 2015
   m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
   /// 2016: A-D3
-  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+//   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
   /// 2016: D4-
   m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+
+  m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
+  m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
+  m_em_mKey = "HLT_mu14";
 
 //   /// 2016: A
 //   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});

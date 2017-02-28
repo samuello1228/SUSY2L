@@ -174,6 +174,9 @@ public:
   TH1* mh_ElChargeFlip; //!
   std::vector< TRIGCONF* > m_trigSel; //!
   TRIGCONF* m_nowTrigSel{0}; //!
+  std::string m_em_eKey;
+  std::string m_em_mKey;
+  std::string m_ee_Key;
 
  private:
   // this is needed to distribute the algorithm to the workers

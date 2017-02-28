@@ -6,6 +6,7 @@
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TLine.h>
+#include <TLatex.h>
 using std::cout;
 using std::endl;
 
@@ -20,6 +21,8 @@ class Plot{
   TPad* pPad1;
   TPad* pPad2;
   TString mCut;
+  TLatex lt;
+  std::string showInfo{""};
 
   void showPlot(TString var, TH1F* h1){
 
@@ -118,6 +121,10 @@ class Plot{
     string x(hData->GetTitle());
     if(x.find("_logy")!=std::string::npos) pPad1->SetLogy();
     lg->Draw();
+
+    if(showInfo!=""){
+      lt.DrawLatexNDC(0.2,0.9,showInfo.c_str());
+     }
 
     /// show ratio if needed
     if(pPad2 && htotal){
