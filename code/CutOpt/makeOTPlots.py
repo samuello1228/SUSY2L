@@ -15,7 +15,7 @@ gROOT.SetBatch(True)
 #####
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 33257.2
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
 MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
 dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
@@ -34,7 +34,6 @@ sumWdict.update( ssUtil.getSumWfromNTUPList( sigFilesTxt ) )
 sumWdict.update( ssUtil.getSumWfromNTUPList( MCbkgFilesTxt ) )
 print "sumWdict loaded\n"
 
-# Load nBkg. Weight entries later.
 def getN(fileDir): 
 	# Initialize nDict
 	import ssUtil
@@ -77,58 +76,17 @@ def getN(fileDir):
 			nSample[chan] = GetHist("hist").GetSumOfWeights()
 			# nSample[chan] = GetEntries("(%s)&&(%s)" % (getCut(chan), weight)) 
 		nDict[sampleID] = nSample
-		if testRun and n>1: break
+		if testRun: break
 	sw.Stop(); sw.Print()
 	return nDict
 
+# Load nBkg and nSig. Normalize later.
+# Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
 nBkgDict = getN(bkgDir)
 print "nBkgDict loaded\n"
 
 nSigDict = getN(sigDir)
 print "nSigDict loaded\n"
-# nBkgDict = getNbkg()
-
-# Load nSig. Weight entries later.
-'''
-def getNsig(): 
-	# Initialize nBkgDict
-	from ssUtil import getCut
-
-	nSigDict = {}
-	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
-
-	fileList = listdir(sigDir)
-	nFiles = len(fileList)
-	n = 0
-	sw = ROOT.TStopwatch(); sw.Start()
-	for line in fileList:
-		n += 1
-		print "Folder %d of %d: %s" % (n, nFiles, line)
-
-		match = re.search(".[0-9]{6}.", line) # Find dataset ID
-		if not match:
-			print "Cannot infer datasetID from filename %s , skipped" % line
-			continue
-
-		sampleID = int(match.group()[1:-1])
-
-		tc = ROOT.TChain("evt2l")
-		for f in listdir("%s/%s" % (sigDir, line)):
-			if f.endswith(".root"):
-				tc.Add("%s/%s/%s" % (sigDir,line,f))
-
-		GetEntries=tc.GetEntries
-		nSample = {}
-
-		# for chan in channels # Use if tqdm not available
-		for chan in tqdm(channels):
-			nSample[chan] = GetEntries("(%s)&&(%s)" % (getCut(chan), weight)) 
-		nSigDict[sampleID] = nSample
-		if testRun and n>1: break
-	sw.Stop(); print "nSigDict loaded"; sw.Print(); print "\n"
-	return nSigDict
-nSigDict = getNsig()
-'''
 
 # # # Load cross section database
 ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
@@ -159,29 +117,6 @@ def notOvertrained(overtrainingNums):
 	BkgChi2 = overtrainingNums[3]
 	return (SigKS > 0.05 and BkgKS > 0.05 and SigKS < 0.95 and BkgKS < 0.95 ) 
 			# and (SigChi2 > 0.05 and BkgChi2 > 0.05 and SigChi2 < 0.95 and BkgChi2 < 0.95)
-
-'''
-def loadXSec():
-	xSecFile = open("SigSample.txt", "r")
-	xSecDict = {}
-	for aLine in xSecFile:
-		aLine = aLine.split("#")[0]
-		if len(aLine)==0: continue
-
-		elements = aLine.split(' ')
-		mC1 = elements[2]
-		mN1 = elements[3]
-		xSec = elements[4]
-		xSecEff = elements[5]
-
-		nBefore = elements [-2]
-		nAfter = elements[-1].rstrip('\n')
-		preSelEff = float(nAfter)/float(nBefore)
-
-		xSecDict[(int(mC1), int(mN1))] = (float(xSec), float(xSecEff), preSelEff)
-	xSecFile.close()
-	return xSecDict
-'''
 
 def makeChanDict(ChanNs):
 	n = int(ChanNs[0])
@@ -225,29 +160,14 @@ def loadEffs():
 	effFile.close()
 	return effDict
 
-'''
-def getNsig(mC1,mN1,chan):
-	xSECxEff = xsecDB.xsectTimesEff(sampleIdDB[(mC1,mN1)], 125)
-	mcSumW = sumWdict.get(sampleIdDB[(mC1,mN1)], -1)
-	if mcSumW < 0: 
-		print "mcSumW <0!"
-		return 0
-
-	tc = ROOT.TChain("evt2l")
-	for line in open(sigFilesTxt).readlines():
-		line = line.split('\n')[0]
-		tc.Add(line)
-
-	treeWeight = xSECxEff * luminosity / mcSumW
-	if treeWeight<=0:
-		print "Encounter <=0 weight sample %s , skipped" % infname 
-		return 0
-	weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
-	return treeWeight*tc.GetEntries("%s*(%s)"% (weight, ssUtil.getCut(chan)))
-'''
-
+nBkgTotDict = {}
+# Normalize nBkg and nSig and save total nBkg to nBkgTotDict 
 def weightNDict():
 	print "Weighting nBkgDict..."
+
+	for chan in channels:
+		nBkgTotDict[chan] = 0
+
 	# for sampleID in nBkgDict:
 	for sampleID in tqdm(nBkgDict):
 		if sampleID==0: continue
@@ -260,8 +180,9 @@ def weightNDict():
 			print "Encounter <=0 weight sample %d , skipped" % sampleID
 			continue
 		for chan in channels:
-			nBkgDict[sampleID][chan] = nBkgDict[sampleID][chan] * treeWeight
-	print "nBkgDict weighted\n"
+			nBkgDict[sampleID][chan] *= treeWeight
+			nBkgTotDict[chan] += nBkgDict[sampleID][chan]
+	print "nBkgDict weighted, nBkgTotDict loaded"
 
 	print "Weighting nSigDict..."
 	# for sampleID in nSigDict:
@@ -280,13 +201,6 @@ def weightNDict():
 	print "nSigDict weighted\n"
 
 weightNDict()
-# xSecDict = loadXSec()
-# effDict = loadEffs()
-# nBkgDict = getNbkg()
-# tc = ROOT.TChain("evt2l")
-# print tc.Add('/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/user.clo.v8.13.00307732.physics_Main_myOutput.root/*.root')
-# print tc.GetEntries(), tc.GetEntries("sig.trigCode"), tc.GetEntries("leps.pt[1]"), tc.GetEntries("leps.ID[0]")
-# nSigDict = getNsig()
 
 
 if __name__ == '__main__':
@@ -341,9 +255,8 @@ if __name__ == '__main__':
 			outViableOT.write("%1.3f,%1.3f,%1.3f,%1.3f\n" % overtrainingNums)
 
 			for mass in C1masses: 
-				xSec = xSecDict[(mass, mass-dm)]
-				selEff = effDict[(mass, mass-dm)][channel%100]
-				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity*selEff
+				nSig = nSigDict[sampleIdDB(mass, mass-dm)][channel]
+				nBkg = nBkgDict[channel]
 				print "## mC1 = %d, mN1 = %d, chan = %d, nEvents %f\n" % (mass, mass-dm, channel, nEvents)
 				if nEvents <= 1: continue
 				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
