@@ -8,7 +8,7 @@
 
 bool signalOnly = true;
 bool applyPRW = true;
-bool passQID = false;
+bool passQID = true;
 
 int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-MCconverted.txt"){
 
