@@ -538,7 +538,7 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
    tempFile.close();
 }
 
-void mvaeffs( TString fin, double nSig , double lumi, Bool_t useTMVAStyle=true, 
+void mvaeffs( TString fin, double nSig , double nBkg, Bool_t useTMVAStyle=true, 
                TString formula="S/sqrt(S+B)" )
 {
    TMVA::TMVAGlob::Initialize( useTMVAStyle );
@@ -548,7 +548,7 @@ void mvaeffs( TString fin, double nSig , double lumi, Bool_t useTMVAStyle=true,
 
    // nSig = lumi/10064.3 * (trainTree->GetEntries("(1-classID)*weight")+testTree->GetEntries("(1-classID)*weight"));
    // Luminosity hack, apply weights
-   double nBkg = lumi/10064.3 * (trainTree->GetEntries("classID*weight")+testTree->GetEntries("classID*weight"));
+   // double nBkg = lumi/10064.3 * (trainTree->GetEntries("classID*weight")+testTree->GetEntries("classID*weight"));
 
    TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
 
