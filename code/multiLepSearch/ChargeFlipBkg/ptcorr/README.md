@@ -1,5 +1,5 @@
 # README: ptCorr
-Last updated 10 February 2017
+Last updated 1 March 2017
 
 Part of the [ChargeFlipBkg](../) code package developed by Gabriel Gallardo for the UM/HK EWK SUSY SS 2L analysis.
 
@@ -20,7 +20,7 @@ Finds \Delta E and \Delta p_T of reconstructed electrons where \Delta p_T is def
 \Delta E is defined similarly.
 
 ### Execution
-`root -l -b -q makeDEhistos.C(\"outputDir\", \"inFileList.txt\")`
+`root -l -b -q "makeDEhistos.C(\"outputDir\", \"inFileList.txt\")"`
 - `outputDir`: Specify output directory
 - `inFileList.txt`: Specify full path and filename of input converted NTuples
 
