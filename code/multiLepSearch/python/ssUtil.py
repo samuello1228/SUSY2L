@@ -136,7 +136,8 @@ basicBDTVars = [
                  ( "mTl1"   , "leps.mT[0]" ),
                  ( "mTl2"   , "leps.mT[1]" ),
                  ( "ll_dPhi", "l12.dPhi"   ),
-                 ( "l12m"   , "l12.m"),
+                 # ( "l12m"   , "l12.m"),
+                 ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100+l12.m"),
                ]
 
 #ISR region
@@ -205,7 +206,7 @@ def getCut(ch):
     elif ch%10==2:
       lepFlav = "%s && %s" % (mumuCut, zMassCut)
     elif ch%10==3:
-      lepFlav = "!(%s || %s) || %s" % (eeCut, mumuCut, zMassCut)
+      lepFlav = "(!(%s || %s) || %s)" % (eeCut, mumuCut, zMassCut)
     elif ch%10==4:
       lepFlav = "(%s || %s) && %s" % (eeCut, mumuCut, zMassCut)
 
