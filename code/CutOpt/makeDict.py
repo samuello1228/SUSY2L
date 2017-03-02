@@ -159,20 +159,28 @@ weightNDict()
 
 # Save bkg counts to CSV
 def saveDict():
-	with open("NDict.csv", "w") as outCSV:
+	with open("nSigDict.csv", "w") as outCSV:
 
 		# Header row
 		outCSV.write("sampleID,")
-		outCSV.write(",".join(channels))
+		outCSV.write(",".join(["%d" % int(chan) for chan in channels]))
 		outCSV.write("\n")
 
 		for sampleID in nSigDict:
 			outCSV.write("%d,"%sampleID)
-			outCSV.write(",".join(nSigDict[sampleID][chan] for chan in channels))
+			outCSV.write(",".join("%f" % nSigDict[sampleID][chan] for chan in channels))
 			outCSV.write("\n")
 
-		for sampleID in nBkgTotDict:
+	with open("nBkgDict.csv", "w") as outCSV:
+
+		# Header row
+		outCSV.write("sampleID,")
+		outCSV.write(",".join(["%d" % int(chan) for chan in channels]))
+		outCSV.write("\n")
+
+		for sampleID in nBkgDict:
 			outCSV.write("%d,"%sampleID)
-			outCSV.write(",".join(nBkgTotDict[sampleID][chan] for chan in channels))
+			outCSV.write(",".join("%f" % nBkgDict[sampleID][chan] for chan in channels))
 			outCSV.write("\n")
+
 saveDict()
