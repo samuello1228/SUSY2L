@@ -541,6 +541,8 @@ void TMVA::StatDialogMVAEffs::PrintResults( const MethodInfo* info )
 void mvaeffs( TString fin, double nSig , double nBkg, Bool_t useTMVAStyle=true, 
                TString formula="S/sqrt(S+B)" )
 {
+   gErrorIgnoreLevel = kInfo;
+   TMVA::gConfig().SetSilent( kTRUE ); 
    TMVA::TMVAGlob::Initialize( useTMVAStyle );
    TFile* file = TMVA::TMVAGlob::OpenFile( fin );
    TTree* trainTree = (TTree*) file->Get("TrainTree");
