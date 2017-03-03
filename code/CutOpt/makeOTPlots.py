@@ -19,17 +19,10 @@ gROOT.SetBatch(True)
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+# channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+channels = (3, 13)
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
-MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
-dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
 
-bkgDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/"
-sigDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
-
-skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012"]
-
-testRun = False
 ####################
 
 def makeSampleIdDB():

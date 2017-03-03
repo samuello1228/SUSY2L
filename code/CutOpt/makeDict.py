@@ -19,7 +19,10 @@ gROOT.SetBatch(True)
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+# channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+channels = (3, 13)
+
+## Updated NTuples
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
 MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
 dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
@@ -27,7 +30,16 @@ dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
 bkgDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/"
 sigDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
 
-skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012"]
+## Old NTuples
+bkgDir = "/srv/SUSY/ychan/allBkg/"
+sigDir = "/srv/SUSY/ychan/sig/"
+
+sigFilesTxt = "oldLists/allSig.txt"
+MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
+dataBkgFilesTxt = "oldLists/data10.txt"
+
+
+skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
 
 testRun = False
 ####################
@@ -49,7 +61,7 @@ def getN(fileDir):
 	weight = "(isMC? (ElSF * MuSF * BtagSF * weight * pwt) : (fLwt+qFwt))"
 	can = ROOT.TCanvas() # for Draw(). Not necessary, but gets rid of some out of place INFO message
 
-	fileList = listdir(fileDir)
+	fileList = [d for d in listdir(fileDir) if isdir("%s/%s" % (fileDir,d)) and d.endswith(".root")]
 	nFiles = len(fileList)
 	n = 0
 	sw = ROOT.TStopwatch(); sw.Start() # Stopwatch
