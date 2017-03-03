@@ -81,12 +81,18 @@ class Sample: public TObject{
 
    void setupFromFile(TString& filename){
      m_file = new TFile(filename, "update");
-     tree1 = (TChain*) m_file.Get("tree1");
+     tree1 = (TChain*) m_file->Get("tree1");
+    }
+
+   void writeToFile(TFile* f1){
+     f1->cd();
+     this->Write(("Sample_"+name).c_str());
+     tree1->Write((name+"_tree1").c_str());
     }
 
    void writeToFile(string dir1="", string filename=""){
      if(!m_file){
-       if (filename=="") filename = "Sample_"+name+".root"
+       if (filename=="") filename = "Sample_"+name+".root";
        m_file = new TFile((dir1+filename).c_str(),"recreate");
       }
      m_file->cd();

@@ -29,7 +29,7 @@ def test3():
     for x in samples:
         samples[x].WriteToFile('Analysis-Test/')
 #         samples[x].m_file.Close()
-funlist.append(test3)
+# funlist.append(test3)
 
 def getSample(fname):
     f1 = TFile(fname,'read')
@@ -55,7 +55,22 @@ class anaSpace:
     def loadSamples(self):
         samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
         for x in samples:
-            samples[x].WriteToFile(self.m_file)
+            samples[x].writeToFile(self.m_file)
+
+def test4():
+    a1 = anaSpace("test1_ana.root")
+    a1.loadSamples()
+
+    s1 = a1.getSample('ds392875')
+    print s1
+    print '--------'
+    print s1.tree1.GetEntries()
+    print s1.GetName()
+    print s1.name
+
+    pass
+funlist.append(test4)
+
 
 def readTest():
     s1 = getSample("Analysis-Test/Sample_ds392875.root")
@@ -70,7 +85,7 @@ def readTest():
     print s1.name
 # 
 #     print f1.GetName()
-funlist.append(readTest)
+# funlist.append(readTest)
 
 def test2():
     dir0 = '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-26-da7031fc/'
