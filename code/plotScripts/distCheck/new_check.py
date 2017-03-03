@@ -22,6 +22,12 @@ def addSample(dsname,treename='evt2l'):
     sx.tree1.Add(dir0+dsname+'/*.root*')
 #     sx.weight = GetWeight()
 
+def readSampleFromFile():
+    x = Sample(filename)
+    print x.tree1.GetEntries(), x.weight, x.crossSection, x.Weight
+
+    
+
 def checkCompare():
     samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
 
@@ -55,25 +61,28 @@ def checkCompare():
 
     ### set styles
     useStyle(sampleG['VV'],(3,1,1,3,20,1,3))
-    useStyle(sampleG['Vgamma'],(4,1,1,4,20,1,4))
+    useStyle(sampleG['Wgamma'],(4,1,1,4,20,1,4))
     useStyle(sampleG['Top'],(5,1,1,5,20,1,5))
     useStyle(sampleG['ZJet'],(2,1,1,2,20,1,2))
-    useStyle(sampleG['dM20'],(3,2,2))
+    useStyle(sampleG['dM20'],(1,2,2))
     useStyle(sampleG['dM100'],(6,9,2))
+    useStyle(sampleG['Zgamma'],(8,9,2))
 
     p1 = Plot()
     p1.mode = 1
     p1.sData = s1
+    p1.sSM.push_back(sampleG['Wgamma'])
     p1.sSM.push_back(sampleG['VV'])
-    p1.sSM.push_back(sampleG['Vgamma'])
     p1.sSM.push_back(sampleG['Top'])
     p1.sSM.push_back(sampleG['ZJet'])
     p1.sSig.push_back(sampleG['dM20'])
     p1.sSig.push_back(sampleG['dM100'])
+    p1.sSig.push_back(sampleG['Zgamma'])
 #     p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag==2&&l12.m>10&&(sig.trigCode&sig.trigMask)!=0&&evt.run<296939)'
 
-#     for x in [(1, 'ee noISR', 'ee_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (2, '#mu#mu noISR','mumu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
-    for x in [(3, 'e#mu noISR', 'emu_noISR'),(4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+    for x in [(1, 'ee noISR', 'ee_noISR'), (2, '#mu#mu noISR','mumu_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+#     for x in [(2, '#mu#mu noISR','mumu_noISR'), (1, 'ee noISR', 'ee_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+#     for x in [(3, 'e#mu noISR', 'emu_noISR'),(4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*(evt.flag=='+str(x[0])+'&&(sig.trigCode&sig.trigMask)!=0)'
         p1.showInfo = x[1]
         sTag = 'preSel_'+x[2]

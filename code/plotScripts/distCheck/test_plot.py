@@ -2,9 +2,11 @@
 import os, sys, re
 from ROOT import *
 from rootUtil import useAtlasStyle, waitRootCmd, savehistory, get_default_fig_dir
+gROOT.LoadMacro('Sample.C+')
 gROOT.LoadMacro('Plot.C+')
 from ROOT import Plot, Sample, SampleGroup
 from sample_info import sampleInfo
+from anaUtil import loadSamples
 funlist=[]
 
 sDir = get_default_fig_dir()
@@ -21,6 +23,54 @@ def addSample(dsname,treename='evt2l'):
     sx.tree1 = TChain(treename)
     sx.tree1.Add(dir0+dsname+'/*.root*')
 #     sx.weight = GetWeight()
+
+def test3():
+    samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
+    for x in samples:
+        samples[x].WriteToFile('Analysis-Test/')
+#         samples[x].m_file.Close()
+funlist.append(test3)
+
+def getSample(fname):
+    f1 = TFile(fname,'read')
+    s1 = f1.Get('ds392875')
+    s1.setupFromFile(fname)
+    return s1
+
+
+class anaSpace:
+    def __init__(self,fname):
+        self.m_file = TFile(fname, 'update')
+        self.wSamples = []
+
+    def getSample(self, sname):
+        s1 = self.m_file.Get("Sample_"+sname)
+        s1.tree1 = self.m_file.Get(sname+"_tree1")
+        return s1
+
+    def useEntryList(self, elistname):
+        for s in self.wSamples:
+            s.SetEntryList(elistname)
+
+    def loadSamples(self):
+        samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
+        for x in samples:
+            samples[x].WriteToFile(self.m_file)
+
+def readTest():
+    s1 = getSample("Analysis-Test/Sample_ds392875.root")
+#     f1 = TFile("Analysis-Test/Sample_ds392875.root",'read')
+#     s1 = f1.Get('ds392875')
+#     s1.tree1 = f1.Get("tree1")
+#     s1.m_file = f1
+    print s1
+    print '--------'
+    print s1.tree1.GetEntries()
+    print s1.GetName()
+    print s1.name
+# 
+#     print f1.GetName()
+funlist.append(readTest)
 
 def test2():
     dir0 = '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-26-da7031fc/'
@@ -105,7 +155,7 @@ def test2():
 
 
     pass
-funlist.append(test2)
+# funlist.append(test2)
 
 def test():
     dir0 = '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-26-da7031fc/'

@@ -1,6 +1,17 @@
-Vgamma:
+Zgamma:
 user.dzhang.v10.1.301535.Sherpa_CT10_eegammaPt10_35_myOutput.root
+user.dzhang.v10.1.301899.Sherpa_CT10_eegammaPt35_70_myOutput.root
+user.dzhang.v10.1.301900.Sherpa_CT10_eegammaPt70_140_myOutput.root
+user.dzhang.v10.1.301901.Sherpa_CT10_eegammaPt140_myOutput.root
 user.dzhang.v10.1.301536.Sherpa_CT10_mumugammaPt10_35_myOutput.root
+user.dzhang.v10.1.301902.Sherpa_CT10_mumugammaPt35_70_myOutput.root
+user.dzhang.v10.1.301903.Sherpa_CT10_mumugammaPt70_140_myOutput.root
+user.dzhang.v10.1.301905.Sherpa_CT10_tautaugammaPt35_70_myOutput.root
+user.dzhang.v10.1.301906.Sherpa_CT10_tautaugammaPt70_140_myOutput.root
+user.dzhang.v10.1.301907.Sherpa_CT10_tautaugammaPt140_myOutput.root
+Zgamma END
+
+Wgamma:
 user.dzhang.v10.1.301890.Sherpa_CT10_enugammaPt35_70_myOutput.root
 user.dzhang.v10.1.301891.Sherpa_CT10_enugammaPt70_140_myOutput.root
 user.dzhang.v10.1.301892.Sherpa_CT10_enugammaPt140_myOutput.root
@@ -10,15 +21,7 @@ user.dzhang.v10.1.301895.Sherpa_CT10_munugammaPt140_myOutput.root
 user.dzhang.v10.1.301896.Sherpa_CT10_taunugammaPt35_70_myOutput.root
 user.dzhang.v10.1.301897.Sherpa_CT10_taunugammaPt70_140_myOutput.root
 user.dzhang.v10.1.301898.Sherpa_CT10_taunugammaPt140_myOutput.root
-user.dzhang.v10.1.301899.Sherpa_CT10_eegammaPt35_70_myOutput.root
-user.dzhang.v10.1.301900.Sherpa_CT10_eegammaPt70_140_myOutput.root
-user.dzhang.v10.1.301901.Sherpa_CT10_eegammaPt140_myOutput.root
-user.dzhang.v10.1.301902.Sherpa_CT10_mumugammaPt35_70_myOutput.root
-user.dzhang.v10.1.301903.Sherpa_CT10_mumugammaPt70_140_myOutput.root
-user.dzhang.v10.1.301905.Sherpa_CT10_tautaugammaPt35_70_myOutput.root
-user.dzhang.v10.1.301906.Sherpa_CT10_tautaugammaPt70_140_myOutput.root
-user.dzhang.v10.1.301907.Sherpa_CT10_tautaugammaPt140_myOutput.root
-Vgamma END
+Wgamma END
 
 VV:
 user.dzhang.v10.1.361069.Sherpa_CT10_llvvjj_ss_EW4_myOutput.root

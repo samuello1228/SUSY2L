@@ -1,6 +1,9 @@
+#ifndef Sample_C
+#define Sample_C
 #include<TChain.h>
 #include <TError.h>
 #include<TH1F.h>
+#include<TEntryList.h>
 #include<string>
 #include<iostream>
 #include<vector>
@@ -10,23 +13,26 @@ using std::endl;
 using std::vector;
 using std::string;
 
-class Sample{
+class Sample: public TObject{
  public:
    Sample(string _name="sample1"):name(_name),tag("s1_"){};
    Sample(string _name, string _tag, string _info, string _leg):name(_name),tag(_tag),info(_info),leg(_leg),mode(0),style{-1,-1,-1,-1,-1,-1,-1,-1,-1},tree1(nullptr){
    };
-   virtual ~Sample(){};
+   virtual ~Sample(){
+     delete m_file;
+    };
 
-   std::string name;
-   std::string tag;
-   std::string info;
+   string name;
+   string tag;
+   string info;
    TString sCuts{""};
    TString leg;
    int mode;
 
    int style[9]; // lc, lw, lz, mc, ms, mz, fc, fs
-   TChain* tree1;
+   TChain* tree1; //!
    vector<TH1F*> hists;
+   TFile* m_file{nullptr}; //!
 
    float weight = -1;
    TString wtExp;
@@ -62,6 +68,32 @@ class Sample{
      return hx;
     }
 
+   void useEntryList(TString elistName, TString cut=""){
+     /// find the elistName in list, or root file. If not found, create it and save it.
+     auto elist = (TEntryList*)m_file->Get(elistName);
+     if(!elist && cut!=""){
+       tree1->Draw(">>"+elistName,cut,"entrylist");
+       m_file->cd();
+       elist->Write(elistName);
+     }
+     tree1->SetEntryList(elist);
+    }
+
+   void setupFromFile(TString& filename){
+     m_file = new TFile(filename, "update");
+     tree1 = (TChain*) m_file.Get("tree1");
+    }
+
+   void writeToFile(string dir1="", string filename=""){
+     if(!m_file){
+       if (filename=="") filename = "Sample_"+name+".root"
+       m_file = new TFile((dir1+filename).c_str(),"recreate");
+      }
+     m_file->cd();
+     this->Write(name.c_str());
+     tree1->Write("tree1");
+    }
+
  protected:
    void dressHist(TH1* hx){
        if(style[0]>=0) hx->SetLineColor(style[0]);
@@ -73,6 +105,8 @@ class Sample{
        if(style[6]>=0) hx->SetFillColor(style[6]);
        if(style[7]>=0) hx->SetFillStyle(style[7]);
     }
+
+   ClassDef(Sample, 1)
 };
 
 class SampleGroup: public Sample{
@@ -99,7 +133,7 @@ class SampleGroup: public Sample{
      return hx;
     }
 
-   void setUpOwnChain(TChain* ch1=nullptr,std::string chainName="evt2l"){
+   void setUpOwnChain(TChain* ch1=nullptr, string chainName="evt2l"){
      Info("setUpOwnChain", "sample group: %s", name.c_str());
      if(ch1) tree1 = ch1;
      else if(tree1){
@@ -113,6 +147,8 @@ class SampleGroup: public Sample{
       }
      status = 0;
     }
+
+   ClassDef(SampleGroup, 2)
  };
 
 int main(){
@@ -121,3 +157,4 @@ int main(){
 
   return 0;
 }
+#endif
