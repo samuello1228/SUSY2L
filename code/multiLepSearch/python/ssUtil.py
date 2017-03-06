@@ -94,9 +94,13 @@ def guessSampleType( filename ):
    if ("lllv"         in filename): return "diboson"
    if ("llvv"         in filename): return "diboson"
    if ("ttW"          in filename): return "topX"
+   if ("ttbarW"       in filename): return "topX"
    if ("ttee"         in filename): return "topX"
    if ("ttmumu"       in filename): return "topX"
    if ("tttautau"     in filename): return "topX"
+   if ("ttH"          in filename): return "topX"
+   if ("ttZ"          in filename): return "topX"
+   if ("4top"         in filename): return "4top"
    if ("physics_Main" in filename): return "data"
 
    #match WZ and Slep samples eg MGPy8EG_A14N23LO_C1N2_WZ_300p0_250p0_3L_2L7_myOutput
@@ -178,7 +182,7 @@ l12mCut = "(l12.m>60.)"
 
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
 ptMllCut = "%s && %s" % (lepptCut, l12mCut)
-# ptMllCut = "1"
+ptMllCut = "1"
 
 def getCut(ch):
   lepFlav = "1"
