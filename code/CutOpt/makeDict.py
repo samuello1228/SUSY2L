@@ -43,15 +43,10 @@ skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "
 
 testRun = False
 ####################
+# Infrastructure   #
+####################
 
-#### Load MC sum-of-weights dictionary ####
-sumWdict = {}
-sumWdict.update( ssUtil.getSumWfromNTUPList( sigFilesTxt ) )
-sumWdict.update( ssUtil.getSumWfromNTUPList( MCbkgFilesTxt ) )
-print "sumWdict loaded\n"
-
-
-#### Load nSig and nBkg. Normalize later. #### 
+# Return dictionary of nEvents from given directory
 def getN(fileDir): 
 	# import ssUtil
 	from multiLepSearch.ssUtil import getCut
@@ -87,10 +82,12 @@ def getN(fileDir):
 		else:
 			sampleID = 0 # data
 
-		tc = TChain("evt2l"); Add = tc.Add
+		tc = TChain("evt2l"); #tcf = TChain("PP1_evt2l")
 		for f in listdir("%s/%s" % (fileDir, line)):
 			if f.endswith(".root"):
 				tc.Add("%s/%s/%s" % (fileDir,line,f))
+				# tcf.Add("%s/%s/%s" % (fileDir,line,f))
+		# tc.AddFriend(tcf)
 
 		# The next two lines are some attempt to speed up the for loop
 		GetEntries=tc.GetEntries
@@ -100,7 +97,7 @@ def getN(fileDir):
 
 		# for chan in channels #  If tqdm not available, comment out the next line and comment in the next line
 		for chan in tqdm(channels):
-			tc.Draw("%s>>hist" % weight, "%s && %s" % (getCut(chan), weight))
+			tc.Draw("%s>>hist" % weight, "%s && %s" % (getCut(chan) if sampleID!=0 else "1", weight))
 			nSample[chan] = GetHist("hist").GetSumOfWeights()
 
 		if nDict.get(sampleID,None) is None: # Save the dictionary if it doesn't exist for the given sampleID
@@ -108,34 +105,28 @@ def getN(fileDir):
 		else: 
 			for chan in channels: 			 # Sum the entries in the dictionary if it already exists
 				nDict[sampleID][chan] += nSample[chan]
-			
+
 	sw.Stop(); sw.Print() # Print stopwatch
 	return nDict
 
-# Load nBkg and nSig. Normalize later.
-# Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
-nBkgDict = getN(bkgDir)
-print "nBkgDict loaded\n"
+# To find source of MC background from sampleID
+MCbkgList = open(MCbkgFilesTxt).readlines()
+def sourceBkg(sampleID):
+	if sampleID == 0: return "qF or fL"
+	sampleID = "%d" % sampleID; sampleType = None
+	for s in MCbkgList:
+		if sampleID in s: sampleType = ssUtil.guessSampleType(s)
+	return sampleID if sampleType is None else sampleType
 
-nSigDict = getN(sigDir)
-print "nSigDict loaded\n"
-
-#### Load cross section database #### 
-ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
-from ROOT.SUSY import CrossSectionDB
-xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
-print "xsecDB loaded\n"
-
-#### Normalize nSig and nBkg to luminosity and save total nBkg to nBkgTotdict ####
-nBkgTotDict = {}
-# Normalize nBkg and nSig and save total nBkg to nBkgTotDict 
+# Normalize nSig and nBkg to luminosity and save total nBkg to nBkgTotdict ####
+nBkgTotDict = {}; nBkgSourceDict = {}
 def weightNDict():
 	print "Weighting nBkgDict..."
 
 	# for sampleID in nBkgDict:
 	for sampleID in tqdm(nBkgDict):
 		treeWeight = 1
-		if sampleID!=0:
+		if sampleID>0:
 			mcSumW = sumWdict.get(sampleID, -1) # Get sum of weights
 			xSECxEff = -1.
 			xSECxEff = xsecDB.xsectTimesEff(sampleID) # Get xSec * filterEff
@@ -145,9 +136,20 @@ def weightNDict():
 				# print "Encounter <=0 weight sample %d , skipped" % sampleID
 				tqdm.write("Encounter <=0 weight sample %d , skipped" % sampleID)
 				continue
+		else:
+			treeWeight = 1 * 33257.2 / 10064.3
 		for chan in channels:
 			nBkgDict[sampleID][chan] *= treeWeight
 			nBkgTotDict[chan] = nBkgTotDict.get(chan, 0) + nBkgDict[sampleID][chan]
+
+		# Save to nBkgSourceDict
+		bkgSource = sourceBkg(sampleID)
+		if nBkgSourceDict.get(bkgSource, None) is None:
+			nBkgSourceDict[bkgSource] = nBkgDict[sampleID]
+		else:
+			for chan in channels:
+				nBkgSourceDict[bkgSource][chan] += nBkgDict[sampleID][chan]
+
 	print "nBkgDict weighted, nBkgTotDict loaded"
 
 	print "Weighting nSigDict..."
@@ -166,8 +168,6 @@ def weightNDict():
 		for chan in channels:
 			nSigDict[sampleID][chan] = nSigDict[sampleID][chan] * treeWeight
 	print "nSigDict weighted\n"
-
-weightNDict()
 
 # Save bkg counts to CSV
 def saveDict():
@@ -195,4 +195,42 @@ def saveDict():
 			outCSV.write(",".join("%f" % nBkgDict[sampleID][chan] for chan in channels))
 			outCSV.write("\n")
 
-saveDict()
+
+	with open("nBkgSourceDict.csv", "w") as outCSV:
+
+		# Header row
+		outCSV.write("source,")
+		outCSV.write(",".join(["%d" % int(chan) for chan in channels]))
+		outCSV.write("\n")
+
+		for sampleID in nBkgSourceDict:
+			outCSV.write("%s,"%sampleID)
+			outCSV.write(",".join("%f" % nBkgSourceDict[sampleID][chan] for chan in channels))
+			outCSV.write("\n")
+
+####################
+# MAIN FUNCTION    #
+####################
+if __name__ == "__main__":
+	#Load MC sum-of-weights dictionary 
+	sumWdict = {}
+	sumWdict.update( ssUtil.getSumWfromNTUPList( sigFilesTxt ) )
+	sumWdict.update( ssUtil.getSumWfromNTUPList( MCbkgFilesTxt ) )
+	print "sumWdict loaded\n"
+
+	# Load nBkg and nSig. Normalize later.
+	# Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
+	nBkgDict = getN(bkgDir)
+	print "nBkgDict loaded\n"
+
+	nSigDict = getN(sigDir)
+	print "nSigDict loaded\n"
+
+	#Load cross section database 
+	ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
+	from ROOT.SUSY import CrossSectionDB
+	xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
+	print "xsecDB loaded\n"
+
+	weightNDict()
+	saveDict()
