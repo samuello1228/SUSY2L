@@ -13,15 +13,18 @@ using std::endl;
 class Plot{
 
  public:
+  Plot(TString f1=""){if(f1!="") m_file = new TFile(f1,"update");}
   Sample* sData;
   vector<Sample*> sSM;
   vector<Sample*> sSig;
+  vector<Sample*> sExtra;
   int mode;
-  TCanvas* pCanvas;
-  TPad* pPad1;
-  TPad* pPad2;
+  TCanvas* pCanvas{nullptr};
+  TPad* pPad1{nullptr};
+  TPad* pPad2{nullptr};
   TString mCut;
   TLatex lt;
+  TFile* m_file{nullptr};
   std::string showInfo{""};
 
   void showPlot(TString var, TH1F* h1){
@@ -189,6 +192,63 @@ class Plot{
     pCanvas->cd();
     pCanvas->Update();
   }
+
+  Sample* getSample(TString name){
+    Sample* s1 = (Sample*)m_file->Get("Sample_"+name);
+    s1->tree1 = (TChain*)m_file->Get(name+"_tree1");
+    return s1;
+   };
+
+  SampleGroup* getSampleGroup(TString name){
+    SampleGroup* s1 = (SampleGroup*)m_file->Get("Sample_"+name);
+    s1->tree1 = (TChain*)m_file->Get(name+"_tree1");
+    for(size_t i=0; i<s1->m_sampleNames.size(); i++) s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+    return s1;
+   };
+
+  void saveSamples(){
+    sData->writeToFile(m_file);
+    for(auto x: sSM) saveSample(x);
+    for(auto x: sSig) saveSample(x);
+    for(auto x: sExtra) saveSample(x);
+   }
+  void saveSample(Sample* s){
+    auto s1 = dynamic_cast< SampleGroup* >(s);
+    if(s1) s1->writeToFile(m_file);
+    else s->writeToFile(m_file);
+   }
+
+  void useEntryList(TString elist, bool includeExtra=false, TString cutx=""){
+    Info("useEntryList", "Setting up entrylist: %s", elist.Data());
+    useEntryList(sData, elist,cutx);
+    for(auto x: sSM) useEntryList(x, elist, cutx);
+    for(auto x: sSig) useEntryList(x, elist, cutx);
+    if(includeExtra){for(auto x: sExtra) useEntryList(x, elist, cutx);}
+   }
+
+  void useEntryList(Sample* s1, TString elist, TString cutx){
+    auto sx = dynamic_cast< SampleGroup* >(s1);
+    if(sx){
+      for(auto s2: sx->sampleList) useEntryList(s2, elist, cutx);
+     }
+
+    if(s1->tree1){
+      /// try to get the entry list
+      TString elistname = "EL_"+elist+"_"+s1->name;
+      auto elist1 = (TEntryList*)m_file->Get(elistname);
+      if(!elist1 && cutx!=""){
+        /// make the entry list
+        Info("useEntryList", "entrylist %s not exist for sample %s, creating it with cut: %s", elist.Data(), s1->name.c_str(), cutx.Data());
+        s1->tree1->Draw(">>"+elistname, cutx, "entrylist");
+        elist1 = (TEntryList*)gDirectory->Get(elistname);
+        if(m_file){
+          m_file->cd();
+          elist1->Write(elistname);
+         }
+       }
+      s1->tree1->SetEntryList((TEntryList*)m_file->Get("EL_"+elist+"_"+s1->name));
+    }
+   }
 
   void test(){
     std::cout << sData->name << std::endl;

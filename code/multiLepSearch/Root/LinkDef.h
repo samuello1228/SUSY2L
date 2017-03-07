@@ -1,3 +1,5 @@
+#include <multiLepSearch/dibosonSelection.h>
+
 #include <multiLepSearch/aDAODMaker.h>
 
 #include <multiLepSearch/ssEvtSelection.h>
@@ -62,4 +64,8 @@
 
 #ifdef __CINT__
 #pragma link C++ class aDAODMaker+;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class dibosonSelection+;
 #endif

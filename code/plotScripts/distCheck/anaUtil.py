@@ -39,3 +39,22 @@ def loadSamples(dslist, dsname=None, dir0='/net/s3_data_home/dzhang/links/SAMPLE
             if grp:
                 grp.sampleList.push_back(s1)
     return samples, sampleG
+
+class anaSpace:
+    def __init__(self,fname):
+        self.m_file = TFile(fname, 'update')
+        self.wSamples = []
+
+    def getSample(self, sname):
+        s1 = self.m_file.Get("Sample_"+sname)
+        s1.tree1 = self.m_file.Get(sname+"_tree1")
+        return s1
+
+    def useEntryList(self, elistname):
+        for s in self.wSamples:
+            s.SetEntryList(elistname)
+
+    def loadSamples(self):
+        samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
+        for x in samples:
+            samples[x].writeToFile(self.m_file)

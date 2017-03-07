@@ -6,7 +6,7 @@ gROOT.LoadMacro('Sample.C+')
 gROOT.LoadMacro('Plot.C+')
 from ROOT import Plot, Sample, SampleGroup
 from sample_info import sampleInfo
-from anaUtil import loadSamples
+from anaUtil import loadSamples, anaSpace
 funlist=[]
 
 sDir = get_default_fig_dir()
@@ -38,25 +38,6 @@ def getSample(fname):
     return s1
 
 
-class anaSpace:
-    def __init__(self,fname):
-        self.m_file = TFile(fname, 'update')
-        self.wSamples = []
-
-    def getSample(self, sname):
-        s1 = self.m_file.Get("Sample_"+sname)
-        s1.tree1 = self.m_file.Get(sname+"_tree1")
-        return s1
-
-    def useEntryList(self, elistname):
-        for s in self.wSamples:
-            s.SetEntryList(elistname)
-
-    def loadSamples(self):
-        samples,sampleG = loadSamples('dataset_v101.list', None, '/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-25x/')
-        for x in samples:
-            samples[x].writeToFile(self.m_file)
-
 def test4():
     a1 = anaSpace("test1_ana.root")
     a1.loadSamples()
@@ -67,6 +48,9 @@ def test4():
     print s1.tree1.GetEntries()
     print s1.GetName()
     print s1.name
+
+    s1.tree1.Draw("l12.m")
+    waitRootCmd()
 
     pass
 funlist.append(test4)

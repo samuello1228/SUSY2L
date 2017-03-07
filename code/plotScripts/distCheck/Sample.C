@@ -85,9 +85,12 @@ class Sample: public TObject{
     }
 
    void writeToFile(TFile* f1){
+     Info("Sample", "%s is wittern out", name.c_str());
      f1->cd();
+     Info("Sample", "get into the files now [%s]", name.c_str());
      this->Write(("Sample_"+name).c_str());
-     tree1->Write((name+"_tree1").c_str());
+     if(tree1) tree1->Write((name+"_tree1").c_str());
+     Info("Sample", "Done [%s]", name.c_str());
     }
 
    void writeToFile(string dir1="", string filename=""){
@@ -122,6 +125,7 @@ class SampleGroup: public Sample{
    };
    int status;
    std::vector< Sample* > sampleList;
+   std::vector< string > m_sampleNames;
 
    TH1F* getHistFromTree(TString var, TH1F* h1, TString cut, TString opt="", bool dress=true){
      TString hname(tag+h1->GetName());
@@ -153,6 +157,22 @@ class SampleGroup: public Sample{
       }
      status = 0;
     }
+
+   void writeToFile(TFile* f1){
+     Info("Sample", "%s is wittern out", name.c_str());
+     f1->cd();
+     m_sampleNames.clear();
+     m_sampleNames.reserve(sampleList.size()); 
+     for(auto s: sampleList){
+       s->writeToFile(f1);
+       m_sampleNames.push_back(s->name);
+      }
+     this->Write(("Sample_"+name).c_str());
+     if(tree1) tree1->Write((name+"_tree1").c_str());
+    }
+
+
+ private:
 
    ClassDef(SampleGroup, 2)
  };
