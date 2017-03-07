@@ -21,6 +21,7 @@ luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 channels = (3, 13)
+# channels = [13]
 
 ## Updated NTuples
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
@@ -38,6 +39,7 @@ sigFilesTxt = "oldLists/allSig.txt"
 MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
 dataBkgFilesTxt = "oldLists/data10.txt"
 
+sampleDictTxt = "multiLepSearch/script/MCBgIDs_2LSS.txt"
 
 skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
 
@@ -55,6 +57,8 @@ def getN(fileDir):
 	nDict = {}
 	weight = "(isMC? (ElSF * MuSF * BtagSF * weight * pwt) : (fLwt+qFwt))"
 	can = ROOT.TCanvas() # for Draw(). Not necessary, but gets rid of some out of place INFO message
+
+	# nJets = ROOT.TH1F("nJets", "nJets", 10,0,10)
 
 	fileList = [d for d in listdir(fileDir) if isdir("%s/%s" % (fileDir,d)) and d.endswith(".root")]
 	nFiles = len(fileList)
@@ -97,8 +101,9 @@ def getN(fileDir):
 
 		# for chan in channels #  If tqdm not available, comment out the next line and comment in the next line
 		for chan in tqdm(channels):
-			tc.Draw("%s>>hist" % weight, "%s && %s" % (getCut(chan) if sampleID!=0 else "1", weight))
+			tc.Draw("%s>>hist" % weight, "%s && %s" % (getCut(chan), weight))
 			nSample[chan] = GetHist("hist").GetSumOfWeights()
+			# tc.Draw("Sum$(jets.pt>20 && abs(jets.eta)<2.4)>>+nJets", "%s && %s" % (getCut(chan) if sampleID==0 else "0", weight))
 
 		if nDict.get(sampleID,None) is None: # Save the dictionary if it doesn't exist for the given sampleID
 			nDict[sampleID]=nSample
@@ -106,16 +111,22 @@ def getN(fileDir):
 			for chan in channels: 			 # Sum the entries in the dictionary if it already exists
 				nDict[sampleID][chan] += nSample[chan]
 
+	# nJets.Draw(); can.Print("nJets.pdf")
 	sw.Stop(); sw.Print() # Print stopwatch
 	return nDict
 
 # To find source of MC background from sampleID
 MCbkgList = open(MCbkgFilesTxt).readlines()
+sampleDict = ssUtil.loadSampleDict(sampleDictTxt)
 def sourceBkg(sampleID):
 	if sampleID == 0: return "qF or fL"
 	sampleID = "%d" % sampleID; sampleType = None
 	for s in MCbkgList:
-		if sampleID in s: sampleType = ssUtil.guessSampleType(s)
+		if sampleID in s: 
+			sampleType = sampleDict.get(int(sampleID), None).get("phyType", None)
+			if sampleType is not None: break
+			sampleType = ssUtil.guessSampleType(s)
+			break 
 	return sampleID if sampleType is None else sampleType
 
 # Normalize nSig and nBkg to luminosity and save total nBkg to nBkgTotdict ####
@@ -220,11 +231,11 @@ if __name__ == "__main__":
 
 	# Load nBkg and nSig. Normalize later.
 	# Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
-	nBkgDict = getN(bkgDir)
-	print "nBkgDict loaded\n"
-
 	nSigDict = getN(sigDir)
 	print "nSigDict loaded\n"
+
+	nBkgDict = getN(bkgDir)
+	print "nBkgDict loaded\n"
 
 	#Load cross section database 
 	ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
