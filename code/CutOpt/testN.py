@@ -41,5 +41,6 @@ for sampleID in nBkgDict:
 			nBkgSourceDict[bkgSource][chan] += nBkgDict[sampleID][chan]
 for source in nBkgSourceDict:
 	print source, nBkgSourceDict[source]
+print "Total", getTotDict(nBkgDict)
 
 
