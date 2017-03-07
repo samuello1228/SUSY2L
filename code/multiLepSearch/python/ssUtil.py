@@ -159,8 +159,8 @@ trigCut   = "sig.trigCode!=0"
 #bjetCut   = "nBJet==0" #BJet info not filled in ssEvtSelection (as of 27Jul2016)
 #cosmicCut = "nCosmic==0" #done in ssEvtSelection
 
-isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==0
-nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
+isrCut       = "(Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0)" #nCentralJets>0 or ==0
+nonisrCut    = "(Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0)" #nCentralJets>0 or ==0
 # zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
 zMassCut     = "!(fabs(l12.m - 91.1876)<=10)"
 # eeCut        = "int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11"
