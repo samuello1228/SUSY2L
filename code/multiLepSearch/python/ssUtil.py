@@ -102,6 +102,14 @@ def guessSampleType( filename ):
    if ("ttZ"          in filename): return "topX"
    if ("4top"         in filename): return "4top"
    if ("physics_Main" in filename): return "data"
+   if ("Zee_Mll10_40" in filename): return "ZeeLowM"
+   if ("Zmm_Mll10_40" in filename): return "ZmmLowM"
+   if ("eegamma"      in filename): return "eegamma"
+   if ("mumugamma"    in filename): return "mumugamma"
+   if ("tautaugamma"  in filename): return "tautaugamma"
+   if ("Ztt_Mll10_40" in filename): return "ZtautauLowM"
+   if ("WqqZll"       in filename): return "diboson"
+   if ("ZqqZll"       in filename): return "diboson"
 
    #match WZ and Slep samples eg MGPy8EG_A14N23LO_C1N2_WZ_300p0_250p0_3L_2L7_myOutput
    matches = re.search("[a-zA-Z0-9_]*C1N2[a-zA-Z0-9_]*", filename)
@@ -159,8 +167,8 @@ trigCut   = "sig.trigCode!=0"
 #bjetCut   = "nBJet==0" #BJet info not filled in ssEvtSelection (as of 27Jul2016)
 #cosmicCut = "nCosmic==0" #done in ssEvtSelection
 
-isrCut       = "(Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0)" #nCentralJets>0 or ==0
-nonisrCut    = "(Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0)" #nCentralJets>0 or ==0
+isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==0
+nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
 # zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
 zMassCut     = "!(fabs(l12.m - 91.1876)<=10)"
 # eeCut        = "int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11"
