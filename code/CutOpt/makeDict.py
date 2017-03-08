@@ -31,12 +31,12 @@ bkgDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/"
 sigDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
 
 ## Old NTuples
-bkgDir = "/srv/SUSY/ychan/allBkg/"
-sigDir = "/srv/SUSY/ychan/sig/"
+# bkgDir = "/srv/SUSY/ychan/allBkg/"
+# sigDir = "/srv/SUSY/ychan/sig/"
 
-sigFilesTxt = "oldLists/allSig.txt"
-MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
-dataBkgFilesTxt = "oldLists/data10.txt"
+# sigFilesTxt = "oldLists/allSig.txt"
+# MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
+# dataBkgFilesTxt = "oldLists/data10.txt"
 
 
 skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
@@ -145,7 +145,7 @@ def weightNDict():
 				# print "Encounter <=0 weight sample %d , skipped" % sampleID
 				tqdm.write("Encounter <=0 weight sample %d , skipped" % sampleID)
 				continue
-		else: treeWeight = 33257.2 / 10064.3 # Scale up data 
+		# else: treeWeight = 33257.2 / 10064.3 # Scale up data 
 		for chan in channels:
 			nBkgDict[sampleID][chan] *= treeWeight
 			nBkgTotDict[chan] = nBkgTotDict.get(chan, 0) + nBkgDict[sampleID][chan]
