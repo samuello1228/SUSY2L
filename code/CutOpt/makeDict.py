@@ -101,7 +101,9 @@ def getN(fileDir):
 		# for chan in channels #  If tqdm not available, comment out the next line and comment in the next line
 		for chan in tqdm(channels):
 			tc.Draw("%s>>hist" % weight, "%s && %s" % (getCut(chan), weight))
-			nSample[chan] = GetHist("hist").GetSumOfWeights()
+			h = GetHist("hist")
+			nSample[chan] = h.GetSumOfWeights()
+			h.Delete()
 
 		if nDict.get(sampleID,None) is None: # Save the dictionary if it doesn't exist for the given sampleID
 			nDict[sampleID]=nSample
