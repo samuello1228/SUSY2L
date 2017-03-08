@@ -32,7 +32,7 @@ def makeSampleIdDB():
 	for aLine in fileList:
 		if "MGPy8EG" not in aLine or "root/user" not in aLine: continue
 		# if (re.search("MCSig.[0-9]{6}", aLine)) is None: continue
-		sampleID = int((re.search("12.[0-9]{6}", aLine).group()).split('.')[1])
+		sampleID = int((re.search(".[0-9]{6}.", aLine).group()).split('.')[1])
 		masses = re.search("Slep_[0-9]{3,4}_[0-9]{1,4}", aLine).group()
 		# print masses
 		mC1 = int(masses.split('_')[1])
