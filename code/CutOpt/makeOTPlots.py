@@ -22,7 +22,7 @@ luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 channels = (3, 13)
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
-
+sigFilesTxt = "sig.txt"
 ####################
 
 def makeSampleIdDB():

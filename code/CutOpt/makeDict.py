@@ -38,8 +38,15 @@ sigFilesTxt = "oldLists/allSig.txt"
 MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
 dataBkgFilesTxt = "oldLists/data10.txt"
 
+# lxplus, Zee
+bkgDir = "/eos/atlas/user/g/ggallard/Zee"
+sigDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47" 
+
+sigFilesTxt = "sig.txt"
+MCbkgFilesTxt ="zee.txt"
 
 skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
+
 
 testRun = False
 ####################

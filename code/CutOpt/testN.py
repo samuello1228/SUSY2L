@@ -6,6 +6,7 @@ import multiLepSearch
 from multiLepSearch.ssUtil import loadSampleDict, guessSampleType
 
 MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
+MCbkgFilesTxt = "zee.txt"
 sampleDictTxt = "multiLepSearch/script/MCBgIDs_2LSS.txt"
 
 
