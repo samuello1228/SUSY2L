@@ -38,12 +38,13 @@ sigFilesTxt = "oldLists/allSig.txt"
 MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
 dataBkgFilesTxt = "oldLists/data10.txt"
 
-# lxplus, Zee
-bkgDir = "/eos/atlas/user/g/ggallard/Zee"
-sigDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47" 
+# lxplus
+bkgDir = "/afs/cern.ch/user/g/ggallard/private/limits/dataSoftLinks"
+sigDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/sig" 
+mcDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/bkg"
 
 sigFilesTxt = "sig.txt"
-MCbkgFilesTxt ="zee.txt"
+MCbkgFilesTxt ="mcbkg.txt"
 
 skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
 
@@ -127,6 +128,10 @@ def getN(fileDir):
 # Load nBkg and nSig. Normalize later.
 # Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
 nBkgDict = getN(bkgDir)
+try:
+    nBkgDict.update(getN(mcDir))
+except:
+    print "INFO: No separate mcDir defined."
 print "nBkgDict loaded\n"
 
 nSigDict = getN(sigDir)
