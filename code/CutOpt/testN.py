@@ -38,7 +38,7 @@ for sampleID in nBkgDict:
 	if nBkgSourceDict.get(bkgSource, None) is None:
 		nBkgSourceDict[bkgSource] = nBkgDict[sampleID]
 	else:
-		for chan in (channels for channels in nBkgDict[0]):
+		for chan in (channels for channels in nBkgDict[nBkgDict.keys()[0]]):
 			nBkgSourceDict[bkgSource][chan] += nBkgDict[sampleID][chan]
 for source in nBkgSourceDict:
 	print source, nBkgSourceDict[source]
