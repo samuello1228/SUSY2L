@@ -18,7 +18,7 @@ MCbkgList = open(MCbkgFilesTxt).readlines()
 sampleDict = loadSampleDict(sampleDictTxt)
 def sourceBkg(sampleID):
 	if sampleID == 0: return "qF or fL"
-	sampleType = sampleDict.get(sampleID, None).get("phyType", None)
+	sampleType = sampleDict.get(sampleID, {}).get("phyType", None)
 	if sampleType is not None: return sampleType
 	sampleID = "%d" % sampleID; 
 	for s in MCbkgList:
