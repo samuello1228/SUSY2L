@@ -110,6 +110,7 @@ def guessSampleType( filename ):
    if ("Ztt_Mll10_40" in filename): return "ZtautauLowM"
    if ("WqqZll"       in filename): return "diboson"
    if ("ZqqZll"       in filename): return "diboson"
+   if ("Zee_Pt"       in filename): return "Zee"
 
    #match WZ and Slep samples eg MGPy8EG_A14N23LO_C1N2_WZ_300p0_250p0_3L_2L7_myOutput
    matches = re.search("[a-zA-Z0-9_]*C1N2[a-zA-Z0-9_]*", filename)
