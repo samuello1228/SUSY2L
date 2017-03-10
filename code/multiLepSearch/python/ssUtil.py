@@ -233,7 +233,7 @@ def getCut(ch):
 
   ptMllCut = "1"
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
 
   # return zMassCut
   return myCut
