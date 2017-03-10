@@ -162,7 +162,7 @@ def weightNDict():
 				# print "Encounter <=0 weight sample %d , skipped" % sampleID
 				tqdm.write("Encounter <=0 weight sample %d , skipped" % sampleID)
 				continue
-		else: treeWeight = 33257.2 / 10064.3 # Scale up data 
+		# else: treeWeight = 33257.2 / 10064.3 # Scale up data # comment out for correctly scaled data
 		for chan in channels:
 			nBkgDict[sampleID][chan] *= treeWeight
 			nBkgTotDict[chan] = nBkgTotDict.get(chan, 0) + nBkgDict[sampleID][chan]
