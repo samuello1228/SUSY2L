@@ -39,7 +39,7 @@ MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
 dataBkgFilesTxt = "oldLists/data10.txt"
 
 # lxplus
-bkgDir = "/afs/cern.ch/user/g/ggallard/private/limits/dataSoftLinks"
+bkgDir = "/eos/user/y/ychan/SUSY_NTUP/v8d6/data"
 sigDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/sig" 
 mcDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/bkg"
 
