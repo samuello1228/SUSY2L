@@ -25,7 +25,7 @@
 
 ROOTFLAG=$(shell root-config --cflags)
 ROOTLIBS=$(shell root-config --libs)
-PKGDIR=/afs/cern.ch/user/g/ggallard/private/multiLepSearch
+PKGDIR=/afs/cern.ch/user/g/ggallard/private/makeNTuples/multiLepSearch
 CXX=gcc
 # OPTFLAG=-g -pt
 OPTFLAGS=-O3 -std=c++11
