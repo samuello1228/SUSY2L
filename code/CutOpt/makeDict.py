@@ -102,7 +102,7 @@ def getN(fileDir):
 		tc = TChain("evt2l"); Add = tc.Add
 		# tcf = TChain("BDT_PP1_evt2l"); AddF = tcf.Add
 		for f in listdir("%s/%s" % (fileDir, line)):
-			if f.endswith(".root"):
+			if re.search("root\.*[0-9]*$", f) is not None:
 				Add("%s/%s/%s" % (fileDir,line,f))
 		# 		if sampleID==0: 
 		# 			AddF("%s/%s/%s" % (fileDir,line,f))
