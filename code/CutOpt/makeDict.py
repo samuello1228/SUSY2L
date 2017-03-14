@@ -22,14 +22,15 @@ luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 channels = (3, 13)
 
-## Updated NTuples
+## Updated NTuples, lxplus
 sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
 MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
 dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
 
-bkgDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/"
-sigDir = "/srv/SUSY/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
+bkgDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/"
+sigDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
 
+'''
 ## Old NTuples
 bkgDir = "/srv/SUSY/ychan/allBkg/"
 sigDir = "/srv/SUSY/ychan/sig/"
@@ -45,6 +46,7 @@ mcDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/bkg"
 
 sigFilesTxt = "sig.txt"
 MCbkgFilesTxt ="mcbkg.txt"
+'''
 
 skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt" "ttH125", "ZZZ"]
 
@@ -66,7 +68,6 @@ def getN(fileDir):
 
 	# Initialize nDict
 	nDict = {}
-	weight = "(isMC? (ElSF * MuSF * BtagSF * weight * pwt) : (fLwt+qFwt))"
 	can = ROOT.TCanvas() # for Draw(). Not necessary, but gets rid of some out of place INFO message
 
 	fileList = [d for d in listdir(fileDir) if isdir("%s/%s" % (fileDir,d)) and d.endswith(".root")]
@@ -92,13 +93,21 @@ def getN(fileDir):
 				continue
 
 			sampleID = int(match.group()[1:-1])
+			weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
 		else:
 			sampleID = 0 # data
+			weight = "(fLwt+qFwt)"
+			# weight = "(BDT_PP1_evt2l.fLwt+BDT_PP1_evt2l.qFwt)"
 
 		tc = TChain("evt2l"); Add = tc.Add
+		# tcf = TChain("BDT_PP1_evt2l"); AddF = tcf.Add
 		for f in listdir("%s/%s" % (fileDir, line)):
 			if f.endswith(".root"):
-				tc.Add("%s/%s/%s" % (fileDir,line,f))
+				Add("%s/%s/%s" % (fileDir,line,f))
+		# 		if sampleID==0: 
+		# 			AddF("%s/%s/%s" % (fileDir,line,f))
+		# if sampleID==0: 
+		# 	tc.AddFriend(tcf)
 
 		# The next two lines are some attempt to speed up the for loop
 		GetEntries=tc.GetEntries
