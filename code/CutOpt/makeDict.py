@@ -48,7 +48,7 @@ sigFilesTxt = "sig.txt"
 MCbkgFilesTxt ="mcbkg.txt"
 '''
 
-skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt"]
+skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt", "period"]
 
 
 testRun = False
