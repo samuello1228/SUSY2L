@@ -94,10 +94,23 @@ def guessSampleType( filename ):
    if ("lllv"         in filename): return "diboson"
    if ("llvv"         in filename): return "diboson"
    if ("ttW"          in filename): return "topX"
+   if ("ttbarW"       in filename): return "topX"
    if ("ttee"         in filename): return "topX"
    if ("ttmumu"       in filename): return "topX"
    if ("tttautau"     in filename): return "topX"
+   if ("ttH"          in filename): return "topX"
+   if ("ttZ"          in filename): return "topX"
+   if ("4top"         in filename): return "4top"
    if ("physics_Main" in filename): return "data"
+   if ("Zee_Mll10_40" in filename): return "ZeeLowM"
+   if ("Zmm_Mll10_40" in filename): return "ZmmLowM"
+   if ("eegamma"      in filename): return "eegamma"
+   if ("mumugamma"    in filename): return "mumugamma"
+   if ("tautaugamma"  in filename): return "tautaugamma"
+   if ("Ztt_Mll10_40" in filename): return "ZtautauLowM"
+   if ("WqqZll"       in filename): return "diboson"
+   if ("ZqqZll"       in filename): return "diboson"
+   if ("Zee_Pt"       in filename): return "Zee"
 
    #match WZ and Slep samples eg MGPy8EG_A14N23LO_C1N2_WZ_300p0_250p0_3L_2L7_myOutput
    matches = re.search("[a-zA-Z0-9_]*C1N2[a-zA-Z0-9_]*", filename)
@@ -136,7 +149,8 @@ basicBDTVars = [
                  ( "mTl1"   , "leps.mT[0]" ),
                  ( "mTl2"   , "leps.mT[1]" ),
                  ( "ll_dPhi", "l12.dPhi"   ),
-                 ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100 + l12.m"),
+                 # ( "l12m"   , "l12.m"),
+                 ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100+l12.m"),
                ]
 
 #ISR region
@@ -156,12 +170,15 @@ trigCut   = "sig.trigCode!=0"
 
 isrCut       = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) > 0" #nCentralJets>0 or ==0
 nonisrCut    = "Sum$(jets.pt>20 && abs(jets.eta)<2.4) ==0" #nCentralJets>0 or ==0
-#zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
-zMassCut     = "!(int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
-eeCut        = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11)"
-emuCut       = "((int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11))"
-mumuCut      = "(int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13)"
-
+# zMassCut     = "!((int(abs(leps.ID[0])/1000)==11 || int(abs(leps.ID[0])/1000)==13) && int(abs(leps.ID[0])/1000) == int(abs(leps.ID[1])/1000) && fabs(l12.m - 91.1876)<=10)"
+zMassCut     = "!(fabs(l12.m - 91.1876)<=10)"
+# eeCut        = "int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 11"
+eeCut        = "Sum$(abs(leps.ID))==22000"
+# emuCut       = "(int(abs(leps.ID[0])/1000) == 11 && int(abs(leps.ID[1])/1000) == 13) || (int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 11)"
+emuCut       = "Sum$(abs(leps.ID))==24000"
+# mumuCut      = "int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13"
+mumuCut      = "Sum$(abs(leps.ID))==26000"
+cftCut       = "leps.ElChargeID[0] && leps.ElChargeID[1]"
 # For diagnostics
 # isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
 
@@ -174,18 +191,21 @@ l12mCut = "(l12.m>60.)"
 
 sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
 ptMllCut = "%s && %s" % (lepptCut, l12mCut)
+ptMllCut = "1"
 
 def getCut(ch):
   lepFlav = "1"
   whichISR = "1"
 
   if type(ch) is int:
-    # Channels:
-    #    noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
-    #      ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
-    #  combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
-    # SFOSveto: +100
-    # useISR = True if int(ch/10)==1 else False
+    '''
+    Channels:
+       noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
+         ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
+     combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
+    SFOSveto: +100
+    useISR = True if int(ch/10)==1 else False
+    '''
 
     if int(int(ch%100)/10)==0:
       whichISR=nonisrCut
@@ -193,19 +213,27 @@ def getCut(ch):
       whichISR=isrCut
 
     if ch%10==0:
-      lepFlav = eeCut
+      lepFlav = "%s && %s" % (eeCut, zMassCut)
     elif ch%10==1:
       lepFlav = emuCut
     elif ch%10==2:
-      lepFlav = mumuCut
+      lepFlav = "%s && %s" % (mumuCut, zMassCut)
+    elif ch%10==3:
+      lepFlav = "(!(%s || %s) || %s)" % (eeCut, mumuCut, zMassCut)
     elif ch%10==4:
-      lepFlav = "%s || %s" % (eeCut, mumuCut)
+      lepFlav = "(%s || %s) && %s" % (eeCut, mumuCut, zMassCut)
 
     if int(ch/100)==1:
       lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
 
+    # lepFlav = "1"
+
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, zMassCut, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
+  ptMllCut = "1"
+
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut, cftCut]])
+
+  # return zMassCut
   return myCut
