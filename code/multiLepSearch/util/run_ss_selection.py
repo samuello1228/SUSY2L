@@ -24,7 +24,7 @@ parser.add_option("--nFilesPerNode", type=int, help="number of files per node in
 parser.add_option("--grl", help="good run list", default='multiLepSearch/GRL/physics_25ns_20.7.xml')
 parser.add_option("--conf", help="selection configuration file", default='multiLepSearch/sel_conf/SUSYTools_multilepAna.txt')
 parser.add_option("--dataPRW", help='data pileup reweighting file list', default= 'multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root')
-parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='multiLepSearch/prw_MC/merged_prw_mc15c_July27_afterFix.root')
+parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='dev/SUSYTools/merged_prw_mc15c_latest.root')
 parser.add_option("--test", help="test run", action='store_true', default=False)
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
@@ -32,6 +32,7 @@ parser.add_option("--sampleList", help="sample list", default=None)
 parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l"),default ="3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
+parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
 
 
 (options, args) = parser.parse_args()
@@ -108,7 +109,8 @@ elif options.samplesDir:
             if not m1:
                 print d, 'excluded'
                 continue
-            tag = m1.group(1)
+#             tag = m1.group(1)
+            tag = '_'.join(m1.groups())
             print tag, d,
             sample = ROOT.SH.SampleLocal(tag)
             files = [d+'/'+f for f in os.listdir(d) if f.find('.root')!=-1]
@@ -169,7 +171,7 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch
-
+alg.useChargeIDSelector = options.ChargeID
 
 # alg.CF_nLepCutExactly = 2
 # alg.CF_nLepCutMin = 2

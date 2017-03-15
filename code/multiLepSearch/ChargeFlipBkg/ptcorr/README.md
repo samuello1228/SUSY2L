@@ -1,5 +1,5 @@
 # README: ptCorr
-Last updated 28 July 2016
+Last updated 10 February 2017
 
 Part of the [ChargeFlipBkg](../) code package developed by Gabriel Gallardo for the UM/HK EWK SUSY SS 2L analysis.
 
@@ -35,9 +35,9 @@ Finds \Delta E and \Delta p_T of reconstructed electrons where \Delta p_T is def
 - Projects 3D histograms to 2D histograms, among which `hDPTflipped_pxy` will be used by the scripts in [ChargeFlipBkg/estimate](../estimate/)
 
 ### Execution
-`./drawDEhistos.py`  
+`./drawDEhistos.py dEhistos.root`  
 OR  
-`python drawDEhistos.py`
+`python drawDEhistos.py dEhistos.root`
 
 ## EnergyCorr.C
 ### Execution:

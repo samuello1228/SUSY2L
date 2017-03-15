@@ -396,7 +396,7 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
    hLHclone->GetYaxis()->SetMoreLogLabels();
    hLHclone->SetMarkerSize(1.08);
    if(ABS_ETA) hLHclone->GetXaxis()->SetTitle("|#eta|");
-   hLHclone->Draw("colz text e");  
+   hLHclone->Draw("colz text 1.3e");  
    filename = sData;
    filename += ".pdf";
    cLH->Print(filename.c_str());
@@ -410,7 +410,7 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
       hDataSubbed->GetYaxis()->SetMoreLogLabels();
       hDataSubbed->SetMarkerSize(1.08);
       if(ABS_ETA) hDataSubbed->GetXaxis()->SetTitle("|#eta|");
-      hDataSubbed->Draw("colz text e");
+      hDataSubbed->Draw("colz text 1.3e");
       filename = sDataSubbed;
       filename += ".pdf";
       cSub->Print(filename.c_str());
@@ -426,7 +426,7 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
       hMCclone->GetYaxis()->SetTitle("p_{T} (GeV)");
       hMCclone->SetMarkerSize(1.08);
       hMCclone->GetYaxis()->SetMoreLogLabels();
-      hMCclone->Draw("colz text e");
+      hMCclone->Draw("colz text 1.3e");
       filename = sMC;
       filename += ".pdf";
       cMC->Print(filename.c_str());
@@ -442,7 +442,7 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
       hMCLHclone->SetMarkerSize(1.08);
       hMCLHclone->GetYaxis()->SetMoreLogLabels();
       if(ABS_ETA) hMCLHclone->GetXaxis()->SetTitle("|#eta|");
-      hMCLHclone->Draw("colz text e");
+      hMCLHclone->Draw("colz text 1.3e");
       filename = sMCLH;
       filename += ".pdf";
       cMCLH->Print(filename.c_str());
@@ -487,7 +487,7 @@ bool compareDataMC(const char* dataFile, const char* dataSubbed, const char* mcF
       cout << "Failed to get hLH histogram from " << dataFile << endl;
       return false;
    }
-   hData->SetName("hGabriel");
+   hData->SetName("hMCLH");
 
    //====================
    // hDataSubbed = (TH2*) fDataSubbed->Get("80.0_100.0_20.0_20.0_DATA_misid");
@@ -503,7 +503,7 @@ bool compareDataMC(const char* dataFile, const char* dataSubbed, const char* mcF
       cout << "Failed to get hMC histogram from " << mcFile << endl;
       return false;
    }
-   hMC->SetName("hMCTruth");
+   hMC->SetName("hMCTruthRate");
 
    // ====================
    // hMCLH = (TH2*) fMC->Get("80.0_100.0_20.0_20.0_DATA_misid");

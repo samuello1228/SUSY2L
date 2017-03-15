@@ -57,6 +57,7 @@ public:
   std::string CF_derivationName;
   std::string study;
   std::string mcTruthMatch;
+  bool useChargeIDSelector;
   int doSys;
   //int CF_nLepCutExactly;
   //int CF_nLepCutMin;
@@ -132,7 +133,6 @@ public:
   std::vector<susyEvts*   > m_susyEvtList; //!
   susyEvts* m_susyEvt; //!
   ST::SUSYObjDef_xAOD* m_objTool; //!
-  SUSY::CrossSectionDB* m_XsecDB;  //!
 //   CP::MuonSelectionTool* m_muonSelTool; //!
 
   ChargeFlipBkgTool* mChargeFlipBkgTool; //!
@@ -158,7 +158,6 @@ public:
   GoodRunsListSelectionTool *m_grl; //!
   //std::map<OFLAGS, CP::IsolationSelectionTool* > m_isoTools; //!
 //   CP::IsolationSelectionTool* m_isoTool; //!
-  TH1* mh_ElChargeFlip; //!
 
  private:
   // this is needed to distribute the algorithm to the workers

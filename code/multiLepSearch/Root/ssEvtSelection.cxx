@@ -47,12 +47,12 @@ static SG::AuxElement::Accessor<char> dec_bjet_loose("bjet_loose");
 static SG::AuxElement::Accessor<char> dec_bjet("bjet");
 static SG::AuxElement::Accessor<char> dec_cosmic("cosmic");
 typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
-static SG::AuxElement::Accessor< int > acc_truthType("truthType");
-static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
+//static SG::AuxElement::Accessor< int > acc_truthType("truthType");
+//static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
 // static SG::AuxElement::Accessor< float > acc_truthProb("truthMatchProbability"); // only ID track
 static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
-static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
-static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
+//static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
+//static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
 
 const float iGeV = 0.001;
 const float GeV = 1000;
@@ -63,7 +63,7 @@ ClassImp(ssEvtSelection)
 
 
 
-ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_XsecDB(0),m_grl(0),mh_ElChargeFlip(0){
+ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0){
   // Here you put any code for the base initialization of variables,
   // e.g. initialize all pointers to 0.  Note that you should only put
   // the most basic initialization here, since this method will be
@@ -319,8 +319,8 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(m_objTool->initialize().isSuccess());
 
   mChargeFlipBkgTool = new ChargeFlipBkgTool("MyQFlipTool");
-  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeMisID_Zee_data_signal_wSys.root"));
-  //CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb"));
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeFlipRates.root"));
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb_data"));
   CHECK(mChargeFlipBkgTool->initialize());
 
   mFakeLepBkgTool = new FakeLepBkgTool("MyFLepTool");
@@ -354,18 +354,11 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
 
-  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool");
+  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool_medium");
   CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
   CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
   CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
   CHECK(ECIDSTool->initialize());
-
-  TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
-  mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
-  Info("chargeMisID", "nbinsX = %d", mh_ElChargeFlip->GetNbinsX());
-
-  //cross section tool
-  if(CF_isMC) m_XsecDB = new SUSY::CrossSectionDB("SUSYTools/susy_crosssections_13TeV.txt",true);
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -502,12 +495,12 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_hCutFlow->Fill("CoreFlag", 1);
 
     // Primary vertex
-    m_susyEvt->sig.nPV=0;
-    m_susyEvt->sig.nVtx=0;
+    unsigned int nPV=0;
+    //m_susyEvt->sig.nVtx=0;
     const xAOD::VertexContainer* vertices(0);
     if( wk()->xaodEvent()->retrieve( vertices, "PrimaryVertices" ).isSuccess() ) {
       for( const auto& vx : *vertices ) {
-        m_susyEvt->sig.nVtx++;
+        //m_susyEvt->sig.nVtx++;
         if(vx->vertexType() != xAOD::VxType::PriVtx) continue;
         int nTrk = 0;
         for(size_t i=0; i<vx->nTrackParticles(); i++){
@@ -515,13 +508,13 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(trk && trk->pt()>CF_vxTrkPtMin) nTrk++;
         }
         if(nTrk<CF_vxTrkNMin) continue;
-        m_susyEvt->sig.nPV++;
+        nPV++;
       }
     }else{
       Error("Failed to retrieve VertexContainer %s, returning NULL", "PrimaryVertices");
     }
 
-    if(m_susyEvt->sig.nPV<1) return sc;
+    if(nPV<1) return sc;
     m_hCutFlow->Fill("PV", 1);
 
     CHECK(m_objTool->ApplyPRWTool());
@@ -753,18 +746,10 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Save informations
     ////////////////////////
     
-    //unused variables
-    m_susyEvt->evt.index = 0;
-    m_susyEvt->evt.cuts = 0;
-    m_susyEvt->evt.pass = 0;
-    m_susyEvt->sig.nEl = 0;
-    m_susyEvt->sig.nMu = 0;
-    m_susyEvt->sig.nTau = 0;
-
     //event information
-    m_susyEvt->evt.run = eventInfo->runNumber();
+    //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
-    m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
+    //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
@@ -774,6 +759,8 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     // charge flip weight and pT correction (have to apply before other calculation that use lep pT)
     m_susyEvt->evt.qFwt = 0.0;
+    m_susyEvt->evt.qFwt_sys_1up = 0.0;
+    m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if ((sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)){
         //ugly code to get lep0 type and charge :(
         xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
@@ -795,6 +782,8 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
         if (sigLepSign0!=sigLepSign1){
           m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
+          m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
+          m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
           auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
           if(tmpPt.size()==2){
             if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
@@ -806,13 +795,18 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     //fake lep weight
     m_susyEvt->evt.fLwt = 0.0;
+    m_susyEvt->evt.fLwt_e_sys_1up = 0.0; 
+    m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
+    m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
+    m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
     if ((sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
+      m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
+      m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
+      m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
+      m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
-
-    //cross section
-    if(CF_isMC) m_susyEvt->evt.Xsec = m_XsecDB->xsectTimesEff(eventInfo->mcChannelNumber());
 
     /// met
     xAOD::MissingETContainer* metcst = new xAOD::MissingETContainer();
@@ -836,7 +830,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
 
     m_susyEvt->sig.HT = 0;
-    m_susyEvt->sig.nJet = jet_Ls.size();
+    //m_susyEvt->sig.nJet = jet_Ls.size();
     m_susyEvt->jets.resize(jet_Ls.size());
     int nSigJet = 0;
     int nBJet = 0;
@@ -844,10 +838,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     int i=0;
     for(auto j0: jet_Ls){
       auto j = dynamic_cast<xAOD::Jet*>(j0);
-      //unused variables
-      m_susyEvt->jets[i].e = 0;
-
-      //
+      
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
@@ -871,7 +862,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       fillLepton(sel_Ls[i], m_susyEvt->leps[i], i);
       m_susyEvt->leps[i].MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
-      if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
+      //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
       m_susyEvt->leps[i].mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
@@ -889,13 +880,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
 
 
-    m_susyEvt->evt.trig = 0;
+    unsigned int dilepFlag = 0;
     //for cutflow
     for(unsigned int i=0;i<electrons_copy->size(); i++){
       for(unsigned int j=i+1;j<electrons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<0;
+          dilepFlag |= 1<<0;
         }
       }
     }
@@ -904,7 +895,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=i+1;j<muons_copy->size(); j++){
         if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<1;
+          dilepFlag |= 1<<1;
         }
       }
     }
@@ -913,7 +904,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       for(unsigned int j=0;j<muons_copy->size(); j++){
         if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
         {
-          m_susyEvt->evt.trig |= 1<<2;
+          dilepFlag |= 1<<2;
         }
       }
     }
@@ -922,7 +913,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     {
         if(totLs == 2 && sig_Ls.size() == 2)
         {
-          if(m_susyEvt->evt.trig > 0)
+          if(dilepFlag > 0)
           {
             m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
           }
@@ -938,7 +929,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         }      
         else if(totLs == 3 && sig_Ls.size() == 3)
         {
-          if(m_susyEvt->evt.trig > 0)
+          if(dilepFlag > 0)
           {
             m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
           }
@@ -1063,18 +1054,6 @@ EL::StatusCode ssEvtSelection :: execute ()
         m_susyEvt->evt.BtagSF = 1;
       }
 
-      ///// get the weight for 1 lepton charge flip
-      //m_susyEvt->evt.qFwt = 0;
-      //for(unsigned int i=0; i<sel_Ls.size(); i++){
-      //  auto e = sel_Ls[i];
-      //  if(!( dec_signal(*e) && TMath::Abs(m_susyEvt->leps[i].ID) == 11000 )) continue;
-      //  int ibin = mh_ElChargeFlip->FindBin(e->eta(), e->pt()*iGeV);
-      //  if(ibin>0){
-      //    float wt = mh_ElChargeFlip->GetBinContent(ibin);
-      //    m_susyEvt->evt.qFwt = wt*(1-m_susyEvt->evt.qFwt)+(1-wt)*(m_susyEvt->evt.qFwt);
-      //  }
-      //}
-
       ///// event weight for fake Lep
       //m_susyEvt->evt.fLwt = 0.;
 
@@ -1169,16 +1148,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 {
   l.ID = 11000;
   l.ID *= el->charge();
-  l.author = el->author();
+  //l.author = el->author();
 
   //isolation
-  if(!el->isolationValue(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(el)", "topoetcone20 failed."); 
-  if(!el->isolationValue(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(el)", "topoetcone30 failed."); 
-  if(!el->isolationValue(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(el)", "topoetcone40 failed."); 
-  if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
-  if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
-  if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
+  //if(!el->isolationValue(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(el)", "topoetcone20 failed."); 
+  //if(!el->isolationValue(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(el)", "topoetcone30 failed."); 
+  //if(!el->isolationValue(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(el)", "topoetcone40 failed."); 
+  //if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
+  //if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
+  //if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
 
+  /*
   //track
   const xAOD::TrackParticle* trk = el->trackParticle(0);
   if(trk)
@@ -1197,12 +1177,13 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   //l.nSCTHoles    =el->trackParticleSummaryIntValue(numberOfSCTHoles);
   l.nTRTHits     =el->trackParticleSummaryIntValue(numberOfTRTHits);
   l.nTRTOutliers =el->trackParticleSummaryIntValue(numberOfTRTOutliers);
-  
+  */
+
   if(CF_isMC)
   {
     if (mcTruthMatch == "TruthLink") {
-      l.truthType = acc_truthType(*el);
-      l.truthOrig = acc_truthOrig(*el);
+      //l.truthType = acc_truthType(*el);
+      //l.truthOrig = acc_truthOrig(*el);
 
       /// save truth match and parents if exist, otherwise save -1.
       auto tl = acc_truthLink(*el);
@@ -1220,11 +1201,11 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
 
     else if (mcTruthMatch == "MCTC"){
-      std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      res = m_truthClassifier->particleTruthClassifier(el);
+      //std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+      //res = m_truthClassifier->particleTruthClassifier(el);
 
-      l.truthType = res.first;
-      l.truthOrig = res.second;
+      //l.truthType = res.first;
+      //l.truthOrig = res.second;
 
       auto truthP = m_truthClassifier->getGenPart();
       if (truthP) {
@@ -1269,7 +1250,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 
   // ChargeIDSelector
   l.ElChargeID = 0;
-  l.ElChargeID =  ECIDSTool ? (bool) ECIDSTool->accept(el) : false ;
+  l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1278,16 +1259,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
 {
   l.ID = 13000;
   l.ID *= mu->charge();
-  l.author = mu->author();
+  //l.author = mu->author();
 
   //isolation
-  if(!mu->isolation(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(mu)", "topoetcone20 failed."); 
-  if(!mu->isolation(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(mu)", "topoetcone30 failed."); 
-  if(!mu->isolation(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(mu)", "topoetcone40 failed."); 
-  if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
-  if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
-  if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
+  //if(!mu->isolation(l.topoetcone20, xAOD::Iso::topoetcone20)) Error("fillLepton(mu)", "topoetcone20 failed."); 
+  //if(!mu->isolation(l.topoetcone30, xAOD::Iso::topoetcone30)) Error("fillLepton(mu)", "topoetcone30 failed."); 
+  //if(!mu->isolation(l.topoetcone40, xAOD::Iso::topoetcone40)) Error("fillLepton(mu)", "topoetcone40 failed."); 
+  //if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
+  //if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
+  //if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
 
+  /*
   //track
   const xAOD::TrackParticle* trk = mu->primaryTrackParticle();
   if(trk)
@@ -1307,14 +1289,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   l.nSCTHoles   = mu->summaryValue(n, numberOfSCTHoles)   ?n:0;
   l.nTRTHits    = mu->summaryValue(n, numberOfTRTHits)    ?n:0;
   l.nTRTOutliers= mu->summaryValue(n, numberOfTRTOutliers)?n:0;
+  */
 
   /// truth
   if(CF_isMC)
   {
+    /*
     if(trk){
-    l.truthType = acc_truthType(*trk);
-    l.truthOrig = acc_truthOrig(*trk);
+      l.truthType = acc_truthType(*trk);
+      l.truthOrig = acc_truthOrig(*trk);
     }
+    */
 
     /// save truth match and parents if exist, otherwise save -1.
     auto tl = acc_truthLink(*mu);
@@ -1327,31 +1312,19 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
-  l.ElChargeID = 63;
+  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
 
 void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
 {
-  l.topoetcone20 *= iGeV;
-  l.topoetcone30 *= iGeV;
-  l.topoetcone40 *= iGeV;
-  l.ptcone20 *= iGeV;
-  l.ptcone30 *= iGeV;
-  l.ptcone40 *= iGeV;
-
-  //unused variables
-  l.truthProb = 0;
-  l.SF_Loose = 0;
-  l.SF_Medium = 0;
-  l.SF_Tight = 0;
-  l.wt1 = 0;
-  l.wt2 = 0;
-  l.wt3 = 0;
-  l.Q = 0;
-  l.wt2 = 0;
-  l.wt2 = 0;
+  //l.topoetcone20 *= iGeV;
+  //l.topoetcone30 *= iGeV;
+  //l.topoetcone40 *= iGeV;
+  //l.ptcone20 *= iGeV;
+  //l.ptcone30 *= iGeV;
+  //l.ptcone40 *= iGeV;
 
   // 
   l.pt = p->pt()*iGeV;
@@ -1365,8 +1338,8 @@ void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
   if(dec_signal(*p)) flag |= IS_SIGNAL;
   if(dec_passOR(*p)) flag |= IS_PASSOR;
 
-  l.z0sinTheta = dec_z0sinTheta(*p);
-  l.d0sig = dec_d0sig(*p);
+  //l.z0sinTheta = dec_z0sinTheta(*p);
+  //l.d0sig = dec_d0sig(*p);
 }
 
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsigned int index)
@@ -1395,12 +1368,12 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.matchI = -1;
   t.motherI = -1;
 
+  /*
   std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
   res = m_truthClassifier->particleTruthClassifier(p);
   t.particleType = res.first;
   t.particleOrigin = res.second;
-
-
+  */
 
   /// add parents if exist
   if(pLevel){
