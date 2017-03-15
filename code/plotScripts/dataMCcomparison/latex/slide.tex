@@ -36,15 +36,12 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \small
-\item remove unused variables in our ntuple
-\item use both 2015 and 2016 data (3212.96 + 33257.2) /pb
-\item update the prw SF for data (change from 1.16 to 1.09)
+\item add Drell Yan low mass samples
+\item to have a better agreement for OS first
 \item Data and MC BG: \\
 /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/
 \item MC signal: \\
 /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/
-\item understand some peak of VV BG: the pileup profiles in SUSYTools for 361071 and 361072 have problem
-\item apply Z mass veto on SR
 \end{itemize}
 \end{frame}
 
@@ -60,79 +57,17 @@ University of Michigan
 \end{frame}
 
 \begin{frame}
-\frametitle{pileup profiles for VV BG (361071)}
-\includegraphics[width=0.5\textwidth]{data/photo/peak.pdf}
-\includegraphics[width=0.5\textwidth]{data/photo/zoom.pdf}
-\end{frame}
-
-
-\begin{frame}
 \begin{center}
 \huge
-Control Region
+opposite sign
 \end{center}
 \end{frame}
 
-\input{data/expN_CR.tex}
+\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
 
 \def \PathToPlot {../plot}
-\input{data/plot_CR.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-Signal Region
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region}
-Definition of the Signal Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
-\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
-\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
-\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
-\item The minimum $M_T$ of the two leptons
-\end{enumerate}
-\includegraphics[width=1\textwidth]{data/photo/SR.png}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region}
-The CMS result:
-\includegraphics[width=1\textwidth]{data/photo/result.png}
-\end{frame}
-
-\begin{frame}
-\includegraphics[width=0.7\textwidth]{data/photo/BG.png}
-\end{frame}
-
-\def \PathToPlot {../plot}
-\begin{frame}
-\frametitle{Signal Region (ee)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_ee.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (mumu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_mumu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (emu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_emu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (combine)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_combine.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
-\end{frame}
+\input{data/plot_OS.tex}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -140,16 +75,17 @@ The CMS result:
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The background is still large after the Z mass veto
+\item The agreement of average Mu is better
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item use the new charge flip weight(not ready in the last week)
-\item simplify trigger list
+\item simplify trigger list(don't know how to decide to use which trigger, different trigger for 3 channels)
+\item use the new charge flip weight
 \item use new signal samples
+\item use new pileup profiles for 361071 and 361072
 \end{itemize}
 \end{frame}
 
@@ -253,6 +189,7 @@ MGPy8EG_A14N23LO_C1N2_Slep_1000_800_0p95_2L5
 \frametitle{Data}
 \small
 GRL (33.3 fb$^{-1}$):\\
+use both 2015 and 2016 data (3212.96 + 33257.2) /pb
 \tiny
 \begin{verbatim}
 GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
@@ -701,16 +638,6 @@ Definition of the Control Region.
 \begin{frame}
 \begin{center}
 \huge
-opposite sign
-\end{center}
-\end{frame}
-
-\input{data/expN_OS.tex}
-%\input{data/expN_BGVV_OS.tex}
-
-\begin{frame}
-\begin{center}
-\huge
 same sign
 \end{center}
 \end{frame}
@@ -740,12 +667,70 @@ same sign
 \begin{frame}
 \begin{center}
 \huge
-opposite sign
+Control Region
 \end{center}
 \end{frame}
 
+\input{data/expN_CR.tex}
+
 \def \PathToPlot {../plot}
-\input{data/plot_OS.tex}
+\input{data/plot_CR.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+Signal Region
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+Definition of the Signal Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
+\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
+\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
+\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
+\item The minimum $M_T$ of the two leptons
+\end{enumerate}
+\includegraphics[width=1\textwidth]{data/photo/SR.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+The CMS result:
+\includegraphics[width=1\textwidth]{data/photo/result.png}
+\end{frame}
+
+\begin{frame}
+\includegraphics[width=0.7\textwidth]{data/photo/BG.png}
+\end{frame}
+
+\def \PathToPlot {../plot}
+\begin{frame}
+\frametitle{Signal Region (ee)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_ee.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (mumu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_mumu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (emu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_emu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (combine)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_combine.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
+\end{frame}
 
 \begin{frame}
 \begin{center}
