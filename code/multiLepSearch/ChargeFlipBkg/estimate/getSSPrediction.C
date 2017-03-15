@@ -23,12 +23,14 @@
 // ========= CONFIGURATION =========== //
 TString defaultOut="outputDirYL-PtCorr";
 TString defaultNTupleList="../common/inFileList-DataYL.txt";
-TString defaultMisIdfile="../QID-on/rates_wSys.root";
+// TString defaultMisIdfile="../QID-on/rates_wSys.root";
+TString defaultMisIdfile="../QID-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
+TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
 // TString misIDhistname="hFlipProb_MCtruth";
 // TString misIDhistname="hFlipProb_MCLH";
-TString misIDhistname="hFlipProb_data";
+// TString misIDhistname="hFlipProb_data";
 TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
 bool onlySignal=true;
 bool applyPtCorrection=true;
