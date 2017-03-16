@@ -57,7 +57,7 @@ def runMinuit(numParameters):
   minuit.mnexcm("SET ERR", arglist, 1, internalFlag)
   
   initialValues = np.zeros(numParameters) + 0.01
-  steps = np.zeros(numParameters) + 0.001
+  steps = np.zeros(numParameters) + 0.0001
   
   for i in xrange(numParameters):
     name = "epsilon%s" % i

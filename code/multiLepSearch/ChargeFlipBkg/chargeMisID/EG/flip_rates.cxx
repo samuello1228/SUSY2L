@@ -51,8 +51,8 @@ bool passQID=true;
 //##################################
 //# Choose the bool for MC or DATA! #
 
-// bool m_DT = false; //for MC
-bool m_DT = true; //for DATA
+bool m_DT = false; //for MC
+// bool m_DT = true; //for DATA
 
 bool applyPRW = !m_DT && true;
 
