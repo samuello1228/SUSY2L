@@ -12,7 +12,7 @@ bool applyPRW = true;
 bool passQID = true;
 
 string defaultOutDir="../QID-on/ptcorr";
-string defaultInFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-ZeePowhegconverted.txt";
+string defaultInFileTxt="/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/common/inFileList-ZeePowhegConverted.txt";
 
 // ========= MAIN FUNCTION ======== //
 int makeDEhistos(string outDir=defaultOutDir, string inFileTxt=defaultInFileTxt){
