@@ -6,11 +6,16 @@
 #include <fstream>
 #include "../common/common.C"
 
+// ======= CONFIGURATION ======== //
 bool signalOnly = true;
 bool applyPRW = true;
 bool passQID = true;
 
-int makeDEhistos(string outDir="20.7/loose", string inFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-MCconverted.txt"){
+string defaultOutDir="../QID/ptcorr";
+string defaultInFileTxt="/afs/cern.ch/user/g/ggallard/Zee/common/inFileList-ZeePowhegconverted.txt"
+
+// ========= MAIN FUNCTION ======== //
+int makeDEhistos(string outDir=defaultOutDir, string inFileTxt=defaultInFileTxt){
 
 	if(signalOnly){
 		cout << "Selecting Signal events" << endl;
