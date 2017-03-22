@@ -147,10 +147,10 @@ int getOrigElecI(const susyEvts* mEvts, int i){
 
 bool convert(TString file){
 
-  // TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
-  // TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
-  TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
-  TPRegexp reFile("user.ggallard.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
+  TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
+  TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
+  // TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
+  // TPRegexp reFile("user.ggallard.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
   outDir = file(reDir).Data();
   outDir = outDir(0,outDir.First('/'));
   TString outFilename = file(reFile).Data();
