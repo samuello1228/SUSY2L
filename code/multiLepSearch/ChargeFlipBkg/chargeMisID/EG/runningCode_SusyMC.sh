@@ -28,6 +28,8 @@ else
 fi
 
 ./flip_rates ZeeCandidate binsMC.txt `listFiles ~/work/NTuples/convertedZeePowheg`
+# ./flip_rates ZeeCandidate binsMC.txt `listFiles ~/work/NTuples/convertedZee`
+
 # ./flip_rates ZeeCandidate binsMC.txt `catFiles MCfiles.txt`
 if [ $? -eq 0 ]; then
 	echo "flip_rates successful"
