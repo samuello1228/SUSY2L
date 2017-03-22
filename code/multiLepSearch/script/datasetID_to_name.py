@@ -50,7 +50,7 @@ def MC15C_criteria(tags):
   """
 
   #One of the following must be present
-  tarTags = ["r7725","r7772","a818","a821"]
+  tarTags = ["r7725","r7772","a818","a821","a766"]
   #tarTags = ["a818","a821"] #tags for AFII fast sim?
   if not any( [ t in tags for t in tarTags] ): return False
 
@@ -59,8 +59,8 @@ def MC15C_criteria(tags):
 
   #This DAOD tag is recommended for athena20.7
   #tarTags = ["p2666","p2688"]
-  tarTags = ["p2879"]
-  #tarTags = ["p2949"]
+  #tarTags = ["p2879"]
+  tarTags = ["p2949"]
   if not any( [ t in tags for t in tarTags] ): return False
 
   return True
@@ -79,8 +79,9 @@ inFile = open(sys.argv[1])
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
-outputPath = "MCBG_sample_list.txt"
+#outputPath = "MCBG_sample_list.txt"
 #outputPath = "Data_sample_list.txt"
+outputPath = "MCSig_sample_list.txt"
 outputFile = open(outputPath,"w")
 
 for aLine in inFile:

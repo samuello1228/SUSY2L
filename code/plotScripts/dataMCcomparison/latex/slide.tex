@@ -36,24 +36,8 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \small
-\item add Drell Yan low mass samples
-\item to have a better agreement for OS first
-\item Data and MC BG: \\
-/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/
-\item MC signal: \\
-/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/
+\item separate V+gamma into W+gamma and Z+gamma
 \end{itemize}
-\end{frame}
-
-\def \PathToPlot {../plot}
-\begin{frame}
-\frametitle{averageMu}
-\begin{figure}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
-\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
-\end{figure}
 \end{frame}
 
 \begin{frame}
@@ -75,19 +59,19 @@ opposite sign
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The agreement of average Mu is better
+\item Z+gamma is large and W+gamma is small
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Plan}
-\begin{itemize}
-\item simplify trigger list(don't know how to decide to use which trigger, different trigger for 3 channels)
-\item use the new charge flip weight
-\item use new signal samples
-\item use new pileup profiles for 361071 and 361072
-\end{itemize}
-\end{frame}
+%\begin{frame}
+%\frametitle{Plan}
+%\begin{itemize}
+%\item simplify trigger list
+%\item use the new charge flip weight
+%\item use new signal samples
+%\item use new pileup profiles for 361071 and 361072
+%\end{itemize}
+%\end{frame}
 
 \begin{frame}
 \begin{center}
@@ -608,6 +592,17 @@ Selection:
 Note: \\
 Pileup reweighting is applied. \\
 Scale factor for reconstruction, isolation, ID and trigger is applied.
+\end{frame}
+
+\def \PathToPlot {../plot}
+\begin{frame}
+\frametitle{averageMu}
+\begin{figure}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
+\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
+\end{figure}
 \end{frame}
 
 \begin{frame}
