@@ -21,23 +21,30 @@
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-// TString defaultOut="../QID-on/estimates-dataSmallBins";
-TString defaultOut="../QID-on/estimates-MCSmallBinsTruth";
+// TString defaultOut="../QID-on/estimates-data";
+// TString defaultOut="../QID-on/estimates-MC-NoPt";
+TString defaultOut="../QID-on/estimates-MCTruth-NoPt";
+
 // TString defaultNTupleList="../common/inFileList-data.txt";
 TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
+// TString defaultNTupleList="../common/inFileList-Zee.txt";
+
 TString defaultMisIdfile="../QID-on/rates_wSys.root";
 // TString defaultMisIdfile="../QID-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
+
 // TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
 TString misIDhistname="hFlipProb_MCtruth";
 // TString misIDhistname="hFlipProb_MCLH";
 // TString misIDhistname="hFlipProb_data";
+
 TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
+
 bool onlySignal=true;
-bool applyPtCorrection=true;
+bool applyPtCorrection=false;
 bool passQID=true;
-bool ZWindowOnly = true;
+bool ZWindowOnly = false;
 // ========= INFRASTRUCTURE =========== //
 class Histos;
 evt2l* evt2lTree=0;
