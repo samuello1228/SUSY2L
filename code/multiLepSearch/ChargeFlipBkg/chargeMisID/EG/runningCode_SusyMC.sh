@@ -11,14 +11,12 @@ listFiles(){
 }
 
 
-if [ $1 -ne "-f" ]; then
-	echo "Did you check the data/MC tag in flip_rates.cxx? ('y' for yes)"
-	read input
-	if [ $input != "y" ] 
-	then
-		echo "Please check it then"
-		exit
-	fi
+echo "Did you check the data/MC tag in flip_rates.cxx? ('y' for yes)"
+read input
+if [ $input != "y" ] 
+then
+	echo "Please check it then"
+	exit
 fi
 
 g++ -O3 -Wall -Wextra -std=c++11 -o flip_rates flip_rates.cxx `root-config --cflags --glibs`
