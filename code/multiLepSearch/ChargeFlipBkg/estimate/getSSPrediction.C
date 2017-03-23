@@ -21,28 +21,30 @@
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-// TString defaultOut="../QID-on/estimates-data";
-// TString defaultOut="../QID-on/estimates-MC-NoPt";
-TString defaultOut="../QID-on/estimates-MCTruth-NoPt";
+// TString defaultOut="../QiD-on/estimates-data";
+TString defaultOut="../QiD-on/estimates-Powheg-oldPt";
+// TString defaultOut="../QiD-on/estimates-MCTruth-NoPt";
 
 // TString defaultNTupleList="../common/inFileList-data.txt";
 TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
 // TString defaultNTupleList="../common/inFileList-Zee.txt";
 
-TString defaultMisIdfile="../QID-on/rates_wSys.root";
-// TString defaultMisIdfile="../QID-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
+TString defaultMisIdfile="../QiD-on/rates_wSys.root";
+// TString defaultMisIdfile="../QiD-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
 
 // TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-TString misIDhistname="hFlipProb_MCtruth";
-// TString misIDhistname="hFlipProb_MCLH";
+//TString misIDhistname="hFlipProb_MCtruth";
+TString misIDhistname="hFlipProb_MCLH";
 // TString misIDhistname="hFlipProb_data";
 
-TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
+// TString defaultdPtfile="../QiD-on/ptcorr/dEhistos.root";
+TString defaultdPtfile="../../data/root_files/dPThistos.root";
+
 
 bool onlySignal=true;
-bool applyPtCorrection=false;
+bool applyPtCorrection=true;
 bool passQID=true;
 bool ZWindowOnly = false;
 // ========= INFRASTRUCTURE =========== //
