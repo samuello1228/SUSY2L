@@ -11,8 +11,8 @@ bool signalOnly = true;
 bool applyPRW = true;
 bool passQID = true;
 
-string defaultOutDir="../QID-on/ptcorr";
-string defaultInFileTxt="/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/common/inFileList-ZeePowhegConverted.txt";
+string defaultOutDir="../QiD-on/ptcorr";
+string defaultInFileTxt="/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/common/inFileList-ZeeConverted.txt";
 
 // ========= MAIN FUNCTION ======== //
 int makeDEhistos(string outDir=defaultOutDir, string inFileTxt=defaultInFileTxt){
