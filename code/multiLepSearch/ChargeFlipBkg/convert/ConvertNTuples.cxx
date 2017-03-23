@@ -286,6 +286,41 @@ bool convert(TString file){
     if(mEvts->leps.size()!=2) continue;
     if (int(fabs(mEvts->leps[0].ID/1000))!=11 || int(fabs(mEvts->leps[1].ID/1000))!=11) continue;
 
+    {
+      MCEvtWeight = 0;
+      MCPileupWeight = 0;
+      Zcand_M = 0;
+      trigCode = 0;
+      elCand1_charge = 0;
+      elCand1_pt = 0;
+      elCand1_cl_eta = 0;
+      elCand1_phi = 0;
+      elCand1_E = 0;
+      elCand1_ID = 0;
+      elCand1_qID = 0;
+      elCand2_charge = 0;
+      elCand2_pt = 0;
+      elCand2_cl_eta = 0;
+      elCand2_phi = 0;
+      elCand2_E = 0;
+      elCand2_ID = 0;
+      elCand2_qID = 0;
+      elCand1_flag = 0;
+      elCand2_flag = 0;
+      elCand1_truthPt = 0;
+      elCand2_truthPt = 0;
+      elCand1_truthE = 0;
+      elCand2_truthE = 0;
+      elCand1_origPt = 0;
+      elCand2_origPt = 0;
+      elCand1_origE = 0;
+      elCand2_origE = 0;
+      elCand1_origCharge = 0;
+      elCand2_origCharge = 0;
+      elCand1_dRwOrig = 0;
+      elCand2_dRwOrig = 0;
+    }
+
     MCEvtWeight = mEvts->evt.weight*mEvts->evt.ElSF*mEvts->evt.MuSF;
     MCPileupWeight = mEvts->evt.pwt;
     trigCode = mEvts->sig.trigCode;
