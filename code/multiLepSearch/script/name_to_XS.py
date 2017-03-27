@@ -19,6 +19,10 @@ with open(sigFilesTxt) as sigFiles:
       elements = aLine.split(".")
       mass = elements[2].split("_")
 
+      #find number of event of SUSY2
+      info = AtlasAPI.get_dataset_info(client, name)[0]
+      number = info['totalEvents']
+
       #find evgen.EVNT sample
       prov = AtlasAPI.get_dataset_prov(client, name)
       node = prov['node']
@@ -34,6 +38,6 @@ with open(sigFilesTxt) as sigFiles:
       print elements[1], xSec, unit, eff
 
       #output file
-      outStr = elements[1] + " " + elements[2] + " " + mass[4] + " " + mass[5] + " " + str(float(xSec)*1000) + " " + eff
+      outStr = elements[1] + " " + elements[2] + " " + mass[4] + " " + mass[5] + " " + str(float(xSec)*1000) + " " + eff + " " + number
       print outStr, "\n"
       outFile.write(outStr+"\n")
