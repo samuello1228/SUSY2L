@@ -22,14 +22,14 @@
 
 // ========= CONFIGURATION =========== //
 // TString defaultOut="../QiD-on/estimates-data";
-TString defaultOut="../QiD-on/estimates-Powheg-oldPt";
+TString defaultOut="../QiD-on/Powheg/estimates-NoPt-TruthMatched";
 // TString defaultOut="../QiD-on/estimates-MCTruth-NoPt";
 
 // TString defaultNTupleList="../common/inFileList-data.txt";
 TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
 // TString defaultNTupleList="../common/inFileList-Zee.txt";
 
-TString defaultMisIdfile="../QiD-on/rates_wSys.root";
+TString defaultMisIdfile="../QiD-on/Powheg/rates_wSys.root";
 // TString defaultMisIdfile="../QiD-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
 
@@ -39,14 +39,15 @@ TString defaultMisIdfile="../QiD-on/rates_wSys.root";
 TString misIDhistname="hFlipProb_MCLH";
 // TString misIDhistname="hFlipProb_data";
 
-// TString defaultdPtfile="../QiD-on/ptcorr/dEhistos.root";
-TString defaultdPtfile="../../data/root_files/dPThistos.root";
+// TString defaultdPtfile="../QiD-on/Powheg/ptcorr/dEhistos.root";
+TString defaultdPtfile="../../data/root_files/dPT_signal.root";
 
 
 bool onlySignal=true;
 bool applyPtCorrection=true;
 bool passQID=true;
-bool ZWindowOnly = false;
+bool isMC = true;
+bool ZWindowOnly = !isMC;
 // ========= INFRASTRUCTURE =========== //
 class Histos;
 evt2l* evt2lTree=0;
@@ -229,6 +230,13 @@ void getSSPrediction(const TString outputDir=defaultOut,
       // Select events which pass electron ChargeFlipTagger
       if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
 
+      // In MC, plot only events with truth-matched electrons 
+      if (isMC &&
+         (evt2lTree->leps_truthI[0] < 0 || evt2lTree->leps_truthI[0] < 0 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11) )
+         continue;
+
       bool SSevent = ((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0));
 
       double pt1 = evt2lTree->leps_pt[0];
@@ -346,7 +354,16 @@ bool initialize(const TString outputDir, const TString ntupleList, const TString
                std::cout << "Option unrecognized. " << std::endl;
                return false;
             }
-         } else {
+         } 
+         else if(key=="mc"){
+            if(value=='y') isMC = true;
+            else if (value=='n') isMC = false;
+            else {
+               std::cout << "Option unrecognized. " << std::endl;
+               return false;
+            }
+         } 
+         else {
             std::cout << "Option unrecognized. " << std::endl;
             return false;
          }
