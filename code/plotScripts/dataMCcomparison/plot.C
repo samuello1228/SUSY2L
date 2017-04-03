@@ -90,24 +90,27 @@ void plot()
     
     std::vector<TString> SigSampleID1;
     std::vector<TString> SigSampleID2;
-    std::vector<double> SigXS; //cross section in pb
+    std::vector<double> SigXS1; //cross section in pb
+    std::vector<double> SigXS2; //cross section in pb
     std::vector<int> SigMass1;
     std::vector<int> SigMass2;
     SigSampleID1.reserve(20);
-    SigXS.reserve(20);
+    SigSampleID2.reserve(20);
+    SigXS1.reserve(20);
+    SigXS2.reserve(20);
     SigMass1.reserve(20);
     SigMass2.reserve(20);
     
     {
         //read SigSample.txt
         ifstream fin;
-        fin.open("SigSample.txt");
-        while(!fin.eof())
+        fin.open("SigSample_diff.txt");
+        
+        //old
+        for(unsigned int i=1;i<=66;i++)
         {
             TString SampleIDTemp;
-            //for 125
             fin>>SampleIDTemp;
-            if(fin.eof()) break;
             
             TString SampleNameTemp;
             fin>>SampleNameTemp;
@@ -116,6 +119,7 @@ void plot()
             SampleIDTemp += SampleNameTemp;
             
             SigSampleID1.push_back("skimming_signal_old/skimming."+SampleIDTemp);
+            SigSampleID2.push_back("skimming_signal_new/skimming."+SampleIDTemp);
             
             int SigMass;
             fin>>SigMass;
@@ -130,35 +134,30 @@ void plot()
             fin>>SigXSTemp;
             SigXSTemp2 *= SigXSTemp;
             
-            /*
-             fin>>SigXSTemp2;
-             fin>>SigXSTemp;
-             SigXSTemp2 *= SigXSTemp;
-             fin>>SigXSTemp;
-             SigXSTemp2 *= SigXSTemp;
-             
-             fin>>SigXSTemp;
-             fin>>SigXSTemp;
-             
-             //next line for 127
-             fin>>SigXSTemp;
-             
-             double SigXSTemp3;
-             fin>>SigXSTemp3;
-             fin>>SigXSTemp;
-             SigXSTemp3 *= SigXSTemp;
-             fin>>SigXSTemp;
-             SigXSTemp3 *= SigXSTemp;
-             
-             fin>>SigXSTemp;
-             fin>>SigXSTemp;
-             
-             //125 + 127
-             SigXSTemp2 += SigXSTemp3;
-             */
+            //cout<<SigXSTemp2<<endl;
+            SigXS1.push_back(SigXSTemp2);
+        }
+        
+        //new
+        for(unsigned int i=1;i<=66;i++)
+        {
+            TString SampleIDTemp;
+            fin>>SampleIDTemp;
+            fin>>SampleIDTemp;
+            
+            int SigMass;
+            fin>>SigMass;
+            fin>>SigMass;
+            
+            double SigXSTemp2;
+            fin>>SigXSTemp2;
+            
+            double SigXSTemp;
+            fin>>SigXSTemp;
+            SigXSTemp2 *= SigXSTemp;
             
             //cout<<SigXSTemp2<<endl;
-            SigXS.push_back(SigXSTemp2);
+            SigXS2.push_back(SigXSTemp2);
         }
         fin.close();
     }
@@ -169,7 +168,7 @@ void plot()
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
         cout<<"Name: "<<SigSampleID1[SigMassSplitting[i].ID].Data()<<endl;
         cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
-        cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
+        cout<<"XS: "<<SigXS1[SigMassSplitting[i].ID]<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleID1.size();j++)
@@ -387,7 +386,7 @@ void plot()
                 }
                 
                 //normalization for h2SigSum
-                h2SigSum[i]->Scale(sumDataL/AOD *SigXS[SigMassSplitting[i].ID]);
+                h2SigSum[i]->Scale(sumDataL/AOD *SigXS1[SigMassSplitting[i].ID]);
             }
             
             for(unsigned int j=0;j<SigSampleID1.size();j++)
