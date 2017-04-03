@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Feb 14 18:02:48 2017 by ROOT version 6.06/08
+// Tue Apr  4 03:19:46 2017 by ROOT version 6.06/08
 // from TTree evt2l/a angles tree
-// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/user.clo.v8.13.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10667615._000001.myOutput.root
+// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -36,7 +36,13 @@ public :
    Float_t         evt_MuSF;
    Float_t         evt_BtagSF;
    Float_t         evt_qFwt;
+   Float_t         evt_qFwt_sys_1up;
+   Float_t         evt_qFwt_sys_1dn;
    Float_t         evt_fLwt;
+   Float_t         evt_fLwt_e_sys_1up;
+   Float_t         evt_fLwt_e_sys_1dn;
+   Float_t         evt_fLwt_u_sys_1up;
+   Float_t         evt_fLwt_u_sys_1dn;
    Int_t           leps_;
    Float_t         leps_pt[kMaxleps];   //[leps_]
    Float_t         leps_eta[kMaxleps];   //[leps_]
@@ -124,9 +130,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/user.clo.v8.13.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10667615._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-26-da7031fc/user.clo.v8.13.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.clo.10667615._000001.myOutput.root");
+         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
