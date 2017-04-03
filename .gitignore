@@ -29,6 +29,7 @@ RootCoreBin
 *.toc
 *.vrb
 code/plotScripts/dataMCcomparison/skimming/*.root
+code/plotScripts/dataMCcomparison/skimming_signal_*/*.root
 code/plotScripts/dataMCcomparison/plot/*.eps
 code/plotScripts/dataMCcomparison/plot/*.pdf
 code/plotScripts/dataMCcomparison/latex/data/expN_BGVV*
