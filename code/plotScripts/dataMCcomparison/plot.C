@@ -28,8 +28,7 @@ void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetO
         TChain* treeTemp = new TChain("tree");
         for(unsigned int j=0;j<SetOfChannel.size();j++)
         {
-            TString fileName = "skimming/skimming.";
-            fileName += SampleID[i];
+            TString fileName = SampleID[i];
             fileName += "_";
             fileName += ChannelInfo[SetOfChannel[j]].ChannelName;
             fileName += ".root";
@@ -89,11 +88,12 @@ void plot()
         element.MassDiff = 300;   element.ID = 21;   SigMassSplitting.push_back(element);
     }
     
-    std::vector<TString> SigSampleID;
+    std::vector<TString> SigSampleID1;
+    std::vector<TString> SigSampleID2;
     std::vector<double> SigXS; //cross section in pb
     std::vector<int> SigMass1;
     std::vector<int> SigMass2;
-    SigSampleID.reserve(20);
+    SigSampleID1.reserve(20);
     SigXS.reserve(20);
     SigMass1.reserve(20);
     SigMass2.reserve(20);
@@ -114,7 +114,8 @@ void plot()
             
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            SigSampleID.push_back(SampleIDTemp);
+            
+            SigSampleID1.push_back("skimming_signal_old/skimming."+SampleIDTemp);
             
             int SigMass;
             fin>>SigMass;
@@ -166,14 +167,14 @@ void plot()
     {
         cout<<"Mass splitting: "<<SigMassSplitting[i].MassDiff<<endl;
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
-        cout<<"Name: "<<SigSampleID[SigMassSplitting[i].ID].Data()<<endl;
+        cout<<"Name: "<<SigSampleID1[SigMassSplitting[i].ID].Data()<<endl;
         cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
         cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
-        for(unsigned int j=0;j<SigSampleID.size();j++)
+        for(unsigned int j=0;j<SigSampleID1.size();j++)
         {
-            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j]<<endl;
+            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID1[j]<<endl;
         }
         cout<<endl;
     }
@@ -190,10 +191,9 @@ void plot()
     
     //Get number of events in AOD
     std::vector<unsigned int> SignAOD;
-    for(unsigned int i=0;i<SigSampleID.size();i++)
+    for(unsigned int i=0;i<SigSampleID1.size();i++)
     {
-        TString NameTemp = "skimming/skimming.";
-        NameTemp += SigSampleID[i];
+        TString NameTemp = SigSampleID1[i];
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += ChannelInfo[0].ChannelName;
@@ -328,7 +328,7 @@ void plot()
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         std::vector<TChain*> tree2Sig;
-        initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+        initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID1,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -343,7 +343,7 @@ void plot()
             xaxis += Var[VarIndex].unit;
             
             TH1F* h2SigSum[SigMassSplitting.size()];
-            TH1F* h2Sig[SigSampleID.size()];
+            TH1F* h2Sig[SigSampleID1.size()];
             
             //h2SigSum
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
@@ -357,7 +357,7 @@ void plot()
             }
             
             //h2Sig
-            for(unsigned int j=0;j<SigSampleID.size();j++)
+            for(unsigned int j=0;j<SigSampleID1.size();j++)
             {
                 TString NameTemp = "Sig_";
                 NameTemp += TString::Itoa(j,10);
@@ -377,7 +377,7 @@ void plot()
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 unsigned int AOD = 0;
-                for(unsigned int j=0;j<SigSampleID.size();j++)
+                for(unsigned int j=0;j<SigSampleID1.size();j++)
                 {
                     if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
                     {
@@ -390,7 +390,7 @@ void plot()
                 h2SigSum[i]->Scale(sumDataL/AOD *SigXS[SigMassSplitting[i].ID]);
             }
             
-            for(unsigned int j=0;j<SigSampleID.size();j++)
+            for(unsigned int j=0;j<SigSampleID1.size();j++)
             {
                 delete h2Sig[j];
             }
@@ -532,7 +532,7 @@ void plot()
             }
         }
         
-        for(unsigned int i=0;i<SigSampleID.size();i++)
+        for(unsigned int i=0;i<SigSampleID1.size();i++)
         {
             delete tree2Sig[i];
         }
