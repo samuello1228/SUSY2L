@@ -1,16 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include <fstream>
 #include <vector>
-#include <algorithm>
 
 #include <TFile.h>
 #include <TChain.h>
 #include <TBranch.h>
 #include <TH1F.h>
-#include <TH2D.h>
 #include <TMath.h>
-#include <THStack.h>
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TLegend.h>
@@ -19,11 +15,6 @@
 #include <TString.h>
 #include "AtlasLabels.C"
 #include "AtlasStyle.C"
-
-#include <TString.h>
-
-#include <TCanvas.h>
-#include <TLatex.h>
 
 struct ChannelData
 {
@@ -86,18 +77,16 @@ void plot()
         int MassDiff;
         unsigned int ID;
         TString IDName;
-        int colour;
-        int statCount;
     };
     std::vector<SigInfo> SigMassSplitting;
     {
         SigInfo element;
         
-        element.MassDiff = 20;    element.ID = 2;   element.colour = 6;   SigMassSplitting.push_back(element);
-        element.MassDiff = 50;    element.ID = 18;  element.colour = 7;   SigMassSplitting.push_back(element);
-        element.MassDiff = 100;   element.ID = 19;  element.colour = 8;   SigMassSplitting.push_back(element);
-        element.MassDiff = 200;   element.ID = 20;  element.colour = 9;   SigMassSplitting.push_back(element);
-        element.MassDiff = 300;   element.ID = 21;  element.colour = 14;  SigMassSplitting.push_back(element);
+        element.MassDiff = 20;    element.ID = 2;    SigMassSplitting.push_back(element);
+        element.MassDiff = 50;    element.ID = 18;   SigMassSplitting.push_back(element);
+        element.MassDiff = 100;   element.ID = 19;   SigMassSplitting.push_back(element);
+        element.MassDiff = 200;   element.ID = 20;   SigMassSplitting.push_back(element);
+        element.MassDiff = 300;   element.ID = 21;   SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -313,7 +302,6 @@ void plot()
     {
         TString RegionName;
         std::vector<unsigned int> setOfChannel;
-        bool isSS;
     };
     
     std::vector<RegionData> RegionInfo;
@@ -325,9 +313,6 @@ void plot()
             element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
             element.setOfChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
-            unsigned int OS = ChannelIndex;
-            if(OS>=6) OS -= 6;
-            element.isSS = OS>=3;
 
             RegionInfo.push_back(element);
         }
@@ -360,8 +345,6 @@ void plot()
             TH1F* h2SigSum[SigMassSplitting.size()];
             TH1F* h2Sig[SigSampleID.size()];
             
-            
-            
             //h2SigSum
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
             {
@@ -369,7 +352,7 @@ void plot()
                 NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
                 h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
-                h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
+                h2SigSum[j]->SetLineColor(2);
                 h2SigSum[j]->SetLineStyle(1);
             }
             
@@ -387,13 +370,8 @@ void plot()
                 
                 TString Cut = "weight";
                 
-                double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
-                    if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
-                }
+                tree2Sig[j]->Draw(temp.Data(),Cut.Data());
             }
-            
             
             //Add Signal for the same mass splitting
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -408,8 +386,13 @@ void plot()
                     }
                 }
                 
-                //preliminary normalization for h2SigSum
-                h2SigSum[i]->Scale(sumDataL/AOD);
+                //normalization for h2SigSum
+                h2SigSum[i]->Scale(sumDataL/AOD *SigXS[SigMassSplitting[i].ID]);
+            }
+            
+            for(unsigned int j=0;j<SigSampleID.size();j++)
+            {
+                delete h2Sig[j];
             }
             
             if(VarIndex==countVariable)
@@ -421,10 +404,7 @@ void plot()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                    hTemp.Add(h2SigSum[i]);
-                    hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
-                    sumOfEvent[i][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[i][1]);
+                    sumOfEvent[i][0] = h2SigSum[i]->IntegralAndError(0,-1,sumOfEvent[i][1]);
                     
                     cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[i][0]<<" +/- "<<sumOfEvent[i][1]<<endl;
                 }
@@ -456,135 +436,93 @@ void plot()
                 fout.close();
             }
             
-            //final normalization for h2SigSum for plotting
-            const int SigScale = 10;
+            
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
-                h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
-            }
-            
-            {
-                //adjust the max and min value for y-axis
-                double min = h2SigSum[0]->GetBinContent(h2SigSum[0]->GetMinimumBin());
-                double max = h2SigSum[0]->GetBinContent(h2SigSum[0]->GetMaximumBin());
-                
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                //Legend
+                TLegend* leg;
                 {
-                    if(h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMinimumBin()) < min) min = h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMinimumBin());
-                }
-                
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
-                    if(h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin()) > max) max = h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin());
-                }
-                
-                if(Var[VarIndex].log)
-                {
-                    h2SigSum[0]->SetMaximum(max*100);
-                    if(min<0.1)
-                    {
-                        h2SigSum[0]->SetMinimum(Var[VarIndex].ymin);
-                    }
-                    else
-                    {
-                        h2SigSum[0]->SetMinimum(min/2);
-                    }
-                }
-                else
-                {
-                    if(min>0) h2SigSum[0]->SetMinimum(min*0.9);
-                    else h2SigSum[0]->SetMinimum(min*1.1);
-                    h2SigSum[0]->SetMaximum(max*1.1);
-                }
-            }
-            
-            //Legend
-            TLegend* leg;
-            {
-                Double_t xl1, yl1, xl2, yl2;
-                
-                xl2=0.92;
-                yl2=0.95;
-                xl1=xl2-0.3;
-                yl1=yl2-0.2;
-                
-                leg = new TLegend(xl1,yl1,xl2,yl2);
-                leg->SetNColumns(2);
-                leg->SetFillStyle(0);
-                leg->SetTextFont(42);
-                leg->SetBorderSize(0);
-                
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
+                    Double_t xl1, yl1, xl2, yl2;
+                    
+                    xl2=0.92;
+                    yl2=0.95;
+                    xl1=xl2-0.3;
+                    yl1=yl2-0.2;
+                    
+                    leg = new TLegend(xl1,yl1,xl2,yl2);
+                    leg->SetNColumns(2);
+                    leg->SetFillStyle(0);
+                    leg->SetTextFont(42);
+                    leg->SetBorderSize(0);
+                    
+                    
                     TString NameTemp = "";
                     NameTemp += "(";
                     NameTemp += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
                     NameTemp += ", ";
                     NameTemp += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
-                    NameTemp += ") x";
-                    NameTemp += TString::Itoa(SigScale,10);
+                    NameTemp += ")";
                     leg->AddEntry(h2SigSum[i],NameTemp.Data(),"l");
+                    
                 }
-            }
-            
-            TH1F* h2Ratio = nullptr;
-            TPad* pad1 = nullptr;
-            TPad* pad2 = nullptr;
-            
-            //x-asix title for pad1
-            h2SigSum[0]->GetXaxis()->SetTitle(xaxis.Data());
-            
-            //pad1
-            pad1 = new TPad("pad1","pad1",0,0,1,1);
-            
-            pad1->SetLogy(Var[VarIndex].log);
-            
-            //Draw for pad1
-            gStyle->SetOptStat(0);
-            TCanvas* c2 = new TCanvas();
-            c2->cd();
-            pad1->Draw();
-            pad1->cd();
-            
-            h2SigSum[0]->Draw("axis");
-            for(unsigned int i=1;i<SigMassSplitting.size();i++)
-            {
+                
+                TH1F* h2Ratio = nullptr;
+                TPad* pad1 = nullptr;
+                TPad* pad2 = nullptr;
+                
+                //x-asix title for pad1
+                h2SigSum[i]->GetXaxis()->SetTitle(xaxis.Data());
+                
+                //pad1
+                pad1 = new TPad("pad1","pad1",0,0,1,1);
+                
+                pad1->SetLogy(Var[VarIndex].log);
+                
+                //Draw for pad1
+                gStyle->SetOptStat(0);
+                TCanvas* c2 = new TCanvas();
+                c2->cd();
+                pad1->Draw();
+                pad1->cd();
+                
+                h2SigSum[i]->Draw("axis");
                 h2SigSum[i]->Draw("histsame");
-            }
- 
-            leg->Draw();
-            
-            {
-                //text
-                ATLASLabel(0.3,0.88,"Internal");
                 
-                TLatex lt2;
-                TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
-                NameTemp += TString::Itoa(sumDataL/1000,10);
-                NameTemp += " fb^{-1}";
-                lt2.DrawLatexNDC(0.3,0.83, NameTemp.Data());
-                lt2.SetTextSize(lt2.GetTextSize());
+                leg->Draw();
                 
-                TLatex lt1;
-                lt1.DrawLatexNDC(0.3,0.78,RegionInfo[RegionIndex].RegionName.Data());
-                lt1.SetTextSize(lt1.GetTextSize());
-            }
-            
-            {
-                //export histograms in eps format
-                TString NameTemp = "plot_signal/";
-                NameTemp += Var[VarIndex].VarName;
-                NameTemp += "_";
-                NameTemp += RegionInfo[RegionIndex].RegionName;
-                NameTemp += ".eps";
-                c2->Print(NameTemp,"eps");
-            }
-
-            
-            //h2Sig
-            for(unsigned int j=0;j<SigSampleID.size();j++)
-            {
-                delete h2Sig[j];
+                {
+                    //text
+                    ATLASLabel(0.3,0.88,"Internal");
+                    
+                    TLatex lt2;
+                    TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
+                    NameTemp += TString::Itoa(sumDataL/1000,10);
+                    NameTemp += " fb^{-1}";
+                    lt2.DrawLatexNDC(0.3,0.83, NameTemp.Data());
+                    lt2.SetTextSize(lt2.GetTextSize());
+                    
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.3,0.78,RegionInfo[RegionIndex].RegionName.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
+                
+                {
+                    //export histograms in eps format
+                    TString NameTemp = "plot_signal/";
+                    NameTemp += Var[VarIndex].VarName;
+                    NameTemp += "_";
+                    NameTemp += RegionInfo[RegionIndex].RegionName;
+                    NameTemp += "_";
+                    NameTemp += SigMassSplitting[i].IDName;
+                    NameTemp += ".eps";
+                    c2->Print(NameTemp,"eps");
+                }
+                
+                //legend
+                delete leg;
+                
+                //canvas
+                delete c2;
             }
             
             //h2SigSum
@@ -592,12 +530,6 @@ void plot()
             {
                 delete h2SigSum[j];
             }
-            
-            //legend
-            delete leg;
-            
-            //canvas
-            delete c2;
         }
         
         for(unsigned int i=0;i<SigSampleID.size();i++)
