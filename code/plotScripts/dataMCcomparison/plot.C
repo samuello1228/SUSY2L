@@ -471,16 +471,19 @@ void plot()
             
             if(VarIndex==countVariable)
             {
-                double sumOfEvent[SigMassSplitting.size()][2];
+                double sumOfEvent1[SigMassSplitting.size()][2];
+                double sumOfEvent2[SigMassSplitting.size()][2];
+
                 //sample,expN/error/significance
                 
                 //expected number of events for signal
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    sumOfEvent[i][0] = h2SigSum1[i]->IntegralAndError(0,-1,sumOfEvent[i][1]);
+                    sumOfEvent1[i][0] = h2SigSum1[i]->IntegralAndError(0,-1,sumOfEvent1[i][1]);
+                    sumOfEvent2[i][0] = h2SigSum2[i]->IntegralAndError(0,-1,sumOfEvent2[i][1]);
                     
-                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[i][0]<<" +/- "<<sumOfEvent[i][1]<<endl;
+                    cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent1[i][0]<<" +/- "<<sumOfEvent1[i][1]<<endl;
                 }
                 cout<<endl;
                 
@@ -501,18 +504,52 @@ void plot()
                     fout<<SigMass2[SigMassSplitting[i].ID];
                     fout<<") & $";
                     fout<<setprecision(1)<<std::fixed;
-                    fout<<sumOfEvent[i][0];
+                    fout<<sumOfEvent1[i][0];
                     fout<<"\\pm";
-                    fout<<sumOfEvent[i][1];
+                    fout<<sumOfEvent1[i][1];
+                    fout<<"$ & $";
+                    fout<<sumOfEvent2[i][0];
+                    fout<<"\\pm";
+                    fout<<sumOfEvent2[i][1];
                     fout<<"$ &";
                     fout<<"\\\\"<<endl<<"\\hline"<<endl;
                 }
                 fout.close();
             }
             
-            
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
+                {
+                    //adjust the max and min value for y-axis
+                    double min = h2SigSum1[i]->GetBinContent(h2SigSum1[i]->GetMinimumBin());
+                    double max = h2SigSum1[i]->GetBinContent(h2SigSum1[i]->GetMaximumBin());
+                    
+                    if(h2SigSum2[i]->GetBinContent(h2SigSum2[i]->GetMinimumBin()) < min) min = h2SigSum2[i]->GetBinContent(h2SigSum2[i]->GetMinimumBin());
+                    if(h2SigSum2[i]->GetBinContent(h2SigSum2[i]->GetMaximumBin()) > max) max = h2SigSum2[i]->GetBinContent(h2SigSum2[i]->GetMaximumBin());
+                    
+                    if(Var[VarIndex].log)
+                    {
+                        h2SigSum1[i]->SetMaximum(max*100);
+                        if(min<0.01)
+                        {
+                            h2SigSum1[i]->SetMinimum(0.01);
+                        }
+                        else
+                        {
+                            h2SigSum1[i]->SetMinimum(min/2);
+                        }
+                    }
+                    else
+                    {
+                        //h2SigSum1[i]->SetMinimum(Var[VarIndex].ymin);
+                        //h2SigSum1[i]->SetMaximum(Var[VarIndex].ymax);
+                        
+                        if(min>0) h2SigSum1[i]->SetMinimum(min*0.9);
+                        else h2SigSum1[i]->SetMinimum(min*1.1);
+                        h2SigSum1[i]->SetMaximum(max*1.1);
+                    }
+                }
+                
                 //Legend
                 TLegend* leg;
                 {
@@ -524,7 +561,7 @@ void plot()
                     yl1=yl2-0.2;
                     
                     leg = new TLegend(xl1,yl1,xl2,yl2);
-                    leg->SetNColumns(2);
+                    leg->SetNColumns(1);
                     leg->SetFillStyle(0);
                     leg->SetTextFont(42);
                     leg->SetBorderSize(0);
@@ -536,8 +573,8 @@ void plot()
                     NameTemp += ", ";
                     NameTemp += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
                     NameTemp += ")";
-                    leg->AddEntry(h2SigSum1[i],NameTemp.Data(),"l");
-                    
+                    leg->AddEntry(h2SigSum1[i],(NameTemp+" old").Data(),"l");
+                    leg->AddEntry(h2SigSum2[i],(NameTemp+" new").Data(),"l");
                 }
                 
                 TH1F* h2Ratio = nullptr;
@@ -561,6 +598,7 @@ void plot()
                 
                 h2SigSum1[i]->Draw("axis");
                 h2SigSum1[i]->Draw("histsame");
+                h2SigSum2[i]->Draw("histsame");
                 
                 leg->Draw();
                 
