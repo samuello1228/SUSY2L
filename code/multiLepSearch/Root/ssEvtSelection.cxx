@@ -306,6 +306,28 @@ EL::StatusCode ssEvtSelection :: initialize ()
   // count number of events
   m_eventCounter = 0;
 
+  /// IsolationSelectionTool
+  m_isoTool = new CP::IsolationSelectionTool("my_isoTest");
+  CHECK(m_isoTool->setProperty("MuonWP","Loose"));
+  CHECK(m_isoTool->setProperty("ElectronWP","Loose"));
+  CHECK(m_isoTool->initialize());
+
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("FixedCutHighPtTrackOnly", xAOD::Type::Muon));
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("FixedCutHighPtCaloOnly", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("FixedCutTrackCone40", xAOD::Type::Electron));
+
   /// SUSYTools
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
   //m_objTool->msg().setLevel( MSG::ERROR );
@@ -1201,6 +1223,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   //if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
   //if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
   //if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
+  l.isoPass = m_isoTool->accept(*el).getCutResultBitSet().to_ulong();
 
   /*
   //track
@@ -1312,6 +1335,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   //if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
   //if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
   //if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
+  l.isoPass = m_isoTool->accept(*mu).getCutResultBitSet().to_ulong();
 
   /*
   //track

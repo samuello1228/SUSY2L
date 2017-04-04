@@ -33,7 +33,7 @@ class Plot{
 
     if(pCanvas) {delete pCanvas; pCanvas = nullptr;}
 
-    if(mode == 1){
+    if(mode>0){
       pCanvas = new TCanvas(canName,canName, 700, 600);
       float yMinP1=0.305;
       float bottomMarginP1=0.005;
@@ -65,15 +65,19 @@ class Plot{
     auto lg = new TLegend(0.6,0.7,0.9,0.88);
     lg->SetFillStyle(0);
     /// get histograms
-    TH1F* hData(nullptr);
-    auto sgData = dynamic_cast< SampleGroup* >(sData);
-    if(sgData && sgData->status!=0) hData = sgData->getHistFromTree(var, h1, mCut);
-    else hData = sData->getHistFromTree(var, h1, mCut);
-
-    lg->AddEntry(hData, sData->leg, "p");
-    hData->Draw("E");
-
     bool updateData(false);
+    TH1F* hfirst(nullptr);
+    
+    TH1F* hData(nullptr);
+    if(sData){
+      auto sgData = dynamic_cast< SampleGroup* >(sData);
+      if(sgData && sgData->status!=0) hData = sgData->getHistFromTree(var, h1, mCut);
+      else hData = sData->getHistFromTree(var, h1, mCut);
+
+      lg->AddEntry(hData, sData->leg, "p");
+      hData->Draw("E");
+      hfirst = hData;
+     }
 
     /// Stack SM
     TH1F* htotal(nullptr);
@@ -95,12 +99,16 @@ class Plot{
         else htotal->Add(hx);
        }
       /// plot Data and sSig
-      hs->Draw("samehist");
+      if(hData) {
+        hs->Draw("samehist");
+        updateData = true;
+       }else{
+        hs->Draw("hist");
+        hfirst = htotal;
+      }
 
       htotal->SetFillStyle(0);
       htotal->Draw("samehist");
-
-      updateData = true;
     }
 
     /// Stack SM
@@ -121,7 +129,7 @@ class Plot{
       hData->Draw("sameaxis");
      }
 
-    string x(hData->GetTitle());
+    string x(hfirst->GetTitle());
     if(x.find("_logy")!=std::string::npos) pPad1->SetLogy();
     lg->Draw();
 
@@ -132,13 +140,36 @@ class Plot{
     /// show ratio if needed
     if(pPad2 && htotal){
       pPad2->cd();
-      auto data_copy = (TH1F*)hData->Clone("data_copy1");
-      data_copy->Divide(htotal);
-      data_copy->Draw("E");
+      auto total_copy = (TH1F*)htotal->Clone("total_copy1");
+      for(int i=0; i<total_copy->GetNbinsX()+2; i++){
+        auto x = total_copy->GetBinContent(i);
+        total_copy->SetBinContent(i, 1);
+        if(x==0) continue;
+        total_copy->SetBinError(i, total_copy->GetBinError(i)/x);
+       }
+      total_copy->SetLineColor(41);
+      total_copy->SetMarkerSize(0);
+      total_copy->SetFillStyle(1001);
+      total_copy->SetFillColor(41);
+      total_copy->Draw("E2");
 
-      auto xxs = data_copy->GetXaxis();
-      auto yxs = data_copy->GetYaxis();
-      yxs->SetTitle("Data / SM");
+      TString rTitle("");
+      if(hData){
+        auto data_copy = (TH1F*)hData->Clone("data_copy1");
+        if(mode == 1){
+          data_copy->Divide(htotal);
+          rTitle = "Data / SM";
+         }else if(mode==2){
+          data_copy->Add(htotal, -1);
+          rTitle = "Data - SM";
+         }
+
+        data_copy->Draw("Esame");
+       }
+      auto xxs = total_copy->GetXaxis();
+      auto yxs = total_copy->GetYaxis();
+      yxs->SetNoExponent();
+      yxs->SetTitle(rTitle);
       yxs->SetLabelSize(0.13);
       yxs->SetNdivisions(503);         
       xxs->SetLabelSize(0.13);
@@ -180,13 +211,14 @@ class Plot{
 
 
       float scale = (0.295-0.001)/(1-0.305);
-      auto yxs1 = hData->GetYaxis();
+      auto yxs1 = hfirst->GetYaxis();
       yxs1->SetLabelSize(0.13*scale);
       yxs1->SetNdivisions(506);         
       yxs1->SetTitleSize(0.14*scale);
       yxs1->SetTitleOffset(0.45/scale);
       yxs1->SetLabelOffset(0.01*scale);
 
+      pPad2->Update();
     }
 
     pCanvas->cd();
@@ -218,9 +250,14 @@ class Plot{
     else s->writeToFile(m_file);
    }
 
-  void useEntryList(TString elist, bool includeExtra=false, TString cutx=""){
+  void useEntryList(TString elist, bool includeExtra=false, TString cutx="", bool remake=false){
     Info("useEntryList", "Setting up entrylist: %s", elist.Data());
-    useEntryList(sData, elist,cutx);
+    if(remake && m_file){
+      Info("useEntryList", "Deleting exist entrylists");
+      m_file->Delete("EL_"+elist+"_*;*");
+     }
+
+    if(sData) useEntryList(sData, elist,cutx);
     for(auto x: sSM) useEntryList(x, elist, cutx);
     for(auto x: sSig) useEntryList(x, elist, cutx);
     if(includeExtra){for(auto x: sExtra) useEntryList(x, elist, cutx);}
@@ -239,6 +276,7 @@ class Plot{
       if(!elist1 && cutx!=""){
         /// make the entry list
         Info("useEntryList", "entrylist %s not exist for sample %s, creating it with cut: %s", elist.Data(), s1->name.c_str(), cutx.Data());
+        s1->tree1->SetEntryList(0);
         s1->tree1->Draw(">>"+elistname, cutx, "entrylist");
         elist1 = (TEntryList*)gDirectory->Get(elistname);
         if(m_file){

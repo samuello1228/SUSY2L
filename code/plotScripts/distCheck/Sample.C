@@ -105,6 +105,7 @@ class Sample: public TObject{
 
  protected:
    void dressHist(TH1* hx){
+     cout << name << " " << style[0] << endl;
        if(style[0]>=0) hx->SetLineColor(style[0]);
        if(style[1]>=0) hx->SetLineStyle(style[1]);
        if(style[2]>=0) hx->SetLineWidth(style[2]);
@@ -127,7 +128,21 @@ class SampleGroup: public Sample{
    std::vector< Sample* > sampleList;
    std::vector< string > m_sampleNames;
 
+   float getStatWeight(TString key="aSumW"){
+    float total(0);
+    for (auto s: sampleList){
+      total += s->getStatWeight(key);
+     }
+    return total;
+   }
+
    TH1F* getHistFromTree(TString var, TH1F* h1, TString cut, TString opt="", bool dress=true){
+     if(sCuts != ""){
+       if(cut != "") cut += "&&";
+       cut += sCuts;
+      }
+     cout << cut << endl;
+
      TString hname(tag+h1->GetName());
      if(mode==0) gDirectory->Delete(hname);
 

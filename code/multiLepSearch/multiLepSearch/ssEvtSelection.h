@@ -6,7 +6,7 @@
 #include "xAODRootAccess/TEvent.h"
 // #include "ElectronPhotonSelectorTools/AsgElectronLikelihoodTool.h"
 // #include "ElectronIsolationSelection/IsolationSelectionTool.h"
-// #include "IsolationSelection/IsolationSelectionTool.h"
+#include "IsolationSelection/IsolationSelectionTool.h"
 // #include "MuonSelectorTools/MuonSelectionTool.h"
 
 // #include "CPAnalysisExamples/errorcheck.h"
@@ -170,7 +170,7 @@ public:
 //   AsgElectronLikelihoodTool* m_LHToolLoose2015; //!
   GoodRunsListSelectionTool *m_grl; //!
   //std::map<OFLAGS, CP::IsolationSelectionTool* > m_isoTools; //!
-//   CP::IsolationSelectionTool* m_isoTool; //!
+  CP::IsolationSelectionTool* m_isoTool; //!
   TH1* mh_ElChargeFlip; //!
   std::vector< TRIGCONF* > m_trigSel; //!
   TRIGCONF* m_nowTrigSel{0}; //!

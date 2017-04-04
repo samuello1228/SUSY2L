@@ -6,7 +6,10 @@ gROOT.LoadMacro('Sample.C+')
 gROOT.LoadMacro('Plot.C+')
 from ROOT import Plot, Sample, SampleGroup
 from sample_info import sampleInfo
-from anaUtil import loadSamples, anaSpace 
+from anaUtil import loadSamples, anaSpace, loadSamplesL 
+
+gROOT.ProcessLine("Sample* noneSample(nullptr);")
+from ROOT import noneSample;
 
 sDir = get_default_fig_dir()
 sTag = 'test_'
@@ -15,6 +18,9 @@ if gROOT.IsBatch(): sDirectly = True
 
 def useStyle(sample, style, size=None):
     for i in range(size if size else len(style)): sample.style[i]=style[i]
+    print sample.name,
+    for i in range(len(style)): print sample.style[i]
+    print
 
 def addSample(dsname,treename='evt2l'):
     tag = dsname.split()[3]
@@ -186,9 +192,134 @@ def run_test():
         p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
         waitRootCmd(sDir+sTag+"l12_m", sDirectly)
 
+def run_test1():
+    ### get analysis space
+    write = False
+    if write:
+        samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC/data-myOutput/')
+        samples1,sampleG1 = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC.1/data-myOutput/')
+
+        for s in samples:
+            if samples[s].getStatWeight() < 1:
+                print s
+                samples[s] = samples1[s]
+                print samples1[s].getStatWeight()
+        for s in sampleG:
+            if sampleG[s].getStatWeight() < 1:
+                print s
+                sampleG[s] = sampleG1[s]
+                print sampleG1[s].getStatWeight()
+
+        print '////////////////////////////'
+        sI1 = sampleInfo()
+        sI1.Unit_fb = True
+        sI1.loadAll()
+
+        Lumi = 36.07;
+        ### get weights
+        for s in samples:
+            sx = samples[s]
+            print '-------------------'
+            print sx.name, sx.tree1.GetEntries(), sx.getStatWeight()
+            print '-------------------'
+            if sx.name.find('ds00') == -1:
+                sx.weight = sI1.getXSec('id=='+sx.info)*Lumi/sx.getStatWeight()
+            print sx.name, sx.getStatWeight(), sx.tree1.GetEntries(), sx.weight
+
+        for g in sampleG:
+            print g
+            if g.find('dM') == -1: continue
+            gx = sampleG[g]
+            gx.setUpOwnChain(TChain('evt2l'))
+            sx = gx.sampleList[0]
+            gx.weight = sI1.getXSec('id=='+sx.info)*Lumi/gx.getStatWeight()
+            print g, sI1.getXSec('id=='+sx.info), Lumi, gx.getStatWeight()
+
+        ### data
+        dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
+        s1 = Sample('data','data_','Pseudo-data','Data')
+        s1.tree1 = TChain('evt2l')
+        s1.tree1.Add(dir1+'v13.0.data/fetch/data-myOutput/*.root')
+
+        ### set styles
+        useStyle(sampleG['VV'],(3,1,1,3,20,1,3))
+        useStyle(sampleG['Wgamma'],(4,1,1,4,20,1,4))
+        useStyle(sampleG['Top'],(5,1,1,5,20,1,5))
+        useStyle(sampleG['ZJet'],(2,1,1,2,20,1,2))
+        useStyle(sampleG['dM20'],(1,2,2))
+        useStyle(sampleG['dM100'],(6,9,2))
+#         useStyle(sampleG['Zgamma'],(8,9,2))
+        useStyle(sampleG['Zgamma'],(0,9,2))
+
+    p1 = Plot("ana1_Mar14b.root")
+    p1.mode = 1
+
+    if write:
+        p1.sData = s1
+        p1.sSM.push_back(sampleG['Wgamma'])
+        p1.sSM.push_back(sampleG['VV'])
+        p1.sSM.push_back(sampleG['Top'])
+        p1.sSM.push_back(sampleG['ZJet'])
+        p1.sSig.push_back(sampleG['dM20'])
+        p1.sSig.push_back(sampleG['dM100'])
+        p1.sSig.push_back(sampleG['Zgamma'])
+        p1.saveSamples()
+        return
+
+
+    p1.sData = p1.getSample("data")
+    p1.sSM.push_back(p1.getSampleGroup('Wgamma'))
+    p1.sSM.push_back(p1.getSampleGroup('VV'))
+    p1.sSM.push_back(p1.getSampleGroup('Top'))
+    p1.sSM.push_back(p1.getSampleGroup('ZJet'))
+    p1.sSig.push_back(p1.getSampleGroup('dM20'))
+    p1.sSig.push_back(p1.getSampleGroup('dM100'))
+#     p1.sSig.push_back(p1.getSampleGroup('Zgamma'))
+
+    s_zgamma = p1.getSampleGroup('Zgamma')
+    p1.sSig.push_back(s_zgamma)
+    useStyle(s_zgamma,(0,9,2))
+#     for x in [(1, 'ee noISR', 'ee_noISR'), (2, '#mu#mu noISR','mumu_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
+    sels = []
+    sels += [(("flag3","evt.flag==3"), 'e#mu noISR','emu_noISR')]
+    sels += [(("flag9","evt.flag==9"), 'e#mu ISR','emu_ISR')]
+    sels += [(("flag1","evt.flag==1"), 'ee noISR','ee_noISR')]
+    sels += [(("flag2","evt.flag==2"), '#mu#mu noISR','mumu_noISR')]
+    sels += [(("flag7","evt.flag==7"), 'ee ISR','ee_ISR')]
+    sels += [(("flag8","evt.flag==8"), '#mu#mu ISR','mumu_ISR')]
+#     sels += [(("flag4","evt.flag==4"), 'ee no ISR, SS','ee_noISR_SS')]
+#     sels += [(("flag5","evt.flag==5"), '#mu#mu no ISR, SS','mumu_noISR_SS')]
+#     sels += [(("flag6","evt.flag==6"), 'e#mu no ISR, SS','emu_noISR_SS')]
+#     sels += [(("flag10","evt.flag==10"), 'ee  ISR, SS','ee_ISR_SS')]
+#     sels += [(("flag11","evt.flag==11"), '#mu#mu  ISR, SS','mumu_ISR_SS')]
+#     sels += [(("flag12","evt.flag==12"), 'e#mu  ISR, SS','emu_ISR_SS')]
+
+
+    p1.mode = 2
+    tTag = 'cID_m2_'
+    for x in sels:
+        p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1)'
+#         if x[0][0] in ['flag4', 'flag10']: ### show Z control region
+#             p1.sData = p1.getSample("data")
+#             p1.sData.sCuts = "(l12.m>81&&l12.m<101)"
+#         else: p1.sData = noneSample
+
+        p1.useEntryList(x[0][0],False,x[0][1], False)
+        p1.showInfo = x[1]
+        sTag = tTag+'preSel_'+x[2]
+
+        p1.showPlot('leps[0].mT', TH1F('h1','lep0_mT_logy;Leading lepton m_{T} [GeV];Events / 2 GeV',100, 0, 200))
+        waitRootCmd(sDir+sTag+"mT0", sDirectly)
+        p1.showPlot('leps[1].mT', TH1F('h1','lep1_mT_logy;Sub-leading lepton m_{T} [GeV];Events / 2 GeV',100, 0, 200))
+        waitRootCmd(sDir+sTag+"mT1", sDirectly)
+        p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+        waitRootCmd(sDir+sTag+"mll", sDirectly)
+        p1.showPlot('sig.Met', TH1F('h1','Met_logy;E_{T}^{Miss} [GeV];Events / 2 GeV',100, 0, 200))
+        waitRootCmd(sDir+sTag+"Met", sDirectly)
 
 if __name__ == '__main__':
     savehistory('.')
     useAtlasStyle()
-    run_test()
+#     run_test()
+    run_test1()
 #     checkCompare()
