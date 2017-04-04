@@ -36,22 +36,18 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \small
-\item separate V+gamma into W+gamma and Z+gamma
+\item compare the old and new signal samples
+\item normalize to 36 fb$^{-1}$
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\begin{center}
-\huge
-opposite sign
-\end{center}
-\end{frame}
+\input{data/expN_signal_OS.tex}
+\input{data/expN_signal_SS.tex}
 
-\input{data/expN_OS.tex}
-%\input{data/expN_BGVV_OS.tex}
+\def \PathToPlot {../plot_signal}
+\input{data/plot_signal_OS.tex}
+\input{data/plot_signal_SS.tex}
 
-\def \PathToPlot {../plot}
-\input{data/plot_OS.tex}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -59,7 +55,7 @@ opposite sign
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item Z+gamma is large and W+gamma is small
+\item Most of the value are similar.
 \end{itemize}
 \end{frame}
 
@@ -631,16 +627,6 @@ Definition of the Control Region.
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\huge
-same sign
-\end{center}
-\end{frame}
-
-\input{data/expN_SS.tex}
-%\input{data/expN_BGVV_SS.tex}
-
-\begin{frame}
 \frametitle{significance calculation}
 \begin{itemize}
 \item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
@@ -658,6 +644,19 @@ same sign
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+opposite sign
+\end{center}
+\end{frame}
+
+\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_OS.tex}
 
 \begin{frame}
 \begin{center}
@@ -733,6 +732,9 @@ The CMS result:
 same sign
 \end{center}
 \end{frame}
+
+\input{data/expN_SS.tex}
+%\input{data/expN_BGVV_SS.tex}
 
 \def \PathToPlot {../plot}
 \input{data/plot_SS.tex}

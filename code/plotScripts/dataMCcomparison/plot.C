@@ -511,7 +511,7 @@ void plot()
                     fout<<sumOfEvent2[i][0];
                     fout<<"\\pm";
                     fout<<sumOfEvent2[i][1];
-                    fout<<"$ &";
+                    fout<<"$ ";
                     fout<<"\\\\"<<endl<<"\\hline"<<endl;
                 }
                 fout.close();
@@ -680,7 +680,7 @@ void plot()
                     NameTemp += "_";
                     NameTemp += RegionInfo[RegionIndex].RegionName;
                     NameTemp += "_";
-                    NameTemp += SigMassSplitting[i].IDName;
+                    NameTemp += TString::Itoa(i,10);
                     NameTemp += ".eps";
                     c2->Print(NameTemp,"eps");
                 }
@@ -720,6 +720,100 @@ void plot()
         {
             delete tree2Sig2[i];
         }
+    }
+    
+    
+    //latex for expN
+    for(unsigned int sign=0;sign<=3;sign+=3)
+    {
+        TString PathName = "latex/data/";
+        PathName += "expN_signal_";
+        if(sign==0) PathName += "OS";
+        else PathName += "SS";
+        PathName += ".tex";
+        
+        ofstream fout;
+        fout.open(PathName.Data());
+        
+        for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+        {
+            if(SixChannel>=3 && SixChannel<=5) continue;
+            
+            fout<<"\\begin{frame}"<<endl;
+            fout<<"\\frametitle{Expected number of events (For ";
+            if(sign==0) fout<<"opposite sign";
+            else fout<<"same sign";
+            fout<<")}"<<endl;
+            
+            fout<<"For ";
+            if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
+            else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
+            else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
+            fout<<" channel, ";
+            if(SixChannel<=2) fout<<"non-ISR";
+            else fout<<"ISR";
+            fout<<"\\\\"<<endl;
+            
+            fout<<"\\vspace{5mm}"<<endl;
+            fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& Number of events(old) & Number of events(new) \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            
+            fout<<"\\input{data/expN_signal/"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
+            
+            fout<<"\\end{tabular}"<<endl;
+            fout<<"\\end{frame}"<<endl<<endl;
+        }
+        fout.close();
+    }
+
+    //latex for plot
+    //plot_OS.tex and plot_SS.tex
+    for(unsigned int sign=0;sign<=3;sign+=3)
+    {
+        TString PathName = "latex/data/";
+        PathName += "plot_signal_";
+        if(sign==0) PathName += "OS";
+        else PathName += "SS";
+        PathName += ".tex";
+        
+        ofstream fout;
+        fout.open(PathName.Data());
+        
+        
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        {
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                if(Var[VarIndex].VarName=="averageMu") continue;
+                if(Var[VarIndex].VarName=="nVtx") continue;
+                
+                fout<<"\\begin{frame}"<<endl;
+                
+                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                if(sign==0) fout<<"opposite sign";
+                else fout<<"same sign";
+                fout<<")}"<<endl;
+                
+                fout<<"\\Wider[5em]{"<<endl;
+                for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+                {
+                    if(SixChannel>=3 && SixChannel<=5) continue;
+                    
+                    fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<"_"<<i<<".eps"<<"}";
+                    if(SixChannel==2) fout<<" \\\\";
+                    fout<<endl;
+                }
+                //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
+                fout<<"}"<<endl;
+                
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
+        }
+        
+        fout.close();
     }
 
 }
