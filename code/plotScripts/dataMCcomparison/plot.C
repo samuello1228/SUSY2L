@@ -81,11 +81,19 @@ void plot()
     {
         SigInfo element;
         
+        /*
         element.MassDiff = 20;    element.ID = 2;    SigMassSplitting.push_back(element);
         element.MassDiff = 50;    element.ID = 18;   SigMassSplitting.push_back(element);
         element.MassDiff = 100;   element.ID = 19;   SigMassSplitting.push_back(element);
         element.MassDiff = 200;   element.ID = 20;   SigMassSplitting.push_back(element);
         element.MassDiff = 300;   element.ID = 21;   SigMassSplitting.push_back(element);
+        */
+        
+        element.MassDiff = 20;    element.ID = 2;    SigMassSplitting.push_back(element);
+        element.MassDiff = 50;    element.ID = 17;   SigMassSplitting.push_back(element);
+        element.MassDiff = 100;   element.ID = 18;   SigMassSplitting.push_back(element);
+        element.MassDiff = 200;   element.ID = 19;   SigMassSplitting.push_back(element);
+        element.MassDiff = 300;   element.ID = 20;   SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID1;
@@ -118,14 +126,17 @@ void plot()
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             
-            SigSampleID1.push_back("skimming_signal_old/skimming."+SampleIDTemp);
-            SigSampleID2.push_back("skimming_signal_new/skimming."+SampleIDTemp);
+            if(i!=13 && i!=32 && i!=38)
+            {
+                SigSampleID1.push_back("skimming_signal_old/skimming."+SampleIDTemp);
+                SigSampleID2.push_back("skimming_signal_new/skimming."+SampleIDTemp);
+            }
             
             int SigMass;
             fin>>SigMass;
-            SigMass1.push_back(SigMass);
+            if(i!=13 && i!=32 && i!=38) SigMass1.push_back(SigMass);
             fin>>SigMass;
-            SigMass2.push_back(SigMass);
+            if(i!=13 && i!=32 && i!=38) SigMass2.push_back(SigMass);
             
             double SigXSTemp2;
             fin>>SigXSTemp2;
@@ -135,7 +146,7 @@ void plot()
             SigXSTemp2 *= SigXSTemp;
             
             //cout<<SigXSTemp2<<endl;
-            SigXS1.push_back(SigXSTemp2);
+            if(i!=13 && i!=32 && i!=38) SigXS1.push_back(SigXSTemp2);
         }
         
         //new
@@ -157,7 +168,7 @@ void plot()
             SigXSTemp2 *= SigXSTemp;
             
             //cout<<SigXSTemp2<<endl;
-            SigXS2.push_back(SigXSTemp2);
+            if(i!=13 && i!=32 && i!=38) SigXS2.push_back(SigXSTemp2);
         }
         fin.close();
     }
@@ -168,7 +179,8 @@ void plot()
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
         cout<<"Name: "<<SigSampleID1[SigMassSplitting[i].ID].Data()<<endl;
         cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
-        cout<<"XS: "<<SigXS1[SigMassSplitting[i].ID]<<endl<<endl;
+        cout<<"old XS: "<<SigXS1[SigMassSplitting[i].ID]<<endl;
+        cout<<"new XS: "<<SigXS2[SigMassSplitting[i].ID]<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleID1.size();j++)
@@ -189,7 +201,7 @@ void plot()
     }
     
     //Get number of events in AOD
-    std::vector<unsigned int> SignAOD;
+    std::vector<unsigned int> SignAOD1;
     for(unsigned int i=0;i<SigSampleID1.size();i++)
     {
         TString NameTemp = SigSampleID1[i];
@@ -202,7 +214,25 @@ void plot()
         TH1F *h1 = (TH1F*) file->Get("hist");
         unsigned int nAOD = h1->GetBinContent(1);
         cout<<nAOD<<endl;
-        SignAOD.push_back(nAOD);
+        SignAOD1.push_back(nAOD);
+        
+        delete file;
+    }
+    
+    std::vector<unsigned int> SignAOD2;
+    for(unsigned int i=0;i<SigSampleID2.size();i++)
+    {
+        TString NameTemp = SigSampleID2[i];
+        cout<<NameTemp<<": ";
+        NameTemp += "_";
+        NameTemp += ChannelInfo[0].ChannelName;
+        NameTemp += ".root";
+        
+        TFile* file = new TFile(NameTemp.Data(),"READ");
+        TH1F *h1 = (TH1F*) file->Get("hist");
+        unsigned int nAOD = h1->GetBinContent(1);
+        cout<<nAOD<<endl;
+        SignAOD2.push_back(nAOD);
         
         delete file;
     }
@@ -326,8 +356,11 @@ void plot()
     
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
-        std::vector<TChain*> tree2Sig;
-        initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID1,ChannelInfo);
+        std::vector<TChain*> tree2Sig1;
+        initializeTree2(tree2Sig1,RegionInfo[RegionIndex].setOfChannel,SigSampleID1,ChannelInfo);
+        
+        std::vector<TChain*> tree2Sig2;
+        initializeTree2(tree2Sig2,RegionInfo[RegionIndex].setOfChannel,SigSampleID2,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -341,35 +374,57 @@ void plot()
             xaxis += " ";
             xaxis += Var[VarIndex].unit;
             
-            TH1F* h2SigSum[SigMassSplitting.size()];
-            TH1F* h2Sig[SigSampleID1.size()];
+            TH1F* h2SigSum1[SigMassSplitting.size()];
+            TH1F* h2SigSum2[SigMassSplitting.size()];
+            TH1F* h2Sig1[SigSampleID1.size()];
+            TH1F* h2Sig2[SigSampleID1.size()];
             
             //h2SigSum
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
             {
-                TString NameTemp = "SigSum_";
+                TString NameTemp = "SigSum1_";
                 NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
-                h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
-                h2SigSum[j]->SetLineColor(2);
-                h2SigSum[j]->SetLineStyle(1);
+                h2SigSum1[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2SigSum1[j]->GetYaxis()->SetTitle("Number of events");
+                h2SigSum1[j]->SetLineColor(2);
+                h2SigSum1[j]->SetLineStyle(1);
+            }
+            for(unsigned int j=0;j<SigMassSplitting.size();j++)
+            {
+                TString NameTemp = "SigSum2_";
+                NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
+                h2SigSum2[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2SigSum2[j]->GetYaxis()->SetTitle("Number of events");
+                h2SigSum2[j]->SetLineColor(3);
+                h2SigSum2[j]->SetLineStyle(1);
             }
             
             //h2Sig
             for(unsigned int j=0;j<SigSampleID1.size();j++)
             {
-                TString NameTemp = "Sig_";
+                TString NameTemp = "Sig1_";
                 NameTemp += TString::Itoa(j,10);
-                h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Sig1[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 
                 //Fill Signal
                 TString temp = Var[VarIndex].VarName;
                 temp += ">>";
                 temp += NameTemp;
-                
                 TString Cut = "weight";
+                tree2Sig1[j]->Draw(temp.Data(),Cut.Data());
+            }
+            for(unsigned int j=0;j<SigSampleID2.size();j++)
+            {
+                TString NameTemp = "Sig2_";
+                NameTemp += TString::Itoa(j,10);
+                h2Sig2[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 
-                tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                //Fill Signal
+                TString temp = Var[VarIndex].VarName;
+                temp += ">>";
+                temp += NameTemp;
+                TString Cut = "weight";
+                tree2Sig2[j]->Draw(temp.Data(),Cut.Data());
             }
             
             //Add Signal for the same mass splitting
@@ -380,18 +435,38 @@ void plot()
                 {
                     if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
                     {
-                        h2SigSum[i]->Add(h2Sig[j]);
-                        AOD += SignAOD[j];
+                        h2SigSum1[i]->Add(h2Sig1[j]);
+                        AOD += SignAOD1[j];
                     }
                 }
                 
                 //normalization for h2SigSum
-                h2SigSum[i]->Scale(sumDataL/AOD *SigXS1[SigMassSplitting[i].ID]);
+                h2SigSum1[i]->Scale(sumDataL/AOD *SigXS1[SigMassSplitting[i].ID]);
+            }
+            
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                unsigned int AOD = 0;
+                for(unsigned int j=0;j<SigSampleID2.size();j++)
+                {
+                    if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
+                    {
+                        h2SigSum2[i]->Add(h2Sig2[j]);
+                        AOD += SignAOD2[j];
+                    }
+                }
+                
+                //normalization for h2SigSum
+                h2SigSum2[i]->Scale(sumDataL/AOD *SigXS2[SigMassSplitting[i].ID]);
             }
             
             for(unsigned int j=0;j<SigSampleID1.size();j++)
             {
-                delete h2Sig[j];
+                delete h2Sig1[j];
+            }
+            for(unsigned int j=0;j<SigSampleID2.size();j++)
+            {
+                delete h2Sig2[j];
             }
             
             if(VarIndex==countVariable)
@@ -403,7 +478,7 @@ void plot()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     //expected number of events
-                    sumOfEvent[i][0] = h2SigSum[i]->IntegralAndError(0,-1,sumOfEvent[i][1]);
+                    sumOfEvent[i][0] = h2SigSum1[i]->IntegralAndError(0,-1,sumOfEvent[i][1]);
                     
                     cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[i][0]<<" +/- "<<sumOfEvent[i][1]<<endl;
                 }
@@ -461,7 +536,7 @@ void plot()
                     NameTemp += ", ";
                     NameTemp += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
                     NameTemp += ")";
-                    leg->AddEntry(h2SigSum[i],NameTemp.Data(),"l");
+                    leg->AddEntry(h2SigSum1[i],NameTemp.Data(),"l");
                     
                 }
                 
@@ -470,7 +545,7 @@ void plot()
                 TPad* pad2 = nullptr;
                 
                 //x-asix title for pad1
-                h2SigSum[i]->GetXaxis()->SetTitle(xaxis.Data());
+                h2SigSum1[i]->GetXaxis()->SetTitle(xaxis.Data());
                 
                 //pad1
                 pad1 = new TPad("pad1","pad1",0,0,1,1);
@@ -484,8 +559,8 @@ void plot()
                 pad1->Draw();
                 pad1->cd();
                 
-                h2SigSum[i]->Draw("axis");
-                h2SigSum[i]->Draw("histsame");
+                h2SigSum1[i]->Draw("axis");
+                h2SigSum1[i]->Draw("histsame");
                 
                 leg->Draw();
                 
@@ -527,13 +602,21 @@ void plot()
             //h2SigSum
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
             {
-                delete h2SigSum[j];
+                delete h2SigSum1[j];
+            }
+            for(unsigned int j=0;j<SigMassSplitting.size();j++)
+            {
+                delete h2SigSum2[j];
             }
         }
         
         for(unsigned int i=0;i<SigSampleID1.size();i++)
         {
-            delete tree2Sig[i];
+            delete tree2Sig1[i];
+        }
+        for(unsigned int i=0;i<SigSampleID2.size();i++)
+        {
+            delete tree2Sig2[i];
         }
     }
 
