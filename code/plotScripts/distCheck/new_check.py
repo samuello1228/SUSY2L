@@ -193,22 +193,25 @@ def run_test():
         waitRootCmd(sDir+sTag+"l12_m", sDirectly)
 
 def run_test1():
+    p1 = Plot("ana1_Apr04b.root")
+    p1.mode = 1
+
     ### get analysis space
     write = False
     if write:
-        samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC/data-myOutput/')
-        samples1,sampleG1 = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC.1/data-myOutput/')
+        samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v14.0.MC/data-myOutput/')
+#         samples1,sampleG1 = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC.1/data-myOutput/')
 
         for s in samples:
             if samples[s].getStatWeight() < 1:
                 print s
-                samples[s] = samples1[s]
-                print samples1[s].getStatWeight()
+#                 samples[s] = samples1[s]
+#                 print samples1[s].getStatWeight()
         for s in sampleG:
             if sampleG[s].getStatWeight() < 1:
                 print s
-                sampleG[s] = sampleG1[s]
-                print sampleG1[s].getStatWeight()
+#                 sampleG[s] = sampleG1[s]
+#                 print sampleG1[s].getStatWeight()
 
         print '////////////////////////////'
         sI1 = sampleInfo()
@@ -239,7 +242,7 @@ def run_test1():
         dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
         s1 = Sample('data','data_','Pseudo-data','Data')
         s1.tree1 = TChain('evt2l')
-        s1.tree1.Add(dir1+'v13.0.data/fetch/data-myOutput/*.root')
+        s1.tree1.Add(dir1+'v14.0.data/fetch/data-myOutput/*.root')
 
         ### set styles
         useStyle(sampleG['VV'],(3,1,1,3,20,1,3))
@@ -251,10 +254,6 @@ def run_test1():
 #         useStyle(sampleG['Zgamma'],(8,9,2))
         useStyle(sampleG['Zgamma'],(0,9,2))
 
-    p1 = Plot("ana1_Mar14b.root")
-    p1.mode = 1
-
-    if write:
         p1.sData = s1
         p1.sSM.push_back(sampleG['Wgamma'])
         p1.sSM.push_back(sampleG['VV'])
@@ -264,45 +263,49 @@ def run_test1():
         p1.sSig.push_back(sampleG['dM100'])
         p1.sSig.push_back(sampleG['Zgamma'])
         p1.saveSamples()
-        return
+    else:
+        p1.sData = p1.getSample("data")
+        p1.sSM.push_back(p1.getSampleGroup('Wgamma'))
+        p1.sSM.push_back(p1.getSampleGroup('VV'))
+        p1.sSM.push_back(p1.getSampleGroup('Top'))
+        p1.sSM.push_back(p1.getSampleGroup('ZJet'))
+        p1.sSig.push_back(p1.getSampleGroup('dM20'))
+        p1.sSig.push_back(p1.getSampleGroup('dM100'))
+    #     p1.sSig.push_back(p1.getSampleGroup('Zgamma'))
 
-
-    p1.sData = p1.getSample("data")
-    p1.sSM.push_back(p1.getSampleGroup('Wgamma'))
-    p1.sSM.push_back(p1.getSampleGroup('VV'))
-    p1.sSM.push_back(p1.getSampleGroup('Top'))
-    p1.sSM.push_back(p1.getSampleGroup('ZJet'))
-    p1.sSig.push_back(p1.getSampleGroup('dM20'))
-    p1.sSig.push_back(p1.getSampleGroup('dM100'))
-#     p1.sSig.push_back(p1.getSampleGroup('Zgamma'))
-
-    s_zgamma = p1.getSampleGroup('Zgamma')
-    p1.sSig.push_back(s_zgamma)
-    useStyle(s_zgamma,(0,9,2))
+        s_zgamma = p1.getSampleGroup('Zgamma')
+        p1.sSig.push_back(s_zgamma)
+        useStyle(s_zgamma,(0,9,2))
 #     for x in [(1, 'ee noISR', 'ee_noISR'), (2, '#mu#mu noISR','mumu_noISR'), (3, 'e#mu noISR', 'emu_noISR'), (4, 'ee ISR', 'ee_ISR'), (6, 'e#mu ISR', 'emu_ISR'), (5, '#mu#mu ISR','mumu_ISR')]:
     sels = []
-    sels += [(("flag3","evt.flag==3"), 'e#mu noISR','emu_noISR')]
-    sels += [(("flag9","evt.flag==9"), 'e#mu ISR','emu_ISR')]
+#     sels += [(("flag3","evt.flag==3"), 'e#mu noISR','emu_noISR')]
+#     sels += [(("flag9","evt.flag==9"), 'e#mu ISR','emu_ISR')]
     sels += [(("flag1","evt.flag==1"), 'ee noISR','ee_noISR')]
     sels += [(("flag2","evt.flag==2"), '#mu#mu noISR','mumu_noISR')]
     sels += [(("flag7","evt.flag==7"), 'ee ISR','ee_ISR')]
     sels += [(("flag8","evt.flag==8"), '#mu#mu ISR','mumu_ISR')]
-#     sels += [(("flag4","evt.flag==4"), 'ee no ISR, SS','ee_noISR_SS')]
-#     sels += [(("flag5","evt.flag==5"), '#mu#mu no ISR, SS','mumu_noISR_SS')]
-#     sels += [(("flag6","evt.flag==6"), 'e#mu no ISR, SS','emu_noISR_SS')]
-#     sels += [(("flag10","evt.flag==10"), 'ee  ISR, SS','ee_ISR_SS')]
-#     sels += [(("flag11","evt.flag==11"), '#mu#mu  ISR, SS','mumu_ISR_SS')]
-#     sels += [(("flag12","evt.flag==12"), 'e#mu  ISR, SS','emu_ISR_SS')]
+    sels += [(("flag4","evt.flag==4"), 'ee no ISR, SS','ee_noISR_SS')]
+    sels += [(("flag5","evt.flag==5"), '#mu#mu no ISR, SS','mumu_noISR_SS')]
+    sels += [(("flag6","evt.flag==6"), 'e#mu no ISR, SS','emu_noISR_SS')]
+    sels += [(("flag10","evt.flag==10"), 'ee  ISR, SS','ee_ISR_SS')]
+    sels += [(("flag11","evt.flag==11"), '#mu#mu  ISR, SS','mumu_ISR_SS')]
+    sels += [(("flag12","evt.flag==12"), 'e#mu  ISR, SS','emu_ISR_SS')]
 
 
     p1.mode = 2
+#     tTag = 'gradient_m2_'
     tTag = 'cID_m2_'
     for x in sels:
         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1)'
-#         if x[0][0] in ['flag4', 'flag10']: ### show Z control region
-#             p1.sData = p1.getSample("data")
-#             p1.sData.sCuts = "(l12.m>81&&l12.m<101)"
-#         else: p1.sData = noneSample
+#         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1&&(leps[0].isoPass&0x2)!=0&&(leps[1].isoPass&0x2)!=0)'
+        if x[0][1].split("==")[1] in [4, 5, 6, 10, 11, 12]:
+            if x[0][0] in ['flag4', 'flag10']: ### show Z control region
+                p1.sData = p1.getSample("data")
+                p1.sData.sCuts = "(l12.m>81&&l12.m<101)"
+            else: p1.sData = noneSample
+        else:
+            p1.sData = p1.getSample("data")
+            p1.sData.sCuts = ''
 
         p1.useEntryList(x[0][0],False,x[0][1], False)
         p1.showInfo = x[1]

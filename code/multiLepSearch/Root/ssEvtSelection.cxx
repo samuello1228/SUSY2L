@@ -312,21 +312,21 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(m_isoTool->setProperty("ElectronWP","Loose"));
   CHECK(m_isoTool->initialize());
 
-  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("FixedCutHighPtTrackOnly", xAOD::Type::Muon));
-  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("FixedCutHighPtCaloOnly", xAOD::Type::Electron));
-  CHECK(m_isoTool->addWP("FixedCutTrackCone40", xAOD::Type::Electron));
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Muon)); //2
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Muon)); //4
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Muon)); //8
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Muon)); //10
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Muon)); //20
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Muon)); //40
+  CHECK(m_isoTool->addWP("FixedCutHighPtTrackOnly", xAOD::Type::Muon));//80
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Electron)); //2
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Electron)); //4
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Electron)); //8
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Electron)); //10
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Electron)); //20
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Electron)); //40
+  CHECK(m_isoTool->addWP("FixedCutHighPtCaloOnly", xAOD::Type::Electron)); //80
+  CHECK(m_isoTool->addWP("FixedCutTrackCone40", xAOD::Type::Electron)); //100
 
   /// SUSYTools
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");

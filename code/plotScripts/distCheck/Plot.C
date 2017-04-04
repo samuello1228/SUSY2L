@@ -141,33 +141,51 @@ class Plot{
     if(pPad2 && htotal){
       pPad2->cd();
       auto total_copy = (TH1F*)htotal->Clone("total_copy1");
-      for(int i=0; i<total_copy->GetNbinsX()+2; i++){
-        auto x = total_copy->GetBinContent(i);
-        total_copy->SetBinContent(i, 1);
-        if(x==0) continue;
-        total_copy->SetBinError(i, total_copy->GetBinError(i)/x);
+      TString rTitle("");
+
+      TString sameOpt="";
+      TH1F* data_copy(nullptr);
+      if(hData){
+        data_copy = (TH1F*)hData->Clone("data_copy1");
+        if(mode == 1){
+          data_copy->Divide(htotal);
+          rTitle = "Data / SM";
+
+          /// MC
+          for(int i=0; i<total_copy->GetNbinsX()+2; i++){
+            auto x = total_copy->GetBinContent(i);
+            total_copy->SetBinContent(i, 1);
+            if(x==0) continue;
+            total_copy->SetBinError(i, total_copy->GetBinError(i)/x);
+           }
+         }else if(mode==2){
+          data_copy->Add(htotal, -1);
+          rTitle = "Data - SM";
+
+          /// MC
+          for(int i=0; i<total_copy->GetNbinsX()+2; i++){
+            total_copy->SetBinContent(i, 0);
+//             total_copy->SetBinError(i, total_copy->GetBinError(i));
+           }
+         }
+
+        data_copy->Draw("E");
+        sameOpt = "same";
        }
       total_copy->SetLineColor(41);
       total_copy->SetMarkerSize(0);
       total_copy->SetFillStyle(1001);
       total_copy->SetFillColor(41);
-      total_copy->Draw("E2");
+      total_copy->Draw("E2"+sameOpt);
 
-      TString rTitle("");
-      if(hData){
-        auto data_copy = (TH1F*)hData->Clone("data_copy1");
-        if(mode == 1){
-          data_copy->Divide(htotal);
-          rTitle = "Data / SM";
-         }else if(mode==2){
-          data_copy->Add(htotal, -1);
-          rTitle = "Data - SM";
-         }
-
-        data_copy->Draw("Esame");
-       }
       auto xxs = total_copy->GetXaxis();
       auto yxs = total_copy->GetYaxis();
+      if(data_copy){
+        data_copy->Draw("Esame");
+        xxs = data_copy->GetXaxis();
+        yxs = data_copy->GetYaxis();
+       }
+
       yxs->SetNoExponent();
       yxs->SetTitle(rTitle);
       yxs->SetLabelSize(0.13);
