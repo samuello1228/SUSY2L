@@ -363,8 +363,8 @@ void plot()
         initializeTree2(tree2Sig2,RegionInfo[RegionIndex].setOfChannel,SigSampleID2,ChannelInfo);
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
-        for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-        //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;
@@ -581,11 +581,54 @@ void plot()
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
                 
-                //x-asix title for pad1
-                h2SigSum1[i]->GetXaxis()->SetTitle(xaxis.Data());
-                
-                //pad1
-                pad1 = new TPad("pad1","pad1",0,0,1,1);
+                {
+                    //size for two pads
+                    const double size1 = 0.65;
+                    const double size2 = 0.35;
+                    const double scale1 = 1/size1;
+                    const double scale2 = 1/size2;
+                    
+                    //adjust the title
+                    const double x_label = h2SigSum1[i]->GetXaxis()->GetLabelSize();
+                    const double y_label = h2SigSum1[i]->GetYaxis()->GetLabelSize();
+                    const double x_title = h2SigSum1[i]->GetXaxis()->GetTitleSize();
+                    const double y_title = h2SigSum1[i]->GetYaxis()->GetTitleSize();
+                    const double y_offset = h2SigSum1[i]->GetYaxis()->GetTitleOffset();
+                    
+                    h2SigSum1[i]->GetXaxis()->SetLabelSize(x_label*scale1);
+                    h2SigSum1[i]->GetYaxis()->SetLabelSize(y_label*scale1);
+                    h2SigSum1[i]->GetXaxis()->SetTitleSize(x_title*scale1);
+                    h2SigSum1[i]->GetYaxis()->SetTitleSize(y_title*scale1);
+                    h2SigSum1[i]->GetYaxis()->SetTitleOffset(y_offset/scale1);
+                    
+                    //ratio plot
+                    h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    h2Ratio->GetXaxis()->SetTitle(xaxis.Data());
+                    h2Ratio->GetYaxis()->SetTitle("new/old");
+                    h2Ratio->GetYaxis()->CenterTitle();
+                    h2Ratio->SetMarkerSize(1.0);
+                    h2Ratio->SetLineColor(1);
+                    
+                    h2Ratio->Sumw2();
+                    h2Ratio->Add(h2SigSum2[i]);
+                    h2Ratio->Divide(h2SigSum1[i]);
+                    
+                    h2Ratio->GetXaxis()->SetLabelSize(x_label*scale2);
+                    h2Ratio->GetYaxis()->SetLabelSize(y_label*scale2);
+                    h2Ratio->GetYaxis()->SetRangeUser(0,5);
+                    h2Ratio->GetXaxis()->SetTitleSize(x_title*scale2);
+                    h2Ratio->GetYaxis()->SetTitleSize(y_title*scale2);
+                    h2Ratio->GetYaxis()->SetTitleOffset(y_offset/scale2);
+                    h2Ratio->GetYaxis()->SetNdivisions(8);
+                    
+                    //Two pads
+                    pad1 = new TPad("pad1","pad1",0,1-size1,1,1);
+                    pad2 = new TPad("pad2","pad2",0,0,1,size2);
+                    pad1->SetBottomMargin(0.1);
+                    pad2->SetBottomMargin(0.4);
+                    pad2->SetTopMargin(0.1);
+                    pad2->SetGridy();
+                }
                 
                 pad1->SetLogy(Var[VarIndex].log);
                 
@@ -599,7 +642,6 @@ void plot()
                 h2SigSum1[i]->Draw("axis");
                 h2SigSum1[i]->Draw("histsame");
                 h2SigSum2[i]->Draw("histsame");
-                
                 leg->Draw();
                 
                 {
@@ -619,6 +661,19 @@ void plot()
                 }
                 
                 {
+                    //Draw for pad2
+                    c2->cd();
+                    pad2->Draw();
+                    pad2->cd();
+                    h2Ratio->Draw();
+                    
+                    TLine l;
+                    TLine* l1 = l.DrawLine(h2Ratio->GetXaxis()->GetXmin(), 1., h2Ratio->GetXaxis()->GetXmax(), 1.);
+                    l1->SetLineStyle(2);
+                    l1->SetLineWidth(2);
+                }
+                
+                {
                     //export histograms in eps format
                     TString NameTemp = "plot_signal/";
                     NameTemp += Var[VarIndex].VarName;
@@ -632,6 +687,15 @@ void plot()
                 
                 //legend
                 delete leg;
+                
+                //h2Ratio
+                delete h2Ratio;
+                
+                //pad1
+                delete pad1;
+                
+                //pad2
+                delete pad2;
                 
                 //canvas
                 delete c2;
