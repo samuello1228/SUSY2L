@@ -44,7 +44,7 @@ TString defaultdPtfile="../../data/root_files/dPT_signal.root";
 
 
 bool onlySignal=true;
-bool applyPtCorrection=true;
+bool applyPtCorrection=false;
 bool passQID=true;
 bool isMC = true;
 bool ZWindowOnly = !isMC;
@@ -263,9 +263,9 @@ void getSSPrediction(const TString outputDir=defaultOut,
       if(!SSevent){
          double pSS = flip1.first + flip2.first - 2*flip1.first*flip2.first;
          chargeFlipWeight = pSS/(1-pSS);
-      } else chargeFlipWeight = -1;
+      } else chargeFlipWeight = 1;
 
-      double w = 1;//evt2lTree->evt_weight * evt2lTree->evt_pwt;
+      double w = evt2lTree->evt_weight * evt2lTree->evt_pwt *evt2lTree->evt_ElSF * evt2lTree->evt_MuSF;
 
       hMass.Fill(mll, w, chargeFlipWeight);
       hLeadingPt.Fill(pt1, w, chargeFlipWeight);
