@@ -69,7 +69,7 @@ class Histos
    TH1D* ExpOS;
    TH1D* RatioSS;
    TH1D* RatioOS;
-   // TCanvas* c;
+   TCanvas* c;
    TLegend* l;
    double* legendXY;
 
@@ -79,6 +79,7 @@ class Histos
       ExpSS = new TH1D(name+"ExpSS", "Estimated "+title+" distribution of same sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
       OS = new TH1D(name+"OS", "Observed "+title+" of opposite sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
       ExpOS = new TH1D(name+"ExpOS", "Estimated "+title+" of opposite sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
+      c = new TCanvas("c"+name, "c"+name, 1); 
 
       SS->SetDirectory(fOut);
       ExpSS->SetDirectory(fOut);
@@ -110,7 +111,8 @@ class Histos
       cout << "Drawing " << name << ((s==sign::SS)? " SS" : " OS") << endl;
 
       // Split pad
-      TCanvas* c = new TCanvas("c"+name, "c"+name, 1); 
+      // TCanvas* c = 0;
+
       c->Divide(1,2);
       c->cd(1)->SetPad(0, 0.25, 1, 1);
       c->cd(2)->SetPad(0, 0, 1, 0.25);
@@ -130,6 +132,7 @@ class Histos
       exp->Draw("bar");
       obs->Draw("same e");
 
+      // TLegend* l = 0; 
       l = new TLegend(legendXY[0], legendXY[1], legendXY[2], legendXY[3]);
       l->AddEntry(obs, "Data", "lp");
       l->AddEntry(exp, "MC", "f");
@@ -139,11 +142,12 @@ class Histos
       c->cd(2)->SetGridy();
 
       TH1D* r = (TH1D*) obs->Clone((TString)(name+"Ratio")+((s==sign::SS)?"SS":"OS"));
-      cout << "1" << endl;
+
       r->Divide(exp);
-      r->SetTitle(";;Data/MC");
+      r->SetTitle("");
       TAxis* RatioX = r->GetXaxis();
       TAxis* RatioY = r->GetYaxis();
+      RatioY->SetTitle("Data/MC");
 
       RatioX->SetLabelOffset(999);
       RatioX->SetLabelSize(0);
@@ -159,18 +163,15 @@ class Histos
       TLine line;
       line.SetLineStyle(2);
       line.DrawLine(RatioX->GetXmin(), 1, RatioX->GetXmax(), 1); 
-      cout << "2" << endl;
 
-      c->cd();
+      cout << "Prepare to print" << endl;
       TString printName=(TString) obs->GetName()+".pdf";
       TString printTitle=(TString) "Title:"+name;
       c->Print(printName, printTitle);
-      // c->Print("Hello.pdf", "Title:Hello");
-      cout << "3" << endl;
+      cout << "Print successful" << endl;
 
       (s==sign::SS) ? RatioSS = r : RatioOS = r;
-      cout << "Lower plot done" <<endl<<endl;
-      delete l; delete c;
+      // delete l; delete c;
    }
 
    void Write(){
@@ -390,8 +391,9 @@ void SSfromMC(const TString outputDir=defaultOut,
    //////////////////////////
    for(auto h : histVector){
       h.Draw(sign::OS);
-      // h.Draw(sign::SS);
+      h.Draw(sign::SS);
       // h.Write();
+
    }
    fOut->Write();
    return;
