@@ -30,10 +30,10 @@
 
 // ========= CONFIGURATION =========== //
 TString defaultDir = "/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/";
-TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
-// TString defaultMClist = defaultDir + "common/ZP.txt";
-TString defaultDataList = defaultDir + "common/inFileList-data.txt";
-// TString defaultDataList = defaultDir + "common/shortD.txt";
+// TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
+TString defaultMClist = defaultDir + "common/ZP.txt";
+// TString defaultDataList = defaultDir + "common/inFileList-data.txt";
+TString defaultDataList = defaultDir + "common/shortD.txt";
 TString defaultOut= defaultDir + "QiD-on/FromMC";
 TString dPtfile=defaultDir + "QiD-on/Powheg/ptcorr/dEhistos.root";
 TString qSFfile=defaultDir + "ChargeCorrectionSF.Medium_FixedCutTightIso_CFTMedium.root";
@@ -69,8 +69,8 @@ class Histos
    TH1D* ExpOS;
    TH1D* RatioSS;
    TH1D* RatioOS;
-   TCanvas* c;
-   TLegend* l;
+   // TCanvas* c;
+   // TLegend* l;
    double* legendXY;
 
    Histos(const TString name, const TString title, const TString xLabel, const TString yLabel, const int nBins, const double xMin, const double xMax){
@@ -79,7 +79,6 @@ class Histos
       ExpSS = new TH1D(name+"ExpSS", "Estimated "+title+" distribution of same sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
       OS = new TH1D(name+"OS", "Observed "+title+" of opposite sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
       ExpOS = new TH1D(name+"ExpOS", "Estimated "+title+" of opposite sign electron pairs;"+xLabel+";"+yLabel, nBins, xMin, xMax);
-      c = new TCanvas("c"+name, "c"+name, 1); 
 
       SS->SetDirectory(fOut);
       ExpSS->SetDirectory(fOut);
@@ -107,12 +106,12 @@ class Histos
 
    void Draw(const sign s){
       // Hide info box of plot
-      gStyle->SetOptStat(0);
       cout << "Drawing " << name << ((s==sign::SS)? " SS" : " OS") << endl;
 
       // Split pad
-      // TCanvas* c = 0;
-
+      TCanvas* c = 0;
+      TString canvasName = (TString)"c"+name+((s==sign::SS)? " SS" : " OS");
+      c = new TCanvas(canvasName, canvasName, 1); 
       c->Divide(1,2);
       c->cd(1)->SetPad(0, 0.25, 1, 1);
       c->cd(2)->SetPad(0, 0, 1, 0.25);
@@ -132,7 +131,7 @@ class Histos
       exp->Draw("bar");
       obs->Draw("same e");
 
-      // TLegend* l = 0; 
+      TLegend* l = 0; 
       l = new TLegend(legendXY[0], legendXY[1], legendXY[2], legendXY[3]);
       l->AddEntry(obs, "Data", "lp");
       l->AddEntry(exp, "MC", "f");
@@ -165,10 +164,11 @@ class Histos
       line.DrawLine(RatioX->GetXmin(), 1, RatioX->GetXmax(), 1); 
 
       cout << "Prepare to print" << endl;
-      TString printName=(TString) obs->GetName()+".pdf";
-      TString printTitle=(TString) "Title:"+name;
-      c->Print(printName, printTitle);
-      cout << "Print successful" << endl;
+      TString printName=(TString) obs->GetName();//+".pdf";
+      // TString printTitle=(TString) "Title:"+name;
+      cout << printName << endl; //<< '\t' << printTitle 
+      c->Print(printName);
+      cout << "Print successful" << endl <<endl;
 
       (s==sign::SS) ? RatioSS = r : RatioOS = r;
       // delete l; delete c;
@@ -217,7 +217,8 @@ void SSfromMC(const TString outputDir=defaultOut,
                      const TString dataList=defaultDataList,
                      const TString opt="")
 {
-   
+   gStyle->SetOptStat(0);
+
    if(!initialize(outputDir, mcList, dataList, opt)){
       std::cout << "Exited from initialize()" << std::endl;
       return;
@@ -351,10 +352,6 @@ void SSfromMC(const TString outputDir=defaultOut,
          hLeadingPhi.Fill(tree->leps_phi[0], w*w1, MC, s);
          hSubleadingPhi.Fill(tree->leps_phi[1], w*w2, MC, s);
       }
-
-      // // Cleanup
-      // delete h; delete tree; delete t;
-      // f.Close();
       cout << endl;
    }
    
