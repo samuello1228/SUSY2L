@@ -30,10 +30,10 @@
 
 // ========= CONFIGURATION =========== //
 TString defaultDir = "/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/";
-// TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
-TString defaultMClist = defaultDir + "common/ZP.txt";
-// TString defaultDataList = defaultDir + "common/inFileList-data.txt";
-TString defaultDataList = defaultDir + "common/shortD.txt";
+TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
+// TString defaultMClist = defaultDir + "common/ZP.txt";
+TString defaultDataList = defaultDir + "common/inFileList-data.txt";
+// TString defaultDataList = defaultDir + "common/shortD.txt";
 TString defaultOut= defaultDir + "QiD-on/FromMC";
 TString dPtfile=defaultDir + "QiD-on/Powheg/ptcorr/dEhistos.root";
 TString qSFfile=defaultDir + "ChargeCorrectionSF.Medium_FixedCutTightIso_CFTMedium.root";
@@ -53,6 +53,8 @@ TFile* fOut=0;
 std::vector<Histos> histVector;
 ChargeFlipTool* cfTool=0;
 double mcEvtW=0;
+TH2* hQSF_OS = 0;
+TH2* hQSF_SS = 0;
 
 enum inType{DATA, MC};
 enum sign{OS=0, SS};
@@ -105,20 +107,18 @@ class Histos
    }
 
    void Draw(const sign s){
-      // Hide info box of plot
-      cout << "Drawing " << name << ((s==sign::SS)? " SS" : " OS") << endl;
-
       // Split pad
       TCanvas* c = 0;
-      TString canvasName = (TString)"c"+name+((s==sign::SS)? " SS" : " OS");
+      TString canvasName = (TString)"c"+name+((s==sign::SS)? "SS" : "OS");
+      cout << "Drawing " << canvasName << endl;
       c = new TCanvas(canvasName, canvasName, 1); 
       c->Divide(1,2);
       c->cd(1)->SetPad(0, 0.25, 1, 1);
       c->cd(2)->SetPad(0, 0, 1, 0.25);
       c->cd(1)->SetLogy();
 
-      TH1* obs = (s==sign::SS) ? SS : OS;
-      TH1* exp = (s==sign::SS) ? ExpSS : ExpOS;
+      TH1* obs = ((s==sign::SS) ? SS : OS);
+      TH1* exp = ((s==sign::SS) ? ExpSS : ExpOS);
 
       // ====  UPPER PLOT ====== //
       // Set range of Y axis()
@@ -148,6 +148,7 @@ class Histos
       TAxis* RatioY = r->GetYaxis();
       RatioY->SetTitle("Data/MC");
 
+      RatioX->SetTitle("");
       RatioX->SetLabelOffset(999);
       RatioX->SetLabelSize(0);
       
@@ -164,14 +165,15 @@ class Histos
       line.DrawLine(RatioX->GetXmin(), 1, RatioX->GetXmax(), 1); 
 
       cout << "Prepare to print" << endl;
-      TString printName=(TString) obs->GetName();//+".pdf";
-      // TString printTitle=(TString) "Title:"+name;
-      cout << printName << endl; //<< '\t' << printTitle 
-      c->Print(printName);
+      TString printName=(TString) obs->GetName()+".pdf";
+      TString printTitle=(TString) "Title:"+name;
+      cout << printName << '\t' << printTitle << endl;
+      c->Print(printName, printTitle);
       cout << "Print successful" << endl <<endl;
 
       (s==sign::SS) ? RatioSS = r : RatioOS = r;
-      // delete l; delete c;
+      delete l; 
+      delete c;
    }
 
    void Write(){
@@ -198,6 +200,7 @@ TChain* loadData(const TString);
 void processMC(const TString mcList);
 bool passCut(const evt2l* tree, const inType t);
 int getOrigElecI(const evt2l* tree, int i);
+double getSF(double eta, double pt);
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
 {
@@ -243,13 +246,13 @@ void SSfromMC(const TString outputDir=defaultOut,
 
    // Initialize histograms here ----------------------------------------
    // gDirectory->cd(fOut);
-   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", 100, 60, 260);
-   Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
-   Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
-   Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
-   Histos hSubleadingEta("hSubleadingEta", "subleading |#eta|", "Subleading |#eta|", "", 40, -2.47, 2.47);
-   Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading |#phi|", "", 40, -3.15, 3.15);
-   Histos hSubleadingPhi("hSubleadingPhi", "subleading #phi", "Subleading |#phi|", "", 40, -3.15, 3.15);
+   Histos hMass("hMass", "invariant mass", "mll", "Events/2 GeV", 100, 60, 260);
+   Histos hLeadingPt("hLeadingPt", "leading pT", "pT", "Events/4 GeV", 50, 20, 200);
+   Histos hSubleadingPt("hSubleadingPt", "subleading pT", "pT", "Events/4 GeV", 50, 20, 200);
+   Histos hLeadingEta("hLeadingEta", "leading |eta|", "Leading |eta|", "", 40, -2.47, 2.47);
+   Histos hSubleadingEta("hSubleadingEta", "subleading |eta|", "Subleading |eta|", "", 40, -2.47, 2.47);
+   Histos hLeadingPhi("hLeadingPhi", "leading phi", "Leading |phi|", "", 40, -3.15, 3.15);
+   Histos hSubleadingPhi("hSubleadingPhi", "subleading phi", "Subleading |phi|", "", 40, -3.15, 3.15);
 
    hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
 
@@ -263,8 +266,8 @@ void SSfromMC(const TString outputDir=defaultOut,
 
    // Load charge scale factors
    TFile *fQSF = TFile::Open(qSFfile);
-   TH2* hQSF_OS = (TH2*) fQSF->Get(qSFnameOS);
-   TH2* hQSF_SS = (TH2*) fQSF->Get(qSFnameSS);
+   hQSF_OS = (TH2*) fQSF->Get(qSFnameOS);
+   hQSF_SS = (TH2*) fQSF->Get(qSFnameSS);
 
    //////////////////////////
    // Initialize input trees
@@ -319,28 +322,17 @@ void SSfromMC(const TString outputDir=defaultOut,
          loadbar(i+1, nEntries);
          tree->GetEntry(i);
 
-         if(!passCut(tree, MC)) continue;
-
+         if(!passCut(tree, MC)) continue; 
          sign s = ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0))? SS : OS;
 
          // Reject if no original electron from Z
          int tp1 = getOrigElecI(tree, 0); int tp2 = getOrigElecI(tree, 1);
-         if(tp1<0 || tp2<0) continue;
+         if((tp1<0 || tp2<0)) continue;
 
-         // Get electron charge correction SF // positron has +ve ID, -ve pdgID
-         double w1 = (tree->leps_ID[0]>0 == (tree->truths_pdgId[tp1] < 0))?  
-         1 :hQSF_SS->GetBinContent(hQSF_SS->FindBin(tree->leps_pt[0]>=150? 149: tree->leps_pt[0], fabs(tree->leps_eta[0])))
-            / hQSF_OS->GetBinContent(hQSF_OS->FindBin(tree->leps_pt[0]>=150? 149: tree->leps_pt[0], fabs(tree->leps_eta[0])));
-            // hQSF_OS->GetBinContent(hQSF_OS->FindBin(tree->leps_pt[0]>=150? 149: tree->leps_pt[0], fabs(tree->leps_eta[0])))
-            // : hQSF_SS->GetBinContent(hQSF_SS->FindBin(tree->leps_pt[0]>=150? 149: tree->leps_pt[0], fabs(tree->leps_eta[0]))) ;
+         // // Get electron charge correction SF // positron has +ve ID, -ve pdgID
 
-         double w2 = (tree->leps_ID[1]>0 == (tree->truths_pdgId[tp2] < 0))?  
-         1 :hQSF_SS->GetBinContent(hQSF_SS->FindBin(tree->leps_pt[1]>=150? 149: tree->leps_pt[1], fabs(tree->leps_eta[1])))
-            / hQSF_OS->GetBinContent(hQSF_OS->FindBin(tree->leps_pt[1]>=150? 149: tree->leps_pt[1], fabs(tree->leps_eta[1])));
-            // hQSF_OS->GetBinContent(hQSF_OS->FindBin(tree->leps_pt[1]>=150? 149: tree->leps_pt[1], fabs(tree->leps_eta[1])))
-            // : hQSF_SS->GetBinContent(hQSF_SS->FindBin(tree->leps_pt[1]>=150? 149: tree->leps_pt[1], fabs(tree->leps_eta[1]))) ;
-
-
+         double w1 = ((tree->leps_ID[0]>0) == (tree->truths_pdgId[tp1]<0))? 1 : getSF(tree->leps_eta[0], tree->leps_pt[0]);
+         double w2 = ((tree->leps_ID[1]>0) == (tree->truths_pdgId[tp2]<0))? 1 : getSF(tree->leps_eta[0], tree->leps_pt[0]);
          // double w1, w2; w1 = w2 = 1;
          double w = tree->evt_weight * tree->evt_pwt *tree->evt_ElSF * tree->evt_MuSF * mcEvtW *w1 *w2;
 
@@ -527,4 +519,13 @@ int getOrigElecI(const evt2l* tree, int i){
    else{ 
       return -1;
    }
+}
+
+double getSF(double eta, double pt)
+{
+   eta = fabs(eta);
+   if (pt>=150) pt=149;
+   int i = hQSF_SS->FindBin(pt, eta);
+   if(hQSF_OS->GetBinContent(i)==0) return 0;
+   return hQSF_SS->GetBinContent(i)/hQSF_OS->GetBinContent(i);
 }
