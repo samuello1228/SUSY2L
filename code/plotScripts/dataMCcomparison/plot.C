@@ -307,18 +307,6 @@ void plot()
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
-        element.VarName = "averageMu";  element.VarTitle = "averageMu";                         element.unit = "";
-        element.bin=35;         element.xmin=0;                 element.xmax=35;
-        element.log=0;          element.ymin=0;                 element.ymax=0;
-        element.latexName = "Average number of interactions per bunch crossing";
-        Var.push_back(element);
-        
-        element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        //Var.push_back(element);
-        
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
@@ -353,6 +341,9 @@ void plot()
     {
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
+    
+    //plot for p-value
+    TH1F* hp = new TH1F("pvalue", "pvalue", 20, 0, 1);
     
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
@@ -658,6 +649,36 @@ void plot()
                     TLatex lt1;
                     lt1.DrawLatexNDC(0.3,0.78,RegionInfo[RegionIndex].RegionName.Data());
                     lt1.SetTextSize(lt1.GetTextSize());
+                    
+                    double pvalue = h2SigSum1[i]->Chi2Test(h2SigSum2[i],"WW");
+                    if(pvalue<0.05) cout<<"p-value: "<<pvalue<<endl;
+                    hp->Fill(pvalue);
+                    int m = int(pvalue*1000);
+                    
+                    if(m==1000)
+                    {
+                        NameTemp = "p-value = 1";
+                    }
+                    if(m>=100)
+                    {
+                        NameTemp = "p-value = 0." + TString::Itoa(m,10);
+                    }
+                    else if(m>=10)
+                    {
+                        NameTemp = "p-value = 0.0" + TString::Itoa(m,10);
+                    }
+                    else if(m>=1)
+                    {
+                        NameTemp = "p-value = 0.00" + TString::Itoa(m,10);
+                    }
+                    else
+                    {
+                        NameTemp = "p-value < 0.001";
+                    }
+                    
+                    TLatex lt3;
+                    lt3.DrawLatexNDC(0.3,0.73,NameTemp.Data());
+                    lt3.SetTextSize(lt3.GetTextSize());
                 }
                 
                 {
@@ -720,6 +741,21 @@ void plot()
         {
             delete tree2Sig2[i];
         }
+    }
+    
+    {
+        gStyle->SetOptStat(0);
+        TCanvas* c2 = new TCanvas();
+        c2->cd();
+        hp->Draw();
+        c2->WaitPrimitive();
+        
+        //export histograms in eps format
+        TString NameTemp = "plot_signal/pvalue.eps";
+        c2->Print(NameTemp,"eps");
+        delete c2;
+        
+        delete hp;
     }
     
     
