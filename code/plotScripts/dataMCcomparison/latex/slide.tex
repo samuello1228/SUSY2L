@@ -35,9 +35,8 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\small
-\item compare the old and new signal samples
-\item normalize to 36 fb$^{-1}$
+\item add p-value of the chi2 test for each plot.
+\item plot a histogram of p-value
 \end{itemize}
 \end{frame}
 
@@ -48,6 +47,13 @@ University of Michigan
 \input{data/plot_signal_OS.tex}
 \input{data/plot_signal_SS.tex}
 
+\includegraphics[width=0.75\textwidth]{../plot_signal/fit}
+\begin{itemize}
+\item Chi2 = 16.001
+\item Number of degree of freedom(NDf) = 19
+\item p0 = 26.1999 $\pm$ 1.14455
+\item Chi2/NDf $<$ 1
+\end{itemize}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -55,7 +61,7 @@ University of Michigan
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item Most of the value are similar.
+\item The old and new signal samples are likely to be compatible within the statistics.
 \end{itemize}
 \end{frame}
 

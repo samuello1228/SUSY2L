@@ -748,7 +748,7 @@ void plot()
         TCanvas* c2 = new TCanvas();
         c2->cd();
         hp->Draw();
-        c2->WaitPrimitive();
+        //c2->WaitPrimitive();
         
         //export histograms in eps format
         TString NameTemp = "plot_signal/pvalue.eps";
