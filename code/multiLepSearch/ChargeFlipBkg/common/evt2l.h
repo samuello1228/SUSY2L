@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Feb 13 07:15:08 2017 by ROOT version 5.34/36
+// Thu Apr 13 05:42:38 2017 by ROOT version 6.04/14
 // from TTree evt2l/a angles tree
-// found on file: /afs/cern.ch/user/g/ggallard/work/NTuples/user.ggallard.v9.1.3.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.10663763._000010.myOutput.root
+// found on file: /eos/atlas/user/g/ggallard/Zee/user.ggallard.v9.2.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11159267._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -14,15 +14,15 @@
 
 // Header file for the classes stored in the TTree if any.
 
-// Fixed size dimensions of array or collections stored in the TTree if any.
-   const Int_t kMaxleps = 4;
-   const Int_t kMaxjets = 22;
-   const Int_t kMaxtruths = 14;
-
 class evt2l {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
+
+// Fixed size dimensions of array or collections stored in the TTree if any.
+   const Int_t kMaxleps = 3;
+   const Int_t kMaxjets = 10;
+   const Int_t kMaxtruths = 8;
 
    // Declaration of leaf types
    ULong64_t       evt_event;
@@ -36,7 +36,13 @@ public :
    Float_t         evt_MuSF;
    Float_t         evt_BtagSF;
    Float_t         evt_qFwt;
+   Float_t         evt_qFwt_sys_1up;
+   Float_t         evt_qFwt_sys_1dn;
    Float_t         evt_fLwt;
+   Float_t         evt_fLwt_e_sys_1up;
+   Float_t         evt_fLwt_e_sys_1dn;
+   Float_t         evt_fLwt_u_sys_1up;
+   Float_t         evt_fLwt_u_sys_1dn;
    Int_t           leps_;
    Float_t         leps_pt[kMaxleps];   //[leps_]
    Float_t         leps_eta[kMaxleps];   //[leps_]
@@ -47,6 +53,7 @@ public :
    Int_t           leps_truthI[kMaxleps];   //[leps_]
    UInt_t          leps_lFlag[kMaxleps];   //[leps_]
    Bool_t          leps_ElChargeID[kMaxleps];   //[leps_]
+   Float_t         leps_ElChargeSF[kMaxleps];   //[leps_]
    Float_t         l12_pt;
    Float_t         l12_eta;
    Float_t         l12_phi;
@@ -88,6 +95,7 @@ public :
    TBranch        *b_leps_truthI;   //!
    TBranch        *b_leps_lFlag;   //!
    TBranch        *b_leps_ElChargeID;   //!
+   TBranch        *b_leps_ElChargeSF;   //!
    TBranch        *b_l12;   //!
    TBranch        *b_jets_;   //!
    TBranch        *b_jets_pt;   //!
@@ -124,9 +132,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/afs/cern.ch/user/g/ggallard/work/NTuples/user.ggallard.v9.1.3.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.10663763._000010.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/Zee/user.ggallard.v9.2.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11159267._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/afs/cern.ch/user/g/ggallard/work/NTuples/user.ggallard.v9.1.3.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.10663763._000010.myOutput.root");
+         f = new TFile("/eos/atlas/user/g/ggallard/Zee/user.ggallard.v9.2.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11159267._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -186,6 +194,7 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("leps.truthI", leps_truthI, &b_leps_truthI);
    fChain->SetBranchAddress("leps.lFlag", leps_lFlag, &b_leps_lFlag);
    fChain->SetBranchAddress("leps.ElChargeID", leps_ElChargeID, &b_leps_ElChargeID);
+   fChain->SetBranchAddress("leps.ElChargeSF", leps_ElChargeSF, &b_leps_ElChargeSF);
    fChain->SetBranchAddress("l12", &l12_pt, &b_l12);
    fChain->SetBranchAddress("jets", &jets_, &b_jets_);
    fChain->SetBranchAddress("jets.pt", jets_pt, &b_jets_pt);
