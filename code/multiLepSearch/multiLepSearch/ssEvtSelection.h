@@ -33,6 +33,7 @@
 #include "AsgAnalysisInterfaces/IEfficiencyScaleFactorTool.h"
 #include "ElectronEfficiencyCorrection/AsgElectronEfficiencyCorrectionTool.h"
 #include "ElectronEfficiencyCorrection/ElectronChargeEfficiencyCorrectionTool.h"
+#include "AsgAnalysisInterfaces/IEfficiencyScaleFactorTool.h"
 
 
 class GoodRunsListSelectionTool;
@@ -141,8 +142,10 @@ public:
 
   ChargeFlipBkgTool* mChargeFlipBkgTool; //!
   FakeLepBkgTool*    mFakeLepBkgTool;  //!
-  CP::ElectronChargeEfficiencyCorrectionTool *m_eccTool;
-  AsgElectronEfficiencyCorrectionTool *electronSF;
+  // ToolHandle<CP::IEfficiencyScaleFactorTool> m_eccTool; //!
+  CP::ElectronChargeEfficiencyCorrectionTool* m_eccTool; //!
+
+  AsgElectronEfficiencyCorrectionTool *electronSF; //!
 
 
 

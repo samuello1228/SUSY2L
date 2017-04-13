@@ -35,6 +35,8 @@
 #include <TH1D.h>
 #include <TFile.h>
 
+// #include "AthAnalysisBaseComps/AthAnalysisHelper.h"
+
 using namespace xAOD;
 using namespace std;
 
@@ -113,6 +115,10 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
   m_eccTool = new CP::ElectronChargeEfficiencyCorrectionTool("ElectronChargeEfficiencyCorrectionTool");
   m_eccTool->setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
   m_eccTool->initialize(); //initializes the tool
+
+  // m_eccTool.setTypeAndName("CP::ElectronChargeEfficiencyCorrectionTool/ElectronChargeEfficiencyCorrectionTool");
+  // m_eccTool.setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
+  // m_eccTool.retrieve(); //initializes the tool
 
   electronSF = new AsgElectronEfficiencyCorrectionTool("AsgElectronEfficiencyCorrectionTool");
   std::vector<std::string> inputFiles{"ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/efficiencySF.ChargeID.MediumLLH_d0z0_v11_isolFixedCutTight_MediumCFT.root "} ;
@@ -321,7 +327,8 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
   /// SUSYTools
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
-  //m_objTool->msg().setLevel( MSG::ERROR );
+  // m_objTool->msg().setLevel( MSG::ERROR );
+  // m_objTool->msg().setLevel(MSG::VERBOSE);
   //m_objTool->msg().setLevel( MSG::WARNING );
 
   ST::ISUSYObjDef_xAODTool::DataSource ds = static_cast<ST::ISUSYObjDef_xAODTool::DataSource>(CF_isMC); 
@@ -1261,10 +1268,15 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
 
     double qSF(1.); double effSF(1.);
-    CHECK(m_eccTool->getEfficiencyScaleFactor(*el, qSF));
+    auto res = m_eccTool->getEfficiencyScaleFactor(*el, qSF);
     CHECK(electronSF->getEfficiencyScaleFactor(*el, effSF));
-    l.ElChargeSF = qSF*effSF;
-  } else l.ElChargeSF = 1;
+    // Info("fillLepton(el)", "qSF = %2.5f, effSF = %2.5f", qSF, effSF);
+    // if (res == CP::CorrectionCode::OutOfValidityRange)
+    // {
+    //   Info("fillLepton(el)", "CP::CorrectionCode::OutOfValidityRange");
+    // }
+    l.ElChargeSF = (float) qSF*effSF;
+  } else l.ElChargeSF = 1.;
 
   // ChargeIDSelector
   l.ElChargeID = 0;
