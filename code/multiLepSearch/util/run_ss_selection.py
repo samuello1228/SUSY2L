@@ -278,7 +278,6 @@ elif (options.driver == "grid"):
         driver = ROOT.EL.PrunDriver()
         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[2]%.%in:name[3]%")
 #         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[4]%")
-        driver.options().setString("nc_outputSampleName", outname)
         if options.extraOptions:
             # "--allowTaskDuplication"
             driver.options().setString("nc_EventLoop_SubmitFlags", options.extraOptions);
@@ -286,9 +285,9 @@ elif (options.driver == "grid"):
             driver.options().setDouble(ROOT.EL.Job.optGridNFiles, 4)
             driver.options().setDouble(ROOT.EL.Job.optGridNFilesPerJob, 2)
         if options.fast:
-#             job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=1,2,3 --useContElementBoundary");
             job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=2,3 --useContElementBoundary");
+            outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag)
+        driver.options().setString("nc_outputSampleName", outname)
 #         driver.options().setDouble("nc_disableAutoRetry", 1)
-#         useContElementBoundary
         logging.info("submit job")
         driver.submitOnly(job, options.outputDir)
