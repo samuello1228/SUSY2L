@@ -311,7 +311,7 @@ def test_dev(anaName="ana1_Apr04b.root"):
 
 
 def run_test1(anaName="ana1_Apr04b.root"):
-    p1 = Plot(anaName)
+    p1 = Plot(anaName, 6)
     p1.mode = 1
 
     ### get analysis space
@@ -449,7 +449,10 @@ def run_test1(anaName="ana1_Apr04b.root"):
 #         waitRootCmd(sDir+sTag+"_l1_eta", sDirectly)
 #         p1.showPlot('Length$(jets)', TH1F('h1','l1_nJets_logy;Number of jets;Events',10, 0, 10))
 #         waitRootCmd(sDir+sTag+"_l1_phi", sDirectly)
-        p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events',100, 0, 200))
+        
+        jetPtBins = [i*10 for i in range(10)] + [100+i*20 for i in range(10)] + [300+i*50 for i in range(6)] + [600+i*100 for i in range(9)]
+        p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events / 10 GeV',len(jetPtBins)-1, array('f',jetPtBins)))
+#         p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events',100, 0, 200))
         waitRootCmd(sDir+sTag+"_j0_pt", sDirectly)
 #         p1.showPlot('leps[1].phi', TH1F('h1','l1_eta_logy;Subleading lepton #phi [rad];Events / 0.1 rad',64, -3.2, 3.2))
 #         waitRootCmd(sDir+sTag+"_l1_phi", sDirectly)
@@ -462,7 +465,7 @@ if __name__ == '__main__':
     savehistory('.')
     useAtlasStyle()
 #     run_test()
-#     run_test1("ana_Apr17a.root")
-    test_dev("ana_Apr17a.root")
+    run_test1("ana_Apr17a.root")
+#     test_dev("ana_Apr17a.root")
 #     buildAna("ana_Apr17a.root")
 #     checkCompare()

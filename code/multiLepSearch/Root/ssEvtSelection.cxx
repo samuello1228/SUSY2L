@@ -892,12 +892,18 @@ EL::StatusCode ssEvtSelection :: execute ()
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
-      fillLepton(sel_Ls[i], m_susyEvt->leps[i], i);
-      m_susyEvt->leps[i].MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
+      auto& l = m_susyEvt->leps[i];
+      fillLepton(sel_Ls[i], l, i);
+      l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
       //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
-      m_susyEvt->leps[i].mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      
+      //// dR with leading jet, and the smallest dR
+      l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
+      l.jet_dRm = l.jet0_dR;
+      for(size_t j=1; j<jet_Ls.size(); j++){auto dRn=jet_Ls[j]->p4().DeltaR(sel_Ls[i]->p4()); if(dRn<l.jet_dRm) l.jet_dRm = dRn;}
     }
 
     ///MetRel correction factor (See Eq6, 2LSS note: https://cds.cern.ch/record/1747285/files/ATL-COM-PHYS-2014-954.pdf)

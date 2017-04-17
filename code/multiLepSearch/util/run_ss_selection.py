@@ -26,6 +26,7 @@ parser.add_option("--conf", help="selection configuration file", default='multiL
 parser.add_option("--dataPRW", help='data pileup reweighting file list', default= 'multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root')
 parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='dev/SUSYTools/merged_prw_mc15c_latest.root')
 parser.add_option("--test", help="test run", action='store_true', default=False)
+parser.add_option("--fast", help="Fast submit for grid jobs.", action='store_true', default=False)
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
 parser.add_option("--sampleList", help="sample list", default=None)
@@ -64,9 +65,10 @@ sh_all = ROOT.SH.SampleHandler()
 if options.inputFiles:
     sample = ROOT.SH.SampleLocal(options.inputTag)
     for file in options.inputFiles.split(','): sample.add(file)
-    sh_all.add (sample);
+    sh_all.add(sample);
 elif options.inputList:
     if options.driver == 'grid':
+        mergeSamples = []
         for ds in options.inputList.split(','):
             with open(ds) as fin1:
                 for line in fin1.readlines():
@@ -74,9 +76,16 @@ elif options.inputList:
                         print line, 'skipped'
                         continue
                     line = line.split()[0]
-                    if line.find('*') == -1:
-                        ROOT.SH.addGrid(sh_all, line.rstrip())
-                    else: ROOT.SH.scanRucio(sh_all, line.rstrip())
+                    if options.fast: mergeSamples.append(line.rstrip())
+                    else:
+                        if line.find('*') == -1: ROOT.SH.addGrid(sh_all, line.rstrip())
+                        else: ROOT.SH.scanRucio(sh_all, line.rstrip())
+        if mergeSamples:
+            ## create a single sample
+            sample = ROOT.SH.SampleGrid("gridMergedSample")
+            sample.meta().setString(ROOT.SH.MetaFields.gridName,','.join(mergeSamples))
+            sample.meta().setString(ROOT.SH.MetaFields.gridFilter, ROOT.SH.MetaFields.gridFilter_default)
+            sh_all.add(sample)
     else: 
         ROOT.SH.readFileList(sh_all, options.inputTag, options.inputList);
 elif options.inputDir:
@@ -88,10 +97,15 @@ elif options.inputDir:
     for file in files: sample.add(file)
     sh_all.add (sample)
 elif options.inputDS:
-#     ROOT.SH.addGrid(sh_all, options.inputDS)
-    if options.inputDS.find('*') == -1:
-        ROOT.SH.addGrid(sh_all, options.inputDS)
-    else: ROOT.SH.scanRucio(sh_all, options.inputDS)
+    if options.fast:
+        sample = ROOT.SH.SampleGrid("gridSamples")
+        sample.meta().setString(ROOT.SH.MetaFields.gridName, options.inputDS)
+        sample.meta().setString(ROOT.SH.MetaFields.gridFilter, ROOT.SH.MetaFields.gridFilter_default)
+        sh_all.add(sample)
+    else:
+        if options.inputDS.find('*') == -1:
+            ROOT.SH.addGrid(sh_all, options.inputDS)
+        else: ROOT.SH.scanRucio(sh_all, options.inputDS)
 elif options.samplesDir:
     dir0 = options.samplesDir
     if dir0[-1] != '/': dir0+='/'
@@ -271,6 +285,9 @@ elif (options.driver == "grid"):
         if options.test:
             driver.options().setDouble(ROOT.EL.Job.optGridNFiles, 4)
             driver.options().setDouble(ROOT.EL.Job.optGridNFilesPerJob, 2)
+        if options.fast:
+#             job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=1,2,3 --useContElementBoundary");
+            job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=2,3 --useContElementBoundary");
 #         driver.options().setDouble("nc_disableAutoRetry", 1)
 #         useContElementBoundary
         logging.info("submit job")

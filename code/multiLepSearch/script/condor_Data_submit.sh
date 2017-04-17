@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v15.0
+tag=v16.0
 # grlDir=
 # /cvmfs/atlas.cern.ch/repo/sw/database/GroupData/GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
 

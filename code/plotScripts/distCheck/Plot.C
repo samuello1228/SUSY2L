@@ -7,6 +7,7 @@
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TProof.h>
+#include <TString.h>
 #include <TLatex.h>
 using std::cout;
 using std::endl;
@@ -14,8 +15,8 @@ using std::endl;
 class Plot{
 
  public:
-  Plot(TString f1=""){if(f1!="") m_file = new TFile(f1,"update");
-    TProof *proof = TProof::Open("workers=4");
+  Plot(TString f1="", int nProof=0){if(f1!="") m_file = new TFile(f1,"update");
+    if(nProof>0){TProof *proof = TProof::Open(TString::Format("workers=%d", nProof));}
   }
   Sample* sData;
   vector<Sample*> sSM;
@@ -85,7 +86,6 @@ class Plot{
     /// Stack SM
     TH1F* htotal(nullptr);
     if(sSM.size()>0){
-      lg->AddEntry(htotal, "Total SM", "l");
 
       THStack *hs = new THStack("hs","");
       for(auto& s: sSM){
@@ -111,7 +111,9 @@ class Plot{
       }
 
       htotal->SetFillStyle(0);
+      htotal->SetLineColor(sSM[sSM.size()-1]->style[0]);
       htotal->Draw("samehist");
+      lg->AddEntry(htotal, "Total SM", "l");
     }
 
     /// Stack SM

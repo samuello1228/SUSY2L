@@ -20,6 +20,8 @@ BASENAME = susy2L2015
 # Default target - make mydocument.pdf with pdflatex
 default: run_pdflatex
 
+lt:lt.pdf
+
 .PHONY: new newtexmf draftcover preprintcover auxmat clean cleanpdf help
 
 new:
