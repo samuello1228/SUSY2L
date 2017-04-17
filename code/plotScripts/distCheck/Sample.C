@@ -4,14 +4,19 @@
 #include <TError.h>
 #include<TH1F.h>
 #include<TEntryList.h>
+#include <THStack.h>
+#include <TStyle.h>
 #include<string>
 #include<iostream>
 #include<vector>
 #include<TFile.h>
+#include <algorithm>
+#include <regex>
 using std::cout;
 using std::endl;
 using std::vector;
 using std::string;
+using std::sort;
 
 class Sample: public TObject{
  public:
@@ -57,9 +62,11 @@ class Sample: public TObject{
      if(mode==0) gDirectory->Delete(hname);
 
      auto hx = (TH1F*)h1->Clone(hname);
+     tree1->SetProof(true);
      hx->Sumw2();
      tree1->Draw(var+">>"+hname,cut,opt+"goff");
      std::cout << var+">>"+hname << " " << hx->GetEntries() << std::endl;
+     tree1->SetProof(false);
     
      if(dress) dressHist(hx);
      if(weight>0) hx->Scale(weight);
@@ -114,6 +121,35 @@ class Sample: public TObject{
        if(style[5]>=0) hx->SetMarkerSize(style[5]);
        if(style[6]>=0) hx->SetFillColor(style[6]);
        if(style[7]>=0) hx->SetFillStyle(style[7]);
+
+     cout << name << " Dress done. Phasing " << hx->GetYaxis()->GetTitle() << endl;
+       /// include the overlow in the last bin?
+       /// costum binning
+       std::cmatch cm;
+//        std::regex e (".*/ *(\\d+[\\.]\\d*).*");
+       std::regex e (".*/ *(\\d+[\\.]*\\d*).*");
+       std::regex_match(hx->GetYaxis()->GetTitle(), cm, e, std::regex_constants::match_default);
+
+     cout << name << " check Bind ->" << cm.size() << endl;
+
+       if(cm.size()>0){
+         cout << cm[1] << endl;
+//   std::cout << "the matches were: ";
+//   for (unsigned i=0; i<cm.size(); ++i) {
+//     std::cout << "[" << cm[i] << "] ";
+//   }
+
+         float width = std::stof(cm[1]);
+         std::cout << width << endl;
+
+         for(int i=1; i<hx->GetNbinsX()+1; i++){
+           float scale = width/hx->GetXaxis()->GetBinWidth(i);
+           hx->SetBinContent(i, hx->GetBinContent(i)*scale);
+           hx->SetBinError(i, hx->GetBinError(i)*scale);
+          }
+     cout << name << " done 1" << style[0] << endl;
+       }
+
     }
 
    ClassDef(Sample, 1)
@@ -156,6 +192,46 @@ class SampleGroup: public Sample{
 
      hists.push_back(hx); 
      return hx;
+    }
+
+   THStack* getHStackFromTree(TString var, TH1F* h1, TString cut, TString opt="", bool dress=true, double threshold=-1){
+     if(sCuts != ""){
+       if(cut != "") cut += "&&";
+       cut += sCuts;
+      }
+     cout << cut << endl;
+
+     TString hname(tag+h1->GetName());
+     if(mode==0) gDirectory->Delete(hname);
+
+     vector<TH1F*> hx_temp;
+     hx_temp.reserve(sampleList.size());
+     for(auto& s: sampleList){
+       auto hx = s->getHistFromTree(var, h1, cut, opt, false);
+
+       if(hx->GetEntries()<0.1 || hx->Integral()<threshold) continue;
+       hx->SetTitle(s->name.c_str());
+       hx_temp.push_back(hx);
+      }
+     sort(hx_temp.begin(), hx_temp.end(), [](const TH1F* a, const TH1F* b)->bool{return a->Integral() < b->Integral();});
+
+     //// add to the stack
+     THStack* hstack = new THStack("hs_"+hname, "stack of sample");
+     int step = gStyle->GetNumberOfColors()/hx_temp.size();
+     if(step==0) step=1;
+     int ih(0);
+     for(auto hx: hx_temp){
+       ih += step;
+
+       auto ic = gStyle->GetColorPalette(ih);
+       hx->SetLineColor(ic);
+       hx->SetFillColor(ic);
+       hx->SetMarkerColor(ic);
+
+       hstack->Add(hx);
+      }
+    
+     return hstack;
     }
 
    void setUpOwnChain(TChain* ch1=nullptr, string chainName="evt2l"){

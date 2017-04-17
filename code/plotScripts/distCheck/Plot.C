@@ -6,6 +6,7 @@
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TLine.h>
+#include <TProof.h>
 #include <TLatex.h>
 using std::cout;
 using std::endl;
@@ -13,7 +14,9 @@ using std::endl;
 class Plot{
 
  public:
-  Plot(TString f1=""){if(f1!="") m_file = new TFile(f1,"update");}
+  Plot(TString f1=""){if(f1!="") m_file = new TFile(f1,"update");
+    TProof *proof = TProof::Open("workers=4");
+  }
   Sample* sData;
   vector<Sample*> sSM;
   vector<Sample*> sSig;
@@ -245,15 +248,30 @@ class Plot{
 
   Sample* getSample(TString name){
     Sample* s1 = (Sample*)m_file->Get("Sample_"+name);
-    s1->tree1 = (TChain*)m_file->Get(name+"_tree1");
+    if(s1) s1->tree1 = (TChain*)m_file->Get(name+"_tree1");
+    else cout << "Sample " << name << " is not found!!!" << endl;
     return s1;
    };
 
   SampleGroup* getSampleGroup(TString name){
     SampleGroup* s1 = (SampleGroup*)m_file->Get("Sample_"+name);
     s1->tree1 = (TChain*)m_file->Get(name+"_tree1");
-    for(size_t i=0; i<s1->m_sampleNames.size(); i++) s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+//     for(size_t i=0; i<s1->m_sampleNames.size(); i++) s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+    for(size_t i=0; i<s1->m_sampleNames.size(); i++){
+      std::cout << s1->m_sampleNames[i] << std::endl;
+      s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+    }
     return s1;
+   };
+
+   void loadSampleGroup(SampleGroup* s1){
+//     for(size_t i=0; i<s1->m_sampleNames.size(); i++) s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+    s1->sampleList.resize(s1->m_sampleNames.size(), nullptr);
+    for(size_t i=0; i<s1->m_sampleNames.size(); i++){
+      std::cout << s1->m_sampleNames[i] << std::endl;
+      s1->sampleList[i] = getSample(s1->m_sampleNames[i]);
+     }
+    return;
    };
 
   void saveSamples(){

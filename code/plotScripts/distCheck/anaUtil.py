@@ -3,6 +3,10 @@ from ROOT import *
 gROOT.LoadMacro('Plot.C+')
 from ROOT import Plot, Sample, SampleGroup
 
+
+def useStyle(sample, style, size=None):
+    for i in range(size if size else len(style)): sample.style[i]=style[i]
+
 def loadSamplesL(dslist, dsname=None, dir0='/net/s3_data_home/dzhang/links/SAMPLES/R20/susyNtuple/AnalysisBase-02-04-26-da7031fc/'):
     ### get the samples
     samples = {}
@@ -32,7 +36,7 @@ def loadSamplesL(dslist, dsname=None, dir0='/net/s3_data_home/dzhang/links/SAMPL
             print line
             fs = line.split('.')
             name = 'ds'+fs[0]
-            s1 = Sample(name,fs[0],fs[0],fs[0])
+            s1 = Sample(name,fs[0],fs[1],fs[0])
             samples[s1.name] = s1
             s1.tree1 = TChain('evt2l')
             s1.tree1.Add(dir0+"*"+line+'*.root*')
