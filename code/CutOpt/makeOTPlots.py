@@ -1,12 +1,72 @@
 #!/usr/bin/env python
 
-import sys, os, subprocess
+import sys, os, subprocess, ROOT, csv, overtraining, re#, ssUtil
+import tqdm # Progress bar # Find and comment out all lines with 'tqdm' if not installed
 from os import listdir, path, mkdir, rename
 from os.path import isdir, isfile
-import re
-import overtraining
 from subprocess import call
+from csv import reader
+from ROOT import TChain, TH1F, gDirectory, gROOT
+from tqdm import tqdm
 
+import multiLepSearch
+from multiLepSearch import ssUtil
+
+gROOT.SetBatch(True)
+####################
+# Config variables #
+####################
+C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
+luminosity = 33257.2
+# channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+# channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
+channels = (3, 13)
+sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
+sigFilesTxt = "sig.txt"
+####################
+
+def makeSampleIdDB():
+	sampleIdDB = {}
+	fileList = open(sigFilesTxt,"r").readlines()
+	# print fileList
+	for aLine in fileList:
+		if "MGPy8EG" not in aLine or "root/user" not in aLine: continue
+		# if (re.search("MCSig.[0-9]{6}", aLine)) is None: continue
+		sampleID = int((re.search(".[0-9]{6}.", aLine).group()).split('.')[1])
+		masses = re.search("Slep_[0-9]{3,4}_[0-9]{1,4}", aLine).group()
+		# print masses
+		mC1 = int(masses.split('_')[1])
+		mN1 = int(masses.split('_')[2])
+		sampleIdDB[(mC1, mN1)] = sampleID
+	return sampleIdDB
+	# print sampleIdDB
+
+def getTotDict(nDict):
+	nTotDict = {}
+
+	for chan in channels:
+		nTotDict[chan] = 0
+
+	for sampleID in nDict:
+		for chan in channels:
+			nTotDict[chan] += nDict[sampleID][chan]
+
+	return nTotDict
+	
+def getNDict(dictCSV):
+	allLines = open(dictCSV).readlines()
+
+	headers = allLines[0].split('\n')[0].split(',')
+	nCols = len(headers)
+
+	nDict = {}
+	for row in allLines[1:]:
+		entries = row.split('\n')[0].split(',')
+		sampleDict = {int(headers[i]): float(entries[i]) for i in range(1,nCols)}
+		nDict[int(entries[0])] = sampleDict
+	return nDict
+
+#### Utility functions
 def whichISR(nISR):
 	return {
 		0 : 'no',
@@ -31,61 +91,17 @@ def notOvertrained(overtrainingNums):
 	return (SigKS > 0.05 and BkgKS > 0.05 and SigKS < 0.95 and BkgKS < 0.95 ) 
 			# and (SigChi2 > 0.05 and BkgChi2 > 0.05 and SigChi2 < 0.95 and BkgChi2 < 0.95)
 
-def loadXSec():
-	xSecFile = open("SigSample.txt", "r")
-	xSecDict = {}
-	for aLine in xSecFile:
-		aLine = aLine.split("#")[0]
-		if len(aLine)==0: continue
-
-		elements = aLine.split(' ')
-		mC1 = elements[2]
-		mN1 = elements[3]
-		xSec = elements[4]
-		xSecEff = elements[5]
-
-		nBefore = elements [-2]
-		nAfter = elements[-1].rstrip('\n')
-		preSelEff = float(nAfter)/float(nBefore)
-
-		xSecDict[(int(mC1), int(mN1))] = (float(xSec), float(xSecEff), preSelEff)
-	xSecFile.close()
-	return xSecDict
-
-def makeChanDict(ChanNs):
-	n = int(ChanNs[0])
-	ChanDict = {
-		0: float(ChanNs[1])/n,
-		1: float(ChanNs[2])/n,
-		2: float(ChanNs[3])/n,
-		3: float(ChanNs[4])/n,
-		4: float(ChanNs[5])/n,
-		10: float(ChanNs[6])/n,
-		11: float(ChanNs[7])/n,
-		12: float(ChanNs[8])/n,
-		13: float(ChanNs[9])/n,
-		14: float(ChanNs[10])/n
-	}
-	return ChanDict
-
-def loadEffs():
-	effFile = open("CutEffs.csv")
-	effDict = {}
-	next(effFile)
-	for line in effFile:
-		elements = line.split(',')
-		effDict[(int(elements[0]), int(elements[1]))] = makeChanDict(elements[2:])
-		# print (int(elements[0]), int(elements[1]))
-
-	effFile.close()
-	return effDict
-
-C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
-# luminosity = 10064.3 # /1000 pb-1 # TODO: Update for higher luminosity
-luminosity = 33000
-channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
-
+#### Main function
 if __name__ == '__main__':
+	ROOT.gIgnoreErrorLevel = ROOT.kInfo # Quiet INFO messages
+
+	# Load nSig and nBkg
+	sampleIdDB = makeSampleIdDB()
+	nBkgDict = getNDict("nBkgDict.csv")
+	nSigDict = getNDict("nSigDict.csv")
+	nBkgTotDict = getTotDict(nBkgDict)
+
+	# Initialize output .csv's
 	outOT = open("checksOT.csv", "w")
 	outOT.write("Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2\n")
 
@@ -93,17 +109,14 @@ if __name__ == '__main__':
 	outViableOT.write("Channel,ISR,Flavor,dm,NTrees,NodeSize,Depth,SigKS,BkgKS,SigChi2,BkgChi2\n")
 
 	outSig = open("checksSig.csv", "w")
-	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,xSec,")
+	outSig.write("m(C1),m(N1),Channel,ISR,Flavor,NTrees,NodeSize,Depth,")
 	outSig.write("nSig,nBkg,BDTopt,nSig(BDTopt),nBkg(BDTopt),sigma(BDTopt),")
 	outSig.write("nSig(0),nBkg(0),sigma(0),")
 	outSig.write("nSig(0.1),nBkg(0.1),sigma(0.1),")
 	outSig.write("nSig(0.2),nBkg(0.2),sigma(0.2),")
 	outSig.write("nSig(0.3),nBkg(0.3),sigma(0.3)\n")
 
-	xSecDict = loadXSec()
-	effDict = loadEffs()
-
-	for directory in sys.argv[1:]:
+	for directory in tqdm(sys.argv[1:]):
 		directory = directory.rstrip('/')
 		if not(isdir(directory)): continue
 		files = listdir(directory)
@@ -111,10 +124,11 @@ if __name__ == '__main__':
 		plotDir = "%s/plots" % directory
 		if not isdir(plotDir): mkdir(plotDir)
 
-		for file in files:
+		for file in tqdm(files):
 			if not(file.endswith(".root")):	continue
 
-			print ("## Now processing %s/%s##" % (directory, file))
+			# print ("## Now processing %s/%s##" % (directory, file))
+			tqdm.write("## Now processing %s/%s##" % (directory, file))
 			dm = int(re.search("[0-9]+", re.search("dm[0-9]+", file).group()).group())
 			NodeSize = int(re.search("[0-9]+", re.search("NodeSize[0-9]+", directory).group()).group())
 			NTrees = int(re.search("[0-9]+", re.search("_[0-9]+_", directory).group()).group())
@@ -139,15 +153,21 @@ if __name__ == '__main__':
 				% (channel, ISR, Flavor, dm, NTrees, NodeSize, Depth))
 			outViableOT.write("%1.3f,%1.3f,%1.3f,%1.3f\n" % overtrainingNums)
 
-			for mass in C1masses: 
-				xSec = xSecDict[(mass, mass-dm)]
-				selEff = effDict[(mass, mass-dm)][channel%100]
-				nEvents = xSec[0]*xSec[1]*xSec[2]*luminosity*selEff
-				print "## mC1 = %d, mN1 = %d, chan = %d, nEvents %f\n" % (mass, mass-dm, channel, nEvents)
-				if nEvents <= 1: continue
-				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nEvents), luminosity), shell=True)
-				outSig.write("%d,%d,%d,%s,%s,%d,%d,%d,%f," 
-					% (mass, mass-dm, channel, ISR, Flavor, NTrees, NodeSize, Depth, xSec[0]))
+			for mass in tqdm(C1masses): 
+				nSig = nSigDict.get(sampleIdDB[(mass, mass-dm)],{}).get(channel,0)
+				if nSig < 1:
+					# print "nSig<1. Skipping."
+					# tqdm.write("nSig<1. Skipping.")
+					continue
+				nBkg = nBkgTotDict[channel]
+
+				# print "## mC1 = %d, mN1 = %d, chan = %d, nSig %f\n" % (mass, mass-dm, channel, nSig)
+				# tqdm.write("## mC1 = %d, mN1 = %d, chan = %d, nSig %f\n" % (mass, mass-dm, channel, nSig))
+
+				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nSig), int(nBkg)), shell=True)
+				
+				outSig.write("%d,%d,%d,%s,%s,%d,%d,%d," 
+					% (mass, mass-dm, channel, ISR, Flavor, NTrees, NodeSize, Depth))
 				with open("effs.csv") as effFile:
 					outSig.write(effFile.readline())
 				os.rename("plots/mvaeffs_BDTD.eps", "%s/%d_%d_Channel%d.eps" % (plotDir, mass, mass-dm, channel))
@@ -155,3 +175,4 @@ if __name__ == '__main__':
 	outOT.close()
 	outViableOT.close()
 	outSig.close()
+	print "\n\n\n\n"

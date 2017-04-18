@@ -63,7 +63,7 @@ ClassImp(ssEvtSelection)
 
 
 
-ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0),mh_ElChargeFlip(0){
+ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0){
   // Here you put any code for the base initialization of variables,
   // e.g. initialize all pointers to 0.  Note that you should only put
   // the most basic initialization here, since this method will be
@@ -384,10 +384,6 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
   CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
   CHECK(ECIDSTool->initialize());
-
-//   TFile* f1 = new TFile(PathResolverFindCalibFile("multiLepSearch/root_files/chargeMisID_Zee_MC_looseBaseline.root").c_str(),"read");
-//   mh_ElChargeFlip = (TH1*)f1->Get("hFlipProb");
-//   Info("chargeMisID", "nbinsX = %d", mh_ElChargeFlip->GetNbinsX());
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -1072,17 +1068,25 @@ EL::StatusCode ssEvtSelection :: execute ()
         m_susyEvt->evt.averageMu = m_objTool->GetCorrectedAverageInteractionsPerCrossing();
       }
 
-      ///// get the weight for 1 lepton charge flip
-      //m_susyEvt->evt.qFwt = 0;
-      //for(unsigned int i=0; i<sel_Ls.size(); i++){
-      //  auto e = sel_Ls[i];
-      //  if(!( dec_signal(*e) && TMath::Abs(m_susyEvt->leps[i].ID) == 11000 )) continue;
-      //  int ibin = mh_ElChargeFlip->FindBin(e->eta(), e->pt()*iGeV);
-      //  if(ibin>0){
-      //    float wt = mh_ElChargeFlip->GetBinContent(ibin);
-      //    m_susyEvt->evt.qFwt = wt*(1-m_susyEvt->evt.qFwt)+(1-wt)*(m_susyEvt->evt.qFwt);
-      //  }
-      //}
+//       //Scale factor
+//       if(CF_isMC){
+//         if( study == "ss" )
+//         {
+//           m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
+//           m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
+//         }
+//         else if(study == "3l")
+//         {
+//           m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
+//           m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
+//         }
+//         m_susyEvt->evt.BtagSF = m_objTool->BtagSF(jets_copy);
+// 
+//       }else{
+//         m_susyEvt->evt.ElSF = 1;
+//         m_susyEvt->evt.MuSF = 1;
+//         m_susyEvt->evt.BtagSF = 1;
+//       }
 
       ///// event weight for fake Lep
       //m_susyEvt->evt.fLwt = 0.;

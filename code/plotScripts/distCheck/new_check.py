@@ -425,7 +425,9 @@ def run_test1(anaName="ana1_Apr04b.root"):
     tTag = 'cID_m2_'
     for x in sels:
 #         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1)'
-        p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1&&l12.m>15)'
+#         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1&&l12.m>15)'
+        p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)'
+        el_pre = '_B'
 #         p1.mCut = '(evt.weight*evt.pwt*evt.ElSF*evt.MuSF)*((sig.trigCode&sig.trigMask)!=0&&leps[0].ElChargeID==1&&leps[1].ElChargeID==1&&(leps[0].isoPass&0x2)!=0&&(leps[1].isoPass&0x2)!=0)'
         if x[0][1].split("==")[1] in [4, 5, 6, 10, 11, 12]:
             if x[0][0] in ['flag4', 'flag10']: ### show Z control region
@@ -436,28 +438,38 @@ def run_test1(anaName="ana1_Apr04b.root"):
             p1.sData = p1.getSample("data")
             p1.sData.sCuts = ''
 
-        p1.useEntryList(x[0][0],False,x[0][1], False)
+        p1.useEntryList(x[0][0]+el_pre,False,x[0][1], False)
         p1.showInfo = x[1]
         sTag = tTag+'preSel_'+x[2]
+
+#         p1.showPlot('leps[0].jet0_dR', TH1F('h1','l0_dR_jet0;#DeltaR(l_{0},jet_{0});Events / 0.05',100, 0, 5))
+#         waitRootCmd(sDir+sTag+"_l0_dR_jet0", sDirectly)
+#         p1.showPlot('leps[0].jet_dRm', TH1F('h1','l0_dRm_jet;Min #DeltaR(l_{0},jets);Events / 0.05',100, 0, 5))
+#         waitRootCmd(sDir+sTag+"_l0_dRm_jet", sDirectly)
+
+
 
 #         p1.showPlot('leps[0].mT', TH1F('h1','lep0_mT_logy;Leading lepton m_{T} [GeV];Events / 2 GeV',100, 0, 200))
 #         waitRootCmd(sDir+sTag+"mT0", sDirectly)
 #         p1.showPlot('leps[1].mT', TH1F('h1','lep1_mT_logy;Sub-leading lepton m_{T} [GeV];Events / 2 GeV',100, 0, 200))
 #         waitRootCmd(sDir+sTag+"mT1", sDirectly)
-#         p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 2 GeV',100, 0, 200))
+        mllBins = [3*i for i in range(120/3)] + [120+i*6 for i in range(10)] + [180+i*12 for i in range(10)] + [300]
+        p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 3 GeV',len(mllBins)-1, array('f',mllBins)))
+        waitRootCmd(sDir+sTag+"_mll_vBin", sDirectly)
+#         p1.showPlot('l12.m', TH1F('h1','l12_m_logy;m_{ll} [GeV];Events / 3 GeV',100, 0, 300))
 #         waitRootCmd(sDir+sTag+"mll", sDirectly)
 #         p1.showPlot('leps[1].eta', TH1F('h1','l1_eta_logy;Subleading lepton #eta;Events / 0.1',60, -3, 3))
 #         waitRootCmd(sDir+sTag+"_l1_eta", sDirectly)
-        p1.showPlot('Length$(jets)', TH1F('h1','l1_nJets_logy;Number of jets;Events',15, 0, 15))
-        waitRootCmd(sDir+sTag+"_nJet", sDirectly)
+#         p1.showPlot('Length$(jets)', TH1F('h1','l1_nJets_logy;Number of jets;Events',15, 0, 15))
+#         waitRootCmd(sDir+sTag+"_nJet", sDirectly)
         
-        jetPtBins = [i*10 for i in range(10)] + [100+i*20 for i in range(10)] + [300+i*50 for i in range(6)] + [600+i*100 for i in range(9)]
-        p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events / 10 GeV',len(jetPtBins)-1, array('f',jetPtBins)))
-#         p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events',100, 0, 200))
-        waitRootCmd(sDir+sTag+"_j0_pt", sDirectly)
+#         jetPtBins = [i*10 for i in range(10)] + [100+i*20 for i in range(10)] + [300+i*50 for i in range(6)] + [600+i*100 for i in range(9)]
+#         p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events / 10 GeV',len(jetPtBins)-1, array('f',jetPtBins)))
+# #         p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events',100, 0, 200))
+#         waitRootCmd(sDir+sTag+"_j0_pt", sDirectly)
 #         p1.showPlot('leps[1].phi', TH1F('h1','l1_eta_logy;Subleading lepton #phi [rad];Events / 0.1 rad',64, -3.2, 3.2))
 #         waitRootCmd(sDir+sTag+"_l1_phi", sDirectly)
-#         p1.showPlot('l12.pt', TH1F('h1','l12_pt_logy;p^{ll}_{T} [GeV];Events / 2 GeV',100, 0, 200))
+#         p1.showPlot('l12.pt', TH1F('h1','l12_pt_logy;p^{ll}_{T} [GeV];Events / 3 GeV',100, 0, 300))
 #         waitRootCmd(sDir+sTag+"llpt", sDirectly)
 #         p1.showPlot('sig.Met', TH1F('h1','Met_logy;E_{T}^{Miss} [GeV];Events / 2 GeV',100, 0, 200))
 #         waitRootCmd(sDir+sTag+"Met", sDirectly)
@@ -470,6 +482,6 @@ if __name__ == '__main__':
 #     run_test1("ana_Apr17a.root")
 #     test_dev("ana_Apr17a.root")
 #     buildAna("ana_Apr17a.root")
-    buildAna(wa)
+#     buildAna(wa)
     run_test1(wa)
 #     checkCompare()

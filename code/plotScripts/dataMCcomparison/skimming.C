@@ -59,7 +59,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     {
         TString fileName = SamplePath;
         fileName += "user.clo.";
-        //fileName += "user.ychan.";
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
@@ -103,7 +102,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
-        TString fileName = "skimming/skimming.";
+        //TString fileName = "skimming/skimming.";
+        //TString fileName = "skimming_signal_old/skimming.";
+        TString fileName = "skimming_signal_new/skimming.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -503,31 +504,13 @@ void skimming()
 {
     //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     TString SamplePath = "/srv/SUSY/ntuple/";
-    //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
-    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
-    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
-    //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
-    //SamplePath += "AnalysisBase-02-04-17-414981/";
-    //SamplePath += "AnalysisBase-02-04-17-419618/";
-    //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
-    //SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
-    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
-    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2-v8d7/";
-    //SamplePath += "AnalysisBase-02-04-26-a73a6eda/";
-    //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/";
-    SamplePath += "AnalysisBase-02-04-26-da7031fc/";
-    
-    //TString tag = "v7.8";
-    //TString tag = "v7.11";
-    //TString tag = "v8.0";
-    //TString tag = "v8.4";
-    //TString tag = "v8.6";
-    //TString tag = "v8.7";
-    //TString tag = "v8.10";
-    //TString tag = "v8.12";
-    TString tag = "v8.13";
+    //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; TString tag = "v8.10";
+    //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; TString tag = "v8.12";
+    //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
+    //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
+    SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
     
     std::vector<nEvent> nSS;
     
@@ -564,8 +547,8 @@ void skimming()
     }
     
     //Signal
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
