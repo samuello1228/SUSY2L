@@ -178,7 +178,7 @@ eeCut        = "Sum$(abs(leps.ID))==22000"
 emuCut       = "Sum$(abs(leps.ID))==24000"
 # mumuCut      = "int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13"
 mumuCut      = "Sum$(abs(leps.ID))==26000"
-
+cftCut       = "leps.ElChargeID[0] && leps.ElChargeID[1]"
 # For diagnostics
 # isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
 
