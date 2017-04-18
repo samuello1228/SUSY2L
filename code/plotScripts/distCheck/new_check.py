@@ -201,7 +201,8 @@ def buildAna(anaFileName):
     ### get analysis space
     write = True
     if write:
-        samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v15.0.MC/data-myOutput/')
+#         samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v15.0.MC/data-myOutput/')
+        samples,sampleG = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v16.0.MC/data-myOutput/')
 #         samples1,sampleG1 = loadSamplesL('dataset_v130.list', None, '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/v13.0.MC.1/data-myOutput/')
 
         for s in samples:
@@ -244,7 +245,7 @@ def buildAna(anaFileName):
         dir1 = '/home/dzhang/work/bsmSearch/ewSUSY/analysis/v20_7b/SUSY2L/code/lRun/output/'
         s1 = Sample('data','data_','Pseudo-data','Data')
         s1.tree1 = TChain('evt2l')
-        s1.tree1.Add(dir1+'v15.0.data/fetch/data-myOutput/*.root')
+        s1.tree1.Add(dir1+'v16.0.data/fetch/data-myOutput/*.root')
 
         ### set styles
         useStyle(sampleG['VV'],(3,1,1,3,20,1,3))
@@ -447,8 +448,8 @@ def run_test1(anaName="ana1_Apr04b.root"):
 #         waitRootCmd(sDir+sTag+"mll", sDirectly)
 #         p1.showPlot('leps[1].eta', TH1F('h1','l1_eta_logy;Subleading lepton #eta;Events / 0.1',60, -3, 3))
 #         waitRootCmd(sDir+sTag+"_l1_eta", sDirectly)
-#         p1.showPlot('Length$(jets)', TH1F('h1','l1_nJets_logy;Number of jets;Events',10, 0, 10))
-#         waitRootCmd(sDir+sTag+"_l1_phi", sDirectly)
+        p1.showPlot('Length$(jets)', TH1F('h1','l1_nJets_logy;Number of jets;Events',15, 0, 15))
+        waitRootCmd(sDir+sTag+"_nJet", sDirectly)
         
         jetPtBins = [i*10 for i in range(10)] + [100+i*20 for i in range(10)] + [300+i*50 for i in range(6)] + [600+i*100 for i in range(9)]
         p1.showPlot('jets[0].pt', TH1F('h1','j0_pt_logy;Leading jet p_{T} [GeV];Events / 10 GeV',len(jetPtBins)-1, array('f',jetPtBins)))
@@ -465,7 +466,10 @@ if __name__ == '__main__':
     savehistory('.')
     useAtlasStyle()
 #     run_test()
-    run_test1("ana_Apr17a.root")
+    wa='ana_Apr18a.root'
+#     run_test1("ana_Apr17a.root")
 #     test_dev("ana_Apr17a.root")
 #     buildAna("ana_Apr17a.root")
+    buildAna(wa)
+    run_test1(wa)
 #     checkCompare()
