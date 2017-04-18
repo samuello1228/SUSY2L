@@ -1,0 +1,12 @@
+#######
+# BDT training with Condor
+#######
+
+
+executable 	= CutOpt/optWithTMVA.py 
+output     	= dm$(MASS)_Channel$(CHAN).out
+error     	= dm$(MASS)_Channel$(CHAN).err
+log    		= dm$(MASS)_Channel$(CHAN).log
+arguments 	= -b $(BKG) -s ../CutOpt/GabrielFiles/sigFiles_$(MASS).txt -d $(DATA) -c $(CHAN) -o dm$(MASS)_Channel$(CHAN).root --NTrees $(NTREES) --NodeSize $(NODESIZE) --Depth $(DEPTH)
+initialdir	= Output_$(NTREES)_NodeSize$(NODESIZE)_Depth$(DEPTH)
+queue
