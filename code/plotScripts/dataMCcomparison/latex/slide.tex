@@ -35,39 +35,25 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\small
-\item add Drell Yan low mass samples
-\item to have a better agreement for OS first
-\item Data and MC BG: \\
-/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/
-\item MC signal: \\
-/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/
+\item add p-value of the chi2 test for each plot.
+\item plot a histogram of p-value
 \end{itemize}
 \end{frame}
 
-\def \PathToPlot {../plot}
-\begin{frame}
-\frametitle{averageMu}
-\begin{figure}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
-\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
-\end{figure}
-\end{frame}
+\input{data/expN_signal_OS.tex}
+\input{data/expN_signal_SS.tex}
 
-\begin{frame}
-\begin{center}
-\huge
-opposite sign
-\end{center}
-\end{frame}
+\def \PathToPlot {../plot_signal}
+\input{data/plot_signal_OS.tex}
+\input{data/plot_signal_SS.tex}
 
-\input{data/expN_OS.tex}
-%\input{data/expN_BGVV_OS.tex}
-
-\def \PathToPlot {../plot}
-\input{data/plot_OS.tex}
+\includegraphics[width=0.75\textwidth]{../plot_signal/fit}
+\begin{itemize}
+\item Chi2 = 16.001
+\item Number of degree of freedom(NDf) = 19
+\item p0 = 26.1999 $\pm$ 1.14455
+\item Chi2/NDf $<$ 1
+\end{itemize}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -75,19 +61,19 @@ opposite sign
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The agreement of average Mu is better
+\item The old and new signal samples are likely to be compatible within the statistics.
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Plan}
-\begin{itemize}
-\item simplify trigger list(don't know how to decide to use which trigger, different trigger for 3 channels)
-\item use the new charge flip weight
-\item use new signal samples
-\item use new pileup profiles for 361071 and 361072
-\end{itemize}
-\end{frame}
+%\begin{frame}
+%\frametitle{Plan}
+%\begin{itemize}
+%\item simplify trigger list
+%\item use the new charge flip weight
+%\item use new signal samples
+%\item use new pileup profiles for 361071 and 361072
+%\end{itemize}
+%\end{frame}
 
 \begin{frame}
 \begin{center}
@@ -610,6 +596,17 @@ Pileup reweighting is applied. \\
 Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{frame}
 
+\def \PathToPlot {../plot}
+\begin{frame}
+\frametitle{averageMu}
+\begin{figure}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
+\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
+\end{figure}
+\end{frame}
+
 \begin{frame}
 \frametitle{Definition of jets}
 \normalsize
@@ -636,16 +633,6 @@ Definition of the Control Region.
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\huge
-same sign
-\end{center}
-\end{frame}
-
-\input{data/expN_SS.tex}
-%\input{data/expN_BGVV_SS.tex}
-
-\begin{frame}
 \frametitle{significance calculation}
 \begin{itemize}
 \item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
@@ -663,6 +650,19 @@ same sign
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+opposite sign
+\end{center}
+\end{frame}
+
+\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_OS.tex}
 
 \begin{frame}
 \begin{center}
@@ -738,6 +738,9 @@ The CMS result:
 same sign
 \end{center}
 \end{frame}
+
+\input{data/expN_SS.tex}
+%\input{data/expN_BGVV_SS.tex}
 
 \def \PathToPlot {../plot}
 \input{data/plot_SS.tex}

@@ -72,8 +72,6 @@
 361077	Sherpa_CT10_ggllvv		0.85492		0.91	1.	1.
 363356 Sherpa_221_NNPDF30NNLO_ZqqZll   15.563 1. 0.13961 1.
 363358 Sherpa_221_NNPDF30NNLO_WqqZll   3.437  1. 1.      1.
-301535	Sherpa_CT10_eegammaPt10_35	52.706		1.	1.	 1.
-301536	Sherpa_CT10_mumugammaPt10_35	52.708		1.	1.	 1.
 301890	Sherpa_CT10_enugammaPt35_70	15.348		1.	1.	 1.
 301891	Sherpa_CT10_enugammaPt70_140	1.5282		1.	1.	 1.
 301892	Sherpa_CT10_enugammaPt140	0.24155		1.	1.	 1.
@@ -83,9 +81,11 @@
 301896	Sherpa_CT10_taunugammaPt35_70	15.297		1.	1.	 1.
 301897	Sherpa_CT10_taunugammaPt70_140	1.529		1.	1.	 1.
 301898	Sherpa_CT10_taunugammaPt140	0.2426		1.	1.	 1.
+301535	Sherpa_CT10_eegammaPt10_35	52.706		1.	1.	 1.
 301899	Sherpa_CT10_eegammaPt35_70	5.242		1.	1.	 1.
 301900	Sherpa_CT10_eegammaPt70_140	0.38455		1.	1.	 1.
 301901	Sherpa_CT10_eegammaPt140	0.047209	1.	1.	 1.
+301536	Sherpa_CT10_mumugammaPt10_35	52.708		1.	1.	 1.
 301902	Sherpa_CT10_mumugammaPt35_70	5.2455		1.	1.	 1.
 301903	Sherpa_CT10_mumugammaPt70_140	0.38548		1.	1.	 1.
 301904	Sherpa_CT10_mumugammaPt140	0.04724		1.	1.	 1.
