@@ -48,7 +48,7 @@ Jet.InputType: 1 # EMTopo
 Jet.JESNPSet: 1
 Jet.JVT_WP: Medium
 #Jet.LargeRcollection: AntiKt10LCTopoTrimmedPtFrac5SmallR20
-Jet.LargeRuncConfig: MultiTagging_medium.config
+Jet.LargeRuncConfig: UJ2016_CombinedMass_medium.config
 Jet.WtaggerWP: medium
 Jet.ZtaggerWP: medium
 #
