@@ -21,7 +21,9 @@
 #include <TLorentzVector.h>
 #include <TSystem.h>
 #include <TLine.h>
+#include <TPRegexp.h>
 
+// #include "ChargeFlipBkg/common/evt2lMC.C"
 #include "ChargeFlipBkg/common/evt2l.C"
 #include "ChargeFlipBkg/ChargeFlipTool/ChargeFlipTool.cpp"
 
@@ -31,18 +33,17 @@
 // ========= CONFIGURATION =========== //
 TString defaultDir = "/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/";
 TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
+// TString defaultMClist = defaultDir + "common/inFileList-ZeeSherpa.txt";
 // TString defaultMClist = defaultDir + "common/ZP.txt";
 TString defaultDataList = defaultDir + "common/inFileList-data.txt";
 // TString defaultDataList = defaultDir + "common/shortD.txt";
-TString defaultOut= defaultDir + "QiD-on/FromMC";
+TString defaultOut= defaultDir + "QiD-on/Powheg-rwMC";
 TString dPtfile=defaultDir + "QiD-on/Powheg/ptcorr/dEhistos.root";
-TString qSFfile=defaultDir + "ChargeCorrectionSF.Medium_FixedCutTightIso_CFTMedium.root";
-TString qSFnameOS="SFCentral_RunNumber296939_311481_OS";
-TString qSFnameSS="SFCentral_RunNumber296939_311481_SS";
 
 bool onlySignal=true;
 bool passQID=true;
-bool ZWindowOnly=true;
+bool ZWindowOnly_Data=true;
+bool ZWindowOnly_MC=true;
 bool applyQF=true;
 
 // ========= INFRASTRUCTURE =========== //
@@ -246,13 +247,13 @@ void SSfromMC(const TString outputDir=defaultOut,
 
    // Initialize histograms here ----------------------------------------
    // gDirectory->cd(fOut);
-   Histos hMass("hMass", "invariant mass", "mll", "Events/2 GeV", 100, 60, 260);
-   Histos hLeadingPt("hLeadingPt", "leading pT", "pT", "Events/4 GeV", 50, 20, 200);
-   Histos hSubleadingPt("hSubleadingPt", "subleading pT", "pT", "Events/4 GeV", 50, 20, 200);
-   Histos hLeadingEta("hLeadingEta", "leading |eta|", "Leading |eta|", "", 40, -2.47, 2.47);
-   Histos hSubleadingEta("hSubleadingEta", "subleading |eta|", "Subleading |eta|", "", 40, -2.47, 2.47);
-   Histos hLeadingPhi("hLeadingPhi", "leading phi", "Leading |phi|", "", 40, -3.15, 3.15);
-   Histos hSubleadingPhi("hSubleadingPhi", "subleading phi", "Subleading |phi|", "", 40, -3.15, 3.15);
+   Histos hMass("hMass", "invariant mass", "m_{#ell #ell}", "Events/2 GeV", 100, 60, 260);
+   Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
+   Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
+   Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
+   Histos hSubleadingEta("hSubleadingEta", "subleading |#eta|", "Subleading |#eta|", "", 40, -2.47, 2.47);
+   Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading #phi", "", 40, -3.15, 3.15);
+   Histos hSubleadingPhi("hSubleadingPhi", "subleading #phi", "Subleading #phi", "", 40, -3.15, 3.15);
 
    hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
 
@@ -263,11 +264,6 @@ void SSfromMC(const TString outputDir=defaultOut,
       cout << "CrossSectionDB could not be loaded" << endl;
       return;
    }
-
-   // Load charge scale factors
-   TFile *fQSF = TFile::Open(qSFfile);
-   hQSF_OS = (TH2*) fQSF->Get(qSFnameOS);
-   hQSF_SS = (TH2*) fQSF->Get(qSFnameSS);
 
    //////////////////////////
    // Initialize input trees
@@ -286,70 +282,90 @@ void SSfromMC(const TString outputDir=defaultOut,
    // MC Loop
    //////////////////////////
    // Define mcEvtW ---------------
-   vector<string> mcFiles; double sumW = 0;
+   vector<TString> mcFiles; double sumW = 0;
    for (std::string line; getline( mcIn, line ); )
-   {
-      TFile f(line.c_str());
-      if(!f.IsOpen()){ cout << "Could not open " << line << endl; continue; }
-
-      TH1* h = (TH1*) f.Get("hCutFlow");
-      if (!h){ cout << "Could not get hCutFlow histogram for " << line << endl; return; }
-
-      sumW += h->GetBinContent(2);
-      f.Close(0);
       mcFiles.push_back(line);
-   }
-   double xSecxEff = xsecDB->xsectTimesEff(361106);
-   double mcEvtW = xSecxEff * 33257.2 / sumW;
 
-   // Run main MC loop
-   for(auto line : mcFiles){
+   for(auto it = mcFiles.begin(); it != mcFiles.end(); )
+   {
+      std::vector<TString> shortList;
 
-      // Open file ----------------
-      TFile f(line.c_str());
-      if(!f.IsOpen()){ cout << "Could not open " << line << endl; continue; }
+      // Get sampleID
+      auto s = *it;
+      TPRegexp reTag("[0-9]+.Powheg");
+      TPRegexp reSampleID("[0-9]+");
+      int sampleID = ((TString)( ( (TString)(s(reTag).Data()) )(reSampleID).Data()) ).Atoi();
+      cout << "sampleID: " << sampleID << '\t';
+      int s1 = sampleID;
+      while(sampleID == s1)
+      {
+         shortList.push_back(s);
+         it++; if (it==mcFiles.end()) break;
+         s = *it;
+         s1 = ((TString)( ( (TString)(s(reTag).Data()) )(reSampleID).Data()) ).Atoi();
+         // cout << s1 << '\t';
+      } 
+      // cout << endl;
 
-      TTree* t = (TTree*) f.Get("evt2l");
-      if(!t){ cout << "No tree found in "<< line << endl; continue; }
+      double sumW(0);
+      for(auto s : shortList)
+      {
+         TFile f(s);
+         if(!f.IsOpen()){ cout << "Could not open " << s << endl; continue; }
 
-      evt2l* tree = new evt2l(t);
-      if(!tree){ cout << "Could not load evt2l of " << line << endl; continue; }
+         TH1* h = (TH1*) f.Get("hCutFlow");
+         if (!h){ cout << "Could not get hCutFlow histogram for " << s << endl; return; }
 
-      // Loop in one file --------------
-      int nEntries = tree->fChain->GetEntries();
-      cout << line << ":\n" ;
-      for(long long i=0; i<nEntries; i++){
-         loadbar(i+1, nEntries);
-         tree->GetEntry(i);
+         sumW += h->GetBinContent(2);
+         f.Close(0);
+      }
+      double xSecxEff = xsecDB->xsectTimesEff(sampleID);
+      cout << "xSecxEff = " << xSecxEff << endl;
+      double mcEvtW = xSecxEff * 33257.2 / sumW;
 
-         if(!passCut(tree, MC)) continue; 
-         sign s = ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0))? SS : OS;
 
-         // Reject if no original electron from Z
-         int tp1 = getOrigElecI(tree, 0); int tp2 = getOrigElecI(tree, 1);
-         if((tp1<0 || tp2<0)) continue;
+      // Run main MC loop
+      for(auto line : shortList){
+         // Open file ----------------
+         TFile f(line);
+         if(!f.IsOpen()){ cout << "Could not open " << line << endl; continue; }
 
-         // // Get electron charge correction SF // positron has +ve ID, -ve pdgID
+         TTree* t = (TTree*) f.Get("evt2l");
+         if(!t){ cout << "No tree found in "<< line << endl; continue; }
 
-         double w1 = ((tree->leps_ID[0]>0) == (tree->truths_pdgId[tp1]<0))? 1 : getSF(tree->leps_eta[0], tree->leps_pt[0]);
-         double w2 = ((tree->leps_ID[1]>0) == (tree->truths_pdgId[tp2]<0))? 1 : getSF(tree->leps_eta[0], tree->leps_pt[0]);
-         // double w1, w2; w1 = w2 = 1;
-         double w = tree->evt_weight * tree->evt_pwt *tree->evt_ElSF * tree->evt_MuSF * mcEvtW *w1 *w2;
+         evt2l* tree = new evt2l(t);
+         if(!tree){ cout << "Could not load evt2l of " << line << endl; continue; }
 
-         hMass.Fill(tree->l12_m, w*w1*w2, MC, s);
-         hLeadingPt.Fill(tree->leps_pt[0], w*w1, MC, s);
-         hSubleadingPt.Fill(tree->leps_pt[1], w*w2, MC, s);
-         hLeadingEta.Fill(tree->leps_eta[0], w*w1, MC, s);
-         hSubleadingEta.Fill(tree->leps_eta[1], w*w2, MC, s);
-         hLeadingPhi.Fill(tree->leps_phi[0], w*w1, MC, s);
-         hSubleadingPhi.Fill(tree->leps_phi[1], w*w2, MC, s);
+         // Loop in one file --------------
+         int nEntries = tree->fChain->GetEntries();
+         cout << line << ":\n" ;
+         for(long long i=0; i<nEntries; i++){
+            loadbar(i+1, nEntries);
+            tree->GetEntry(i);
+
+            if(!passCut(tree, MC)) continue; 
+            sign s = ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0))? SS : OS;
+
+            double w = tree->evt_weight * tree->evt_pwt *tree->evt_ElSF * tree->evt_MuSF * mcEvtW;
+            w *= (tree->leps_ElChargeSF[0]>0?tree->leps_ElChargeSF[0]:0)*(tree->leps_ElChargeSF[1]>0?tree->leps_ElChargeSF[1]:0);
+
+            hMass.Fill(tree->l12_m, w, MC, s);
+            hLeadingPt.Fill(tree->leps_pt[0], w, MC, s);
+            hSubleadingPt.Fill(tree->leps_pt[1], w, MC, s);
+            hLeadingEta.Fill(tree->leps_eta[0], w, MC, s);
+            hSubleadingEta.Fill(tree->leps_eta[1], w, MC, s);
+            hLeadingPhi.Fill(tree->leps_phi[0], w, MC, s);
+            hSubleadingPhi.Fill(tree->leps_phi[1], w, MC, s);
+         }
       }
       cout << endl;
    }
+
+
    
-   //////////////////////////
+   ////////////////////////
    // Data loop
-   //////////////////////////
+   ////////////////////////
    cout << endl << "Data tree:" << endl;
    long long nEntries = dataTree->fChain->GetEntries();
    for(long long i=0; i<nEntries; i++){
@@ -360,7 +376,7 @@ void SSfromMC(const TString outputDir=defaultOut,
 
       sign s = ((dataTree->leps_ID[0]>0) == (dataTree->leps_ID[1]>0))? SS : OS;
       
-      double w = 1; // dataTree->evt_weight * dataTree->evt_pwt *dataTree->evt_ElSF * dataTree->evt_MuSF;
+      double w = 1 * dataTree->evt_weight * dataTree->evt_pwt *dataTree->evt_ElSF * dataTree->evt_MuSF;
 
       hMass.Fill(dataTree->l12_m, w, DATA, s);
       hLeadingPt.Fill(dataTree->leps_pt[0], w, DATA, s);
@@ -398,9 +414,17 @@ bool passCut(const evt2l* tree, const inType t)
    if(onlySignal && !(((tree->leps_lFlag[0] & 2)/2) && ((tree->leps_lFlag[1] & 2)/2))) return false;
 
    // For SS Data events, select ZWindow only
-   if(t==DATA && ZWindowOnly 
+   if(t==DATA && ZWindowOnly_Data 
       && ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0)) && fabs(tree->l12_m - 91)>10) 
       return false;
+
+   // For SS MC events, select ZWindow only
+   if(t==MC && ZWindowOnly_MC 
+      && ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0)) && fabs(tree->l12_m - 91)>10) 
+      return false;
+
+   // if(fabs(tree->l12_m - 91)>10)
+   //    return false;
 
    // Select events which pass electron ChargeFlipTagger
    if(passQID && !(tree->leps_ElChargeID[0] && tree->leps_ElChargeID[1])) return false;
