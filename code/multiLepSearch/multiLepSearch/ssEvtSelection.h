@@ -97,7 +97,7 @@ public:
   MCTruthClassifier* m_truthClassifier; //!
 
   // ElectronChargeIDSelector
-  AsgElectronChargeIDSelectorTool* ECIDSTool; //!
+  // AsgElectronChargeIDSelectorTool* ECIDSTool; //!
 
   double ECIDS_OP; //!
   std::string ECIDS_trainingFile; //!
