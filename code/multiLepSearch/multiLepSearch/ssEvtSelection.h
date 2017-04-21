@@ -143,9 +143,9 @@ public:
   ChargeFlipBkgTool* mChargeFlipBkgTool; //!
   FakeLepBkgTool*    mFakeLepBkgTool;  //!
   // ToolHandle<CP::IEfficiencyScaleFactorTool> m_eccTool; //!
-  CP::ElectronChargeEfficiencyCorrectionTool* m_eccTool; //!
+  // CP::ElectronChargeEfficiencyCorrectionTool* m_eccTool; //!
 
-  AsgElectronEfficiencyCorrectionTool *electronSF; //!
+  // AsgElectronEfficiencyCorrectionTool *electronSF; //!
 
 
 

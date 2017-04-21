@@ -13,6 +13,7 @@ Ele.d0sig: 5.
 Ele.z0: 0.5
 Ele.fallbackEt: 100000000.
 Ele.FallbackId: MediumLLH
+Ele.CFT: Medium
 #
 MuonBaseline.Pt: 10000.
 MuonBaseline.Id: 1 # Medium

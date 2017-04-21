@@ -112,21 +112,21 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
   ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
 
   // Electron efficiency corrections for chargeID
-  m_eccTool = new CP::ElectronChargeEfficiencyCorrectionTool("ElectronChargeEfficiencyCorrectionTool");
-  m_eccTool->setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
-  m_eccTool->initialize(); //initializes the tool
+  // m_eccTool = new CP::ElectronChargeEfficiencyCorrectionTool("ElectronChargeEfficiencyCorrectionTool");
+  // m_eccTool->setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
+  // m_eccTool->initialize(); //initializes the tool
 
   // m_eccTool.setTypeAndName("CP::ElectronChargeEfficiencyCorrectionTool/ElectronChargeEfficiencyCorrectionTool");
   // m_eccTool.setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
   // m_eccTool.retrieve(); //initializes the tool
 
-  electronSF = new AsgElectronEfficiencyCorrectionTool("AsgElectronEfficiencyCorrectionTool");
-  std::vector<std::string> inputFiles{"ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/efficiencySF.ChargeID.MediumLLH_d0z0_v11_isolFixedCutTight_MediumCFT.root "} ;
-  electronSF->setProperty("CorrectionFileNameList",inputFiles);
-  //set datatype, 0-Data(or dont use the tool - faster), 1-FULLSIM, 3-AF2
-  electronSF->setProperty("ForceDataType",1);
-  //init the tool
-  electronSF->initialize();
+  // electronSF = new AsgElectronEfficiencyCorrectionTool("AsgElectronEfficiencyCorrectionTool");
+  // std::vector<std::string> inputFiles{"ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/efficiencySF.ChargeID.MediumLLH_d0z0_v11_isolFixedCutTight_MediumCFT.root "} ;
+  // electronSF->setProperty("CorrectionFileNameList",inputFiles);
+  // //set datatype, 0-Data(or dont use the tool - faster), 1-FULLSIM, 3-AF2
+  // electronSF->setProperty("ForceDataType",1);
+  // //init the tool
+  // electronSF->initialize();
 }
 
 
@@ -1058,7 +1058,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(CF_isMC){
         if( study == "ss" )
         {
-          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
+          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0", true);
           m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
         }
         else if(study == "3l")
@@ -1267,16 +1267,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
 
-    double qSF(1.); double effSF(1.);
-    auto res = m_eccTool->getEfficiencyScaleFactor(*el, qSF);
-    CHECK(electronSF->getEfficiencyScaleFactor(*el, effSF));
+    // double qSF(1.); double effSF(1.);
+    // auto res = m_eccTool->getEfficiencyScaleFactor(*el, qSF);
+    // CHECK(electronSF->getEfficiencyScaleFactor(*el, effSF));
     // Info("fillLepton(el)", "qSF = %2.5f, effSF = %2.5f", qSF, effSF);
     // if (res == CP::CorrectionCode::OutOfValidityRange)
     // {
     //   Info("fillLepton(el)", "CP::CorrectionCode::OutOfValidityRange");
     // }
-    l.ElChargeSF = (float) qSF*effSF;
-  } else l.ElChargeSF = 1.;
+    // l.ElChargeSF = (float) qSF*effSF;
+  }
+  l.ElChargeSF = 1.;
 
   // ChargeIDSelector
   l.ElChargeID = 0;
