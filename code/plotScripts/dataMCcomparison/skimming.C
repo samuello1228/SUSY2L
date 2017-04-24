@@ -42,7 +42,6 @@ Double_t weight;
 Double_t qFwt;
 Double_t fLwt;
 Double_t averageMu;
-Int_t nVtx;
 
 struct nEvent
 {
@@ -60,7 +59,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     {
         TString fileName = SamplePath;
         fileName += "user.clo.";
-        //fileName += "user.ychan.";
         fileName += tag;
         fileName += ".";
         fileName += SampleName;
@@ -104,7 +102,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
-        TString fileName = "skimming/skimming.";
+        //TString fileName = "skimming/skimming.";
+        //TString fileName = "skimming_signal_old/skimming.";
+        TString fileName = "skimming_signal_new/skimming.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -206,7 +206,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        if(isPP1 && evtsP->evt_fLwt!=0)
+        if(isPP1) fLwt = evtsP->evt_fLwt;
+        else fLwt = evts->evt_fLwt;
+        
+        if(!evts->evt_isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -276,16 +279,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
-        //weight = evts->evt_weight * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
         
-        if(isPP1) fLwt = evtsP->evt_fLwt;
-        else fLwt = evts->evt_fLwt;
-        
         averageMu = evts->evt_averageMu;
-        nVtx = evts->sig_nVtx;
         
         //SF or DF
         int channelIndex = 0;
@@ -506,25 +504,13 @@ void skimming()
 {
     //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
     TString SamplePath = "/srv/SUSY/ntuple/";
-    //TString SamplePath = "/srv/SUSY/ychan/v8d6/";
-    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/";
-    //TString SamplePath = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v8d6/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
-    //TString SamplePath = "/Users/samuel/Atlas/ntuple/ychan/";
     
-    //SamplePath += "AnalysisBase-02-04-17-414981/";
-    //SamplePath += "AnalysisBase-02-04-17-419618/";
-    //SamplePath += "AnalysisBase-02-04-17-419618-wt/";
-    //SamplePath += "AnalysisBase-02-04-18-f8c85e6b/";
-    SamplePath += "AnalysisBase-02-04-18-4bd95dc2/";
-    //SamplePath += "AnalysisBase-02-04-18-4bd95dc2-v8d7/";
-    
-    //TString tag = "v7.8";
-    //TString tag = "v8.0";
-    //TString tag = "v8.4";
-    TString tag = "v8.6";
-    //TString tag = "v8.7";
-    //TString tag = "v7.11";
+    //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; TString tag = "v8.10";
+    //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; TString tag = "v8.12";
+    //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
+    //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
+    SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
     
     std::vector<nEvent> nSS;
     
@@ -537,7 +523,7 @@ void skimming()
         std::vector<TString> DataSampleName;
         DataSampleName.reserve(20);
         GetSampleName(DataSampleName,"Data",1);
-        //for(unsigned int i=0;i<=1;i++)
+        //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
             skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
@@ -553,7 +539,7 @@ void skimming()
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=76;i<=77;i++)
+        //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
@@ -561,8 +547,8 @@ void skimming()
     }
     
     //Signal
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";

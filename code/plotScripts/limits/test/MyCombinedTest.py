@@ -30,12 +30,12 @@ class ParmV:
         self.e2 = 0
         try:
             self.val = float(vs[0])
-        except typeError:
+        except TypeError:
             self.val = 0
         if len(vs)>1:
             try:
                 self.e2 = pow(float(vs[1]),2)
-            except typeError:
+            except TypeError:
                 self.e2 = 0
     def add(self, value2):
         self.val += value2.val

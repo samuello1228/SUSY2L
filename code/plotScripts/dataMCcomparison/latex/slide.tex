@@ -35,78 +35,25 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\normalsize
-\item histogram for SR
-\item significance 2D plot
-\item some data samples are missing in /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-18-4bd95dc2/, but still intact in /afs/cern.ch/work/y/ychan/public/SUSY\_NTUP/v8d6/data/
-\item plan to remove unused variables in our ntuple.
-\item plan to calculate the systematic uncertainties, started to simplify the ntuple workflow: add flag for separating 12 channel, and add charge flip weight and fake lepton weight in the ntuple making process.
+\item add p-value of the chi2 test for each plot.
+\item plot a histogram of p-value
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\begin{center}
-\huge
-Signal Region
-\end{center}
-\end{frame}
+\input{data/expN_signal_OS.tex}
+\input{data/expN_signal_SS.tex}
 
-\begin{frame}
-\frametitle{Signal Region}
-Definition of the Signal Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
-\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
-\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
-\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
-\item The minimum $M_T$ of the two leptons
-\end{enumerate}
-\includegraphics[width=1\textwidth]{data/SR.png}
-\end{frame}
+\def \PathToPlot {../plot_signal}
+\input{data/plot_signal_OS.tex}
+\input{data/plot_signal_SS.tex}
 
-\begin{frame}
-\frametitle{Signal Region}
-Note:
-\begin{enumerate}
-\item No pile up weight is applied.
-\item Add all signal samples with the same mass splitting to calculate signal numbers.
-\item Charge flip BG for emu channel is missing.
-\end{enumerate}
-\end{frame}
-
-%\def \PathToPlot {../plot}
-
-\begin{frame}
-\frametitle{Signal Region (ee)}
-\includegraphics[width=1\textwidth]{../plot/SR_ee.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (mumu)}
-\includegraphics[width=1\textwidth]{../plot/SR_mumu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (emu)}
-\includegraphics[width=1\textwidth]{../plot/SR_emu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (combine)}
-\includegraphics[width=1\textwidth]{../plot/SR_combine.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
-\includegraphics[width=1\textwidth]{../plot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
-\end{frame}
-
-%\input{data/expN_SS.tex}
-%\input{data/expN_BGVV_SS.tex}
-
-\def \PathToPlot {../plot}
-%\input{data/plot_SS.tex}
-
+\includegraphics[width=0.75\textwidth]{../plot_signal/fit}
+\begin{itemize}
+\item Chi2 = 16.001
+\item Number of degree of freedom(NDf) = 19
+\item p0 = 26.1999 $\pm$ 1.14455
+\item Chi2/NDf $<$ 1
+\end{itemize}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -114,19 +61,19 @@ Note:
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item ?
+\item The old and new signal samples are likely to be compatible within the statistics.
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Plan}
-\begin{itemize}
-\item Add charge flip BG for emu channel
-\item Apply pile up weight
-\item plan to remove unused variables in our ntuple.
-\item plan to calculate the systematic uncertainties, and to simplify the ntuple workflow
-\end{itemize}
-\end{frame}
+%\begin{frame}
+%\frametitle{Plan}
+%\begin{itemize}
+%\item simplify trigger list
+%\item use the new charge flip weight
+%\item use new signal samples
+%\item use new pileup profiles for 361071 and 361072
+%\end{itemize}
+%\end{frame}
 
 \begin{frame}
 \begin{center}
@@ -227,163 +174,280 @@ MGPy8EG_A14N23LO_C1N2_Slep_1000_800_0p95_2L5
 \begin{frame}[fragile]
 \frametitle{Data}
 \small
-GRL (10.6 fb$^{-1}$):\\
+GRL (33.3 fb$^{-1}$):\\
+use both 2015 and 2016 data (3212.96 + 33257.2) /pb
 \tiny
 \begin{verbatim}
-data16_13TeV.periodAllYear_DetStatus-v80-pro20-08_DQDefects-00-02-02_PHYS_StandardGRL_All_Good_25ns.xml
+GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
+GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Data}
 \small
-Data Sample Name:
+Data Sample Name(p2880 tag):
 \tiny
 \begin{verbatim}
-data16_13TeV.00297730.physics_Main.merge.DAOD_SUSY2.f694_m1583_p2667/
-data16_13TeV.00298595.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298609.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298633.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298687.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298690.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298771.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298773.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00298862.physics_Main.merge.DAOD_SUSY2.f696_m1588_p2667/
-data16_13TeV.00298967.physics_Main.merge.DAOD_SUSY2.f696_m1588_p2667/
-data16_13TeV.00299055.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00299144.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00299147.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00299184.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
-data16_13TeV.00299243.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2667/
+data15_13TeV.periodD.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodE.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodF.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodG.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodH.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
+data15_13TeV.periodJ.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Data}
-\tiny
-\begin{verbatim}
-data16_13TeV.00299584.physics_Main.merge.DAOD_SUSY2.f703_m1600_p2667/
-data16_13TeV.00300279.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300345.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300415.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300418.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300487.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300540.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300571.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2667/
-data16_13TeV.00300600.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300655.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300687.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300784.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300800.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300863.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00300908.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2667/
-data16_13TeV.00301912.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2667/
-data16_13TeV.00301918.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2667/
-data16_13TeV.00301932.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2667/
-data16_13TeV.00301973.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2667/
-data16_13TeV.00302053.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2689/
-data16_13TeV.00302137.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2689/
-data16_13TeV.00302265.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2689/
-data16_13TeV.00302269.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2689/
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Data}
-\tiny
-\begin{verbatim}
-data16_13TeV.00302300.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302347.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302380.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302391.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302393.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302737.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302831.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2689/
-data16_13TeV.00302872.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00302919.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00302925.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00302956.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303007.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303079.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303201.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303208.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303264.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303266.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2689/
-data16_13TeV.00303291.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00303304.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00303338.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00303421.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00303499.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-data16_13TeV.00303560.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2689/
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background(Non Z+jets)}
 \small
-Sample Name(r7676 tag):
+Data Sample Name(p2880 tag):
+\tiny
+\begin{verbatim}
+data16_13TeV.00297730.physics_Main.merge.DAOD_SUSY2.f694_m1583_p2880
+data16_13TeV.00298595.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298609.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298633.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298687.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298690.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298771.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298773.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00298862.physics_Main.merge.DAOD_SUSY2.f696_m1588_p2880
+data16_13TeV.00298967.physics_Main.merge.DAOD_SUSY2.f696_m1588_p2880
+data16_13TeV.00299055.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00299144.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00299147.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00299184.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00299243.physics_Main.merge.DAOD_SUSY2.f698_m1594_p2880
+data16_13TeV.00299584.physics_Main.merge.DAOD_SUSY2.f703_m1600_p2880
+data16_13TeV.00300279.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300345.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300415.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300418.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300487.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300540.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300571.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2880
+data16_13TeV.00300600.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300655.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300687.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300784.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300800.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300863.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+data16_13TeV.00300908.physics_Main.merge.DAOD_SUSY2.f708_m1606_p2880
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\tiny
+\begin{verbatim}
+data16_13TeV.00301912.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2880
+data16_13TeV.00301918.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2880
+data16_13TeV.00301932.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2880
+data16_13TeV.00301973.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2880
+data16_13TeV.00302053.physics_Main.merge.DAOD_SUSY2.f709_m1611_p2880
+data16_13TeV.00302137.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2880
+data16_13TeV.00302265.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2880
+data16_13TeV.00302269.physics_Main.merge.DAOD_SUSY2.f709_m1620_p2880
+data16_13TeV.00302300.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302347.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302380.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302391.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302393.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302737.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302831.physics_Main.merge.DAOD_SUSY2.f711_m1620_p2880
+data16_13TeV.00302872.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00302919.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00302925.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00302956.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303007.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303079.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303201.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303208.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303264.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303266.physics_Main.merge.DAOD_SUSY2.f715_m1620_p2880
+data16_13TeV.00303291.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303304.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303338.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303421.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303499.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\tiny
+\begin{verbatim}
+data16_13TeV.00303560.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303638.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303832.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303846.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303892.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00303943.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304006.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304008.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304128.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304178.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304198.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304211.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304243.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304308.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304337.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304409.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304431.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00304494.physics_Main.merge.DAOD_SUSY2.f716_m1620_p2880
+data16_13TeV.00305380.physics_Main.merge.DAOD_SUSY2.f727_m1646_p2880
+data16_13TeV.00305543.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305571.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305618.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305671.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305674.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305723.physics_Main.merge.DAOD_SUSY2.f729_m1646_p2880
+data16_13TeV.00305727.physics_Main.merge.DAOD_SUSY2.f730_m1653_p2880
+data16_13TeV.00305735.physics_Main.merge.DAOD_SUSY2.f730_m1653_p2880
+data16_13TeV.00305777.physics_Main.merge.DAOD_SUSY2.f730_m1653_p2880
+data16_13TeV.00305811.physics_Main.merge.DAOD_SUSY2.f730_m1653_p2880
+data16_13TeV.00305920.physics_Main.merge.DAOD_SUSY2.f730_m1653_p2880
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\tiny
+\begin{verbatim}
+data16_13TeV.00306269.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00306278.physics_Main.merge.DAOD_SUSY2.f732_m1659_p2880
+data16_13TeV.00306310.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00306384.physics_Main.merge.DAOD_SUSY2.f733_m1659_p2880
+data16_13TeV.00306419.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00306442.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00306448.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00306451.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00307126.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00307195.physics_Main.merge.DAOD_SUSY2.f731_m1659_p2880
+data16_13TeV.00307259.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307306.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307354.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307358.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307394.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307454.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307514.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307539.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307569.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307601.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307619.physics_Main.merge.DAOD_SUSY2.f739_m1667_p2880
+data16_13TeV.00307656.physics_Main.merge.DAOD_SUSY2.f739_m1673_p2880
+data16_13TeV.00307710.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00307716.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00307732.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00307861.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00307935.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00308047.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00308084.physics_Main.merge.DAOD_SUSY2.f741_m1673_p2880
+data16_13TeV.00309375.physics_Main.merge.DAOD_SUSY2.f749_m1684_p2880
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\tiny
+\begin{verbatim}
+data16_13TeV.00309390.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00309440.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00309516.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00309640.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00309674.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00309759.physics_Main.merge.DAOD_SUSY2.f750_m1689_p2880
+data16_13TeV.00310015.physics_Main.merge.DAOD_SUSY2.f753_m1689_p2880
+data16_13TeV.00310247.physics_Main.merge.DAOD_SUSY2.f755_m1699_p2880
+data16_13TeV.00310249.physics_Main.merge.DAOD_SUSY2.f755_m1699_p2880
+data16_13TeV.00310341.physics_Main.merge.DAOD_SUSY2.f755_m1699_p2880
+data16_13TeV.00310370.physics_Main.merge.DAOD_SUSY2.f755_m1704_p2880
+data16_13TeV.00310405.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310468.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310473.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310634.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310691.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310738.physics_Main.merge.DAOD_SUSY2.f756_m1704_p2880
+data16_13TeV.00310809.physics_Main.merge.DAOD_SUSY2.f756_m1710_p2880
+data16_13TeV.00310863.physics_Main.merge.DAOD_SUSY2.f756_m1710_p2880
+data16_13TeV.00310872.physics_Main.merge.DAOD_SUSY2.f756_m1710_p2880
+data16_13TeV.00310969.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311071.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311170.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311244.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311287.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311321.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311365.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311402.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311473.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+data16_13TeV.00311481.physics_Main.merge.DAOD_SUSY2.f758_m1710_p2880
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Background(top)}
+\small
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
 mc15_13TeV.410000.
-PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_SUSY2.e3698_s2608_s2183_r7725_r7676_p2666/
+PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_SUSY2.e3698_s2608_s2183_r7725_r7676_p2879
 
 mc15_13TeV.410015.
-PowhegPythiaEvtGen_P2012_Wt_dilepton_top.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2666/
+PowhegPythiaEvtGen_P2012_Wt_dilepton_top.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879
 
 mc15_13TeV.410016.
-PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2666/
+PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Background Di-Boson(Sherpa)}
 \small
-Sample Name(r7676 tag):
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
-mc15_13TeV.361063.Sherpa_CT10_llll.merge.DAOD_SUSY2.e3836_a766_a821_r7676_p2666/
-mc15_13TeV.361064.Sherpa_CT10_lllvSFMinus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.361065.Sherpa_CT10_lllvOFMinus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.361066.Sherpa_CT10_lllvSFPlus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.361067.Sherpa_CT10_lllvOFPlus.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.361068.Sherpa_CT10_llvv.merge.DAOD_SUSY2.e3836_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.361069.Sherpa_CT10_llvvjj_ss_EW4.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2666/
-mc15_13TeV.361070.Sherpa_CT10_llvvjj_ss_EW6.merge.DAOD_SUSY2.e3836_s2608_r7772_r7676_p2666/
-mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2666/
-mc15_13TeV.361072.Sherpa_CT10_lllljj_EW6.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2666/
-mc15_13TeV.361073.Sherpa_CT10_ggllll.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2666/
-mc15_13TeV.361077.Sherpa_CT10_ggllvv.merge.DAOD_SUSY2.e4641_s2726_r7772_r7676_p2666/
-mc15_13TeV.361084.Sherpa_CT10_WqqZll.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2666/
-mc15_13TeV.361086.Sherpa_CT10_ZqqZll.merge.DAOD_SUSY2.e3926_s2608_s2183_r7772_r7676_p2666/
+mc15_13TeV.363490.Sherpa_221_NNPDF30NNLO_llll.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
+mc15_13TeV.363491.Sherpa_221_NNPDF30NNLO_lllv.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
+mc15_13TeV.363492.Sherpa_221_NNPDF30NNLO_llvv.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
+mc15_13TeV.361069.Sherpa_CT10_llvvjj_ss_EW4.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879
+mc15_13TeV.361070.Sherpa_CT10_llvvjj_ss_EW6.merge.DAOD_SUSY2.e3836_s2608_r7772_r7676_p2879
+mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
+mc15_13TeV.361072.Sherpa_CT10_lllljj_EW6.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
+mc15_13TeV.361073.Sherpa_CT10_ggllll.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
+mc15_13TeV.361077.Sherpa_CT10_ggllvv.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
+mc15_13TeV.363358.Sherpa_221_NNPDF30NNLO_WqqZll.merge.DAOD_SUSY2.e5525_s2726_r7772_r7676_p2879
+mc15_13TeV.363356.Sherpa_221_NNPDF30NNLO_ZqqZll.merge.DAOD_SUSY2.e5525_s2726_r7772_r7676_p2879
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Background V+gamma(Sherpa)}
 \small
-Sample Name(r7676 tag):
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
-mc15_13TeV.301535.Sherpa_CT10_eegammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301536.Sherpa_CT10_mumugammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301890.Sherpa_CT10_enugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301891.Sherpa_CT10_enugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301892.Sherpa_CT10_enugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301893.Sherpa_CT10_munugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301894.Sherpa_CT10_munugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301895.Sherpa_CT10_munugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301896.Sherpa_CT10_taunugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301897.Sherpa_CT10_taunugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301898.Sherpa_CT10_taunugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301899.Sherpa_CT10_eegammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301900.Sherpa_CT10_eegammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301901.Sherpa_CT10_eegammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301902.Sherpa_CT10_mumugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301903.Sherpa_CT10_mumugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301904.Sherpa_CT10_mumugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301905.Sherpa_CT10_tautaugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301906.Sherpa_CT10_tautaugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
-mc15_13TeV.301907.Sherpa_CT10_tautaugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2666/
+mc15_13TeV.301535.Sherpa_CT10_eegammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301536.Sherpa_CT10_mumugammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301890.Sherpa_CT10_enugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301891.Sherpa_CT10_enugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301892.Sherpa_CT10_enugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301893.Sherpa_CT10_munugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301894.Sherpa_CT10_munugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301895.Sherpa_CT10_munugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301896.Sherpa_CT10_taunugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301897.Sherpa_CT10_taunugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301898.Sherpa_CT10_taunugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301899.Sherpa_CT10_eegammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301900.Sherpa_CT10_eegammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301901.Sherpa_CT10_eegammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301902.Sherpa_CT10_mumugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301903.Sherpa_CT10_mumugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301904.Sherpa_CT10_mumugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301905.Sherpa_CT10_tautaugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301906.Sherpa_CT10_tautaugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
+mc15_13TeV.301907.Sherpa_CT10_tautaugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
 \end{verbatim}
 \end{frame}
 
@@ -397,146 +461,109 @@ Z+jets(Sherpa)
 \begin{frame}[fragile]
 \frametitle{Background Z+jets(Sherpa)}
 \small
-Sample Name(r7676 tag):
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
-363388.Sherpa_NNPDF30NNLO_Zee_Pt0_70_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363389.Sherpa_NNPDF30NNLO_Zee_Pt0_70_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363390.Sherpa_NNPDF30NNLO_Zee_Pt0_70_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363391.Sherpa_NNPDF30NNLO_Zee_Pt70_140_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363392.Sherpa_NNPDF30NNLO_Zee_Pt70_140_CFilterBVeto.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363393.Sherpa_NNPDF30NNLO_Zee_Pt70_140_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363394.Sherpa_NNPDF30NNLO_Zee_Pt140_280_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363395.Sherpa_NNPDF30NNLO_Zee_Pt140_280_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363396.Sherpa_NNPDF30NNLO_Zee_Pt140_280_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363397.Sherpa_NNPDF30NNLO_Zee_Pt280_500_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363398.Sherpa_NNPDF30NNLO_Zee_Pt280_500_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363399.Sherpa_NNPDF30NNLO_Zee_Pt280_500_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363400.Sherpa_NNPDF30NNLO_Zee_Pt500_700_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363401.Sherpa_NNPDF30NNLO_Zee_Pt500_700_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363402.Sherpa_NNPDF30NNLO_Zee_Pt500_700_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363403.Sherpa_NNPDF30NNLO_Zee_Pt700_1000_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363404.Sherpa_NNPDF30NNLO_Zee_Pt700_1000_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363405.Sherpa_NNPDF30NNLO_Zee_Pt700_1000_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363406.Sherpa_NNPDF30NNLO_Zee_Pt1000_2000_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363407.Sherpa_NNPDF30NNLO_Zee_Pt1000_2000_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363408.Sherpa_NNPDF30NNLO_Zee_Pt1000_2000_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363409.Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363410.Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363411.Sherpa_NNPDF30NNLO_Zee_Pt2000_E_CMS_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
+364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364115.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364116.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364117.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364118.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364119.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364120.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364121.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364122.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364123.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364124.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364125.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364126.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
+364127.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Background Z+jets(Sherpa)}
 \small
-Sample Name(r7676 tag):
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
-363364.Sherpa_NNPDF30NNLO_Zmumu_Pt0_70_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363365.Sherpa_NNPDF30NNLO_Zmumu_Pt0_70_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363366.Sherpa_NNPDF30NNLO_Zmumu_Pt0_70_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363367.Sherpa_NNPDF30NNLO_Zmumu_Pt70_140_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363368.Sherpa_NNPDF30NNLO_Zmumu_Pt70_140_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363369.Sherpa_NNPDF30NNLO_Zmumu_Pt70_140_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363370.Sherpa_NNPDF30NNLO_Zmumu_Pt140_280_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363371.Sherpa_NNPDF30NNLO_Zmumu_Pt140_280_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363372.Sherpa_NNPDF30NNLO_Zmumu_Pt140_280_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363373.Sherpa_NNPDF30NNLO_Zmumu_Pt280_500_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363374.Sherpa_NNPDF30NNLO_Zmumu_Pt280_500_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363375.Sherpa_NNPDF30NNLO_Zmumu_Pt280_500_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363376.Sherpa_NNPDF30NNLO_Zmumu_Pt500_700_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363377.Sherpa_NNPDF30NNLO_Zmumu_Pt500_700_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363378.Sherpa_NNPDF30NNLO_Zmumu_Pt500_700_BFilter.merge.DAOD_SUSY2.e4772_s2726_r7725_r7676_p2666/
-363379.Sherpa_NNPDF30NNLO_Zmumu_Pt700_1000_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363380.Sherpa_NNPDF30NNLO_Zmumu_Pt700_1000_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363381.Sherpa_NNPDF30NNLO_Zmumu_Pt700_1000_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363382.Sherpa_NNPDF30NNLO_Zmumu_Pt1000_2000_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363383.Sherpa_NNPDF30NNLO_Zmumu_Pt1000_2000_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363384.Sherpa_NNPDF30NNLO_Zmumu_Pt1000_2000_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363385.Sherpa_NNPDF30NNLO_Zmumu_Pt2000_E_CMS_CVetoBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363386.Sherpa_NNPDF30NNLO_Zmumu_Pt2000_E_CMS_CFilterBVeto.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
-363387.Sherpa_NNPDF30NNLO_Zmumu_Pt2000_E_CMS_BFilter.merge.DAOD_SUSY2.e4716_s2726_r7725_r7676_p2666/
+364100.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364101.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364102.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364103.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364104.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364105.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364107.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364108.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364109.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364110.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364111.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364112.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
+364113.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Background Z+jets(Sherpa)}
 \small
-Sample Name(r7676 tag):
+Sample Name(p2879 tag):
 \tiny
 \begin{verbatim}
-363361.Sherpa_NNPDF30NNLO_Ztautau_Pt0_70_CVetoBVeto.merge.DAOD_SUSY2.e4689_s2726_r7725_r7676_p2666/
-363362.Sherpa_NNPDF30NNLO_Ztautau_Pt0_70_CFilterBVeto.merge.DAOD_SUSY2.e4689_s2726_r7725_r7676_p2666/
-363363.Sherpa_NNPDF30NNLO_Ztautau_Pt0_70_BFilter.merge.DAOD_SUSY2.e4743_s2726_r7725_r7676_p2666/
-363102.Sherpa_NNPDF30NNLO_Ztautau_Pt70_140_CVetoBVeto.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363103.Sherpa_NNPDF30NNLO_Ztautau_Pt70_140_CFilterBVeto.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363104.Sherpa_NNPDF30NNLO_Ztautau_Pt70_140_BFilter.merge.DAOD_SUSY2.e4792_s2726_r7725_r7676_p2666/
-363105.Sherpa_NNPDF30NNLO_Ztautau_Pt140_280_CVetoBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363106.Sherpa_NNPDF30NNLO_Ztautau_Pt140_280_CFilterBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363107.Sherpa_NNPDF30NNLO_Ztautau_Pt140_280_BFilter.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363108.Sherpa_NNPDF30NNLO_Ztautau_Pt280_500_CVetoBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363109.Sherpa_NNPDF30NNLO_Ztautau_Pt280_500_CFilterBVeto.merge.DAOD_SUSY2.e4792_s2726_r7725_r7676_p2666/
-363110.Sherpa_NNPDF30NNLO_Ztautau_Pt280_500_BFilter.merge.DAOD_SUSY2.e4792_s2726_r7725_r7676_p2666/
-363111.Sherpa_NNPDF30NNLO_Ztautau_Pt500_700_CVetoBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363112.Sherpa_NNPDF30NNLO_Ztautau_Pt500_700_CFilterBVeto.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363113.Sherpa_NNPDF30NNLO_Ztautau_Pt500_700_BFilter.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363114.Sherpa_NNPDF30NNLO_Ztautau_Pt700_1000_CVetoBVeto.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363115.Sherpa_NNPDF30NNLO_Ztautau_Pt700_1000_CFilterBVeto.merge.DAOD_SUSY2.e4792_s2726_r7725_r7676_p2666/
-363116.Sherpa_NNPDF30NNLO_Ztautau_Pt700_1000_BFilter.merge.DAOD_SUSY2.e4742_s2726_r7725_r7676_p2666/
-363117.Sherpa_NNPDF30NNLO_Ztautau_Pt1000_2000_CVetoBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363118.Sherpa_NNPDF30NNLO_Ztautau_Pt1000_2000_CFilterBVeto.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363119.Sherpa_NNPDF30NNLO_Ztautau_Pt1000_2000_BFilter.merge.DAOD_SUSY2.e4666_s2726_r7725_r7676_p2666/
-363120.Sherpa_NNPDF30NNLO_Ztautau_Pt2000_E_CMS_CVetoBVeto.merge.DAOD_SUSY2.e4690_s2726_r7725_r7676_p2666/
-363121.Sherpa_NNPDF30NNLO_Ztautau_Pt2000_E_CMS_CFilterBVeto.merge.DAOD_SUSY2.e4690_s2726_r7725_r7676_p2666/
-363122.Sherpa_NNPDF30NNLO_Ztautau_Pt2000_E_CMS_BFilter.merge.DAOD_SUSY2.e4792_s2726_r7725_r7676_p2666/
-\end{verbatim}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Z+jets(Powheg)
-\end{center}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background Z+jets(Powheg)}
-\small
-Sample Name(r7676 tag):
-\tiny
-\begin{verbatim}
-mc15_13TeV.361106.
-PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2666/
-
-mc15_13TeV.361107.
-PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zmumu.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2669/
-
-mc15_13TeV.361108.
-PowhegPythia8EvtGen_AZNLOCTEQ6L1_Ztautau.merge.DAOD_SUSY2.e3601_s2726_r7772_r7676_p2666/
+364128.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364129.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364130.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364131.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364132.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364133.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364134.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364135.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364136.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364137.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364138.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5313_s2726_r7772_r7676_p2879
+364139.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5313_s2726_r7772_r7676_p2879
+364140.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
+364141.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \small
-Trigger:\\
+Trigger list:\\
 \scriptsize
 \begin{verbatim}
-For 2015,
-HLT_2e12_lhloose_L12EM10VH
-HLT_e17_lhloose_mu14
-HLT_mu18_mu8noL1
-
-For 2016,
+HLT_e24_lhtight_nod0_ivarloose
+HLT_e26_lhtight_nod0_ivarloose
+HLT_e60_lhmedium_nod0
+HLT_e60_medium
+HLT_e140_lhloose_nod0
+HLT_e300_etcut
 HLT_2e15_lhvloose_nod0_L12EM13VH
-HLT_e17_lhloose_nod0_mu14
+HLT_2e17_lhvloose_nod0
+HLT_mu24_iloose
+HLT_mu24_ivarloose
+HLT_mu24_imedium
+HLT_mu24_ivarmedium
+HLT_mu26_imedium
+HLT_mu26_ivarmedium
+HLT_mu40
+HLT_mu50
+HLT_2mu10
+HLT_2mu10_nomucomb
+HLT_2mu14
+HLT_2mu14_nomucomb
 HLT_mu20_mu8noL1
+HLT_mu22_mu8noL1
+HLT_e17_lhloose_nod0_mu14
+HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1
+HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1
+HLT_e7_lhmedium_nod0_mu24
 \end{verbatim}
 \end{frame}
 
 \begin{frame}{Selection}
 \small
-Tool: AnalysisBase 2.4.17, SUSYTools-00-07-92 \\
+Tool: AnalysisBase 2.4.26 \\
 
 \centering
 \begin{table}
@@ -561,13 +588,23 @@ Selection:
 \begin{itemize}
 \item Trigger selection
 \item Exactly 2 signal leptons
-\item $p_{T1} > 25$ GeV, $p_{T2} > 20$ GeV, $m_{ll} > 60$ GeV
 \end{itemize}
 
 \tiny
 Note: \\
 Pileup reweighting is applied. \\
 Scale factor for reconstruction, isolation, ID and trigger is applied.
+\end{frame}
+
+\def \PathToPlot {../plot}
+\begin{frame}
+\frametitle{averageMu}
+\begin{figure}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
+\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
+\end{figure}
 \end{frame}
 
 \begin{frame}
@@ -596,39 +633,6 @@ Definition of the Control Region.
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\huge
-Control Region
-\end{center}
-\end{frame}
-
-%\input{data/expN_CR.tex}
-
-\def \PathToPlot {../plot}
-%\input{data/plot_CR.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-opposite sign
-\end{center}
-\end{frame}
-
-%\input{data/expN_OS.tex}
-%\input{data/expN_BGVV_OS.tex}
-
-\def \PathToPlot {../plot}
-\begin{frame}
-\frametitle{averageMu}
-\begin{figure}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
-\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
-\end{figure}
-\end{frame}
-
-\begin{frame}
 \frametitle{significance calculation}
 \begin{itemize}
 \item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
@@ -654,7 +658,91 @@ opposite sign
 \end{center}
 \end{frame}
 
+\input{data/expN_OS.tex}
+%\input{data/expN_BGVV_OS.tex}
+
 \def \PathToPlot {../plot}
-%\input{data/plot_OS.tex}
+\input{data/plot_OS.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+Control Region
+\end{center}
+\end{frame}
+
+\input{data/expN_CR.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_CR.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+Signal Region
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+Definition of the Signal Region.
+\begin{enumerate}
+\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
+\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
+\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
+\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
+\item The minimum $M_T$ of the two leptons
+\end{enumerate}
+\includegraphics[width=1\textwidth]{data/photo/SR.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region}
+The CMS result:
+\includegraphics[width=1\textwidth]{data/photo/result.png}
+\end{frame}
+
+\begin{frame}
+\includegraphics[width=0.7\textwidth]{data/photo/BG.png}
+\end{frame}
+
+\def \PathToPlot {../plot}
+\begin{frame}
+\frametitle{Signal Region (ee)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_ee.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (mumu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_mumu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (emu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_emu.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{Signal Region (combine)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_combine.eps}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
+\includegraphics[width=1\textwidth]{\PathToPlot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+same sign
+\end{center}
+\end{frame}
+
+\input{data/expN_SS.tex}
+%\input{data/expN_BGVV_SS.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_SS.tex}
 
 \end{document}

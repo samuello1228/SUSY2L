@@ -13,11 +13,14 @@ parser = OptionParser()
 parser.add_option('-b', "--bkgList" , help="list of BKG input ROOT file", default=None)
 parser.add_option('-s', "--sigList" , help="list of SIG input ROOT file", default=None)
 parser.add_option('-d', "--dataList", help="list of DATA input ROOT file", default=None)
-parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in input file", default="PP1_evt2l")
+parser.add_option('-t', "--nominalTreeName", help="name of the nominal tree in input file", default="evt2l")
 parser.add_option('-l', "--inputLumi", help="total Luminosity(fb-1) in dataList samples. Affects weight ratio between MC & data driven bkg", 
-		  type="float", default=10064.3)
+      type="float", default=33257.2)
 parser.add_option('-o', "--outFile", help="name of output file", default="testoutput.root")
-parser.add_option('-c', "--channel", help="set channel, options are: ISR", default="")
+parser.add_option('-c', "--channel", help="set channel, options are: 0=ee, 1=emu, 2=emu; +0=noISR, +10=ISR",type="int", default=None)
+parser.add_option("--NodeSize", help="minimum node size (in %) of the trees", type="int", default=5)
+parser.add_option("--NTrees", help="number of trees in forest", type="int", default=400)
+parser.add_option("--Depth", help="tree depth", type="int", default=2)
 
 (options, args) = parser.parse_args()
 
@@ -36,7 +39,7 @@ factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
 for (aVar, aFormula) in ssUtil.basicBDTVars:
   factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
-if ("ISR" in options.channel):
+if (int((options.channel%100)/10) != 0):
   for (aVar, aFormula) in ssUtil.isrBDTVars:
     factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
 
@@ -86,6 +89,8 @@ def addTreesToTMVA(fileList, isMC, isSig):
       continue
   
     inTree  = inFile.Get( options.nominalTreeName )
+    if inTree.GetEntries()==0: continue
+    
     if isSig:
       factory.AddSignalTree( inTree, treeWeight )
     else:
@@ -101,17 +106,17 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-useISR = ("ISR" in options.channel)
-bkgCut = ROOT.TCut( ssUtil.getCut(useISR) )
-sigCut = ROOT.TCut( ssUtil.getCut(useISR) )
+bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
+sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     "nTrain_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:NormMode=EqualNumEvents:!V" )
     #"nTrain_Signal=0:nTrain_Background=2000:SplitMode=Random:NormMode=EqualNumEvents:!V" )
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
-factory.BookMethod( TMVA.Types.kBDT, "BDTD",
-                    "!H:!V:NTrees=400:MinNodeSize=5%:MaxDepth=2:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate" )
+methodOpt = "!H:!V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate"
+methodOpt = "%s:MaxDepth=%d:NTrees=%d:MinNodeSize=%d%%" % (methodOpt, options.Depth, options.NTrees, options.NodeSize)
+factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 
 factory.TrainAllMethods()
 factory.TestAllMethods()

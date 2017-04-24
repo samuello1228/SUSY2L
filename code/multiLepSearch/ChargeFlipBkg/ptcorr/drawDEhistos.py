@@ -3,6 +3,7 @@ import ROOT
 from ROOT import TH3D, TFile, TCanvas, gStyle, TLegend, TLine, gPad
 import sys
 
+ROOT.gROOT.SetBatch(True)
 gStyle.SetOptStat(0)
 gStyle.SetPalette(ROOT.kLightTerrain)
 f = TFile.Open(sys.argv[1], "update")

@@ -17,7 +17,7 @@ def logLlhPair(i, j, parameters):
   epsI, epsJ = parameters[i], parameters[j]
   expectedNss = nIJ * ((1-epsI)*epsJ + (1-epsJ)*epsI)
   try:
-    logLlh = nssIJ * log(expectedNss) - expectedNss
+    logLlh = nssIJ * log(expectedNss) - expectedNss - nIJ * log(nIJ) + nIJ
   except ValueError:
     logLlh = 0.0
   return logLlh
