@@ -774,11 +774,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Save informations
     ////////////////////////
     
+    //unused variables
+    m_susyEvt->evt.cut = 0;
+
     //event information
-//     m_susyEvt->evt.run = eventInfo->runNumber();
+    //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
-//     m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
+    //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
     m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
@@ -1068,28 +1071,6 @@ EL::StatusCode ssEvtSelection :: execute ()
         m_susyEvt->evt.averageMu = m_objTool->GetCorrectedAverageInteractionsPerCrossing();
       }
 
-//       //Scale factor
-//       if(CF_isMC){
-//         if( study == "ss" )
-//         {
-//           m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true);
-//           m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-//         }
-//         else if(study == "3l")
-//         {
-//           m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
-//           m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
-//         }
-//         m_susyEvt->evt.BtagSF = m_objTool->BtagSF(jets_copy);
-// 
-//       }else{
-//         m_susyEvt->evt.ElSF = 1;
-//         m_susyEvt->evt.MuSF = 1;
-//         m_susyEvt->evt.BtagSF = 1;
-//       }
-
-      ///// event weight for fake Lep
-      //m_susyEvt->evt.fLwt = 0.;
       //// get trigger info, if passed, and the SF
       auto& sEvt = m_susyEvt->evt;
       sEvt.run = m_objTool->GetRunNumber();
@@ -1103,7 +1084,7 @@ EL::StatusCode ssEvtSelection :: execute ()
            TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 1;
           m_susyEvt->sig.trigMask = trigCut->ee_mask;
-         }
+        }
 
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
                 TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
@@ -1115,12 +1096,12 @@ EL::StatusCode ssEvtSelection :: execute ()
                 TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 3;
           m_susyEvt->sig.trigMask = trigCut->em_mask;
-         }
+        }
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
                 TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
           m_susyEvt->evt.flag += 2;
           m_susyEvt->sig.trigMask = trigCut->mm_mask;
-         }
+        }
 
         if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
            (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
@@ -1144,7 +1125,7 @@ EL::StatusCode ssEvtSelection :: execute ()
             sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
           }
-         }
+        }
         else if(study == "3l")
         {
           sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
@@ -1511,8 +1492,8 @@ void ssEvtSelection::setupTriggers(){
       if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
       if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
       m1 *= 2;
-     }
-   }
+    }
+  }
 
   return;
 }
@@ -1527,8 +1508,8 @@ TRIGCONF* ssEvtSelection::getTriggerConf(uint32_t run){
     if(run>=x->runStart && run<=x->runEnd){
       m_nowTrigSel = x;
       break;
-     }
-   }
+    }
+  }
 
   return m_nowTrigSel; 
 }
