@@ -2,6 +2,7 @@
 #this file is based heavily on $ROOTSYS/tutorials/TMVAClassification.C
 
 import ROOT
+ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
 from ROOT import TMVA
 
 import os, re
@@ -24,7 +25,7 @@ parser.add_option("--Depth", help="tree depth", type="int", default=2)
 
 (options, args) = parser.parse_args()
 
-ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
+
 from ROOT.SUSY import CrossSectionDB
 xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
 

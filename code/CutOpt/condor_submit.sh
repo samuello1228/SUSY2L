@@ -8,22 +8,27 @@ nTreesList="100 200 400 600"
 nodeSizeList="5 7 10"
 depthList="2 3 4 5"
 
-bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
-dataFiles="CutOpt/GabrielFiles/dataFiles.txt"
+nodeSizeList="5"
+depthList="2"
+
+bkgFiles="/afs/cern.ch/user/g/ggallard/private/limits/CutOpt/GabrielFiles/bkgFiles.txt"
+dataFiles="/afs/cern.ch/user/g/ggallard/private/limits/CutOpt/GabrielFiles/dataFiles.txt"
+
+
 
 for nTrees in $nTreesList; do for nodeSize in $nodeSizeList; do for depth in $depthList
 do
 
-	dirName="Output_"$nTrees"_NodeSize"$nodeSize"_Depth"$depth
+	dirName="/afs/cern.ch/user/g/ggallard/work/private/limits/Output_"$nTrees"_NodeSize"$nodeSize"_Depth"$depth
 	if [ -d "$dirName" ]; then 
 		rm -rf $dirName
 	fi
 	mkdir $dirName
 	# cd $dirName
 
-	for chan in $channels
+	for mass in $masses
 	do
-		for mass in $masses
+		for chan in $channels
 		do
 			if [ $mass -eq "100" ]
 			then	
@@ -31,7 +36,8 @@ do
 			else 
 				chan1=$chan
 			fi
-		    condor_submit MASS=$mass CHAN=$chan1 BKG=$bkgFiles DATA=$dataFiles NTREES=$nTrees NODESIZE=$nodeSize DEPTH=$depth condor.sub
+			condor_submit MASS=$mass CHAN=$chan1 BKG=$bkgFiles DATA=$dataFiles NTREES=$nTrees NODESIZE=$nodeSize DEPTH=$depth condor.sub
+			exit
 		done
 	done
 
