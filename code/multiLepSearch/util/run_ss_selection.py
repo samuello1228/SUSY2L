@@ -276,7 +276,7 @@ elif (options.driver == "LSF"):
 elif (options.driver == "grid"):
         logging.info("running on Grid")
         driver = ROOT.EL.PrunDriver()
-        outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[2]%.%in:name[3]%")
+        outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[1]%.%in:name[2]%.%in:name[3]%")
 #         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[4]%")
         if options.extraOptions:
             # "--allowTaskDuplication"
