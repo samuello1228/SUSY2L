@@ -92,9 +92,12 @@ Condor submission is still a work in progress
 
 ## Overtraining and sensitivity checks
 
-Execute: 
+Workflow: 
 - makeOTPlots.py
+- calcCLs.py
+- Process output CSV's in spreadsheet application
 
+**makeOTPlots.py**  
 Execute `makeOTPlots.py`, which is dependent on 
 - `overtraining.py` for the overtraining checks, and
 - `mvaeffs.cxx` for the signal/background efficiency and sensitivity checks checks
@@ -111,12 +114,17 @@ The outputs of this script are:
 - Plots for overtraining checks and efficiency/sensitivity checks
   +  Saved into the ./bdtDir/plots directory
 
+Note that significance here is calculated as S/sqrt(S+B)
+
+**calcCLs.py**
+This script takes `checksSig.csv` from `makeOTPlots.py` as input, replaces the columns of significance with CLs, and outputs to `checksCLs.csv`
+
 The CSVs can be imported into Excel or Google Spreadsheets to sort the columns based on mass splitting/point and sensitivity to find the best settings for each splitting/mass point. Suggested sorting order:
 - dm
 - m(C1)
-- Significance
+- CLs
 
-Note that significance here is calculated as S/sqrt(S+B)
+The script `makeCLsHist.py` is also provided to plot the maximum/minimum CLs across the mass parameter space.
 
 ### Execution
 
@@ -124,12 +132,15 @@ Note that significance here is calculated as S/sqrt(S+B)
 # Set up root first
 setupATLAS
 lsetup root
+ln -s CutOpt/calcCLs.py CutOpt/makeOTPlots.py . # Optional
 
 # Execution
 ./makeOTPlots.py ./bdtDir # Here the directory bdtDir* contains the root files and weights from BDT training
 
 # To execute over all the directories output by runAll.sh
 ./makeOTPlots.py ./Output_*
+
+./calcCLs.py
 
 ```
 
