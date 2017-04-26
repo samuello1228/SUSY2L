@@ -116,7 +116,7 @@ The outputs of this script are:
 
 Note that significance here is calculated as S/sqrt(S+B)
 
-**calcCLs.py**
+**calcCLs.py**   
 This script takes `checksSig.csv` from `makeOTPlots.py` as input, replaces the columns of significance with CLs, and outputs to `checksCLs.csv`
 
 The CSVs can be imported into Excel or Google Spreadsheets to sort the columns based on mass splitting/point and sensitivity to find the best settings for each splitting/mass point. Suggested sorting order:
