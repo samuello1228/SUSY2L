@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v9.3
+tag=v9.4.2
 dataPRW=GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 
 #For background MC
@@ -16,14 +16,15 @@ file=../multiLepSearch/script/MCBGZeeSherpa.txt
 #file=../multiLepSearch/script/MCBG_llll.txt
 #file=../multiLepSearch/script/MCZeePowheg.txt
 # file=./testZee.txt
+# file=../multiLepSearch/script/MCZeeAndSignal.txt
 
 # k=${tag}.MCBG
 k=${tag}.MCZee
 
 #For signal MC
-#mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
-#file=../multiLepSearch/script/MCSig_sample_list.txt
-#k=${tag}.MCSig
+mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+file=../multiLepSearch/script/MCSig_sample_list_new.txt
+k=${tag}.MCSig
 
 driver=grid
 # driver=direct
