@@ -7,7 +7,7 @@ EleBaseline.Id:LooseAndBLayerLLH
 #
 Ele.Et: 10000.
 Ele.Eta: 2.47
-Ele.Iso: GradientLoose
+Ele.Iso: FixedCutTight
 Ele.Id: MediumLLH
 Ele.d0sig: 5.
 Ele.z0: 0.5
