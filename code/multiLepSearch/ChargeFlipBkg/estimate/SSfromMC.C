@@ -428,7 +428,7 @@ bool passCut(const evt2l* tree, const inType t)
    //    return false;
 
    // Select events which pass electron ChargeFlipTagger
-   if(passQID && !(tree->leps_ElChargeID[0] && tree->leps_ElChargeID[1])) return false;
+   if(t==DATA && !(tree->leps_ElChargeID[0] && tree->leps_ElChargeID[1])) return false;
 
    // In MC, plot only events with truth-matched electrons 
    // if (t==MC &&
