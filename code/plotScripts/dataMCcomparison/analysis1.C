@@ -284,13 +284,14 @@ void analysis1()
         fin.open("BGSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp;
-            fin>>SampleIDTemp;
-            if(fin.eof()) break;
-            
+            TString SampleIDTemp = "mc15_13TeV.";
             TString SampleNameTemp;
             fin>>SampleNameTemp;
+            if(fin.eof()) break;
             
+            SampleIDTemp += SampleNameTemp;
+            
+            fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             BGMCSampleID.push_back(SampleIDTemp);
@@ -366,14 +367,15 @@ void analysis1()
         fin.open("SigSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp;
+            TString SampleIDTemp = "mc15_13TeV.";
             //for 125
-            fin>>SampleIDTemp;
-            if(fin.eof()) break;
-            
             TString SampleNameTemp;
             fin>>SampleNameTemp;
+            if(fin.eof()) break;
             
+            SampleIDTemp += SampleNameTemp;
+            
+            fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             SigSampleID.push_back(SampleIDTemp);
@@ -1803,7 +1805,7 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
