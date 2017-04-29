@@ -131,6 +131,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mtm",&mt2,"mtm/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
+        tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
@@ -268,7 +269,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         eta2 = evts->leps_eta[sigIndex[1]];
         mll = evts->l12_m;
         ptll = evts->l12_pt;
-        MET = evts->sig_MetRel;
+        MET = evts->sig_Met;
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
@@ -315,29 +316,31 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         nCJet = 0;
         nFJet = 0;
         int nISR = 0;
+        int leadingJetIndex = 0;
         int leadingBJetIndex = 0;
         int leadingCJetIndex = 0;
         int leadingFJetIndex = 0;
         for(int k=0;k<evts->jets_;k++)
         {
+            //signal jets
+            if(!(evts->jets_jFlag[k] & 1<<1)) continue;
             nJet++;
+            if(nJet==1) leadingJetIndex = k;
+            
+            //B-jets
+            if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            {
+                nBJet++;
+                if(nBJet==1) leadingBJetIndex = k;
+            }
+            
             if(fabs(evts->jets_eta[k]) < 2.4)
             {
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
                 //Central jets
-                if(evts->jets_jFlag[k] & 1<<5)
-                {
-                    //b-tagged
-                    if(evts->jets_pt[k] > 20)
-                    {
-                        //Central b-jets
-                        nBJet++;
-                        if(nBJet==1) leadingBJetIndex = k;
-                    }
-                }
-                else
+                if(!(evts->jets_jFlag[k] & 1<<5))
                 {
                     //no b-tagged
                     if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
@@ -362,9 +365,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(nJet>0)
         {
-            jetpt = evts->jets_pt[0];
-            jeteta = evts->jets_eta[0];
-            jetphi = evts->jets_phi[0];
+            jetpt = evts->jets_pt[leadingJetIndex];
+            jeteta = evts->jets_eta[leadingJetIndex];
+            jetphi = evts->jets_phi[leadingJetIndex];
         }
         else
         {
