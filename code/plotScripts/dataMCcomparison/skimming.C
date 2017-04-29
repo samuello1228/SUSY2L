@@ -198,7 +198,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(isPP1) evtsP->GetEntry(j);
         
         //trigger
-        if(evts->sig_trigCode==0)
+        if((evts->sig_trigCode & evts->sig_trigMask)==0)
         {
             continue;
         }
