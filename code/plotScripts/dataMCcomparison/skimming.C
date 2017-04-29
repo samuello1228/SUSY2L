@@ -102,9 +102,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
-        //TString fileName = "skimming/skimming.";
+        TString fileName = "skimming/skimming.";
         //TString fileName = "skimming_signal_old/skimming.";
-        TString fileName = "skimming_signal_new/skimming.";
+        //TString fileName = "skimming_signal_new/skimming.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -510,7 +510,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; TString tag = "v8.12";
     //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
-    SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
+    //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
+    SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
     
     std::vector<nEvent> nSS;
     
@@ -542,6 +543,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
+            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
         }
     }
@@ -558,6 +560,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<SigSampleName.size();i++)
         {
+            SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }
     }

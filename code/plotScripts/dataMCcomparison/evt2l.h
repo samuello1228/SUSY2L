@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Apr  4 03:19:46 2017 by ROOT version 6.06/08
+// Sat Apr 29 03:54:33 2017 by ROOT version 6.06/08
 // from TTree evt2l/a angles tree
-// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root
+// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -25,12 +25,13 @@ public :
    Int_t           fCurrent; //!current Tree number in a TChain
 
    // Declaration of leaf types
+   ULong64_t       evt_run;
    ULong64_t       evt_event;
-   ULong64_t       evt_actualMu;
    UInt_t          evt_isMC;
+   UInt_t          evt_cut;
    Int_t           evt_flag;
-   Float_t         evt_averageMu;
    Float_t         evt_weight;
+   Float_t         evt_averageMu;
    Float_t         evt_pwt;
    Float_t         evt_ElSF;
    Float_t         evt_MuSF;
@@ -49,9 +50,12 @@ public :
    Float_t         leps_phi[kMaxleps];   //[leps_]
    Float_t         leps_MET_dPhi[kMaxleps];   //[leps_]
    Float_t         leps_mT[kMaxleps];   //[leps_]
+   Float_t         leps_jet0_dR[kMaxleps];   //[leps_]
+   Float_t         leps_jet_dRm[kMaxleps];   //[leps_]
    Int_t           leps_ID[kMaxleps];   //[leps_]
    Int_t           leps_truthI[kMaxleps];   //[leps_]
    UInt_t          leps_lFlag[kMaxleps];   //[leps_]
+   UInt_t          leps_isoPass[kMaxleps];   //[leps_]
    Bool_t          leps_ElChargeID[kMaxleps];   //[leps_]
    Float_t         l12_pt;
    Float_t         l12_eta;
@@ -75,6 +79,7 @@ public :
    Int_t           truths_motherI[kMaxtruths];   //[truths_]
    Int_t           truths_matchI[kMaxtruths];   //[truths_]
    ULong64_t       sig_trigCode;
+   ULong64_t       sig_trigMask;
    Float_t         sig_Met;
    Float_t         sig_MetRel;
    Float_t         sig_MetX;
@@ -90,9 +95,12 @@ public :
    TBranch        *b_leps_phi;   //!
    TBranch        *b_leps_MET_dPhi;   //!
    TBranch        *b_leps_mT;   //!
+   TBranch        *b_leps_jet0_dR;   //!
+   TBranch        *b_leps_jet_dRm;   //!
    TBranch        *b_leps_ID;   //!
    TBranch        *b_leps_truthI;   //!
    TBranch        *b_leps_lFlag;   //!
+   TBranch        *b_leps_isoPass;   //!
    TBranch        *b_leps_ElChargeID;   //!
    TBranch        *b_l12;   //!
    TBranch        *b_jets_;   //!
@@ -130,9 +138,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-29-f86dc244/user.clo.v9.0.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11072092._000001.myOutput.root");
+         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -181,16 +189,19 @@ void evt2l::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("evt", &evt_event, &b_evt);
+   fChain->SetBranchAddress("evt", &evt_run, &b_evt);
    fChain->SetBranchAddress("leps", &leps_, &b_leps_);
    fChain->SetBranchAddress("leps.pt", leps_pt, &b_leps_pt);
    fChain->SetBranchAddress("leps.eta", leps_eta, &b_leps_eta);
    fChain->SetBranchAddress("leps.phi", leps_phi, &b_leps_phi);
    fChain->SetBranchAddress("leps.MET_dPhi", leps_MET_dPhi, &b_leps_MET_dPhi);
    fChain->SetBranchAddress("leps.mT", leps_mT, &b_leps_mT);
+   fChain->SetBranchAddress("leps.jet0_dR", leps_jet0_dR, &b_leps_jet0_dR);
+   fChain->SetBranchAddress("leps.jet_dRm", leps_jet_dRm, &b_leps_jet_dRm);
    fChain->SetBranchAddress("leps.ID", leps_ID, &b_leps_ID);
    fChain->SetBranchAddress("leps.truthI", leps_truthI, &b_leps_truthI);
    fChain->SetBranchAddress("leps.lFlag", leps_lFlag, &b_leps_lFlag);
+   fChain->SetBranchAddress("leps.isoPass", leps_isoPass, &b_leps_isoPass);
    fChain->SetBranchAddress("leps.ElChargeID", leps_ElChargeID, &b_leps_ElChargeID);
    fChain->SetBranchAddress("l12", &l12_pt, &b_l12);
    fChain->SetBranchAddress("jets", &jets_, &b_jets_);
