@@ -595,7 +595,13 @@ void analysis1()
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        //Var.push_back(element);
+        Var.push_back(element);
+        
+        element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
+        element.bin=15;         element.xmin=0;                 element.xmax=15;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = element.VarTitle;
+        Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
