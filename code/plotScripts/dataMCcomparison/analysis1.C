@@ -1712,29 +1712,55 @@ void analysis1()
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
     
+    //channelRepresentative for SR
+    std::vector<unsigned int> SRchannelRepresentative;
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_mumu") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_emu") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    
+    std::vector< std::vector<TString> > SRBGName;
+    for(unsigned int i=0;i<SRchannelRepresentative.size();i++)
+    {
+        std::vector<TString> element;
+        const unsigned int channelRepresentative = SRchannelRepresentative[i];
+        //For MC background
+        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGMC.size();j++)
+        {
+            element.push_back(ChannelInfo[channelRepresentative].setOfBGMC[j]);
+        }
+        
+        //For data-driven background
+        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGData.size();j++)
+        {
+            element.push_back(ChannelInfo[channelRepresentative].setOfBGData[j]);
+        }
+        
+        SRBGName.push_back(element);
+    }
+    
     //expN for SR
     TString PathName_SR = "latex/data/expN/SR.txt";
     fstream fout_SR;
     fout_SR.open(PathName_SR.Data(), ios::out);
     fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    for(unsigned int i=0;i<SRBGName[3].size();i++)
     {
-        if(BGMCGroupData[i].GroupName == "VV") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
-    }
-    for(unsigned int i=0;i<BGMCGroupData.size();i++)
-    {
-        if(BGMCGroupData[i].GroupName == "Vgamma") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+        fout_SR<<std::setw(15)<<SRBGName[3][i].Data();
     }
     
-    for(unsigned int i=0;i<BGDataGroupData.size();i++)
-    {
-        if(BGDataGroupData[i].GroupName == "charge flip") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
-    }
-    for(unsigned int i=0;i<BGDataGroupData.size();i++)
-    {
-        if(BGDataGroupData[i].GroupName == "fake lepton") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
-    }
-
     fout_SR<<std::setw(15)<<"Total BG";
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1758,45 +1784,18 @@ void analysis1()
         else if(i==3) LeptonName = "_combine";
         
         //h2SRBG
-        //VV
-        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        for(unsigned int j=0;j<SRBGName[i].size();j++)
         {
-            if(BGMCGroupData[j].GroupName == "VV") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(2);
-        hTemp->SetFillColor(2);
-        element.push_back(hTemp);
-        
-        //Vgamma
-        for(unsigned int j=0;j<BGMCGroupData.size();j++)
-        {
-            if(BGMCGroupData[j].GroupName == "Vgamma") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(4);
-        hTemp->SetFillColor(4);
-        element.push_back(hTemp);
-        
-        //charge flip
-        if(i!=1)
-        {
-            for(unsigned int j=0;j<BGDataGroupData.size();j++)
-            {
-                if(BGDataGroupData[j].GroupName == "charge flip") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-            }
-            hTemp->SetLineColor(3);
-            hTemp->SetFillColor(3);
+            hTemp = new TH1F((SRBGName[i][j]+LeptonName).Data(),"",18,0,18);
+            int colour = 0;
+            if(SRBGName[i][j] == "VV") colour = 2;
+            else if(SRBGName[i][j] == "Vgamma") colour = 4;
+            else if(SRBGName[i][j] == "charge flip") colour = 3;
+            else if(SRBGName[i][j] == "fake lepton") colour = 5;
+            hTemp->SetLineColor(colour);
+            hTemp->SetFillColor(colour);
             element.push_back(hTemp);
         }
-        
-        //fake lepton
-        for(unsigned int j=0;j<BGDataGroupData.size();j++)
-        {
-            if(BGDataGroupData[j].GroupName == "fake lepton") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(5);
-        hTemp->SetFillColor(5);
-        element.push_back(hTemp);
-        
         h2SRBG.push_back(element);
         element.clear();
         
@@ -1816,6 +1815,8 @@ void analysis1()
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
+        const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+        
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
         
@@ -1827,9 +1828,9 @@ void analysis1()
             //For MC background
             for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                 {
-                    if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                    if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                     {
                         std::vector<TString> BGMCGroupSampleID;
                         std::vector<double> BGMCGroupXSElement;
@@ -1923,9 +1924,9 @@ void analysis1()
             //For data-driven background
             for(unsigned int j=0;j<BGDataGroupData.size();j++)
             {
-                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                 {
-                    if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                    if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGDataGroupData[j]);
@@ -1939,7 +1940,16 @@ void analysis1()
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
         
         std::vector<TChain*> tree2DataOS;
-        if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+        if(ChannelInfo[channelRepresentative].isSS_qF)
+        {
+            std::vector<unsigned int> setOfQFChannel;
+            for(unsigned int index=0;index<RegionInfo[RegionIndex].setOfChannel.size();index++)
+            {
+                const unsigned int ChannelIndex  = RegionInfo[RegionIndex].setOfChannel[index];
+                setOfQFChannel.push_back(ChannelInfo[ChannelIndex].qFChannel);
+            }
+            initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
+        }
         
         //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
@@ -2386,13 +2396,23 @@ void analysis1()
                     fout_SR<<std::setw(46)<<RegionInfo[RegionIndex].RegionName;
                     
                     fout_SR<<setprecision(1)<<std::fixed;
-                    for(unsigned int j=0;j<BGGroup.size();j++)
                     {
-                        if(!RegionInfo[RegionIndex].isSS_qF && j==2) fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
-                        
-                        fout_SR<<std::setw(8)<<sumOfEvent[j][0];
-                        fout_SR<<"+/-";
-                        fout_SR<<std::setw(4)<<sumOfEvent[j][1];
+                        unsigned int j2 = 0;
+                        for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+                        {
+                            if(SRBGName[3][j1]==BGGroup[j2].info->GroupName)
+                            {
+                                fout_SR<<std::setw(8)<<sumOfEvent[j2][0];
+                                fout_SR<<"+/-";
+                                fout_SR<<std::setw(4)<<sumOfEvent[j2][1];
+                                
+                                j2++;
+                            }
+                            else
+                            {
+                                fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
+                            }
+                        }
                     }
                     
                     fout_SR<<std::setw(8)<<sumOfEvent[BGGroup.size()][0];
@@ -2759,7 +2779,7 @@ void analysis1()
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
             delete tree2Data[i];
-            if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
+            if(ChannelInfo[channelRepresentative].isSS_qF) delete tree2DataOS[i];
         }
         for(unsigned int j=0;j<tree2BGMC.size();j++)
         {
@@ -2820,16 +2840,16 @@ void analysis1()
     for(unsigned int i=0;i<3;i++)
     {
         //h2SRBG
-        h2SRBG[3][0]->Add(h2SRBG[i][0]);
-        h2SRBG[3][1]->Add(h2SRBG[i][1]);
-        if(i==0 || i==2)
         {
-            h2SRBG[3][2]->Add(h2SRBG[i][2]);
-            h2SRBG[3][3]->Add(h2SRBG[i][3]);
-        }
-        else
-        {
-            h2SRBG[3][3]->Add(h2SRBG[i][2]);
+            unsigned int j2 = 0;
+            for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+            {
+                if(SRBGName[i][j2]==SRBGName[3][j1])
+                {
+                    h2SRBG[3][j1]->Add(h2SRBG[i][j2]);
+                    j2++;
+                }
+            }
         }
         
         //h2SRSig
@@ -2857,31 +2877,22 @@ void analysis1()
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
             
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                if(BGMCGroupData[j].GroupName == "VV") leg->AddEntry(h2SRBG[i][0],BGMCGroupData[j].LegendName.Data(),"fl");
-            }
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
-            {
-                if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
-            }
-            
-            if(i!=1)
-            {
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                unsigned int j2 = 0;
+                for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
                 {
-                    if(BGDataGroupData[j].GroupName == "charge flip") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
-                }
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
-                {
-                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][3],BGDataGroupData[j].LegendName.Data(),"fl");
-                }
-            }
-            else
-            {
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
-                {
-                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                    if(SRBGName[i][j2]==SRBGName[3][j1])
+                    {
+                        for(unsigned int k=0;k<BGMCGroupData.size();k++)
+                        {
+                            if(BGMCGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGMCGroupData[k].LegendName.Data(),"fl");
+                        }
+                        for(unsigned int k=0;k<BGDataGroupData.size();k++)
+                        {
+                            if(BGDataGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGDataGroupData[k].LegendName.Data(),"fl");
+                        }
+                        j2++;
+                    }
                 }
             }
             
