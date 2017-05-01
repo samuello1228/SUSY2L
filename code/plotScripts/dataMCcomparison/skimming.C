@@ -253,6 +253,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
+        if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
+        if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
+        
         /*
         //mll > 60 GeV
         if(!(evts->l12_m>60))
