@@ -617,12 +617,7 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
-        bool isSS;
-        bool isSS_qF;
-        std::vector<unsigned int> qFChannel;
         TString Cut;
-        std::vector<TString> setOfBGMC;
-        std::vector<TString> setOfBGData;
     };
     
     if(dorw)
@@ -638,14 +633,6 @@ void analysis1()
         std::vector<RegionData> RegionInfo;
         {
             RegionData element;
-            
-            element.setOfBGMC.push_back("Zee");
-            element.setOfBGMC.push_back("Zmumu");
-            element.setOfBGMC.push_back("Ztautau");
-            element.setOfBGMC.push_back("ttbar");
-            element.setOfBGMC.push_back("Wt");
-            element.setOfBGMC.push_back("VV");
-            element.setOfBGMC.push_back("Vgamma");
             
             element.RegionName = "OS_ee";
             element.setOfChannel.clear();
@@ -664,6 +651,8 @@ void analysis1()
         TH1F* h2Ratio_rw[2];
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
+            const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+            
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
@@ -675,9 +664,9 @@ void analysis1()
                 //For MC background
                 for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                     {
-                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
