@@ -36,9 +36,9 @@ University of Michigan
 \frametitle{Update}
 \begin{itemize}
 \item use new ntuple AnalysisBase-02-04-30-f15e6058
-\item new trigger selection(simplify trigger list)
-\item use the new charge flip weight (but do not know how to use)
-\item try the old method for Z pt reweighting first
+\item new trigger selection (simplify trigger list)
+\item use the new charge flip weight (the two signal leptons need to pass ElChargeID)
+\item try to use the old method for Z pt reweighting first
 \end{itemize}
 \end{frame}
 
@@ -70,14 +70,15 @@ opposite sign
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item .
+\item It does not improve much, after Z pt reweighting.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item .
+\item Try to not use the fitting, and directly reweight in each bin (bin size: 2 GeV)
+\item Do I need to separate into 4 channels? (ISR\_OS\_ee,nonISR\_OS\_ee,ISR\_OS\_mumu,nonISR\_OS\_mumu)
 \end{itemize}
 \end{frame}
 
