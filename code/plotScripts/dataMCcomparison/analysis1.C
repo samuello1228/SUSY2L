@@ -1062,18 +1062,12 @@ void analysis1()
         {
             element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
             element.setOfChannel.clear();
-            element.qFChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
-            unsigned int OS = ChannelIndex;
-            if(OS>=6) OS -= 6;
-            element.isSS = OS>=3;
-            element.isSS_qF = (OS==3 || OS==5);
-            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
-            element.showData = !element.isSS;
-            //element.showData = true;
-            element.showSignificance = element.isSS;
+
+            element.showData = !ChannelInfo[ChannelIndex].isSS;
+            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
             
-            if(element.isSS)
+            if(ChannelInfo[ChannelIndex].isSS)
             {
                 //element.Cut = " && ( mll<76.18 || mll>106.18 )";
                 element.Cut = "";
@@ -1088,55 +1082,40 @@ void analysis1()
         
         
         //Control Region
-        element.isSS = true;
         element.showData = true;
         element.showSignificance = false;
         element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
-        element.isSS_qF = true;
-        
         element.RegionName = "CR_nonISR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
-        element.qFChannel.push_back(0);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(9);
-        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
         element.setOfChannel.push_back(9);
-        element.qFChannel.push_back(0);
-        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         //SS_mumu
-        element.isSS_qF = false;
-        
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
@@ -1194,61 +1173,17 @@ void analysis1()
                             element.RegionName += "_";
                             element.RegionName += lepton[m];
                             
-                            element.isSS = true;
-                            element.isSS_qF = (m==0 || m==2);
-                            
                             const unsigned int ChannelIndex = 3 +6*i +m;
                             element.setOfChannel.clear();
                             element.setOfChannel.push_back(ChannelIndex);
-                            element.qFChannel.clear();
-                            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
                             
-                            element.showData = !element.isSS;
-                            element.showSignificance = element.isSS;
+                            element.showData = !ChannelInfo[ChannelIndex].isSS;
+                            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
                             
                             RegionInfo.push_back(element);
                         }
                     }
                 }
-            }
-        }
-        
-        //setOfBG
-        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
-        {
-            //cout<<RegionInfo[RegionIndex].RegionName.Data()<<", Cut: "<<RegionInfo[RegionIndex].Cut.Data()<<endl;
-            if(RegionInfo[RegionIndex].isSS)
-            {
-                if(RegionInfo[RegionIndex].isSS_qF)
-                {
-                    if(docfw)
-                    {
-                        RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
-                    }
-                    else
-                    {
-                        RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
-                    }
-                }
-                
-                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
-                
-                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Zgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Wgamma");
-            }
-            else
-            {
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Zgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Wgamma");
             }
         }
     }
@@ -1279,6 +1214,8 @@ void analysis1()
         //for(int RegionIndex=10;RegionIndex<=10;RegionIndex++)
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
+            const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+            
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
@@ -1290,9 +1227,9 @@ void analysis1()
                 //For MC background
                 for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                     {
-                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
@@ -1320,9 +1257,9 @@ void analysis1()
                 //For data-driven background
                 for(unsigned int j=0;j<BGDataGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                     {
-                        if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                        if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                         {
                             Group BGGroupElement;
                             BGGroupElement.info = &(BGDataGroupData[j]);
@@ -1336,7 +1273,16 @@ void analysis1()
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
             
             std::vector<TChain*> tree2DataOS;
-            if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+            if(ChannelInfo[channelRepresentative].isSS_qF)
+            {
+                std::vector<unsigned int> setOfQFChannel;
+                for(unsigned int index=0;index<RegionInfo[RegionIndex].setOfChannel.size();index++)
+                {
+                    const unsigned int ChannelIndex  = RegionInfo[RegionIndex].setOfChannel[index];
+                    setOfQFChannel.push_back(ChannelInfo[ChannelIndex].qFChannel);
+                }
+                initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
+            }
  
             const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
@@ -1508,7 +1454,7 @@ void analysis1()
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
                 delete tree2Data[i];
-                if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
+                if(ChannelInfo[channelRepresentative].isSS_qF) delete tree2DataOS[i];
             }
             for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
@@ -1731,6 +1677,7 @@ void analysis1()
         if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
     }
     
+    //Find all BG group name for each channel
     std::vector< std::vector<TString> > SRBGName;
     for(unsigned int i=0;i<SRchannelRepresentative.size();i++)
     {
