@@ -567,7 +567,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "ptll";       element.VarTitle = "Dilepton pt";                       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.bin=140;        element.xmin=0;                 element.xmax=700;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "Dilepton $\\text{p}_{\\text{T}}$";
         Var.push_back(element);
@@ -632,6 +632,7 @@ void analysis1()
         {
             RegionData element;
             
+            /*
             element.RegionName = "OS_ee";
             element.setOfChannel.clear();
             element.setOfChannel.push_back(0);
@@ -643,10 +644,33 @@ void analysis1()
             element.setOfChannel.push_back(1);
             element.setOfChannel.push_back(7);
             RegionInfo.push_back(element);
+            */
+            
+            ///*
+            element.RegionName = ChannelInfo[0].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[1].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[6].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(6);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[7].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(7);
+            RegionInfo.push_back(element);
+            //*/
         }
 
         //calculate ratio plot
-        TH1F* h2Ratio_rw[2];
+        TH1F* h2Ratio_rw[RegionInfo.size()];
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -805,11 +829,11 @@ void analysis1()
             }
         }
         
-        TF1* fun[2];
+        TF1* fun[RegionInfo.size()];
         //simple fit
         if(fitting && simple)
         {
-            for(int RegionIndex=0;RegionIndex<=1;RegionIndex++)
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
             {
                 TString NameTemp = "fun_";
                 NameTemp += TString::Itoa(RegionIndex,10);
@@ -879,15 +903,25 @@ void analysis1()
             leg->SetFillStyle(0);
             leg->SetTextFont(32);
             leg->SetBorderSize(0);
-            leg->AddEntry(h2Ratio_rw[0],"ee channel","p");
-            leg->AddEntry(h2Ratio_rw[1],"mumu channel","p");
+            
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+            {
+                const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+                TString NameTemp = "plot/";
+                leg->AddEntry(h2Ratio_rw[RegionIndex],ChannelInfo[channelRepresentative].ChannelName.Data(),"p");
+            }
         }
         
         TCanvas* c2 = new TCanvas();
         c2->cd();
         gStyle->SetOptStat(0);
+        h2Ratio_rw[0]->SetMinimum(0);
+        h2Ratio_rw[0]->SetMaximum(2);
         h2Ratio_rw[0]->Draw();
-        h2Ratio_rw[1]->Draw("same");
+        for(unsigned int RegionIndex=1;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            h2Ratio_rw[RegionIndex]->Draw("same");
+        }
         leg->Draw();
         
         {
@@ -952,8 +986,10 @@ void analysis1()
         }
         
         //delete h2Ratio_rw
-        delete h2Ratio_rw[0];
-        delete h2Ratio_rw[1];
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            delete h2Ratio_rw[RegionIndex];
+        }
         //delete legend
         delete leg;
         //delete canvas
@@ -962,8 +998,10 @@ void analysis1()
         if(fitting)
         {
             //delete functions
-            delete fun[0];
-            delete fun[1];
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+            {
+                delete fun[RegionIndex];
+            }
         }
     }
     
