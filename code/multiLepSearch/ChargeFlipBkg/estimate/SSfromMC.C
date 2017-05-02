@@ -424,8 +424,8 @@ bool passCut(const evt2l* tree, const inType t)
       && ((tree->leps_ID[0]>0) == (tree->leps_ID[1]>0)) && fabs(tree->l12_m - 91)>10) 
       return false;
 
-   // if(fabs(tree->l12_m - 91)>10)
-   //    return false;
+   if(fabs(tree->l12_m - 91)>10)
+      return false;
 
    // Select events which pass electron ChargeFlipTagger
    if(t==DATA && !(tree->leps_ElChargeID[0] && tree->leps_ElChargeID[1])) return false;
