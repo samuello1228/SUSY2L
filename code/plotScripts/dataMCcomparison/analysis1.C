@@ -32,12 +32,14 @@
 
 #include <TGraph2D.h>
 
-bool dorw = 0;
-bool docfw = 0;
-bool simple = 1;
-bool combined = 0;
+const bool dorw = 1;
+const bool direct = 1;
+const bool fitting = 0;
+const bool simple = 1;
+const bool combined = 0;
 
-bool doOptimize = 0;
+const bool docfw = 0;
+const bool doOptimize = 0;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -231,9 +233,6 @@ void analysis1()
                         element.setOfBGMC.push_back("ttbar");
                         element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
-                        element.setOfBGMC.push_back("Vgamma");
-                        //element.setOfBGMC.push_back("Zgamma");
-                        //element.setOfBGMC.push_back("Wgamma");
                     }
 
                     ChannelInfo.push_back(element);
@@ -621,7 +620,6 @@ void analysis1()
     };
     
     if(dorw)
-    //if(false)
     {
         //Z pt reweighting
         int VarIndex = 0;
@@ -809,7 +807,7 @@ void analysis1()
         
         TF1* fun[2];
         //simple fit
-        if(simple)
+        if(fitting && simple)
         {
             for(int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
@@ -823,7 +821,7 @@ void analysis1()
         }
         
         //combined fit
-        if(combined)
+        if(fitting && combined)
         {
             fun[1] = new TF1("fun_mumu_OS","pol2(0)",Var[VarIndex].xmin,Var[VarIndex].xmax);
             fun[0] = new TF1("fun_ee_OS","pol0(0)*(pol2(1))",Var[VarIndex].xmin,Var[VarIndex].xmax);
@@ -901,14 +899,6 @@ void analysis1()
             c2->Print(NameTemp,"eps");
         }
         
-        //delete h2Ratio_rw
-        delete h2Ratio_rw[0];
-        delete h2Ratio_rw[1];
-        //delete legend
-        delete leg;
-        //delete canvas
-        delete c2;
-        
         //add weight in the tree
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
@@ -939,13 +929,14 @@ void analysis1()
                             for(int m=0;m<tree1->GetEntries();m++)
                             {
                                 tree1->GetEntry(m);
-                                if(simple)
+                                if(fitting)
                                 {
-                                    rw=fun[RegionIndex]->Eval(ptll);
+                                    if(simple) rw=fun[RegionIndex]->Eval(ptll);
+                                    else if(combined) rw=fun[1]->Eval(ptll);
                                 }
-                                if(combined)
+                                if(direct)
                                 {
-                                    rw=fun[1]->Eval(ptll);
+                                    rw = h2Ratio_rw[RegionIndex]->GetBinContent(h2Ratio_rw[RegionIndex]->FindBin(ptll));
                                 }
                                 tree2->Fill();
                             }
@@ -960,9 +951,20 @@ void analysis1()
             }
         }
         
-        //delete functions
-        delete fun[0];
-        delete fun[1];
+        //delete h2Ratio_rw
+        delete h2Ratio_rw[0];
+        delete h2Ratio_rw[1];
+        //delete legend
+        delete leg;
+        //delete canvas
+        delete c2;
+        
+        if(fitting)
+        {
+            //delete functions
+            delete fun[0];
+            delete fun[1];
+        }
     }
     
     if(docfw)
@@ -1887,7 +1889,7 @@ void analysis1()
             initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
         }
         
-        //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
+        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
