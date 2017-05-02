@@ -12,9 +12,9 @@ mcPRW=dev/SUSYTools/merged_prw_mc15c_Feb13.root
 #file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
 # file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-file=../multiLepSearch/script/MCBGZeeSherpa.txt
+# file=../multiLepSearch/script/MCBGZeeSherpa.txt
 #file=../multiLepSearch/script/MCBG_llll.txt
-#file=../multiLepSearch/script/MCZeePowheg.txt
+file=../multiLepSearch/script/MCZeePowheg.txt
 # file=./testZee.txt
 # file=../multiLepSearch/script/MCZeeAndSignal.txt
 
@@ -22,9 +22,9 @@ file=../multiLepSearch/script/MCBGZeeSherpa.txt
 k=${tag}.MCZee
 
 #For signal MC
-mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
-file=../multiLepSearch/script/MCSig_sample_list_new.txt
-k=${tag}.MCSig
+# mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+# file=../multiLepSearch/script/MCSig_sample_list_new.txt
+# k=${tag}.MCSig
 
 driver=grid
 # driver=direct
