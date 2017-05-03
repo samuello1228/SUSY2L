@@ -32,7 +32,7 @@
 
 #include <TGraph2D.h>
 
-const bool dorw = 1;
+const bool dorw = 0;
 const bool direct = 1;
 const bool fitting = 0;
 const bool simple = 1;
@@ -233,6 +233,7 @@ void analysis1()
                         element.setOfBGMC.push_back("ttbar");
                         element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
+                        element.setOfBGMC.push_back("Wgamma");
                     }
 
                     ChannelInfo.push_back(element);
@@ -494,13 +495,13 @@ void analysis1()
         element.lower = 63;  element.upper = 73; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 74;  element.upper = 93;BGMCGroupData.push_back(element);
+        element.lower = 74;  element.upper = 93; BGMCGroupData.push_back(element);
         
-        //element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        //element.lower = 74;  element.upper = 82;BGMCGroupData.push_back(element);
+        element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
+        element.lower = 74;  element.upper = 82; BGMCGroupData.push_back(element);
         
-        //element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        //element.lower = 83;  element.upper = 93;BGMCGroupData.push_back(element);
+        element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
+        element.lower = 83;  element.upper = 93; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
