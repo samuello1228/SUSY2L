@@ -3227,4 +3227,40 @@ void analysis1()
         }
         fout.close();
     }
+    
+    {
+        TString PathName = "latex/data/plot_zpt.tex";
+        ofstream fout;
+        fout.open(PathName.Data());
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        {
+            if(Var[VarIndex].VarName=="averageMu") continue;
+            
+            for(unsigned int lepton=0;lepton<=1;lepton++)
+            {
+                fout<<"\\begin{frame}"<<endl;
+                
+                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                if(lepton==0) fout<<"ee channel";
+                if(lepton==1) fout<<"mumu channel";
+                fout<<")}"<<endl;
+                
+                fout<<"\\Wider[5em]{"<<endl;
+                for(unsigned int ISR=0;ISR<=6;ISR+=6)
+                {
+                    fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_nozpt/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[lepton+ISR].ChannelName.Data()<<"}";
+                    fout<<endl;
+                    
+                    fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_zpt/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[lepton+ISR].ChannelName.Data()<<"}";
+                    if(ISR==0) fout<<" \\\\";
+                    fout<<endl;
+                }
+                fout<<"}"<<endl;
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
+        }
+        fout.close();
+    }
 }
