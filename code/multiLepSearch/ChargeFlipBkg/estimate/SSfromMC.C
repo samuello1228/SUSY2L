@@ -32,12 +32,12 @@
 
 // ========= CONFIGURATION =========== //
 TString defaultDir = "/afs/cern.ch/user/g/ggallard/private/SUSY2L/code/multiLepSearch/ChargeFlipBkg/";
-// TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
-TString defaultMClist = defaultDir + "common/inFileList-ZeeSherpa.txt";
+TString defaultMClist = defaultDir + "common/inFileList-ZeePowheg.txt";
+// TString defaultMClist = defaultDir + "common/inFileList-ZeeSherpa.txt";
 // TString defaultMClist = defaultDir + "common/ZP.txt";
 TString defaultDataList = defaultDir + "common/inFileList-data.txt";
 // TString defaultDataList = defaultDir + "common/shortD.txt";
-TString defaultOut= defaultDir + "QiD-on/Sherpa-rwMC";
+TString defaultOut= defaultDir + "QiD-on/Powheg-rwMC";
 // TString dPtfile=defaultDir + "QiD-on/Powheg/ptcorr/dEhistos.root";
 
 bool onlySignal=true;
@@ -292,8 +292,8 @@ void SSfromMC(const TString outputDir=defaultOut,
 
       // Get sampleID
       auto s = *it;
-      // TPRegexp reTag("[0-9]+.Powheg");
-      TPRegexp reTag("[0-9]+.Sherpa");
+      TPRegexp reTag("[0-9]+.Powheg");
+      // TPRegexp reTag("[0-9]+.Sherpa");
       TPRegexp reSampleID("[0-9]+");
       int sampleID = ((TString)( ( (TString)(s(reTag).Data()) )(reSampleID).Data()) ).Atoi();
       cout << "sampleID: " << sampleID << '\t';
