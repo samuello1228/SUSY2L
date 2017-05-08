@@ -21,12 +21,12 @@
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-// TString defaultOut="../QiD-on/estimates-data";
-TString defaultOut="../QiD-on/Powheg/estimates-NoPt-TruthMatched";
+TString defaultOut="../QiD-on/estimates-data";
+// TString defaultOut="../QiD-on/Powheg/estimates-NoPt-TruthMatched";
 // TString defaultOut="../QiD-on/estimates-MCTruth-NoPt";
 
-// TString defaultNTupleList="../common/inFileList-data.txt";
-TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
+TString defaultNTupleList="../common/inFileList-data.txt";
+// TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
 // TString defaultNTupleList="../common/inFileList-Zee.txt";
 
 TString defaultMisIdfile="../QiD-on/Powheg/rates_wSys.root";
@@ -202,7 +202,8 @@ void getSSPrediction(const TString outputDir=defaultOut,
    }
 
    // Initialize histograms here ----------------------------------------
-   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   // Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", 100, 60, 260);
    Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
@@ -210,7 +211,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
    Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading |#phi|", "", 40, -3.15, 3.15);
    Histos hSubleadingPhi("hSubleadingPhi", "subleading #phi", "Subleading |#phi|", "", 40, -3.15, 3.15);
 
-  hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
+   hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
 
    long long nEntries = evt2lTree->fChain->GetEntries();
    for(long long i=0; i<nEntries; i++){
@@ -263,7 +264,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
       if(!SSevent){
          double pSS = flip1.first + flip2.first - 2*flip1.first*flip2.first;
          chargeFlipWeight = pSS/(1-pSS);
-      } else chargeFlipWeight = 1;
+      } else chargeFlipWeight = -1;
 
       double w = evt2lTree->evt_weight * evt2lTree->evt_pwt *evt2lTree->evt_ElSF * evt2lTree->evt_MuSF;
 
