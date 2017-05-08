@@ -1116,7 +1116,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         if( study == "ss" )
         {
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;

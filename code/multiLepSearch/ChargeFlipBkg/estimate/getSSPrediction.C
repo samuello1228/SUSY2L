@@ -21,19 +21,33 @@
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-TString defaultOut="outputDirYL-PtCorr";
-TString defaultNTupleList="../common/inFileList-DataYL.txt";
-TString defaultMisIdfile="../QID-on/rates_wSys.root";
+TString defaultOut="../QiD-on/estimates-data";
+// TString defaultOut="../QiD-on/Powheg/estimates-NoPt-TruthMatched";
+// TString defaultOut="../QiD-on/estimates-MCTruth-NoPt";
+
+TString defaultNTupleList="../common/inFileList-data.txt";
+// TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
+// TString defaultNTupleList="../common/inFileList-Zee.txt";
+
+TString defaultMisIdfile="../QiD-on/Powheg/rates_wSys.root";
+// TString defaultMisIdfile="../QiD-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
+
+// TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
 //TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-TString misIDhistname="hFlipProb_MCtruth";
-// TString misIDhistname="hFlipProb_MCLH";
-// TString misIDhistname="hFlipProb";
-TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
+//TString misIDhistname="hFlipProb_MCtruth";
+TString misIDhistname="hFlipProb_MCLH";
+// TString misIDhistname="hFlipProb_data";
+
+// TString defaultdPtfile="../QiD-on/Powheg/ptcorr/dEhistos.root";
+TString defaultdPtfile="../../data/root_files/dPT_signal.root";
+
+
 bool onlySignal=true;
-bool applyPtCorrection=true;
+bool applyPtCorrection=false;
 bool passQID=true;
-bool ZWindowOnly = false;
+bool isMC = true;
+bool ZWindowOnly = !isMC;
 // ========= INFRASTRUCTURE =========== //
 class Histos;
 evt2l* evt2lTree=0;
@@ -188,7 +202,8 @@ void getSSPrediction(const TString outputDir=defaultOut,
    }
 
    // Initialize histograms here ----------------------------------------
-   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   // Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", 100, 60, 260);
    Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
@@ -196,7 +211,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
    Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading |#phi|", "", 40, -3.15, 3.15);
    Histos hSubleadingPhi("hSubleadingPhi", "subleading #phi", "Subleading |#phi|", "", 40, -3.15, 3.15);
 
-  hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
+   hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
 
    long long nEntries = evt2lTree->fChain->GetEntries();
    for(long long i=0; i<nEntries; i++){
@@ -215,6 +230,13 @@ void getSSPrediction(const TString outputDir=defaultOut,
 
       // Select events which pass electron ChargeFlipTagger
       if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
+
+      // In MC, plot only events with truth-matched electrons 
+      if (isMC &&
+         (evt2lTree->leps_truthI[0] < 0 || evt2lTree->leps_truthI[0] < 0 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11) )
+         continue;
 
       bool SSevent = ((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0));
 
@@ -244,7 +266,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
          chargeFlipWeight = pSS/(1-pSS);
       } else chargeFlipWeight = -1;
 
-      double w = 1;//evt2lTree->evt_weight * evt2lTree->evt_pwt;
+      double w = evt2lTree->evt_weight * evt2lTree->evt_pwt *evt2lTree->evt_ElSF * evt2lTree->evt_MuSF;
 
       hMass.Fill(mll, w, chargeFlipWeight);
       hLeadingPt.Fill(pt1, w, chargeFlipWeight);
@@ -333,7 +355,16 @@ bool initialize(const TString outputDir, const TString ntupleList, const TString
                std::cout << "Option unrecognized. " << std::endl;
                return false;
             }
-         } else {
+         } 
+         else if(key=="mc"){
+            if(value=='y') isMC = true;
+            else if (value=='n') isMC = false;
+            else {
+               std::cout << "Option unrecognized. " << std::endl;
+               return false;
+            }
+         } 
+         else {
             std::cout << "Option unrecognized. " << std::endl;
             return false;
          }

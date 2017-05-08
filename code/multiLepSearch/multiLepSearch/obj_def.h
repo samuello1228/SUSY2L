@@ -32,9 +32,8 @@ struct L_PAR:PAR{
   int truthI;
   unsigned int lFlag;
   unsigned int isoPass;
-  bool ElChargeID;
 };
-const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:ElChargeID/O";
+const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i";
 
 struct EL_Par:L_PAR{
   int elID;
