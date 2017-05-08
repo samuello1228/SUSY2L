@@ -27,8 +27,8 @@ k=${tag}.MCZee
 # file=../multiLepSearch/script/MCSig_sample_list_new.txt
 # k=${tag}.MCSig
 
-# driver=grid
-driver=direct
+driver=grid
+# driver=direct
 
 ../multiLepSearch/util/run_ss_selection.py --driver ${driver} --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch dR --doSys 0 --ChargeID 1
 
