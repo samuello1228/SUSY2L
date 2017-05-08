@@ -32,12 +32,14 @@
 
 #include <TGraph2D.h>
 
-bool dorw = 0;
-bool docfw = 0;
-bool simple = 1;
-bool combined = 0;
+const bool dorw = 0;
+const bool direct = 1;
+const bool fitting = 0;
+const bool simple = 1;
+const bool combined = 0;
 
-bool doOptimize = 0;
+const bool docfw = 0;
+const bool doOptimize = 0;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -231,9 +233,7 @@ void analysis1()
                         element.setOfBGMC.push_back("ttbar");
                         element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
-                        element.setOfBGMC.push_back("Vgamma");
-                        //element.setOfBGMC.push_back("Zgamma");
-                        //element.setOfBGMC.push_back("Wgamma");
+                        element.setOfBGMC.push_back("Wgamma");
                     }
 
                     ChannelInfo.push_back(element);
@@ -284,13 +284,14 @@ void analysis1()
         fin.open("BGSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp;
-            fin>>SampleIDTemp;
-            if(fin.eof()) break;
-            
+            TString SampleIDTemp = "mc15_13TeV.";
             TString SampleNameTemp;
             fin>>SampleNameTemp;
+            if(fin.eof()) break;
             
+            SampleIDTemp += SampleNameTemp;
+            
+            fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             BGMCSampleID.push_back(SampleIDTemp);
@@ -366,14 +367,15 @@ void analysis1()
         fin.open("SigSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp;
+            TString SampleIDTemp = "mc15_13TeV.";
             //for 125
-            fin>>SampleIDTemp;
-            if(fin.eof()) break;
-            
             TString SampleNameTemp;
             fin>>SampleNameTemp;
+            if(fin.eof()) break;
             
+            SampleIDTemp += SampleNameTemp;
+            
+            fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             SigSampleID.push_back(SampleIDTemp);
@@ -493,13 +495,13 @@ void analysis1()
         element.lower = 63;  element.upper = 73; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 74;  element.upper = 93;BGMCGroupData.push_back(element);
+        element.lower = 74;  element.upper = 93; BGMCGroupData.push_back(element);
         
-        //element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        //element.lower = 74;  element.upper = 82;BGMCGroupData.push_back(element);
+        element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
+        element.lower = 74;  element.upper = 82; BGMCGroupData.push_back(element);
         
-        //element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        //element.lower = 83;  element.upper = 93;BGMCGroupData.push_back(element);
+        element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
+        element.lower = 83;  element.upper = 93; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -566,7 +568,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "ptll";       element.VarTitle = "Dilepton pt";                       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.bin=140;        element.xmin=0;                 element.xmax=700;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "Dilepton $\\text{p}_{\\text{T}}$";
         Var.push_back(element);
@@ -593,7 +595,13 @@ void analysis1()
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
-        //Var.push_back(element);
+        Var.push_back(element);
+        
+        element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
+        element.bin=15;         element.xmin=0;                 element.xmax=15;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = element.VarTitle;
+        Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
@@ -609,16 +617,10 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
-        bool isSS;
-        bool isSS_qF;
-        std::vector<unsigned int> qFChannel;
         TString Cut;
-        std::vector<TString> setOfBGMC;
-        std::vector<TString> setOfBGData;
     };
     
     if(dorw)
-    //if(false)
     {
         //Z pt reweighting
         int VarIndex = 0;
@@ -631,14 +633,7 @@ void analysis1()
         {
             RegionData element;
             
-            element.setOfBGMC.push_back("Zee");
-            element.setOfBGMC.push_back("Zmumu");
-            element.setOfBGMC.push_back("Ztautau");
-            element.setOfBGMC.push_back("ttbar");
-            element.setOfBGMC.push_back("Wt");
-            element.setOfBGMC.push_back("VV");
-            element.setOfBGMC.push_back("Vgamma");
-            
+            /*
             element.RegionName = "OS_ee";
             element.setOfChannel.clear();
             element.setOfChannel.push_back(0);
@@ -650,12 +645,37 @@ void analysis1()
             element.setOfChannel.push_back(1);
             element.setOfChannel.push_back(7);
             RegionInfo.push_back(element);
+            */
+            
+            ///*
+            element.RegionName = ChannelInfo[0].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[1].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[6].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(6);
+            RegionInfo.push_back(element);
+            
+            element.RegionName = ChannelInfo[7].ChannelName;
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(7);
+            RegionInfo.push_back(element);
+            //*/
         }
 
         //calculate ratio plot
-        TH1F* h2Ratio_rw[2];
+        TH1F* h2Ratio_rw[RegionInfo.size()];
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
+            const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+            
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
@@ -667,9 +687,9 @@ void analysis1()
                 //For MC background
                 for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                     {
-                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
@@ -810,11 +830,11 @@ void analysis1()
             }
         }
         
-        TF1* fun[2];
+        TF1* fun[RegionInfo.size()];
         //simple fit
-        if(simple)
+        if(fitting && simple)
         {
-            for(int RegionIndex=0;RegionIndex<=1;RegionIndex++)
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
             {
                 TString NameTemp = "fun_";
                 NameTemp += TString::Itoa(RegionIndex,10);
@@ -826,7 +846,7 @@ void analysis1()
         }
         
         //combined fit
-        if(combined)
+        if(fitting && combined)
         {
             fun[1] = new TF1("fun_mumu_OS","pol2(0)",Var[VarIndex].xmin,Var[VarIndex].xmax);
             fun[0] = new TF1("fun_ee_OS","pol0(0)*(pol2(1))",Var[VarIndex].xmin,Var[VarIndex].xmax);
@@ -884,15 +904,25 @@ void analysis1()
             leg->SetFillStyle(0);
             leg->SetTextFont(32);
             leg->SetBorderSize(0);
-            leg->AddEntry(h2Ratio_rw[0],"ee channel","p");
-            leg->AddEntry(h2Ratio_rw[1],"mumu channel","p");
+            
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+            {
+                const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+                TString NameTemp = "plot/";
+                leg->AddEntry(h2Ratio_rw[RegionIndex],ChannelInfo[channelRepresentative].ChannelName.Data(),"p");
+            }
         }
         
         TCanvas* c2 = new TCanvas();
         c2->cd();
         gStyle->SetOptStat(0);
+        h2Ratio_rw[0]->SetMinimum(0);
+        h2Ratio_rw[0]->SetMaximum(2);
         h2Ratio_rw[0]->Draw();
-        h2Ratio_rw[1]->Draw("same");
+        for(unsigned int RegionIndex=1;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            h2Ratio_rw[RegionIndex]->Draw("same");
+        }
         leg->Draw();
         
         {
@@ -903,14 +933,6 @@ void analysis1()
             NameTemp += ".eps";
             c2->Print(NameTemp,"eps");
         }
-        
-        //delete h2Ratio_rw
-        delete h2Ratio_rw[0];
-        delete h2Ratio_rw[1];
-        //delete legend
-        delete leg;
-        //delete canvas
-        delete c2;
         
         //add weight in the tree
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
@@ -942,13 +964,14 @@ void analysis1()
                             for(int m=0;m<tree1->GetEntries();m++)
                             {
                                 tree1->GetEntry(m);
-                                if(simple)
+                                if(fitting)
                                 {
-                                    rw=fun[RegionIndex]->Eval(ptll);
+                                    if(simple) rw=fun[RegionIndex]->Eval(ptll);
+                                    else if(combined) rw=fun[1]->Eval(ptll);
                                 }
-                                if(combined)
+                                if(direct)
                                 {
-                                    rw=fun[1]->Eval(ptll);
+                                    rw = h2Ratio_rw[RegionIndex]->GetBinContent(h2Ratio_rw[RegionIndex]->FindBin(ptll));
                                 }
                                 tree2->Fill();
                             }
@@ -963,9 +986,24 @@ void analysis1()
             }
         }
         
-        //delete functions
-        delete fun[0];
-        delete fun[1];
+        //delete h2Ratio_rw
+        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+        {
+            delete h2Ratio_rw[RegionIndex];
+        }
+        //delete legend
+        delete leg;
+        //delete canvas
+        delete c2;
+        
+        if(fitting)
+        {
+            //delete functions
+            for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
+            {
+                delete fun[RegionIndex];
+            }
+        }
     }
     
     if(docfw)
@@ -1054,18 +1092,12 @@ void analysis1()
         {
             element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
             element.setOfChannel.clear();
-            element.qFChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
-            unsigned int OS = ChannelIndex;
-            if(OS>=6) OS -= 6;
-            element.isSS = OS>=3;
-            element.isSS_qF = (OS==3 || OS==5);
-            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
-            element.showData = !element.isSS;
-            //element.showData = true;
-            element.showSignificance = element.isSS;
+
+            element.showData = !ChannelInfo[ChannelIndex].isSS;
+            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
             
-            if(element.isSS)
+            if(ChannelInfo[ChannelIndex].isSS)
             {
                 //element.Cut = " && ( mll<76.18 || mll>106.18 )";
                 element.Cut = "";
@@ -1080,55 +1112,40 @@ void analysis1()
         
         
         //Control Region
-        element.isSS = true;
         element.showData = true;
         element.showSignificance = false;
         element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
-        element.isSS_qF = true;
-        
         element.RegionName = "CR_nonISR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
-        element.qFChannel.push_back(0);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(9);
-        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_ee";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(3);
         element.setOfChannel.push_back(9);
-        element.qFChannel.push_back(0);
-        element.qFChannel.push_back(6);
         RegionInfo.push_back(element);
         
         //SS_mumu
-        element.isSS_qF = false;
-        
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_ISR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
         element.RegionName = "CR_SS_mumu";
         element.setOfChannel.clear();
-        element.qFChannel.clear();
         element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
@@ -1186,61 +1203,17 @@ void analysis1()
                             element.RegionName += "_";
                             element.RegionName += lepton[m];
                             
-                            element.isSS = true;
-                            element.isSS_qF = (m==0 || m==2);
-                            
                             const unsigned int ChannelIndex = 3 +6*i +m;
                             element.setOfChannel.clear();
                             element.setOfChannel.push_back(ChannelIndex);
-                            element.qFChannel.clear();
-                            if(element.isSS_qF) element.qFChannel.push_back(ChannelIndex-3);
                             
-                            element.showData = !element.isSS;
-                            element.showSignificance = element.isSS;
+                            element.showData = !ChannelInfo[ChannelIndex].isSS;
+                            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
                             
                             RegionInfo.push_back(element);
                         }
                     }
                 }
-            }
-        }
-        
-        //setOfBG
-        for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
-        {
-            //cout<<RegionInfo[RegionIndex].RegionName.Data()<<", Cut: "<<RegionInfo[RegionIndex].Cut.Data()<<endl;
-            if(RegionInfo[RegionIndex].isSS)
-            {
-                if(RegionInfo[RegionIndex].isSS_qF)
-                {
-                    if(docfw)
-                    {
-                        RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
-                    }
-                    else
-                    {
-                        RegionInfo[RegionIndex].setOfBGData.push_back("charge flip");
-                    }
-                }
-                
-                RegionInfo[RegionIndex].setOfBGData.push_back("fake lepton");
-                
-                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Zgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Wgamma");
-            }
-            else
-            {
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Zee");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Zmumu");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Ztautau");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("ttbar");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Wt");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("VV");
-                RegionInfo[RegionIndex].setOfBGMC.push_back("Vgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Zgamma");
-                //RegionInfo[RegionIndex].setOfBGMC.push_back("Wgamma");
             }
         }
     }
@@ -1271,6 +1244,8 @@ void analysis1()
         //for(int RegionIndex=10;RegionIndex<=10;RegionIndex++)
         //for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
+            const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+            
             std::vector<TChain*> tree2Data;
             initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
             
@@ -1282,9 +1257,9 @@ void analysis1()
                 //For MC background
                 for(unsigned int j=0;j<BGMCGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                     {
-                        if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                        if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
@@ -1312,9 +1287,9 @@ void analysis1()
                 //For data-driven background
                 for(unsigned int j=0;j<BGDataGroupData.size();j++)
                 {
-                    for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                     {
-                        if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                        if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                         {
                             Group BGGroupElement;
                             BGGroupElement.info = &(BGDataGroupData[j]);
@@ -1328,7 +1303,16 @@ void analysis1()
             initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
             
             std::vector<TChain*> tree2DataOS;
-            if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+            if(ChannelInfo[channelRepresentative].isSS_qF)
+            {
+                std::vector<unsigned int> setOfQFChannel;
+                for(unsigned int index=0;index<RegionInfo[RegionIndex].setOfChannel.size();index++)
+                {
+                    const unsigned int ChannelIndex  = RegionInfo[RegionIndex].setOfChannel[index];
+                    setOfQFChannel.push_back(ChannelInfo[ChannelIndex].qFChannel);
+                }
+                initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
+            }
  
             const double uncertainty[] = {0.1,0.2,0.3};
             const int uncertaintyN = sizeof(uncertainty)/sizeof(uncertainty[0]);
@@ -1500,7 +1484,7 @@ void analysis1()
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
                 delete tree2Data[i];
-                if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
+                if(ChannelInfo[channelRepresentative].isSS_qF) delete tree2DataOS[i];
             }
             for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
@@ -1704,29 +1688,56 @@ void analysis1()
         if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
     }
     
+    //channelRepresentative for SR
+    std::vector<unsigned int> SRchannelRepresentative;
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_mumu") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_emu") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+    {
+        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+    }
+    
+    //Find all BG group name for each channel
+    std::vector< std::vector<TString> > SRBGName;
+    for(unsigned int i=0;i<SRchannelRepresentative.size();i++)
+    {
+        std::vector<TString> element;
+        const unsigned int channelRepresentative = SRchannelRepresentative[i];
+        //For MC background
+        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGMC.size();j++)
+        {
+            element.push_back(ChannelInfo[channelRepresentative].setOfBGMC[j]);
+        }
+        
+        //For data-driven background
+        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGData.size();j++)
+        {
+            element.push_back(ChannelInfo[channelRepresentative].setOfBGData[j]);
+        }
+        
+        SRBGName.push_back(element);
+    }
+    
     //expN for SR
     TString PathName_SR = "latex/data/expN/SR.txt";
     fstream fout_SR;
     fout_SR.open(PathName_SR.Data(), ios::out);
     fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    for(unsigned int i=0;i<BGMCGroupData.size();i++)
+    for(unsigned int i=0;i<SRBGName[3].size();i++)
     {
-        if(BGMCGroupData[i].GroupName == "VV") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
-    }
-    for(unsigned int i=0;i<BGMCGroupData.size();i++)
-    {
-        if(BGMCGroupData[i].GroupName == "Vgamma") fout_SR<<std::setw(15)<<BGMCGroupData[i].GroupName.Data();
+        fout_SR<<std::setw(15)<<SRBGName[3][i].Data();
     }
     
-    for(unsigned int i=0;i<BGDataGroupData.size();i++)
-    {
-        if(BGDataGroupData[i].GroupName == "charge flip") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
-    }
-    for(unsigned int i=0;i<BGDataGroupData.size();i++)
-    {
-        if(BGDataGroupData[i].GroupName == "fake lepton") fout_SR<<std::setw(15)<<BGDataGroupData[i].GroupName.Data();
-    }
-
     fout_SR<<std::setw(15)<<"Total BG";
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1750,45 +1761,18 @@ void analysis1()
         else if(i==3) LeptonName = "_combine";
         
         //h2SRBG
-        //VV
-        for(unsigned int j=0;j<BGMCGroupData.size();j++)
+        for(unsigned int j=0;j<SRBGName[i].size();j++)
         {
-            if(BGMCGroupData[j].GroupName == "VV") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(2);
-        hTemp->SetFillColor(2);
-        element.push_back(hTemp);
-        
-        //Vgamma
-        for(unsigned int j=0;j<BGMCGroupData.size();j++)
-        {
-            if(BGMCGroupData[j].GroupName == "Vgamma") hTemp = new TH1F((BGMCGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(4);
-        hTemp->SetFillColor(4);
-        element.push_back(hTemp);
-        
-        //charge flip
-        if(i!=1)
-        {
-            for(unsigned int j=0;j<BGDataGroupData.size();j++)
-            {
-                if(BGDataGroupData[j].GroupName == "charge flip") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-            }
-            hTemp->SetLineColor(3);
-            hTemp->SetFillColor(3);
+            hTemp = new TH1F((SRBGName[i][j]+LeptonName).Data(),"",18,0,18);
+            int colour = 0;
+            if(SRBGName[i][j] == "VV") colour = 2;
+            else if(SRBGName[i][j] == "Vgamma") colour = 4;
+            else if(SRBGName[i][j] == "charge flip") colour = 3;
+            else if(SRBGName[i][j] == "fake lepton") colour = 5;
+            hTemp->SetLineColor(colour);
+            hTemp->SetFillColor(colour);
             element.push_back(hTemp);
         }
-        
-        //fake lepton
-        for(unsigned int j=0;j<BGDataGroupData.size();j++)
-        {
-            if(BGDataGroupData[j].GroupName == "fake lepton") hTemp = new TH1F((BGDataGroupData[j].GroupName+LeptonName).Data(),"",18,0,18);
-        }
-        hTemp->SetLineColor(5);
-        hTemp->SetFillColor(5);
-        element.push_back(hTemp);
-        
         h2SRBG.push_back(element);
         element.clear();
         
@@ -1803,11 +1787,13 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionIndex=43;RegionIndex<=43;RegionIndex++)
+    //for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
+        const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
+        
         std::vector<TChain*> tree2Data;
         initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
         
@@ -1819,9 +1805,9 @@ void analysis1()
             //For MC background
             for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGMC.size();k++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                 {
-                    if(BGMCGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGMC[k])
+                    if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                     {
                         std::vector<TString> BGMCGroupSampleID;
                         std::vector<double> BGMCGroupXSElement;
@@ -1915,9 +1901,9 @@ void analysis1()
             //For data-driven background
             for(unsigned int j=0;j<BGDataGroupData.size();j++)
             {
-                for(unsigned int k=0;k<RegionInfo[RegionIndex].setOfBGData.size();k++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                 {
-                    if(BGDataGroupData[j].GroupName == RegionInfo[RegionIndex].setOfBGData[k])
+                    if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGDataGroupData[j]);
@@ -1931,9 +1917,18 @@ void analysis1()
         initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
         
         std::vector<TChain*> tree2DataOS;
-        if(RegionInfo[RegionIndex].isSS_qF) initializeTree2(tree2DataOS,RegionInfo[RegionIndex].qFChannel,DataSampleID,ChannelInfo);
+        if(ChannelInfo[channelRepresentative].isSS_qF)
+        {
+            std::vector<unsigned int> setOfQFChannel;
+            for(unsigned int index=0;index<RegionInfo[RegionIndex].setOfChannel.size();index++)
+            {
+                const unsigned int ChannelIndex  = RegionInfo[RegionIndex].setOfChannel[index];
+                setOfQFChannel.push_back(ChannelInfo[ChannelIndex].qFChannel);
+            }
+            initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
+        }
         
-        //for(unsigned int VarIndex=4;VarIndex<=4;VarIndex++)
+        //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
@@ -2378,13 +2373,23 @@ void analysis1()
                     fout_SR<<std::setw(46)<<RegionInfo[RegionIndex].RegionName;
                     
                     fout_SR<<setprecision(1)<<std::fixed;
-                    for(unsigned int j=0;j<BGGroup.size();j++)
                     {
-                        if(!RegionInfo[RegionIndex].isSS_qF && j==2) fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
-                        
-                        fout_SR<<std::setw(8)<<sumOfEvent[j][0];
-                        fout_SR<<"+/-";
-                        fout_SR<<std::setw(4)<<sumOfEvent[j][1];
+                        unsigned int j2 = 0;
+                        for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+                        {
+                            if(SRBGName[3][j1]==BGGroup[j2].info->GroupName)
+                            {
+                                fout_SR<<std::setw(8)<<sumOfEvent[j2][0];
+                                fout_SR<<"+/-";
+                                fout_SR<<std::setw(4)<<sumOfEvent[j2][1];
+                                
+                                j2++;
+                            }
+                            else
+                            {
+                                fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
+                            }
+                        }
                     }
                     
                     fout_SR<<std::setw(8)<<sumOfEvent[BGGroup.size()][0];
@@ -2751,7 +2756,7 @@ void analysis1()
         for(unsigned int i=0;i<DataSampleID.size();i++)
         {
             delete tree2Data[i];
-            if(RegionInfo[RegionIndex].isSS_qF) delete tree2DataOS[i];
+            if(ChannelInfo[channelRepresentative].isSS_qF) delete tree2DataOS[i];
         }
         for(unsigned int j=0;j<tree2BGMC.size();j++)
         {
@@ -2812,16 +2817,16 @@ void analysis1()
     for(unsigned int i=0;i<3;i++)
     {
         //h2SRBG
-        h2SRBG[3][0]->Add(h2SRBG[i][0]);
-        h2SRBG[3][1]->Add(h2SRBG[i][1]);
-        if(i==0 || i==2)
         {
-            h2SRBG[3][2]->Add(h2SRBG[i][2]);
-            h2SRBG[3][3]->Add(h2SRBG[i][3]);
-        }
-        else
-        {
-            h2SRBG[3][3]->Add(h2SRBG[i][2]);
+            unsigned int j2 = 0;
+            for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+            {
+                if(SRBGName[i][j2]==SRBGName[3][j1])
+                {
+                    h2SRBG[3][j1]->Add(h2SRBG[i][j2]);
+                    j2++;
+                }
+            }
         }
         
         //h2SRSig
@@ -2849,31 +2854,22 @@ void analysis1()
             leg->SetTextFont(42);
             leg->SetBorderSize(0);
             
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
             {
-                if(BGMCGroupData[j].GroupName == "VV") leg->AddEntry(h2SRBG[i][0],BGMCGroupData[j].LegendName.Data(),"fl");
-            }
-            for(unsigned int j=0;j<BGMCGroupData.size();j++)
-            {
-                if(BGMCGroupData[j].GroupName == "Vgamma") leg->AddEntry(h2SRBG[i][1],BGMCGroupData[j].LegendName.Data(),"fl");
-            }
-            
-            if(i!=1)
-            {
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                unsigned int j2 = 0;
+                for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
                 {
-                    if(BGDataGroupData[j].GroupName == "charge flip") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
-                }
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
-                {
-                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][3],BGDataGroupData[j].LegendName.Data(),"fl");
-                }
-            }
-            else
-            {
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
-                {
-                    if(BGDataGroupData[j].GroupName == "fake lepton") leg->AddEntry(h2SRBG[i][2],BGDataGroupData[j].LegendName.Data(),"fl");
+                    if(SRBGName[i][j2]==SRBGName[3][j1])
+                    {
+                        for(unsigned int k=0;k<BGMCGroupData.size();k++)
+                        {
+                            if(BGMCGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGMCGroupData[k].LegendName.Data(),"fl");
+                        }
+                        for(unsigned int k=0;k<BGDataGroupData.size();k++)
+                        {
+                            if(BGDataGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGDataGroupData[k].LegendName.Data(),"fl");
+                        }
+                        j2++;
+                    }
                 }
             }
             
@@ -3226,6 +3222,42 @@ void analysis1()
                 //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
                 fout<<"}"<<endl;
                 
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
+        }
+        fout.close();
+    }
+    
+    {
+        TString PathName = "latex/data/plot_zpt.tex";
+        ofstream fout;
+        fout.open(PathName.Data());
+        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        {
+            if(Var[VarIndex].VarName=="averageMu") continue;
+            
+            for(unsigned int lepton=0;lepton<=1;lepton++)
+            {
+                fout<<"\\begin{frame}"<<endl;
+                
+                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                if(lepton==0) fout<<"ee channel";
+                if(lepton==1) fout<<"mumu channel";
+                fout<<")}"<<endl;
+                
+                fout<<"\\Wider[5em]{"<<endl;
+                for(unsigned int ISR=0;ISR<=6;ISR+=6)
+                {
+                    fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_nozpt/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[lepton+ISR].ChannelName.Data()<<"}";
+                    fout<<endl;
+                    
+                    fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_zpt/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[lepton+ISR].ChannelName.Data()<<"}";
+                    if(ISR==0) fout<<" \\\\";
+                    fout<<endl;
+                }
+                fout<<"}"<<endl;
                 fout<<"\\end{frame}"<<endl<<endl;
             }
         }

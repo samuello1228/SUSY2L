@@ -35,8 +35,6 @@
 #include <TH1D.h>
 #include <TFile.h>
 
-// #include "AthAnalysisBaseComps/AthAnalysisHelper.h"
-
 using namespace xAOD;
 using namespace std;
 
@@ -105,6 +103,11 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
 
   // MCTC, TruthLink, dR
   mcTruthMatch = "MCTC"; 
+
+  // ElectronChargeIDSelector working points
+  // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
+  ECIDS_OP=-0.28087;
+  ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
 }
 
 
@@ -303,11 +306,35 @@ EL::StatusCode ssEvtSelection :: initialize ()
   // count number of events
   m_eventCounter = 0;
 
+  /// IsolationSelectionTool
+  m_isoTool = new CP::IsolationSelectionTool("my_isoTest");
+  CHECK(m_isoTool->setProperty("MuonWP","Loose"));
+  CHECK(m_isoTool->setProperty("ElectronWP","Loose"));
+  CHECK(m_isoTool->initialize());
+
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Muon)); //2
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Muon)); //4
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Muon)); //8
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Muon)); //10
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Muon)); //20
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Muon)); //40
+  CHECK(m_isoTool->addWP("FixedCutHighPtTrackOnly", xAOD::Type::Muon));//80
+  CHECK(m_isoTool->addWP("Gradient", xAOD::Type::Electron)); //2
+  CHECK(m_isoTool->addWP("GradientLoose", xAOD::Type::Electron)); //4
+  CHECK(m_isoTool->addWP("LooseTrackOnly", xAOD::Type::Electron)); //8
+  CHECK(m_isoTool->addWP("FixedCutTight", xAOD::Type::Electron)); //10
+  CHECK(m_isoTool->addWP("FixedCutTightTrackOnly", xAOD::Type::Electron)); //20
+  CHECK(m_isoTool->addWP("FixedCutLoose", xAOD::Type::Electron)); //40
+  CHECK(m_isoTool->addWP("FixedCutHighPtCaloOnly", xAOD::Type::Electron)); //80
+  CHECK(m_isoTool->addWP("FixedCutTrackCone40", xAOD::Type::Electron)); //100
+
   /// SUSYTools
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
-  // m_objTool->msg().setLevel( MSG::ERROR );
-  // m_objTool->msg().setLevel(MSG::VERBOSE);
+  //m_objTool->msg().setLevel( MSG::ERROR );
   //m_objTool->msg().setLevel( MSG::WARNING );
+//   m_objTool->msg().setLevel( MSG::VERBOSE );
+
+  for(auto x: CF_PRW_confFiles){Info("CF_PRW_confFiles", "%s", x.c_str());}
 
   ST::ISUSYObjDef_xAODTool::DataSource ds = static_cast<ST::ISUSYObjDef_xAODTool::DataSource>(CF_isMC); 
   CHECK(m_objTool->setProperty("DataSource",ds));
@@ -351,6 +378,12 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
+
+  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool_medium");
+  CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
+  CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
+  CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
+  CHECK(ECIDSTool->initialize());
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -406,6 +439,9 @@ EL::StatusCode ssEvtSelection :: initialize ()
     }
   }
   std::cout << "===============================" << std::endl;
+
+
+  setupTriggers();
 
 
   return EL::StatusCode::SUCCESS;
@@ -738,11 +774,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Save informations
     ////////////////////////
     
+    //unused variables
+    m_susyEvt->evt.cut = 0;
+
     //event information
     //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
-    m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
+    //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
     m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
@@ -852,12 +891,18 @@ EL::StatusCode ssEvtSelection :: execute ()
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
-      fillLepton(sel_Ls[i], m_susyEvt->leps[i], i);
-      m_susyEvt->leps[i].MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
+      auto& l = m_susyEvt->leps[i];
+      fillLepton(sel_Ls[i], l, i);
+      l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
       //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
-      m_susyEvt->leps[i].mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      
+      //// dR with leading jet, and the smallest dR
+      l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
+      l.jet_dRm = l.jet0_dR;
+      for(size_t j=1; j<jet_Ls.size(); j++){auto dRn=jet_Ls[j]->p4().DeltaR(sel_Ls[i]->p4()); if(dRn<l.jet_dRm) l.jet_dRm = dRn;}
     }
 
     ///MetRel correction factor (See Eq6, 2LSS note: https://cds.cern.ch/record/1747285/files/ATL-COM-PHYS-2014-954.pdf)
@@ -1026,48 +1071,37 @@ EL::StatusCode ssEvtSelection :: execute ()
         m_susyEvt->evt.averageMu = m_objTool->GetCorrectedAverageInteractionsPerCrossing();
       }
 
-      //Scale factor
-      if(CF_isMC){
-        if( study == "ss" )
-        {
-          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0", true);
-          m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
-        }
-        else if(study == "3l")
-        {
-          m_susyEvt->evt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
-          m_susyEvt->evt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
-        }
-        m_susyEvt->evt.BtagSF = m_objTool->BtagSF(jets_copy);
-
-      }else{
-        m_susyEvt->evt.ElSF = 1;
-        m_susyEvt->evt.MuSF = 1;
-        m_susyEvt->evt.BtagSF = 1;
-      }
-
-      ///// event weight for fake Lep
-      //m_susyEvt->evt.fLwt = 0.;
+      //// get trigger info, if passed, and the SF
+      auto& sEvt = m_susyEvt->evt;
+      sEvt.run = m_objTool->GetRunNumber();
+      auto trigCut = getTriggerConf(sEvt.run);
 
       //12 channel
       m_susyEvt->evt.flag = 0;
       if(totLs == 2)
       {
         if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 1;
+          m_susyEvt->sig.trigMask = trigCut->ee_mask;
+        }
 
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
           m_susyEvt->evt.flag += 3;
+          m_susyEvt->sig.trigMask = trigCut->em_mask;
+        }
 
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
           m_susyEvt->evt.flag += 3;
-
+          m_susyEvt->sig.trigMask = trigCut->em_mask;
+        }
         else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 )
+                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
           m_susyEvt->evt.flag += 2;
+          m_susyEvt->sig.trigMask = trigCut->mm_mask;
+        }
 
         if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
            (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
@@ -1076,6 +1110,34 @@ EL::StatusCode ssEvtSelection :: execute ()
         if(nISR==1) m_susyEvt->evt.flag += 6;
         else if(nISR!=0) m_susyEvt->evt.flag = 0;
       }
+
+      //Scale factor
+      if(CF_isMC){
+        if( study == "ss" )
+        {
+          if(sEvt.flag%3 == 1){ // ee
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            sEvt.MuSF = 1;
+          }else if(sEvt.flag%3 == 2){ // mumu
+            sEvt.ElSF = 1;
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
+          }else if(sEvt.flag%3 == 0){ // emu
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
+          }
+        }
+        else if(study == "3l")
+        {
+          sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
+          sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
+        }
+        sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
+      }else{
+        sEvt.ElSF = 1;
+        sEvt.MuSF = 1;
+        sEvt.BtagSF = 1;
+      }
+
 
       /// fill events
       ATH_MSG_VERBOSE("Fill " << iSyst << " " << jSyst );
@@ -1113,7 +1175,10 @@ EL::StatusCode ssEvtSelection :: finalize ()
   // merged.  This is different from histFinalize() in that it only
   // gets called on worker nodes that processed input events.
 
- xAOD::IOStats::instance().stats().printSmartSlimmingBranchList();
+//  xAOD::IOStats::instance().stats().printSmartSlimmingBranchList();
+
+ for(auto x: m_trigSel) delete x;
+ m_trigSel.clear();
 
  return EL::StatusCode::SUCCESS;
 }
@@ -1149,6 +1214,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   //if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
   //if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
   //if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
+  l.isoPass = m_isoTool->accept(*el).getCutResultBitSet().to_ulong();
 
   /*
   //track
@@ -1239,7 +1305,10 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
   }
-  
+
+  // ChargeIDSelector
+  l.ElChargeID = 0;
+  l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1257,6 +1326,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   //if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
   //if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
   //if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
+  l.isoPass = m_isoTool->accept(*mu).getCutResultBitSet().to_ulong();
 
   /*
   //track
@@ -1301,6 +1371,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
+  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1340,7 +1411,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
   }
   return EL::StatusCode::SUCCESS;
 }
-
 int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLevel){
   /// check if already exist
   const int bcode = p->barcode();
@@ -1374,4 +1444,72 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
     }
   }
   return nv;
+}
+
+void ssEvtSelection::setupTriggers(){
+  /// try di lepton trigger for now
+  /// 2015
+  m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
+  /// 2016: A-D3
+//   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+  /// 2016: D4-
+  m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+
+  m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
+  m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
+  m_em_mKey = "HLT_mu14";
+
+//   /// 2016: A
+//   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+// 
+//   /// 2016: B-D3
+//   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+// 
+//   /// 2016: D4-E
+//   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: F
+//   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: G1-G2
+//   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: G3-I3
+//   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+// 
+//   /// 2016: I4-
+//   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+
+
+//   /// 2016: temp
+//   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
+
+  for(auto& t: m_trigSel){
+    unsigned long int m1(1);
+    for(auto& x: CF_trigNames){
+      if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
+      if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
+      if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
+      m1 *= 2;
+    }
+  }
+
+  return;
+}
+
+TRIGCONF* ssEvtSelection::getTriggerConf(uint32_t run){
+  /// use the cached one if possible to save time
+  if(m_nowTrigSel && run>=m_nowTrigSel->runStart && run<=m_nowTrigSel->runEnd) return m_nowTrigSel;
+
+  /// if not cached, fine the new one
+  m_nowTrigSel = nullptr;
+  for(auto& x: m_trigSel){
+    if(run>=x->runStart && run<=x->runEnd){
+      m_nowTrigSel = x;
+      break;
+    }
+  }
+
+  return m_nowTrigSel; 
 }

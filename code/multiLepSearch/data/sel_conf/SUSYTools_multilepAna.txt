@@ -1,11 +1,11 @@
 ##################################################
 # SUSYTools configuration file
 ##################################################
-EleBaseline.Pt: 10000.
-EleBaseline.Id:LooseAndBLayerLLH
-#this LooseAndBLayerLLH less tight than LooseLLH
+EleBaseline.Pt: 9000.
+EleBaseline.Id: LooseAndBLayerLLH
+EleBaseline.Eta: 2.47
 #
-Ele.Et: 10000.
+Ele.Et: 9000.
 Ele.Eta: 2.47
 Ele.Iso: FixedCutTight
 Ele.Id: MediumLLH
@@ -15,10 +15,11 @@ Ele.fallbackEt: 100000000.
 Ele.FallbackId: MediumLLH
 Ele.CFT: Medium
 #
-MuonBaseline.Pt: 10000.
+MuonBaseline.Pt: 9000.
+MuonBaseline.Eta: 2.7
 MuonBaseline.Id: 1 # Medium
 #
-Muon.Pt: 10000.
+Muon.Pt: 9000.
 Muon.Eta: 2.4
 Muon.Id: 1 # Medium
 Muon.Iso: GradientLoose
@@ -30,15 +31,17 @@ MuonCosmic.d0: 0.2
 #
 BadMuon.qoverp: 0.2
 #
-PhotonBaseline.Pt: 25000.
+PhotonBaseline.Pt: 500.
+PhotonBaseline.Eta: 2.37
+PhotonBaseline.Id: Tight
 #
-Photon.Pt: 130000.
+Photon.Pt: 500.
 Photon.Eta: 2.37
 Photon.Id: Tight
 Photon.Iso: FixedCutTight
 #
 Tau.Pt: 20000.
-Tau.Eta: 2.47
+Tau.Eta: 2.5
 Tau.Id: Medium
 #
 Jet.Pt: 20000.
@@ -48,7 +51,7 @@ Jet.InputType: 1 # EMTopo
 Jet.JESNPSet: 1
 Jet.JVT_WP: Medium
 #Jet.LargeRcollection: AntiKt10LCTopoTrimmedPtFrac5SmallR20
-Jet.LargeRuncConfig: UJ2016_CombinedMass_medium.config
+#Jet.LargeRuncConfig: MultiTagging_medium.config
 Jet.WtaggerWP: medium
 Jet.ZtaggerWP: medium
 #
@@ -62,15 +65,18 @@ BadJet.Cut: LooseBad
 Btag.enable: true
 Btag.Tagger: MV2c10
 Btag.WP: FixedCutBEff_77
-Btag.CalibPath: xAODBTaggingEfficiency/13TeV/2016-20_7-13TeV-MC15-CDI-July12_v1.root
+#Btag.CalibPath: xAODBTaggingEfficiency/13TeV/2016-Winter-13TeV-MC15-CDI-February14_v2.root
+Btag.CalibPath: xAODBTaggingEfficiency/13TeV/2016-20_7-13TeV-MC15-CDI-May31_v1.root
 #
 SigLep.RequireIso: 1
+SigLepPh.IsoCloseByOR: false
 #
 OR.DoBoostedLepton: false
 #OR.DoBoostedElectron: false
 OR.BoostedElectronC1: -999.
 OR.BoostedElectronC2: -999.
 OR.BoostedElectronMaxConeSize: -999.
+OR.DoBoostedMuon: true
 OR.BoostedMuonC1: -999.
 OR.BoostedMuonC2: -999.
 OR.BoostedMuonMaxConeSize: -999.
@@ -79,7 +85,6 @@ OR.DoPhoton: false
 OR.MuJetPtRatio: -999.
 OR.MuJetTrkPtRatio: -999.
 OR.BtagWP: FixedCutBEff_85
-
 OR.DoBoostedMuon: true
 OR.RemoveCaloMuons: true
 OR.ApplyJVT: true
@@ -89,6 +94,7 @@ OR.MuJetInnerDR: -999.
 OR.Bjet: true
 OR.ElBjet: true
 OR.MuBjet: true
+
 #
 MET.EleTerm: RefEle
 MET.GammaTerm: RefGamma
@@ -104,5 +110,3 @@ MET.DoCaloSyst: 0
 #
 PRW.DefaultChannel: -1
 PRW.MuUncertainty: 0.2
-#
-Ele.TriggerSFStringDi: DI_E_2015_e12_lhloose_L1EM10VH_2016_e15_lhvloose_nod0_L1EM13VH

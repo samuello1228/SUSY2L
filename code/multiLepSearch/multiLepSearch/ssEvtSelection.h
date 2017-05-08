@@ -6,7 +6,7 @@
 #include "xAODRootAccess/TEvent.h"
 // #include "ElectronPhotonSelectorTools/AsgElectronLikelihoodTool.h"
 // #include "ElectronIsolationSelection/IsolationSelectionTool.h"
-// #include "IsolationSelection/IsolationSelectionTool.h"
+#include "IsolationSelection/IsolationSelectionTool.h"
 // #include "MuonSelectorTools/MuonSelectionTool.h"
 
 // #include "CPAnalysisExamples/errorcheck.h"
@@ -33,6 +33,17 @@ class TH1;
 
 class ChargeFlipBkgTool;
 class FakeLepBkgTool;
+
+struct TRIGCONF{
+   uint32_t runStart;
+   uint32_t runEnd;
+   std::vector<std::string> eeTrig;
+   std::vector<std::string> emTrig;
+   std::vector<std::string> mmTrig;
+   unsigned long int ee_mask;
+   unsigned long int em_mask;
+   unsigned long int mm_mask;
+};
 
 class ssEvtSelection : public EL::Algorithm
 {
@@ -114,6 +125,8 @@ public:
     static SG::AuxElement::Accessor<float> charge("charge");
     return charge(*p1)*charge(*p2)>0;
   }
+  void setupTriggers();
+  TRIGCONF* getTriggerConf(uint32_t run);
 
  protected:
   std::string m_name; //!
@@ -152,7 +165,13 @@ public:
 //   AsgElectronLikelihoodTool* m_LHToolLoose2015; //!
   GoodRunsListSelectionTool *m_grl; //!
   //std::map<OFLAGS, CP::IsolationSelectionTool* > m_isoTools; //!
-//   CP::IsolationSelectionTool* m_isoTool; //!
+  CP::IsolationSelectionTool* m_isoTool; //!
+  TH1* mh_ElChargeFlip; //!
+  std::vector< TRIGCONF* > m_trigSel; //!
+  TRIGCONF* m_nowTrigSel{0}; //!
+  std::string m_em_eKey;
+  std::string m_em_mKey;
+  std::string m_ee_Key;
 
  private:
   // this is needed to distribute the algorithm to the workers
