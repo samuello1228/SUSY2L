@@ -29,8 +29,6 @@ struct L_PAR:PAR{
   int ID;
   int truthI;
   unsigned int lFlag;
-  bool ElChargeID;
-  float ElChargeSF;
 };
 const string L_PAR_s = PAR_s+":mT/F:ID/I:truthI/I:lFlag/i:ElChargeID/O:ElChargeSF/F";
 

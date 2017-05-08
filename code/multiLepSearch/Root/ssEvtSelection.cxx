@@ -105,28 +105,6 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
 
   // MCTC, TruthLink, dR
   mcTruthMatch = "MCTC"; 
-
-  // ElectronChargeIDSelector working points
-  // Defined here: https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/ElectronChargeFlipTaggerTool
-  ECIDS_OP=-0.28087;
-  ECIDS_trainingFile="ElectronPhotonSelectorTools/ChargeID/ECIDS_20161125for2017Moriond.root";
-
-  // Electron efficiency corrections for chargeID
-  // m_eccTool = new CP::ElectronChargeEfficiencyCorrectionTool("ElectronChargeEfficiencyCorrectionTool");
-  // m_eccTool->setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
-  // m_eccTool->initialize(); //initializes the tool
-
-  // m_eccTool.setTypeAndName("CP::ElectronChargeEfficiencyCorrectionTool/ElectronChargeEfficiencyCorrectionTool");
-  // m_eccTool.setProperty( "CorrectionFileName", "ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/ChargeCorrectionSF.Medium_FixedCutTight.root" );
-  // m_eccTool.retrieve(); //initializes the tool
-
-  // electronSF = new AsgElectronEfficiencyCorrectionTool("AsgElectronEfficiencyCorrectionTool");
-  // std::vector<std::string> inputFiles{"ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/charge_misID/efficiencySF.ChargeID.MediumLLH_d0z0_v11_isolFixedCutTight_MediumCFT.root "} ;
-  // electronSF->setProperty("CorrectionFileNameList",inputFiles);
-  // //set datatype, 0-Data(or dont use the tool - faster), 1-FULLSIM, 3-AF2
-  // electronSF->setProperty("ForceDataType",1);
-  // //init the tool
-  // electronSF->initialize();
 }
 
 
@@ -373,12 +351,6 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
-
-  // ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool_medium");
-  // CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
-  // CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
-  // CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
-  // CHECK(ECIDSTool->initialize());
 
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
@@ -1266,22 +1238,8 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         m_susyEvt->truths[l.truthI].matchI = index;
       } else l.truthI = -1;
     }
-
-    // double qSF(1.); double effSF(1.);
-    // auto res = m_eccTool->getEfficiencyScaleFactor(*el, qSF);
-    // CHECK(electronSF->getEfficiencyScaleFactor(*el, effSF));
-    // Info("fillLepton(el)", "qSF = %2.5f, effSF = %2.5f", qSF, effSF);
-    // if (res == CP::CorrectionCode::OutOfValidityRange)
-    // {
-    //   Info("fillLepton(el)", "CP::CorrectionCode::OutOfValidityRange");
-    // }
-    // l.ElChargeSF = (float) qSF*effSF;
   }
-  l.ElChargeSF = 1.;
-
-  // ChargeIDSelector
-  l.ElChargeID = 0;
-  // l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
+  
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1343,7 +1301,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
-  l.ElChargeID = true; l.ElChargeSF = 1;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
