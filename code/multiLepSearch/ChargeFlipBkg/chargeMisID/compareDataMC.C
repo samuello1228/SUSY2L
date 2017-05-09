@@ -152,8 +152,8 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
          TH1* hEtaPt_LH = 0;
          hEtaPt_LH = hData->ProjectionX((sHistName+"LH").c_str(), ptBin+1, ptBin+1, "e");
 
-         if(ptBin <= 2)hEtaPt_LH->GetYaxis()->SetRangeUser(1e-4, 0.1);
-         else hEtaPt_LH->GetYaxis()->SetRangeUser(1e-4, 0.1);
+         if(ptBin <= 2)hEtaPt_LH->GetYaxis()->SetRangeUser(1e-5, 0.01);
+         else hEtaPt_LH->GetYaxis()->SetRangeUser(1e-5, 0.01);
          hEtaPt_LH->SetTitle("");
          hEtaPt_LH->GetYaxis()->SetTitle("misID rate");
          hEtaPt_LH->GetYaxis()->SetTitleOffset(1.4);

@@ -26,6 +26,7 @@ parser.add_option("--conf", help="selection configuration file", default='multiL
 parser.add_option("--dataPRW", help='data pileup reweighting file list', default= 'multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-005.root')
 parser.add_option("--mcPRW", help='mc pileup reweighting file list', default='dev/SUSYTools/merged_prw_mc15c_latest.root')
 parser.add_option("--test", help="test run", action='store_true', default=False)
+parser.add_option("--fast", help="Fast submit for grid jobs.", action='store_true', default=False)
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
 parser.add_option("--sampleList", help="sample list", default=None)
@@ -33,6 +34,7 @@ parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
 parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
+parser.add_option("--extraOptions", help="extra options", default=None)
 
 
 (options, args) = parser.parse_args()
@@ -63,18 +65,27 @@ sh_all = ROOT.SH.SampleHandler()
 if options.inputFiles:
     sample = ROOT.SH.SampleLocal(options.inputTag)
     for file in options.inputFiles.split(','): sample.add(file)
-    sh_all.add (sample);
+    sh_all.add(sample);
 elif options.inputList:
     if options.driver == 'grid':
-        with open(options.inputList) as fin1:
-            for line in fin1.readlines():
-                if line[0] == '#':
-                    print line, 'skipped'
-                    continue
-	        line = line.split()[0]
-                if line.find('*') == -1:
-                    ROOT.SH.addGrid(sh_all, line.rstrip())
-                else: ROOT.SH.addGrid(sh_all, line.rstrip())
+        mergeSamples = []
+        for ds in options.inputList.split(','):
+            with open(ds) as fin1:
+                for line in fin1.readlines():
+                    if line[0] == '#':
+                        print line, 'skipped'
+                        continue
+                    line = line.split()[0]
+                    if options.fast: mergeSamples.append(line.rstrip())
+                    else:
+                        if line.find('*') == -1: ROOT.SH.addGrid(sh_all, line.rstrip())
+                        else: ROOT.SH.scanRucio(sh_all, line.rstrip())
+        if mergeSamples:
+            ## create a single sample
+            sample = ROOT.SH.SampleGrid("gridMergedSample")
+            sample.meta().setString(ROOT.SH.MetaFields.gridName,','.join(mergeSamples))
+            sample.meta().setString(ROOT.SH.MetaFields.gridFilter, ROOT.SH.MetaFields.gridFilter_default)
+            sh_all.add(sample)
     else: 
         ROOT.SH.readFileList(sh_all, options.inputTag, options.inputList);
 elif options.inputDir:
@@ -86,22 +97,31 @@ elif options.inputDir:
     for file in files: sample.add(file)
     sh_all.add (sample)
 elif options.inputDS:
-    ROOT.SH.addGrid(sh_all, options.inputDS)
+    if options.fast:
+        sample = ROOT.SH.SampleGrid("gridSamples")
+        sample.meta().setString(ROOT.SH.MetaFields.gridName, options.inputDS)
+        sample.meta().setString(ROOT.SH.MetaFields.gridFilter, ROOT.SH.MetaFields.gridFilter_default)
+        sh_all.add(sample)
+    else:
+        if options.inputDS.find('*') == -1:
+            ROOT.SH.addGrid(sh_all, options.inputDS)
+        else: ROOT.SH.scanRucio(sh_all, options.inputDS)
 elif options.samplesDir:
     dir0 = options.samplesDir
     if dir0[-1] != '/': dir0+='/'
     if options.sampleList:
-        with open(options.sampleList) as fin1:
-            for line in fin1.readlines():
-                if line[0] == '#':
-                    print line, 'skipped'
-                    continue
-                s = line.rstrip().split(':')
-                sample = ROOT.SH.SampleLocal(s[0])
-                d = dir0+s[-1]
-                print s[0],d
-                for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)): sample.add(d+'/'+f)
-                sh_all.add(sample)
+        for samp1 in options.sampleList.split(','):
+            with open(samp1) as fin1:
+                for line in fin1.readlines():
+                    if line[0] == '#':
+                        print line, 'skipped'
+                        continue
+                    s = line.rstrip().split(':')
+                    sample = ROOT.SH.SampleLocal(s[0])
+                    d = dir0+s[-1]
+                    print s[0],d
+                    for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)): sample.add(d+'/'+f)
+                    sh_all.add(sample)
     else:
         dirs = [dir0+d for d in os.listdir(dir0) if os.path.isdir(dir0+d)]
         for d in dirs:
@@ -153,19 +173,19 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
     #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
     
-    electronTrig = ["HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
+    electronTrig = ["HLT_e24_lhmedium_L1EM20VH","HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
     for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    dielectronTrig = ["HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
+    dielectronTrig = ["HLT_2e12_lhloose_L12EM10VH","HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
     for i in dielectronTrig: alg.CF_trigNames.push_back(i)
 
-    muonTrig = ["HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
+    muonTrig = ["HLT_mu20_iloose_L1MU15","HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
     for i in muonTrig: alg.CF_trigNames.push_back(i)
 
-    dimuonTrig = ["HLT_2mu10","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
+    dimuonTrig = ["HLT_2mu10","HLT_mu18_mu8noL1","HLT_mu18_2mu4noL1","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
 
-    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
+    elemuonTrig = ["HLT_e17_lhloose_mu14","HLT_e24_lhmedium_L1EM20VHI_mu8noL1","HLT_e7_lhmedium_mu24","HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
     for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
     alg.study = options.study
@@ -256,12 +276,18 @@ elif (options.driver == "LSF"):
 elif (options.driver == "grid"):
         logging.info("running on Grid")
         driver = ROOT.EL.PrunDriver()
-        outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[2]%.%in:name[3]%")
+        outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[1]%.%in:name[2]%.%in:name[3]%")
 #         outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag+".%in:name[4]%")
-        driver.options().setString("nc_outputSampleName", outname)
+        if options.extraOptions:
+            # "--allowTaskDuplication"
+            driver.options().setString("nc_EventLoop_SubmitFlags", options.extraOptions);
         if options.test:
             driver.options().setDouble(ROOT.EL.Job.optGridNFiles, 4)
             driver.options().setDouble(ROOT.EL.Job.optGridNFilesPerJob, 2)
+        if options.fast:
+            job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=2,3 --useContElementBoundary");
+            outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag)
+        driver.options().setString("nc_outputSampleName", outname)
 #         driver.options().setDouble("nc_disableAutoRetry", 1)
         logging.info("submit job")
         driver.submitOnly(job, options.outputDir)

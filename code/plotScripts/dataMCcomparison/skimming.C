@@ -102,9 +102,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
-        //TString fileName = "skimming/skimming.";
+        TString fileName = "skimming/skimming.";
         //TString fileName = "skimming_signal_old/skimming.";
-        TString fileName = "skimming_signal_new/skimming.";
+        //TString fileName = "skimming_signal_new/skimming.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -131,6 +131,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mtm",&mt2,"mtm/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
+        tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
@@ -197,7 +198,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(isPP1) evtsP->GetEntry(j);
         
         //trigger
-        if(evts->sig_trigCode==0)
+        if((evts->sig_trigCode & evts->sig_trigMask)==0)
         {
             continue;
         }
@@ -252,6 +253,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
+        if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
+        if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
+        
         /*
         //mll > 60 GeV
         if(!(evts->l12_m>60))
@@ -268,7 +272,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         eta2 = evts->leps_eta[sigIndex[1]];
         mll = evts->l12_m;
         ptll = evts->l12_pt;
-        MET = evts->sig_MetRel;
+        MET = evts->sig_Met;
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
@@ -315,29 +319,31 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         nCJet = 0;
         nFJet = 0;
         int nISR = 0;
+        int leadingJetIndex = 0;
         int leadingBJetIndex = 0;
         int leadingCJetIndex = 0;
         int leadingFJetIndex = 0;
         for(int k=0;k<evts->jets_;k++)
         {
+            //signal jets
+            if(!(evts->jets_jFlag[k] & 1<<1)) continue;
             nJet++;
+            if(nJet==1) leadingJetIndex = k;
+            
+            //B-jets
+            if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            {
+                nBJet++;
+                if(nBJet==1) leadingBJetIndex = k;
+            }
+            
             if(fabs(evts->jets_eta[k]) < 2.4)
             {
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
                 //Central jets
-                if(evts->jets_jFlag[k] & 1<<5)
-                {
-                    //b-tagged
-                    if(evts->jets_pt[k] > 20)
-                    {
-                        //Central b-jets
-                        nBJet++;
-                        if(nBJet==1) leadingBJetIndex = k;
-                    }
-                }
-                else
+                if(!(evts->jets_jFlag[k] & 1<<5))
                 {
                     //no b-tagged
                     if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
@@ -362,9 +368,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(nJet>0)
         {
-            jetpt = evts->jets_pt[0];
-            jeteta = evts->jets_eta[0];
-            jetphi = evts->jets_phi[0];
+            jetpt = evts->jets_pt[leadingJetIndex];
+            jeteta = evts->jets_eta[leadingJetIndex];
+            jetphi = evts->jets_phi[leadingJetIndex];
         }
         else
         {
@@ -510,7 +516,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; TString tag = "v8.12";
     //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
-    SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
+    //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
+    SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
     
     std::vector<nEvent> nSS;
     
@@ -542,6 +549,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
+            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
         }
     }
@@ -558,6 +566,7 @@ void skimming()
         //for(unsigned int i=0;i<=1;i++)
         for(unsigned int i=0;i<SigSampleName.size();i++)
         {
+            SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
         }
     }

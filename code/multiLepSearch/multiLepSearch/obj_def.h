@@ -26,12 +26,14 @@ const string R_PAR_s = PAR_s+":m/F:dPhi:dR";
 
 struct L_PAR:PAR{
   float mT;
+  float jet0_dR;
+  float jet_dRm;
   int ID;
   int truthI;
   unsigned int lFlag;
-  bool ElChargeID;
+  unsigned int isoPass;
 };
-const string L_PAR_s = PAR_s+":mT/F:ID/I:truthI/I:lFlag/i:ElChargeID/O";
+const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i";
 
 struct EL_Par:L_PAR{
   int elID;
@@ -49,12 +51,14 @@ struct J_PAR:PAR{
 const string J_PAR_s = PAR_s+":jFlag/I";
 
 struct EVT{
+  unsigned long int run;
   unsigned long int event;
-  unsigned long int actualMu;
   unsigned int isMC;
+  unsigned int cut;
   int flag;
-  float averageMu;
+//   float actualMu;
   float weight;
+  float averageMu;
   float pwt;
   float ElSF;
   float MuSF;
@@ -68,9 +72,12 @@ struct EVT{
   float fLwt_u_sys_1up;
   float fLwt_u_sys_1dn;
  };
-const string EVT_s = "event/l:actualMu/l:isMC/i:flag/I:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
+// const string EVT_s = "run/l:event/l:isMC/i:cut/i;flag/I:actualMu/F:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
+const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
+
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
+  unsigned long int trigMask;//trigger info
   float Met;
   float MetRel;
   float MetX;
@@ -78,7 +85,7 @@ struct SIGNATURE{
   float mT2;
   float HT;
 };
-const string SIGNATURE_s = "trigCode/l:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F";
+const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F";
 
 struct TR_PAR:PAR0{
   int pdgId; 

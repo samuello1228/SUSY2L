@@ -1,7 +1,7 @@
 #!/bin/sh
 
 listFiles(){
-	inFiles=`find $1 | grep -E ".*\.myOutput.root$"`
+	inFiles=`find $1 | grep -E ".*\.myOutput.root.?[0-9]?$"`
 	allFiles=""
 	for file in $inFiles
 	do

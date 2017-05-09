@@ -1,3 +1,7 @@
+#include <multiLepSearch/dibosonSelection.h>
+
+#include <multiLepSearch/aDAODMaker.h>
+
 #include <multiLepSearch/ssEvtSelection.h>
 #include <multiLepSearch/ssEvtPostProc1.h>
 #include <multiLepSearch/ssEvtPostProc2.h>
@@ -56,4 +60,12 @@
 
 #pragma link C++ class ChargeFlipBkgTool+;
 #pragma link C++ class FakeLepBkgTool+;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class aDAODMaker+;
+#endif
+
+#ifdef __CINT__
+#pragma link C++ class dibosonSelection+;
 #endif
