@@ -379,12 +379,6 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
   m_truthClassifier = new MCTruthClassifier("m_truthClassifier");
 
-  ECIDSTool = new AsgElectronChargeIDSelectorTool("AsgElectronChargeIDSelectorTool_medium");
-  CHECK(ECIDSTool->setProperty("TrainingFile", ECIDS_trainingFile));
-  CHECK(ECIDSTool->setProperty("CutOnBDT", ECIDS_OP));
-  CHECK(ECIDSTool->setProperty("WorkingPoint","medium"));
-  CHECK(ECIDSTool->initialize());
-
   //prepare list of systematics to do
   TFile *outputFile = wk()->getOutputFile(CF_outputName);
   std::vector<ST::SystInfo> fullSystInfoList = m_objTool->getSystInfoList();
@@ -1306,10 +1300,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
   }
 
-  // ChargeIDSelector
-  l.ElChargeID = 0;
-  l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
-  fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
 
@@ -1371,7 +1361,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       m_susyEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
-  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }

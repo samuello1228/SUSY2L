@@ -468,9 +468,6 @@ EL::StatusCode dibosonSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsi
       //l.truthProb = trk?acc_truthProb(*trk):-1;
   }
 
-  // ChargeIDSelector
-  l.ElChargeID = 0;
-//   l.ElChargeID =  !useChargeIDSelector || (ECIDSTool ? (bool) ECIDSTool->accept(el) : false );
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -532,7 +529,6 @@ EL::StatusCode dibosonSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned
       m_zphEvt->truths[l.truthI].matchI = index;
       }else l.truthI = -1;
   }
-  l.ElChargeID = true;
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
 }
