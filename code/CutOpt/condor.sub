@@ -3,11 +3,15 @@
 #######
 
 
-# executable 	= /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/optWithTMVA.py
-executable 	= /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/hello.py
+executable 	= /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/optWithTMVA.py
+# executable 	= /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/hello.py
 output     	= dm$(MASS)_Channel$(CHAN).out
 error     	= dm$(MASS)_Channel$(CHAN).err
 log    		= dm$(MASS)_Channel$(CHAN).log
-arguments 	= -b $(BKG) -s /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/GabrielFiles/sigFiles_$(MASS).txt -d $(DATA) -c $(CHAN) -o dm$(MASS)_Channel$(CHAN).root --NTrees $(NTREES) --NodeSize $(NODESIZE) --Depth $(DEPTH)
+arguments 	= -b $(BKG) -s /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/sig$(MASS).txt -d $(DATA) -c $(CHAN) -o dm$(MASS)_Channel$(CHAN).root --NTrees $(NTREES) --NodeSize $(NODESIZE) --Depth $(DEPTH)
 initialdir	= /afs/cern.ch/user/g/ggallard/work/private/limits/Output_$(NTREES)_NodeSize$(NODESIZE)_Depth$(DEPTH)
+getenv      = True
++JobFlavor   = "longlunch"
+RequestCpus = 10
 queue
+

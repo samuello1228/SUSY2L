@@ -8,11 +8,11 @@ nTreesList="100 200 400 600"
 nodeSizeList="5 7 10"
 depthList="2 3 4 5"
 
-nodeSizeList="5"
-depthList="2"
+# nodeSizeList="5"
+# depthList="2"
 
-bkgFiles="/afs/cern.ch/user/g/ggallard/private/limits/CutOpt/GabrielFiles/bkgFiles.txt"
-dataFiles="/afs/cern.ch/user/g/ggallard/private/limits/CutOpt/GabrielFiles/dataFiles.txt"
+bkgFiles="/afs/cern.ch/user/g/ggallard/private/limits/mcbkg.txt"
+dataFiles="/afs/cern.ch/user/g/ggallard/private/limits/data.txt"
 
 
 
@@ -37,7 +37,7 @@ do
 				chan1=$chan
 			fi
 			condor_submit MASS=$mass CHAN=$chan1 BKG=$bkgFiles DATA=$dataFiles NTREES=$nTrees NODESIZE=$nodeSize DEPTH=$depth condor.sub
-			exit
+	#		exit
 		done
 	done
 
