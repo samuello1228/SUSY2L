@@ -149,8 +149,8 @@ basicBDTVars = [
                  ( "mTl1"   , "leps.mT[0]" ),
                  ( "mTl2"   , "leps.mT[1]" ),
                  ( "ll_dPhi", "l12.dPhi"   ),
-                 # ( "l12m"   , "l12.m"),
-                 ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100+l12.m"),
+                 ( "l12m"   , "l12.m"),
+                 # ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100+l12.m"),
                ]
 
 #ISR region
@@ -178,7 +178,7 @@ eeCut        = "Sum$(abs(leps.ID))==22000"
 emuCut       = "Sum$(abs(leps.ID))==24000"
 # mumuCut      = "int(abs(leps.ID[0])/1000) == 13 && int(abs(leps.ID[1])/1000) == 13"
 mumuCut      = "Sum$(abs(leps.ID))==26000"
-cftCut       = "leps.ElChargeID[0] && leps.ElChargeID[1]"
+# cftCut       = "leps.ElChargeID[0] && leps.ElChargeID[1]" #Deprecated 
 
 # For diagnostics
 # isrCut = "isr"; nonisrCut = "noisr"; eeCut = "ee" ; emuCut = "emu" ; mumuCut = "mumu"
@@ -190,9 +190,8 @@ exact2LepCut = "Length$(leps.lFlag)==2"
 lepptCut = "(leps.pt[0]>25.) && (leps.pt[1]>20.)"
 l12mCut = "(l12.m>60.)"
 
-sigLepSSWithDataBkgCut = "((%s)&&(%s)) || (!isMC && (qFwt+fLwt)!=0)" % (sigLepCut, ssCut)
 ptMllCut = "%s && %s" % (lepptCut, l12mCut)
-ptMllCut = "1"
+ptMllCut = "%s" % (lepptCut)
 
 def getCut(ch):
   lepFlav = "1"
@@ -204,7 +203,7 @@ def getCut(ch):
        noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
          ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
      combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
-    SFOSveto: +100
+    SFOSveto: +100 // Only use for signal samples!!
     useISR = True if int(ch/10)==1 else False
     '''
 
@@ -220,23 +219,24 @@ def getCut(ch):
     elif ch%10==2:
       lepFlav = "%s && %s" % (mumuCut, zMassCut)
     elif ch%10==3:
-      lepFlav = "(!(%s || %s) || %s)" % (eeCut, mumuCut, zMassCut)
+      lepFlav = "(%s || %s)" % (emuCut, zMassCut)
     elif ch%10==4:
       lepFlav = "(%s || %s) && %s" % (eeCut, mumuCut, zMassCut)
 
-    if int(ch/100)==1:
+
+    if int(ch/100)==1: # Allow opposite-sign different flavor
       lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
+    if int(ch/200)==2: # Allow both SS and OS for all flavors
+      lepFlav = lepFlav
+    else: # Same-sign only or OS fake events from data
+      lepFlav = "(%s) && (%s || (!isMC && (qFwt+fLwt)!=0))" % (lepFlav, ssCut)
 
     # lepFlav = "1"
 
   elif type(ch) is bool:
     whichISR = isrCut if ch else nonisrCut
 
-  ptMllCut = "1"
-
-  # myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut, cftCut]])
-
-  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, sigLepSSWithDataBkgCut, exact2LepCut, lepFlav, ptMllCut]])
+  myCut = "&&".join(["(%s)"%cut for cut in [trigCut, whichISR, sigLepCut, exact2LepCut, lepFlav]])
  
   # return zMassCut
   return myCut

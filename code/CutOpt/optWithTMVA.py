@@ -107,15 +107,15 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
-sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
+bkgCut = ROOT.TCut( ssUtil.getCut(int((options.channel)%100) ) )
+sigCut = ROOT.TCut( ssUtil.getCut( int(options.channel + (200 if int(options.channel/100)==0 else 0) ) ) )
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     "nTrain_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:NormMode=EqualNumEvents:!V" )
     #"nTrain_Signal=0:nTrain_Background=2000:SplitMode=Random:NormMode=EqualNumEvents:!V" )
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
-methodOpt = "!H:!V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate"
+methodOpt = "!H:!V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=N"
 methodOpt = "%s:MaxDepth=%d:NTrees=%d:MinNodeSize=%d%%" % (methodOpt, options.Depth, options.NTrees, options.NodeSize)
 factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 
