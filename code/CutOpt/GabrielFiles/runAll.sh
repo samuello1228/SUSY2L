@@ -7,10 +7,10 @@ masses="20 50 100"
 # masses2="50 100 +"
 nTreesList="100 200 400 600"
 nodeSizeList="5 7 10"
-depthList="2 3 4 5"
+depthList="2 3 4"
 
-bkgFiles="CutOpt/GabrielFiles/bkgFiles.txt"
-dataFiles="CutOpt/GabrielFiles/dataFiles.txt"
+bkgFiles="CutOpt/GabrielFiles/MCbkgFiles.txt"
+dataFiles="CutOpt/GabrielFiles/data2016.txt"
 
 for nTrees in $nTreesList; do for nodeSize in $nodeSizeList; do for depth in $depthList
 do
