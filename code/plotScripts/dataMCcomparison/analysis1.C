@@ -561,6 +561,12 @@ void analysis1()
         element.latexName = "$\\eta$ of the subleading lepton";
         Var.push_back(element);
         
+        element.VarName = "phi1";       element.VarTitle = "phi of the leading lepton";         element.unit = "";
+        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$\\phi$ of the leading lepton";
+        Var.push_back(element);
+        
         element.VarName = "mll";        element.VarTitle = "Dilepton invariant mass";           element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
@@ -603,10 +609,10 @@ void analysis1()
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
-        element.VarName = "l12_MET_dPhi";element.VarTitle = "phi difference between l12 and MET";        element.unit = "";
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
+        element.bin=15;         element.xmin=0;                 element.xmax=15;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\phi$ difference between l12 and MET";
+        element.latexName = element.VarTitle;
         Var.push_back(element);
     }
     SetAtlasStyle();
@@ -1685,7 +1691,7 @@ void analysis1()
     unsigned int countVariable = 0;
     for(unsigned int i=0;i<Var.size();i++)
     {
-        if(Var[i].VarName == "l12_MET_dPhi") countVariable = i;
+        if(Var[i].VarName == "phi1") countVariable = i;
     }
     
     //channelRepresentative for SR
