@@ -142,22 +142,22 @@ def guessSampleDm(fileName):
 #follow 2LSS note Ch5.2: Disciminating variables
 #the formula reference variable names in obj_def.h
 basicBDTVars = [
-                 ( "mT2"    , "sig.mT2"    ),
-                 ( "pt"     , "l12.pt"     ),
-                 ( "MET"    , "sig.MetRel" ),
-                 ( "Ht"     , "sig.HT"     ),
-                 ( "mTl1"   , "leps.mT[0]" ),
-                 ( "mTl2"   , "leps.mT[1]" ),
-                 ( "ll_dPhi", "l12.dPhi"   ),
-                 ( "l12m"   , "l12.m"),
+                 ( "mT2"    , "sig.mT2 * (sig.mT2>0)"              ),
+                 ( "pt"     , "l12.pt * (l12.pt>0)  "              ),
+                 ( "MET"    , "sig.MetRel * (sig.MetRel>0)"        ),
+                 ( "Ht"     , "sig.HT * (sig.HT>0)"                ),
+                 ( "mTl1"   , "leps.mT[0] * (leps.mT[0]>0)"        ),
+                 ( "mTl2"   , "leps.mT[1] * (leps.mT[1]>0)"        ),
+                 ( "ll_dPhi", "l12.dPhi * (fabs(l12.dPhi) < 3.15)" ),
+                 ( "l12m"   , "l12.m * (l12.m>0)"                  ),
                  # ( "l12m"   , "(int(abs(leps.ID[0]))!=int(abs(leps.ID[1])))*100+l12.m"),
                ]
 
 #ISR region
 isrBDTVars   = [
-                 ( "JetMET_dPhi"  , "jets.MET_dPhi[0]"     ),
-                 ( "MET_JetPt_R"  , "sig.MetRel/jets.pt[0]"),
-                 ( "l1Pt_JetPt_R" , "leps.pt[0]/jets.pt[0]"),
+                 ( "JetMET_dPhi"  , "jets.MET_dPhi[0] * (jets.MET_dPhi[0]>0)"                 ),
+                 ( "MET_JetPt_R"  , "sig.MetRel/jets.pt[0] * (sig.MetRel > 0 && jets.pt[0]>0)"),
+                 ( "l1Pt_JetPt_R" , "leps.pt[0]/jets.pt[0] * (leps.pt[0] > 0 && jets.pt[0]>0)"),
                ]
 
 #-----------------
