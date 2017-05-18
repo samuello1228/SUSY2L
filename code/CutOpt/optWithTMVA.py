@@ -34,8 +34,11 @@ TMVA.Tools.Instance()
 
 outputFile = ROOT.TFile( options.outFile, "RECREATE" );
 outputTag = options.outFile.split("/")[-1].split(".")[0]
+# factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
+#                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+
 factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
-                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G:AnalysisType=Classification" );
 
 for (aVar, aFormula) in ssUtil.basicBDTVars:
   factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
@@ -115,7 +118,7 @@ factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     #"nTrain_Signal=0:nTrain_Background=2000:SplitMode=Random:NormMode=EqualNumEvents:!V" )
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
-methodOpt = "!H:!V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=N"
+methodOpt = "!H:V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=N"
 methodOpt = "%s:MaxDepth=%d:NTrees=%d:MinNodeSize=%d%%" % (methodOpt, options.Depth, options.NTrees, options.NodeSize)
 factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 
