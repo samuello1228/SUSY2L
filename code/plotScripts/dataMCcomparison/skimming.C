@@ -11,6 +11,7 @@ Double_t pt1;
 Double_t pt2;
 Double_t eta1;
 Double_t eta2;
+Double_t phi1;
 Double_t mll;
 Double_t ptll;
 Double_t MET;
@@ -125,14 +126,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("pt2",&pt2,"pt2/D");
         tree2[j]->Branch("eta1",&eta1,"eta1/D");
         tree2[j]->Branch("eta2",&eta2,"eta2/D");
+        tree2[j]->Branch("phi1",&phi1,"phi1/D");
         tree2[j]->Branch("mll",&mll,"mll/D");
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mtm",&mt2,"mtm/D");
-        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
+        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
@@ -270,6 +272,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
 
         eta1 = evts->leps_eta[sigIndex[0]];
         eta2 = evts->leps_eta[sigIndex[1]];
+        phi1 = evts->leps_phi[sigIndex[0]];
         mll = evts->l12_m;
         ptll = evts->l12_pt;
         MET = evts->sig_Met;
@@ -278,10 +281,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mt2 = evts->leps_mT[sigIndex[1]];
         if(mt1<mt2) mtm = mt1;
         else mtm = mt2;
-        HT = evts->sig_HT;
-        R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = evts->l12_dPhi;
-        l12_MET_dPhi = evts->l12_MET_dPhi;
+        //HT = evts->sig_HT;
+        //R2 = MET/(MET + pt1 + pt2);
+        //l12_dPhi = evts->l12_dPhi;
+        //l12_MET_dPhi = evts->l12_MET_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
@@ -331,7 +334,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(nJet==1) leadingJetIndex = k;
             
             //B-jets
-            if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            //if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            if(evts->jets_jFlag[k] & 1<<5)
             {
                 nBJet++;
                 if(nBJet==1) leadingBJetIndex = k;
