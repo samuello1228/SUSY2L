@@ -574,7 +574,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "ptll";       element.VarTitle = "Dilepton pt";                       element.unit = "[GeV]";
-        element.bin=140;        element.xmin=0;                 element.xmax=700;
+        element.bin=40;         element.xmin=0;                 element.xmax=700;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "Dilepton $\\text{p}_{\\text{T}}$";
         Var.push_back(element);
@@ -610,7 +610,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
+        element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
@@ -623,6 +623,7 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
+        bool isSR;
         TString Cut;
     };
     
@@ -1102,6 +1103,7 @@ void analysis1()
 
             element.showData = !ChannelInfo[ChannelIndex].isSS;
             element.showSignificance = ChannelInfo[ChannelIndex].isSS;
+            element.isSR = false;
             
             if(ChannelInfo[ChannelIndex].isSS)
             {
@@ -1120,6 +1122,7 @@ void analysis1()
         //Control Region
         element.showData = true;
         element.showSignificance = false;
+        element.isSR = false;
         element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
@@ -1215,12 +1218,42 @@ void analysis1()
                             
                             element.showData = !ChannelInfo[ChannelIndex].isSS;
                             element.showSignificance = ChannelInfo[ChannelIndex].isSS;
+                            element.isSR = true;
                             
                             RegionInfo.push_back(element);
                         }
                     }
                 }
             }
+        }
+        
+        //Control Region
+        element.showData = true;
+        element.showSignificance = false;
+        element.isSR = false;
+        
+        //1 b-jet
+        element.Cut = " && nBJet == 1";
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_1BJet";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        //2 b-jets
+        element.Cut = " && nBJet == 2";
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_2BJet";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
         }
     }
     
@@ -1796,6 +1829,7 @@ void analysis1()
     //for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
     //for(unsigned int RegionIndex=0;RegionIndex<=17;RegionIndex++)
     //for(unsigned int RegionIndex=18;RegionIndex<=71;RegionIndex++)
+    //for(unsigned int RegionIndex=72;RegionIndex<=95;RegionIndex++)
     for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
     {
         const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -1938,6 +1972,8 @@ void analysis1()
         for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
         //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
         {
+            if(RegionInfo[RegionIndex].isSR && VarIndex!=countVariable) continue;
+            
             //initialize histograms
             TString title = Var[VarIndex].VarTitle;
             
@@ -2372,7 +2408,7 @@ void analysis1()
                 fout.close();
                 
                 //output SR.txt file
-                if(RegionIndex>=18)
+                if(RegionInfo[RegionIndex].isSR)
                 {
                     fout_SR.open(PathName_SR.Data(), ios::out | ios::app);
                     
@@ -2418,7 +2454,7 @@ void analysis1()
                 }
                 
                 //h2SR
-                if(RegionIndex>=18)
+                if(RegionInfo[RegionIndex].isSR)
                 {
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
@@ -2431,7 +2467,7 @@ void analysis1()
                 }
                 
                 //significance for all mass point
-                if(RegionIndex>=18)
+                if(RegionInfo[RegionIndex].isSR)
                 {
                     PathName = "latex/data/significance/";
                     PathName += RegionInfo[RegionIndex].RegionName;
@@ -2469,7 +2505,7 @@ void analysis1()
                     fout.close();
                     
                     //if(pointN>=3)
-                    if(RegionIndex==43)
+                    if(RegionInfo[RegionIndex].RegionName == "nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu")
                     {
                         gStyle->SetPalette(1);
                         gStyle->SetPadRightMargin(0.16);
@@ -2550,14 +2586,14 @@ void analysis1()
                 Double_t xl1, yl1, xl2, yl2;
                 if(RegionInfo[RegionIndex].showData)
                 {
-                    xl2=0.92;
+                    xl2=0.82;
                     yl2=0.95;
                     xl1=xl2-0.3;
                     yl1=yl2-0.3;
                 }
                 else
                 {
-                    xl2=0.92;
+                    xl2=0.82;
                     yl2=0.95;
                     xl1=xl2-0.3;
                     yl1=yl2-0.2;
@@ -2674,17 +2710,17 @@ void analysis1()
             
             {
                 //text
-                ATLASLabel(0.3,0.88,"Internal");
+                ATLASLabel(0.2,0.88,"Internal");
                 
                 TLatex lt2;
                 TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
                 NameTemp += TString::Itoa(sumDataL/1000,10);
                 NameTemp += " fb^{-1}";
-                lt2.DrawLatexNDC(0.3,0.83, NameTemp.Data());
+                lt2.DrawLatexNDC(0.2,0.83, NameTemp.Data());
                 lt2.SetTextSize(lt2.GetTextSize());
                 
                 TLatex lt1;
-                lt1.DrawLatexNDC(0.3,0.78,RegionInfo[RegionIndex].RegionName.Data());
+                lt1.DrawLatexNDC(0.2,0.78,RegionInfo[RegionIndex].RegionName.Data());
                 lt1.SetTextSize(lt1.GetTextSize());
             }
             
@@ -3176,6 +3212,68 @@ void analysis1()
         }
         
         fout.close();
+    }
+    
+    //plot_BJet_OS.tex and plot_BJet_SS.tex
+    for(unsigned int nbjet=1;nbjet<=2;nbjet++)
+    {
+        unsigned int startingIndex = 0;
+        if(nbjet==1) startingIndex = 72;
+        else if(nbjet==2) startingIndex = 84;
+        
+        for(unsigned int sign=0;sign<=3;sign+=3)
+        {
+            TString PathName = "latex/data/plot_";
+            
+            if(nbjet==1) PathName += "1BJet_";
+            else if(nbjet==2) PathName += "2BJet_";
+            
+            if(sign==0) PathName += "OS";
+            else PathName += "SS";
+            PathName += ".tex";
+            
+            ofstream fout;
+            fout.open(PathName.Data());
+            
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            {
+                if(Var[VarIndex].VarName=="averageMu") continue;
+                if(Var[VarIndex].VarName=="nVtx") continue;
+                
+                fout<<"\\begin{frame}"<<endl;
+                
+                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                if(sign==0) fout<<"opposite sign";
+                else fout<<"same sign";
+                fout<<")}"<<endl;
+                
+                fout<<"\\Wider[5em]{"<<endl;
+                for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+                {
+                    if(SixChannel>=3 && SixChannel<=5) continue;
+                    
+                    if(SixChannel<=2 &&
+                       (Var[VarIndex].VarName=="bjetpt"  ||
+                        Var[VarIndex].VarName=="bjeteta" ||
+                        Var[VarIndex].VarName=="bjetphi" ||
+                        Var[VarIndex].VarName=="cjetpt"  ||
+                        Var[VarIndex].VarName=="cjeteta" ||
+                        Var[VarIndex].VarName=="cjetphi" )
+                       ) continue;
+                    
+                    fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
+                    <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[startingIndex+sign+SixChannel].RegionName.Data()<<"}";
+                    if(SixChannel==2) fout<<" \\\\";
+                    fout<<endl;
+                }
+                //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
+                fout<<"}"<<endl;
+                
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
+            
+            fout.close();
+        }
     }
     
     //plot_special.tex
