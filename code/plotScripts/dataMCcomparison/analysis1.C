@@ -2276,24 +2276,6 @@ void analysis1()
                 h2SigSum[i]->Scale(sumDataL/AOD);
             }
             
-            //Add BG
-            TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            std::vector<Group> vBGGroup;
-            for(unsigned int j=0;j<BGGroup.size();j++)
-            {
-                h2BGSum->Add(BGGroup[j].h2);
-                vBGGroup.push_back(BGGroup[j]);
-            }
-            
-            //sort
-            std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
-            
-            //stack
-            THStack stack;
-            for(unsigned int j=0;j<vBGGroup.size();j++)
-            {
-                stack.Add(vBGGroup[j].h2);
-            }
             
             if(VarIndex==countVariable)
             {
@@ -2537,6 +2519,41 @@ void analysis1()
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
                 h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
+            }
+            
+            //scale Z+jets by 1.4 for CR
+            if(RegionIndex>=72 && RegionIndex<=95)
+            {
+                for(unsigned int i=0;i<tree2BGMC.size();i++)
+                {
+                    if(
+                       BGGroup[i].info->GroupName == "Zee"    ||
+                       BGGroup[i].info->GroupName == "Zmumu"  ||
+                       BGGroup[i].info->GroupName == "Ztautau"
+                      )
+                    {
+                        //BGGroup[i].h2->Scale(1.4);
+                    }
+                }
+            }
+            
+            //Add BG
+            TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            std::vector<Group> vBGGroup;
+            for(unsigned int j=0;j<BGGroup.size();j++)
+            {
+                h2BGSum->Add(BGGroup[j].h2);
+                vBGGroup.push_back(BGGroup[j]);
+            }
+            
+            //sort
+            std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
+            
+            //stack
+            THStack stack;
+            for(unsigned int j=0;j<vBGGroup.size();j++)
+            {
+                stack.Add(vBGGroup[j].h2);
             }
             
             {
