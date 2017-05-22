@@ -35,22 +35,32 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\item remove Z+gamma for OS
-\item Z pt reweighting without fitting
+\item study new Control Regions (1 or 2 b-jet)
 \end{itemize}
 \end{frame}
 
-%\def \PathToPlot {../plot}
-\def \PathToPlot {../plot_nozpt}
-%\def \PathToPlot {../plot_zpt}
+\def \PathToPlot {../plot}
+
 \begin{frame}
-\frametitle{Z pt reweighting}
-\begin{figure}
-\includegraphics[width=\textwidth]{\PathToPlot/ptll_rw}
-\end{figure}
+\begin{center}
+\huge
+1 b-jet
+\end{center}
 \end{frame}
 
-\input{data/plot_zpt.tex}
+\input{data/plot_1BJet_OS.tex}
+\input{data/plot_1BJet_SS.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+2 b-jets
+\end{center}
+\end{frame}
+
+\input{data/plot_2BJet_OS.tex}
+\input{data/plot_2BJet_SS.tex}
+
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -58,15 +68,16 @@ University of Michigan
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item mll improved after removing Z+gamma
-\item mT2 improved after Z pt reweighting
+\item Z-jets is smaller by 1.4 times
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item ?
+\item use the default PRW profile for VV
+\item use mc15\_13TeV.361071.Sherpa\_CT10\_lllvjj\_EW6.merge. \\
+DAOD\_SUSY2.e3836\_s2726\_r7772\_r7676\_p2879
 \end{itemize}
 \end{frame}
 
