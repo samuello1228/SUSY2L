@@ -110,8 +110,8 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-bkgCut = ROOT.TCut( ssUtil.getCut(int((options.channel)%100) ) )
-sigCut = ROOT.TCut( ssUtil.getCut( int(options.channel + (200 if int(options.channel/100)==0 else 0) ) ) )
+bkgCut = ROOT.TCut( ssUtil.getCut(int((options.channel)%100) ) ) # SS events or fake events from data only 
+sigCut = ROOT.TCut( ssUtil.getCut( int(options.channel + (200 if int(options.channel/100)==0 else 0) ) ) ) # Allow OS signal events for training
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     "nTrain_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:NormMode=EqualNumEvents:!V" )

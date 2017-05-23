@@ -203,7 +203,11 @@ def getCut(ch):
        noISR:  0=ee,  1=emu,  2=mumu,  3=combFlav,  4=SF,  
          ISR: 10=ee, 11=emu, 12=mumu, 13=combFlav, 14=SF, 
      combISR: 20=ee, 21=emu, 22=mumu, 23=combFlav, 24=SF, 
-    SFOSveto: +100 // Only use for signal samples!!
+
+    Allow DFOS: +100 // Only use for signal samples!! Use for dm>=100 GeV
+    Allow OS:   +200 // Only use for signal samples!! Use for dm<= 50 GeV
+    SS only or fake events from data otherwise
+
     useISR = True if int(ch/10)==1 else False
     '''
 
@@ -226,7 +230,7 @@ def getCut(ch):
 
     if int(ch/100)==1: # Allow opposite-sign different flavor
       lepFlav = "(%s) && (%s || %s)" % (lepFlav, ssCut, emuCut)
-    if int(ch/200)==2: # Allow both SS and OS for all flavors
+    if int(ch/100)==2: # Allow both SS and OS for all flavors
       lepFlav = lepFlav
     else: # Same-sign only or OS fake events from data
       lepFlav = "(%s) && (%s || (!isMC && (qFwt+fLwt)!=0))" % (lepFlav, ssCut)
