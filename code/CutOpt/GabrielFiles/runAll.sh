@@ -9,6 +9,10 @@ nTreesList="100 200 400 600"
 nodeSizeList="5 7 10"
 depthList="2 3 4"
 
+nTreesList="400"
+nodeSizeList="5"
+depthList="3"
+
 bkgFiles="CutOpt/GabrielFiles/MCbkgFiles.txt"
 dataFiles="CutOpt/GabrielFiles/data2016.txt"
 
