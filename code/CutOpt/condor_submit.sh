@@ -37,7 +37,7 @@ do
 				chan1=$chan
 			fi
 			condor_submit MASS=$mass CHAN=$chan1 BKG=$bkgFiles DATA=$dataFiles NTREES=$nTrees NODESIZE=$nodeSize DEPTH=$depth condor.sub
-	#		exit
+			exit
 		done
 	done
 

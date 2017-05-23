@@ -12,6 +12,10 @@ arguments 	= -b $(BKG) -s /afs/cern.ch/user/g/ggallard/private/limits/CutOpt/sig
 initialdir	= /afs/cern.ch/user/g/ggallard/work/private/limits/Output_$(NTREES)_NodeSize$(NODESIZE)_Depth$(DEPTH)
 getenv      = True
 +JobFlavor   = "longlunch"
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_output_files = dm$(MASS)_Channel$(CHAN).root, weights/TMVAClassification_dm$(MASS)_Channel$(CHAN)_BDTD.class.C, weights/TMVAClassification_dm$(MASS)_Channel$(CHAN)_BDTD.weights.xml
 RequestCpus = 10
+
 queue
 
