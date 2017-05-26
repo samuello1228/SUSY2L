@@ -22,33 +22,14 @@ luminosity = 33257.2
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
 channels = (3, 13)
 
-## Updated NTuples, lxplus
-sigFilesTxt = "CutOpt/GabrielFiles/allSig.txt"
-MCbkgFilesTxt = "CutOpt/GabrielFiles/MCbkgFiles.txt"
-dataBkgFilesTxt = "CutOpt/GabrielFiles/data2016.txt"
+## NTuples on HKU computer 25 May 2017
+sigFilesTxt = "/home/ggallard/Documents/SUSY2L/code/CutOpt/GabrielFiles/sigFiles_all.txt"
+MCbkgFilesTxt = "/home/ggallard/Documents/SUSY2L/code/CutOpt/GabrielFiles/MCbkgFiles.txt"
 
-bkgDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-da7031fc/"
-sigDir = "/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-26-4dcc2f47/"
+bkgDir = [ "/srv/SUSY/ntuple/v18.data", "/srv/SUSY/ntuple/v18.MC", "/srv/SUSY/ntuple/v18.MC.1", "/srv/SUSY/ntuple/v18.MC.2"]
+sigDir = [ "/srv/SUSY/ntuple/v18.MC.sig" ]
 
-'''
-## Old NTuples
-bkgDir = "/srv/SUSY/ychan/allBkg/"
-sigDir = "/srv/SUSY/ychan/sig/"
-
-sigFilesTxt = "oldLists/allSig.txt"
-MCbkgFilesTxt = "oldLists/MCbkgFiles.txt"
-dataBkgFilesTxt = "oldLists/data10.txt"
-
-# lxplus
-bkgDir = "/eos/user/y/ychan/SUSY_NTUP/v8d6/data"
-sigDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/sig" 
-mcDir = "/afs/cern.ch/work/y/ychan/public/SUSY_NTUP/v7d11/bkg"
-
-sigFilesTxt = "sig.txt"
-MCbkgFilesTxt ="mcbkg.txt"
-'''
-
-skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt", "period"]
+skipDirs = ["Zee_MAX", "Zmumu", "Ztautau", "P2012_ttbar", "P2012_Wt"]
 
 
 testRun = False
@@ -70,22 +51,23 @@ def getN(fileDir):
 	nDict = {}
 	can = ROOT.TCanvas() # for Draw(). Not necessary, but gets rid of some out of place INFO message
 
-	fileList = [d for d in listdir(fileDir) if isdir("%s/%s" % (fileDir,d)) and d.endswith(".root")]
+	fileList = [d for d in listdir(fileDir) if isfile("%s/%s" % (fileDir, d)) and d.endswith(".root")]
 	nFiles = len(fileList)
 	n = 0
 	sw = ROOT.TStopwatch(); sw.Start() # Stopwatch
+	print "Loading from", fileDir
 	for line in tqdm(fileList):
 		n += 1
 		if testRun and n>1: break
 		# print "Folder %d of %d: %s" % (n, nFiles, line)
-		tqdm.write("Folder %d of %d: %s" % (n, nFiles, line))
+		tqdm.write("File %d of %d: %s" % (n, nFiles, line))
 
 		# Skip specified directories
 		if any(substr in line for substr in skipDirs):
 			continue
 
 		# Get sampleID for MC, set sampleID of data to 0
-		if "physics" not in line:
+		if "data" not in line:
 			match = re.search(".[0-9]{6}.", line) # Find dataset ID
 			if not match:
 				# print "Cannot infer datasetID from filename %s , skipped" % line
@@ -95,23 +77,26 @@ def getN(fileDir):
 			sampleID = int(match.group()[1:-1])
 			weight = "(ElSF * MuSF * BtagSF * weight * pwt)"
 		else:
+			if "data15" in line: continue # Reject 2015 data
 			sampleID = 0 # data
 			weight = "(fLwt+qFwt)"
 
-		tc = TChain("evt2l"); Add = tc.Add
-		for f in listdir("%s/%s" % (fileDir, line)):
-			if re.search("root\.*[0-9]*$", f) is not None:
-				Add("%s/%s/%s" % (fileDir,line,f))
+		tc = TChain("evt2l"); tc.Add("%s/%s" % (fileDir, line))
+
+		# Add = tc.Add
+		# for f in listdir("%s/%s" % (fileDir, line)):
+		# 	if re.search("root\.*[0-9]*$", f) is not None:
+		# 		Add("%s/%s/%s" % (fileDir,line,f))
 
 		# The next two lines are some attempt to speed up the for loop
-		GetEntries=tc.GetEntries
+		Draw=tc.Draw
 		GetHist = gDirectory.Get
 
 		nSample = {}
 
-		# for chan in channels #  If tqdm not available, comment out the next line and comment in the next line
-		for chan in tqdm(channels):
-			tc.Draw("%s>>hist" % weight, "(%s)*(%s)" % (getCut(chan), weight))
+		for chan in channels: #  If tqdm not available, comment out the next line and comment in the next line
+		# for chan in tqdm(channels):
+			Draw("%s>>hist" % weight, "(%s)*(%s)" % (getCut(chan), weight))
 			h = GetHist("hist")
 			if h is None or not isinstance(h, ROOT.TH1): 
 				nSample[chan]=0
@@ -130,14 +115,12 @@ def getN(fileDir):
 
 # Load nBkg and nSig. Normalize later.
 # Cannot be weighted during loading time because of some conflict with sumWdict and xsecDB
-nBkgDict = getN(bkgDir)
-try:
-    nBkgDict.update(getN(mcDir))
-except:
-    print "INFO: No separate mcDir defined."
+nBkgDict = {}
+for d in bkgDir: nBkgDict.update(getN(d))
 print "nBkgDict loaded\n"
 
-nSigDict = getN(sigDir)
+nSigDict = {}
+for d in sigDir: nSigDict.update(getN(d))
 print "nSigDict loaded\n"
 
 #### Load cross section database #### 
