@@ -552,7 +552,7 @@ void mvaeffs( TString fin, double nSig , double nBkg, Bool_t useTMVAStyle=true,
    // Luminosity hack, apply weights
    // double nBkg = lumi/10064.3 * (trainTree->GetEntries("classID*weight")+testTree->GetEntries("classID*weight"));
 
-   TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs("ds", gClient->GetRoot(), nSig, nBkg);
+   TMVA::StatDialogMVAEffs* gGui = new TMVA::StatDialogMVAEffs(gClient->GetRoot(), nSig, nBkg);
 
    gGui->ReadHistograms(file);
    gGui->SetFormula(formula);
