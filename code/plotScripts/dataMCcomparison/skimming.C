@@ -521,7 +521,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
     //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
-    SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
+    //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
+    SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
     
     std::vector<nEvent> nSS;
     
@@ -542,16 +543,16 @@ void skimming()
     }
     
     //Background
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=0;i<=1;i++)
-        for(unsigned int i=0;i<BGSampleName.size();i++)
+        for(unsigned int i=68;i<=69;i++)
+        //for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
@@ -559,8 +560,8 @@ void skimming()
     }
     
     //Signal
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
