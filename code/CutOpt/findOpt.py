@@ -35,11 +35,11 @@ headersOT = [
 headersSig = [
 	"m(C1)","m(N1)","dm", "channel","NTrees","MNS","Depth","ROC-int",
 	"nSig","nBkg",
+	"BDTopt", "CLs(BDTopt)",
 	"nSig(0)","nBkg(0)","CLs(0)",
 	"nSig(0.1)","nBkg(0.1)","CLs(0.1)",
 	"nSig(0.2)","nBkg(0.2)","CLs(0.2)",
-	"nSig(0.3)","nBkg(0.3)","CLs(0.3)",
-	"BDTopt", "CLs(BDTopt)"
+	"nSig(0.3)","nBkg(0.3)","CLs(0.3)"
 	]
 
 '''
@@ -164,10 +164,11 @@ if __name__ == '__main__':
 
 			## CLs checks
 			for mass in tqdm(C1masses):
-				if mass==1000 and dm%100!=0: continue # Only (1000, 100n) samples available
-				nSig = nSigDict.get(sampleIdDB[(mass, mass-dm)],{}).get(chan,0)
+				if mass==1000 and dm%100!=0: continue # Only for mC1=1000, (1000, 100n) samples available
+				chan1 = chan%100
+				nSig = nSigDict.get(sampleIdDB[(mass, mass-dm)],{}).get(chan1,0)
 				if nSig < 1: continue
-				nBkg = nBkgTotDict[chan]
+				nBkg = nBkgTotDict[chan1]
 
 				call('root -l -b -q "mvaeffs.cxx(\\"%s/%s\\", %d, %f)"' % (directory, file, int(nSig), int(nBkg)), shell=True)
 				
@@ -177,13 +178,13 @@ if __name__ == '__main__':
 					effList = list(reader)[0][6:] # Only extract nSig, nBkg for BDT = 0, 0.1, 0.2, 0.3
 					for i in range(0,12,3):
 						# CLs formula is PP(nData|S+B)/PP(nBkg|B)
-						nSig = float(effList[i])
-						nBkg = float(effList[i+1])
-						nData = int(nBkg) # Take nData = nBkg for this MC study
-						CLs = PP(nData, nSig+nBkg) / PP(nData, nBkg)
+						nS = float(effList[i])
+						nB = float(effList[i+1])
+						nD = int(nB) # Take nData = nBkg for this MC study
+						CLs = PP(nD, nS+nB) / PP(nD, nB)
 						effList[i+2] = CLs
 						if minCLs[1]>CLs: minCLs = (round(i/30.,1), CLs) 
-				rowsSig.append( (mass, mass-dm, dm, chan, ntrees, mns, depth, roc, nSig, nBkg) + tuple(effList[:-1]) + minCLs) 
+				rowsSig.append( (mass, mass-dm, dm, chan, ntrees, mns, depth, roc, nSig, nBkg) + minCLs + tuple(effList[:-1])) 
 				os.rename("plots/mvaeffs_BDTD.eps", "%s/%d_%d_Channel%d.eps" % (plotDir, mass, mass-dm, chan))
 
 	rowsOT = sorted(rowsOT, key=lambda x : (x[0], x[1], -x[5]) )
