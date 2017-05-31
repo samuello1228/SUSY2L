@@ -5,8 +5,8 @@
 # masses="20 50 100"
 # masses1="all 20"
 # masses2="50 100 +"
-nTreesList="100 200 400 600"
-nodeSizeList="5 7 10"
+nTreesList="25 50 75 100 200"
+nodeSizeList="5 10 15"
 depthList="2 3 4"
 
 
