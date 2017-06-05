@@ -119,6 +119,3 @@
 /srv/SUSY/ntuple/v18.MC/mc15_13TeV.364213.Sherpa_221_NN30NNLO_Ztt_Mll10_40_MAXHTPTV70_280_BFilter.merge.DAOD_SUSY2.e5421_s2726_r7772_r7676_p2879.root
 /srv/SUSY/ntuple/v18.MC/mc15_13TeV.364214.Sherpa_221_NN30NNLO_Ztt_Mll10_40_MAXHTPTV280_E_CMS_BVeto.merge.DAOD_SUSY2.e5421_s2726_r7772_r7676_p2879.root
 /srv/SUSY/ntuple/v18.MC/mc15_13TeV.364215.Sherpa_221_NN30NNLO_Ztt_Mll10_40_MAXHTPTV280_E_CMS_BFilter.merge.DAOD_SUSY2.e5421_s2726_r7772_r7676_p2879.root
-/srv/SUSY/ntuple/v18.MC/mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_SUSY2.e3698_s2608_s2183_r7725_r7676_p2879.root
-/srv/SUSY/ntuple/v18.MC/mc15_13TeV.410015.PowhegPythiaEvtGen_P2012_Wt_dilepton_top.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879.root
-/srv/SUSY/ntuple/v18.MC/mc15_13TeV.410016.PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879.root
