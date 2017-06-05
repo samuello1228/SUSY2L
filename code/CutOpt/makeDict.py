@@ -18,9 +18,9 @@ gROOT.SetBatch(True)
 ####################
 C1masses = (200, 300, 400, 500, 600, 700, 800, 900, 1000)
 luminosity = 33257.2
-# channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
+channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14)
 # channels = (0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 100, 101, 102, 103, 104, 110, 111, 112, 113, 114)
-channels = (3, 13)
+# channels = (3, 13)
 
 ## NTuples on HKU computer 25 May 2017
 sigFilesTxt = "/home/ggallard/Documents/SUSY2L/code/CutOpt/GabrielFiles/sigFiles_all.txt"
