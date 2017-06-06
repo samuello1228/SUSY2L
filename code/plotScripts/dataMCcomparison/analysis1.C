@@ -2514,6 +2514,21 @@ void analysis1()
                     delete h2;
                     delete g2;
                 }
+                
+                //calculate scale factor for fake BG
+                if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
+                   RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" )
+                {
+                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    {
+                        if(BGGroup[j].info->GroupName == "fake lepton")
+                        {
+                            double fakeBG = sumOfEvent[BGGroup.size()][0] - sumOfEvent[j][0];
+                            double factor = (sumOfEvent[BGGroup.size()+1][0] - fakeBG) / sumOfEvent[j][0];
+                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": scale factor: "<<factor<<endl;
+                        }
+                    }
+                }
             }
             
             //final normalization for h2SigSum for plotting
@@ -2535,6 +2550,25 @@ void analysis1()
                       )
                     {
                         BGGroup[i].h2->Scale(1.4);
+                    }
+                }
+            }
+            
+            //apply scale factor for fake BG
+            for(unsigned int j=0;j<BGGroup.size();j++)
+            {
+                if(BGGroup[j].info->GroupName == "fake lepton")
+                {
+                    if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
+                       RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_2BJet" )
+                    {
+                        BGGroup[j].h2->Scale(3.50464);
+                    }
+                    
+                    if(RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" ||
+                       RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_2BJet" )
+                    {
+                        BGGroup[j].h2->Scale(4.21815);
                     }
                 }
             }
