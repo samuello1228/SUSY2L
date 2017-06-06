@@ -3175,58 +3175,6 @@ void analysis1()
     }
     
     //latex for plot
-    //plot_OS.tex and plot_SS.tex
-    for(unsigned int sign=0;sign<=3;sign+=3)
-    {
-        TString PathName = "latex/data/";
-        PathName += "plot_";
-        if(sign==0) PathName += "OS";
-        else PathName += "SS";
-        PathName += ".tex";
-        
-        ofstream fout;
-        fout.open(PathName.Data());
-        
-        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
-        {
-            if(Var[VarIndex].VarName=="averageMu") continue;
-            if(Var[VarIndex].VarName=="nVtx") continue;
-
-            fout<<"\\begin{frame}"<<endl;
-            
-            fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
-            if(sign==0) fout<<"opposite sign";
-            else fout<<"same sign";
-            fout<<")}"<<endl;
-            
-            fout<<"\\Wider[5em]{"<<endl;
-            for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
-            {
-                if(SixChannel>=3 && SixChannel<=5) continue;
-                
-                if(SixChannel<=2 &&
-                   (Var[VarIndex].VarName=="bjetpt"  ||
-                    Var[VarIndex].VarName=="bjeteta" ||
-                    Var[VarIndex].VarName=="bjetphi" ||
-                    Var[VarIndex].VarName=="cjetpt"  ||
-                    Var[VarIndex].VarName=="cjeteta" ||
-                    Var[VarIndex].VarName=="cjetphi" )
-                   ) continue;
-                
-                fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<"}";
-                if(SixChannel==2) fout<<" \\\\";
-                fout<<endl;
-            }
-            //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
-            fout<<"}"<<endl;
-            
-            fout<<"\\end{frame}"<<endl<<endl;
-        }
-        
-        fout.close();
-    }
-    
     //plot_CR.tex
     {
         TString PathName = "latex/data/plot_CR.tex";
@@ -3268,18 +3216,19 @@ void analysis1()
     }
     
     //plot_BJet_OS.tex and plot_BJet_SS.tex
-    for(unsigned int nbjet=1;nbjet<=2;nbjet++)
+    for(unsigned int TempIndex=0;TempIndex<=2;TempIndex++)
     {
         unsigned int startingIndex = 0;
-        if(nbjet==1) startingIndex = 72;
-        else if(nbjet==2) startingIndex = 84;
+        if(TempIndex==0) startingIndex = 0;
+        else if(TempIndex==1) startingIndex = 72;
+        else if(TempIndex==2) startingIndex = 84;
         
         for(unsigned int sign=0;sign<=3;sign+=3)
         {
             TString PathName = "latex/data/plot_";
             
-            if(nbjet==1) PathName += "1BJet_";
-            else if(nbjet==2) PathName += "2BJet_";
+            if(TempIndex==1) PathName += "1BJet_";
+            else if(TempIndex==2) PathName += "2BJet_";
             
             if(sign==0) PathName += "OS";
             else PathName += "SS";
