@@ -3053,90 +3053,110 @@ void analysis1()
     
     //latex for tables
     //latex for expN
-    for(unsigned int sign=0;sign<=3;sign+=3)
+    for(unsigned int TempIndex=0;TempIndex<=2;TempIndex++)
     {
-        TString PathName = "latex/data/";
-        PathName += "expN_";
-        if(sign==0) PathName += "OS";
-        else PathName += "SS";
-        PathName += ".tex";
-        
-        ofstream fout;
-        fout.open(PathName.Data());
-        
-        for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+        unsigned int startingIndex = 0;
+        if(TempIndex==0) startingIndex = 0;
+        else if(TempIndex==1) startingIndex = 72;
+        else if(TempIndex==2) startingIndex = 84;
+
+        for(unsigned int sign=0;sign<=3;sign+=3)
         {
-            if(SixChannel>=3 && SixChannel<=5) continue;
+            TString PathName = "latex/data/expN_";
             
-            fout<<"\\begin{frame}"<<endl;
-            fout<<"\\frametitle{Expected number of events (For ";
-            if(sign==0) fout<<"opposite sign";
-            else fout<<"same sign";
-            fout<<")}"<<endl;
+            if(TempIndex==1) PathName += "1BJet_";
+            else if(TempIndex==2) PathName += "2BJet_";
             
-            fout<<"For ";
-            if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
-            else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
-            else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
-            fout<<" channel, ";
-            if(SixChannel<=2) fout<<"non-ISR";
-            else fout<<"ISR";
-            fout<<"\\\\"<<endl;
+            if(sign==0) PathName += "OS";
+            else PathName += "SS";
+            PathName += ".tex";
             
-            fout<<"\\vspace{5mm}"<<endl;
-            fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
-            fout<<"\\hline"<<endl;
-            fout<<"& Number of events & Significance \\\\"<<endl;
-            fout<<"\\hline"<<endl;
+            ofstream fout;
+            fout.open(PathName.Data());
             
-            fout<<"\\input{data/expN/"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
+            for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+            {
+                if(SixChannel>=3 && SixChannel<=5) continue;
+                if((TempIndex==1 || TempIndex==2) &&
+                   !(sign==3 && (SixChannel == 1 || SixChannel == 7)) ) continue;
+                
+                fout<<"\\begin{frame}"<<endl;
+                fout<<"\\frametitle{Expected number of events (For ";
+                if(sign==0) fout<<"opposite sign";
+                else fout<<"same sign";
+                fout<<")}"<<endl;
+                
+                fout<<"For ";
+                if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
+                else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
+                else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
+                fout<<" channel, ";
+                
+                if(SixChannel<=2) fout<<"non-ISR";
+                else fout<<"ISR";
+                
+                if(TempIndex==1) fout<<", 1BJet";
+                else if(TempIndex==2) fout<<", 2BJet";
+                
+                fout<<"\\\\"<<endl;
+                
+                fout<<"\\vspace{5mm}"<<endl;
+                fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
+                fout<<"\\hline"<<endl;
+                fout<<"& Number of events & Significance \\\\"<<endl;
+                fout<<"\\hline"<<endl;
+                
+                fout<<"\\input{data/expN/"<<RegionInfo[startingIndex+sign+SixChannel].RegionName.Data()<<".tex}"<<endl;
+                
+                fout<<"\\end{tabular}"<<endl;
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
             
-            fout<<"\\end{tabular}"<<endl;
-            fout<<"\\end{frame}"<<endl<<endl;
+            fout.close();
+            
+            /*
+            //For VV
+            PathName = "latex/data/";
+            PathName += "expN_BGVV_";
+            if(sign==0) PathName += "OS";
+            else PathName += "SS";
+            PathName += ".tex";
+            fout.open(PathName.Data());
+            
+            for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
+            {
+                if(SixChannel>=3 && SixChannel<=5) continue;
+                
+                fout<<"\\begin{frame}"<<endl;
+                fout<<"\\frametitle{Expected number of events for VV (For ";
+                if(sign==0) fout<<"opposite sign";
+                else fout<<"same sign";
+                fout<<")}"<<endl;
+                
+                fout<<"For ";
+                if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
+                else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
+                else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
+                fout<<" channel, ";
+                if(SixChannel<=2) fout<<"non-ISR";
+                else fout<<"ISR";
+                fout<<"\\\\"<<endl;
+                
+                fout<<"\\vspace{5mm}"<<endl;
+                fout<<"\\begin{tabular}{|c|c|}"<<endl;
+                fout<<"\\hline"<<endl;
+                fout<<"& Number of events \\\\"<<endl;
+                fout<<"\\hline"<<endl;
+                
+                fout<<"\\input{data/expN/BGVV_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
+                
+                fout<<"\\end{tabular}"<<endl;
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
+            
+            fout.close();
+            */
         }
-        
-        fout.close();
-        
-        //For VV
-        PathName = "latex/data/";
-        PathName += "expN_BGVV_";
-        if(sign==0) PathName += "OS";
-        else PathName += "SS";
-        PathName += ".tex";
-        fout.open(PathName.Data());
-        
-        for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
-        {
-            if(SixChannel>=3 && SixChannel<=5) continue;
-            
-            fout<<"\\begin{frame}"<<endl;
-            fout<<"\\frametitle{Expected number of events for VV (For ";
-            if(sign==0) fout<<"opposite sign";
-            else fout<<"same sign";
-            fout<<")}"<<endl;
-            
-            fout<<"For ";
-            if(SixChannel == 0 || SixChannel == 6) fout<<"ee";
-            else if(SixChannel == 1 || SixChannel == 7) fout<<"$\\mu\\mu$";
-            else if(SixChannel == 2 || SixChannel == 8) fout<<"e$\\mu$";
-            fout<<" channel, ";
-            if(SixChannel<=2) fout<<"non-ISR";
-            else fout<<"ISR";
-            fout<<"\\\\"<<endl;
-            
-            fout<<"\\vspace{5mm}"<<endl;
-            fout<<"\\begin{tabular}{|c|c|}"<<endl;
-            fout<<"\\hline"<<endl;
-            fout<<"& Number of events \\\\"<<endl;
-            fout<<"\\hline"<<endl;
-            
-            fout<<"\\input{data/expN/BGVV_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<".tex}"<<endl;
-            
-            fout<<"\\end{tabular}"<<endl;
-            fout<<"\\end{frame}"<<endl<<endl;
-        }
-        
-        fout.close();
     }
     
     //latex for expN for CR
@@ -3215,6 +3235,7 @@ void analysis1()
         fout.close();
     }
     
+    //plot_OS.tex and plot_SS.tex
     //plot_BJet_OS.tex and plot_BJet_SS.tex
     for(unsigned int TempIndex=0;TempIndex<=2;TempIndex++)
     {
