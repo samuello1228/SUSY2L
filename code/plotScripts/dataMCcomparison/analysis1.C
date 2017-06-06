@@ -1233,7 +1233,8 @@ void analysis1()
         element.isSR = false;
         
         //1 b-jet
-        element.Cut = " && nBJet == 1";
+        //element.Cut = " && nBJet == 1";
+        element.Cut = " && nBJet == 1 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
             element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
@@ -1245,7 +1246,8 @@ void analysis1()
         }
         
         //2 b-jets
-        element.Cut = " && nBJet == 2";
+        //element.Cut = " && nBJet == 2";
+        element.Cut = " && nBJet == 2 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
             element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
@@ -2532,7 +2534,7 @@ void analysis1()
                        BGGroup[i].info->GroupName == "Ztautau"
                       )
                     {
-                        //BGGroup[i].h2->Scale(1.4);
+                        BGGroup[i].h2->Scale(1.4);
                     }
                 }
             }
@@ -3291,62 +3293,6 @@ void analysis1()
             
             fout.close();
         }
-    }
-    
-    //plot_special.tex
-    {
-        TString PathName = "latex/data/plot_special.tex";
-        ofstream fout;
-        fout.open(PathName.Data());
-        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
-        {
-            for(unsigned int sign=0;sign<=3;sign+=3)
-            {
-                if(!
-                   (Var[VarIndex].VarName=="pt1"   ||
-                    Var[VarIndex].VarName=="pt2"   ||
-                    Var[VarIndex].VarName=="mll"   ||
-                    Var[VarIndex].VarName=="ptll"  ||
-                    Var[VarIndex].VarName=="MET"   ||
-                    Var[VarIndex].VarName=="mTtwo" ||
-                    Var[VarIndex].VarName=="mT1"   ||
-                    Var[VarIndex].VarName=="mT2"   ||
-                    Var[VarIndex].VarName=="HT"    )
-                   )continue;
-                
-                fout<<"\\begin{frame}"<<endl;
-                
-                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
-                if(sign==0) fout<<"opposite sign";
-                else fout<<"same sign";
-                fout<<")}"<<endl;
-                
-                fout<<"\\Wider[5em]{"<<endl;
-                for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
-                {
-                    if(SixChannel>=3 && SixChannel<=5) continue;
-                    
-                    if(SixChannel<=2 &&
-                       (Var[VarIndex].VarName=="bjetpt"  ||
-                        Var[VarIndex].VarName=="bjeteta" ||
-                        Var[VarIndex].VarName=="bjetphi" ||
-                        Var[VarIndex].VarName=="cjetpt"  ||
-                        Var[VarIndex].VarName=="cjeteta" ||
-                        Var[VarIndex].VarName=="cjetphi" )
-                       ) continue;
-                    
-                    fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                    <<Var[VarIndex].VarName.Data()<<"_"<<ChannelInfo[sign+SixChannel].ChannelName.Data()<<"}";
-                    if(SixChannel==2) fout<<" \\\\";
-                    fout<<endl;
-                }
-                //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
-                fout<<"}"<<endl;
-                
-                fout<<"\\end{frame}"<<endl<<endl;
-            }
-        }
-        fout.close();
     }
     
     {
