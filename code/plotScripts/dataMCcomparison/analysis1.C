@@ -622,9 +622,6 @@ void analysis1()
         TString GroupName;
         unsigned int lower;
         unsigned int upper;
-        bool showData;
-        bool showSignificance;
-        bool isSR;
     };
     
     struct RegionData
@@ -633,7 +630,6 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         bool showData;
         bool showSignificance;
-        bool isSR;
         TString Cut;
     };
     
@@ -1118,7 +1114,6 @@ void analysis1()
 
             element.showData = !ChannelInfo[ChannelIndex].isSS;
             element.showSignificance = ChannelInfo[ChannelIndex].isSS;
-            element.isSR = false;
             
             if(ChannelInfo[ChannelIndex].isSS)
             {
@@ -1141,7 +1136,6 @@ void analysis1()
         
         element.showData = true;
         element.showSignificance = false;
-        element.isSR = false;
         element.Cut = " && mll>81.18 && mll<101.18";
         
         //SS_ee
@@ -1182,7 +1176,7 @@ void analysis1()
         RegionGroup.push_back(GroupElement);
         
         //Signal region
-        GroupElement.GroupName = "SS";
+        GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
         
         TString ISR[2] = {"nonISR","ISR"};
@@ -1243,7 +1237,6 @@ void analysis1()
                             
                             element.showData = !ChannelInfo[ChannelIndex].isSS;
                             element.showSignificance = ChannelInfo[ChannelIndex].isSS;
-                            element.isSR = true;
                             
                             RegionInfo.push_back(element);
                         }
@@ -1261,7 +1254,6 @@ void analysis1()
         
         element.showData = true;
         element.showSignificance = false;
-        element.isSR = false;
         
         //1 b-jet
         //element.Cut = " && nBJet == 1";
@@ -2007,7 +1999,7 @@ void analysis1()
             for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
-                if(RegionInfo[RegionIndex].isSR && VarIndex!=countVariable) continue;
+                if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
                 //initialize histograms
                 TString title = Var[VarIndex].VarTitle;
@@ -2425,7 +2417,7 @@ void analysis1()
                     fout.close();
                     
                     //output SR.txt file
-                    if(RegionInfo[RegionIndex].isSR)
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR")
                     {
                         fout_SR.open(PathName_SR.Data(), ios::out | ios::app);
                         
@@ -2471,7 +2463,7 @@ void analysis1()
                     }
                     
                     //h2SR
-                    if(RegionInfo[RegionIndex].isSR)
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR")
                     {
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
@@ -2484,7 +2476,7 @@ void analysis1()
                     }
                     
                     //significance for all mass point
-                    if(RegionInfo[RegionIndex].isSR)
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR")
                     {
                         PathName = "latex/data/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
