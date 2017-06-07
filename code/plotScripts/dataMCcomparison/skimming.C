@@ -18,11 +18,11 @@ Double_t MET;
 Double_t mTtwo;
 Double_t mt1;
 Double_t mt2;
-Double_t mtm;
-Double_t HT;
-Double_t R2;
+
 Double_t l12_dPhi;
 Double_t l12_MET_dPhi;
+Double_t jets_MET_dPhi;
+
 Int_t nJet;
 Double_t jetpt;
 Double_t jeteta;
@@ -39,10 +39,15 @@ Int_t nFJet;
 Double_t fjetpt;
 Double_t fjeteta;
 Double_t fjetphi;
+
 Double_t weight;
 Double_t qFwt;
 Double_t fLwt;
 Double_t averageMu;
+
+Double_t mtm;
+Double_t HT;
+Double_t R2;
 
 struct nEvent
 {
@@ -131,10 +136,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mtm",&mt2,"mtm/D");
+        tree2[j]->Branch("mt1",&mt1,"mt1/D");
+        tree2[j]->Branch("mt2",&mt2,"mt2/D");
+
+        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
+        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
+        tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/D");
+
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
+        tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
@@ -279,12 +292,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
-        if(mt1<mt2) mtm = mt1;
-        else mtm = mt2;
+        //if(mt1<mt2) mtm = mt1;
+        //else mtm = mt2;
         //HT = evts->sig_HT;
         //R2 = MET/(MET + pt1 + pt2);
-        //l12_dPhi = evts->l12_dPhi;
-        //l12_MET_dPhi = evts->l12_MET_dPhi;
+        l12_dPhi = evts->l12_dPhi;
+        l12_MET_dPhi = evts->l12_MET_dPhi;
+        jets_MET_dPhi = evts->jets_MET_dPhi[0];
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
@@ -319,13 +333,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //jets
         nJet = 0;
         nBJet = 0;
-        nCJet = 0;
-        nFJet = 0;
+        //nCJet = 0;
+        //nFJet = 0;
         int nISR = 0;
         int leadingJetIndex = 0;
-        int leadingBJetIndex = 0;
-        int leadingCJetIndex = 0;
-        int leadingFJetIndex = 0;
+        //int leadingBJetIndex = 0;
+        //int leadingCJetIndex = 0;
+        //int leadingFJetIndex = 0;
         for(int k=0;k<evts->jets_;k++)
         {
             //signal jets
@@ -338,7 +352,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(evts->jets_jFlag[k] & 1<<5)
             {
                 nBJet++;
-                if(nBJet==1) leadingBJetIndex = k;
+                //if(nBJet==1) leadingBJetIndex = k;
             }
             
             if(fabs(evts->jets_eta[k]) < 2.4)
@@ -346,6 +360,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
+                /*
                 //Central jets
                 if(!(evts->jets_jFlag[k] & 1<<5))
                 {
@@ -358,15 +373,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                         if(nCJet==1) leadingCJetIndex = k;
                     }
                 }
+                */
             }
             else
             {
+                /*
                 //Forward jets
                 if(evts->jets_pt[k] > 30)
                 {
                     nFJet++;
                     if(nFJet==1) leadingFJetIndex = k;
                 }
+                */
             }
         }
         
@@ -374,15 +392,16 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             jetpt = evts->jets_pt[leadingJetIndex];
             jeteta = evts->jets_eta[leadingJetIndex];
-            jetphi = evts->jets_phi[leadingJetIndex];
+            //jetphi = evts->jets_phi[leadingJetIndex];
         }
         else
         {
             jetpt = 0;
             jeteta = 0;
-            jetphi = 0;
+            //jetphi = 0;
         }
-        
+       
+        /* 
         if(nBJet>0)
         {
             bjetpt = evts->jets_pt[leadingBJetIndex];
@@ -421,9 +440,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             fjeteta = 0;
             fjetphi = 0;
         }
-        
+        */
+
         //separate the sample into channels
-        
         if(nISR==0) {}
         else if(nISR==1) channelIndex += 6;
         else continue;
@@ -512,8 +531,8 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    TString SamplePath = "/srv/SUSY/ntuple/";
+    TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     
     //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; TString tag = "v8.10";
