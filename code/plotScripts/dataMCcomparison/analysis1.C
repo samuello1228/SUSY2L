@@ -1131,31 +1131,50 @@ void analysis1()
         RegionGroup.push_back(GroupElement);
         
         //Control Region
-        GroupElement.GroupName = "Z mass";
+        //b jet Control Region
+        GroupElement.GroupName = "b jet";
         GroupElement.lower = RegionInfo.size();
         
         element.showData = true;
         element.showSignificance = false;
-        element.Cut = " && mll>81.18 && mll<101.18";
         
-        //SS_ee
-        element.RegionName = "CR_nonISR_SS_ee";
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(3);
-        RegionInfo.push_back(element);
+        //1 b-jet
+        //element.Cut = " && nBJet == 1";
+        element.Cut = " && nBJet == 1 && mll>81.18 && mll<101.18";
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_1BJet";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
         
-        element.RegionName = "CR_ISR_SS_ee";
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(9);
-        RegionInfo.push_back(element);
+        //2 b-jets
+        //element.Cut = " && nBJet == 2";
+        element.Cut = " && nBJet == 2 && mll>81.18 && mll<101.18";
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_2BJet";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
         
-        element.RegionName = "CR_SS_ee";
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(3);
-        element.setOfChannel.push_back(9);
-        RegionInfo.push_back(element);
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
         
-        //SS_mumu
+        //CR_mll_15_mT2_30
+        GroupElement.GroupName = "CR_mll_15_mT2_30";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = true;
+        element.showSignificance = false;
+        element.Cut = " && mll>15 && mTtwo<30";
+        
         element.RegionName = "CR_nonISR_SS_mumu";
         element.setOfChannel.clear();
         element.setOfChannel.push_back(4);
@@ -1163,12 +1182,6 @@ void analysis1()
         
         element.RegionName = "CR_ISR_SS_mumu";
         element.setOfChannel.clear();
-        element.setOfChannel.push_back(10);
-        RegionInfo.push_back(element);
-        
-        element.RegionName = "CR_SS_mumu";
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(4);
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
         
@@ -1248,41 +1261,7 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
-        //Control Region
-        GroupElement.GroupName = "b jet";
-        GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
-        
-        //1 b-jet
-        //element.Cut = " && nBJet == 1";
-        element.Cut = " && nBJet == 1 && mll>81.18 && mll<101.18";
-        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-        {
-            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
-            element.RegionName += "_1BJet";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(ChannelIndex);
-            RegionInfo.push_back(element);
-        }
-        
-        //2 b-jets
-        //element.Cut = " && nBJet == 2";
-        element.Cut = " && nBJet == 2 && mll>81.18 && mll<101.18";
-        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-        {
-            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
-            element.RegionName += "_2BJet";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(ChannelIndex);
-            RegionInfo.push_back(element);
-        }
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
+
     }
     
     //Significance optimization
@@ -1854,7 +1833,7 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<=0;RegionGroupIndex++)
+    //for(unsigned int RegionGroupIndex=2;RegionGroupIndex<=2;RegionGroupIndex++)
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
