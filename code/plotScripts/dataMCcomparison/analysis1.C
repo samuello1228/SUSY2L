@@ -591,6 +591,18 @@ void analysis1()
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
+        element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$\\text{m}_{\\text{T}}$ of the leading lepton";
+        Var.push_back(element);
+        
+        element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$\\text{m}_{\\text{T}}$ of the subleading lepton";
+        Var.push_back(element);
+        
         element.VarName = "averageMu";  element.VarTitle = "averageMu";                         element.unit = "";
         element.bin=35;         element.xmin=0;                 element.xmax=35;
         element.log=0;          element.ymin=0;                 element.ymax=0;
@@ -601,6 +613,12 @@ void analysis1()
         element.bin=40;         element.xmin=20;                element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
+        Var.push_back(element);
+        
+        element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
+        element.bin=40;         element.xmin=-3;                element.xmax=3;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$\\eta$ of the leading jet";
         Var.push_back(element);
         
         element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
@@ -614,6 +632,25 @@ void analysis1()
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
+        
+        element.VarName = "l12_dPhi";   element.VarTitle = "l12_dPhi";                          element.unit = "";
+        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "l12\\_dPhi";
+        Var.push_back(element);
+        
+        element.VarName = "l12_MET_dPhi";  element.VarTitle = "l12_MET_dPhi";                   element.unit = "";
+        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "l12\\_MET\\_dPhi";
+        Var.push_back(element);
+        
+        element.VarName = "jets_MET_dPhi"; element.VarTitle = "jets_MET_dPhi";                  element.unit = "";
+        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "jets\\_MET\\_dPhi";
+        Var.push_back(element);
+
     }
     SetAtlasStyle();
     
@@ -3261,7 +3298,7 @@ void analysis1()
             
             fout<<"\\begin{frame}"<<endl;
             
-            fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For CR)}"<<endl;;
+            fout<<"\\frametitle{"<<Var[VarIndex].latexName.Data()<<" (For CR)}"<<endl;;
             
             fout<<"\\Wider[5em]{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
@@ -3317,7 +3354,7 @@ void analysis1()
                 
                 fout<<"\\begin{frame}"<<endl;
                 
-                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                fout<<"\\frametitle{"<<Var[VarIndex].latexName.Data()<<" (For ";
                 if(sign==0) fout<<"opposite sign";
                 else fout<<"same sign";
                 fout<<")}"<<endl;
@@ -3363,7 +3400,7 @@ void analysis1()
             {
                 fout<<"\\begin{frame}"<<endl;
                 
-                fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For ";
+                fout<<"\\frametitle{"<<Var[VarIndex].latexName.Data()<<" (For ";
                 if(lepton==0) fout<<"ee channel";
                 if(lepton==1) fout<<"mumu channel";
                 fout<<")}"<<endl;
