@@ -35,19 +35,32 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\item use the default PRW profile for VV
-\item use mc15\_13TeV.361071.Sherpa\_CT10\_lllvjj\_EW6.merge. \\
-DAOD\_SUSY2.e3836\_s2726\_r7772\_r7676\_p2879
-\item study new Control Regions (1 or 2 b-jet)
+\item ?
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\frametitle{motivation}
+\begin{itemize}
+\item Use the Control Regions (1 or 2 b-jet) to estimate the fake background
+\item Check whether the 1.4 factor comes from Z+jets (apply a cut 81 GeV $<$ mll $<$ 101 GeV)
+\end{itemize}
+\end{frame}
+
+\input{data/expN_1BJet_OS.tex}
+\input{data/expN_1BJet_SS.tex}
+\input{data/expN_2BJet_OS.tex}
+\input{data/expN_2BJet_SS.tex}
 
 \def \PathToPlot {../plot}
 
 \begin{frame}
 \begin{center}
 \huge
-1 b-jet
+1 b-jet \\
+\small
+fake BG scale factor for nonISR: 3.50464 \\
+fake BG scale factor for ISR: 4.21815
 \end{center}
 \end{frame}
 
@@ -57,12 +70,30 @@ DAOD\_SUSY2.e3836\_s2726\_r7772\_r7676\_p2879
 \begin{frame}
 \begin{center}
 \huge
-2 b-jets
+2 b-jet \\
+\small
+fake BG scale factor for nonISR: 3.50464 \\
+fake BG scale factor for ISR: 4.21815
 \end{center}
 \end{frame}
 
 \input{data/plot_2BJet_OS.tex}
 \input{data/plot_2BJet_SS.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+Control Region \\
+\small
+fake BG scale factor for nonISR: 4.26277 \\
+fake BG scale factor for ISR: 3.80146
+\end{center}
+\end{frame}
+
+\input{data/expN_CR.tex}
+
+%\def \PathToPlot {../plot}
+\input{data/plot_CR.tex}
 
 
 %\def \PathToPlot {../plot}
@@ -71,7 +102,7 @@ DAOD\_SUSY2.e3836\_s2726\_r7772\_r7676\_p2879
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item Z-jets is smaller by 1.4 times
+\item The 1.4 factor mainly comes from Z+jets
 \end{itemize}
 \end{frame}
 
@@ -482,18 +513,6 @@ opposite sign
 
 %\def \PathToPlot {../plot}
 \input{data/plot_OS.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-Control Region
-\end{center}
-\end{frame}
-
-\input{data/expN_CR.tex}
-
-%\def \PathToPlot {../plot}
-\input{data/plot_CR.tex}
 
 \begin{frame}
 \begin{center}

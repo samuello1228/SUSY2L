@@ -2612,15 +2612,23 @@ void analysis1()
                     if(BGGroup[j].info->GroupName == "fake lepton")
                     {
                         if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_2BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu"    )
+                           RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_2BJet" )
+                        {
+                            BGGroup[j].h2->Scale(3.50464);
+                        }
+                        
+                        if(RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" ||
+                           RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_2BJet" )
+                        {
+                            BGGroup[j].h2->Scale(4.21815);
+                        }
+                        
+                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu")
                         {
                             BGGroup[j].h2->Scale(4.26277);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_2BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu"    )
+                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu")
                         {
                             BGGroup[j].h2->Scale(3.80146);
                         }
