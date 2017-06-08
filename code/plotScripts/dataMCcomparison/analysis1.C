@@ -1878,6 +1878,8 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
+    TFile* fout = new TFile("plot/fout.root","recreate");
+    
     for(unsigned int RegionGroupIndex=3;RegionGroupIndex<=3;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
@@ -2861,6 +2863,12 @@ void analysis1()
                     NameTemp += RegionInfo[RegionIndex].RegionName;
                     NameTemp += ".eps";
                     c2->Print(NameTemp,"eps");
+                    
+                    NameTemp = Var[VarIndex].VarName;
+                    NameTemp += "_";
+                    NameTemp += RegionInfo[RegionIndex].RegionName;
+                    fout->cd();
+                    c2->Write(NameTemp);
                 }
                 
                 //c2->WaitPrimitive();
@@ -2967,6 +2975,9 @@ void analysis1()
             }
         }
     }
+    
+    //delete fout
+    delete fout;
     
     //h2SR
     THStack stackSR[4];
