@@ -1131,14 +1131,13 @@ void analysis1()
         RegionGroup.push_back(GroupElement);
         
         //Control Region
-        //b jet Control Region
-        GroupElement.GroupName = "b jet";
+        //1 b-jet
+        GroupElement.GroupName = "1BJet";
         GroupElement.lower = RegionInfo.size();
         
         element.showData = true;
         element.showSignificance = false;
         
-        //1 b-jet
         //element.Cut = " && nBJet == 1";
         element.Cut = " && nBJet == 1 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1151,7 +1150,16 @@ void analysis1()
             RegionInfo.push_back(element);
         }
         
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //2 b-jets
+        GroupElement.GroupName = "2BJet";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = true;
+        element.showSignificance = false;
+        
         //element.Cut = " && nBJet == 2";
         element.Cut = " && nBJet == 2 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1833,8 +1841,8 @@ void analysis1()
         h2SRSig.push_back(element);
     }
     
-    //for(unsigned int RegionGroupIndex=2;RegionGroupIndex<=2;RegionGroupIndex++)
-    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=3;RegionGroupIndex<=3;RegionGroupIndex++)
+    //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
@@ -2444,13 +2452,14 @@ void analysis1()
                     //h2SR
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR")
                     {
+                        const unsigned int RegionIndex2 = RegionIndex-RegionGroup[RegionGroupIndex].lower;
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
-                            h2SRBG[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[j][0]);
+                            h2SRBG[RegionIndex2%3][j]->SetBinContent(RegionIndex2/3 +1,sumOfEvent[j][0]);
                         }
                         for(unsigned int j=0;j<SigMassSplitting.size();j++)
                         {
-                            h2SRSig[RegionIndex%3][j]->SetBinContent((RegionIndex-18)/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
+                            h2SRSig[RegionIndex2%3][j]->SetBinContent(RegionIndex2/3 +1,sumOfEvent[BGGroup.size()+j+2][0]);
                         }
                     }
                     
@@ -2521,7 +2530,8 @@ void analysis1()
                     
                     //calculate scale factor for fake BG
                     if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
-                       RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" )
+                       RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet"    ||
+                       RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
                     {
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
@@ -2543,7 +2553,8 @@ void analysis1()
                 }
                 
                 //scale Z+jets by 1.4 for CR
-                if(RegionIndex>=72 && RegionIndex<=95)
+                if(RegionGroup[RegionGroupIndex].GroupName == "1BJet"  ||
+                   RegionGroup[RegionGroupIndex].GroupName == "2BJet"  )
                 {
                     for(unsigned int i=0;i<tree2BGMC.size();i++)
                     {
@@ -3058,19 +3069,27 @@ void analysis1()
     
     //latex for tables
     //latex for expN
-    for(unsigned int TempIndex=0;TempIndex<=2;TempIndex++)
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         unsigned int startingIndex = 0;
-        if(TempIndex==0) startingIndex = 0;
-        else if(TempIndex==1) startingIndex = 72;
-        else if(TempIndex==2) startingIndex = 84;
-
+        
+        if(RegionGroup[RegionGroupIndex].GroupName == "no cut" ||
+           RegionGroup[RegionGroupIndex].GroupName == "1BJet"  ||
+           RegionGroup[RegionGroupIndex].GroupName == "2BJet"  )
+        {
+            startingIndex = RegionGroup[RegionGroupIndex].lower;
+        }
+        else continue;
+        
         for(unsigned int sign=0;sign<=3;sign+=3)
         {
             TString PathName = "latex/data/expN_";
             
-            if(TempIndex==1) PathName += "1BJet_";
-            else if(TempIndex==2) PathName += "2BJet_";
+            if(RegionGroup[RegionGroupIndex].GroupName != "no cut")
+            {
+                PathName += RegionGroup[RegionGroupIndex].GroupName;
+                PathName += "_";
+            }
             
             if(sign==0) PathName += "OS";
             else PathName += "SS";
@@ -3082,7 +3101,7 @@ void analysis1()
             for(unsigned int SixChannel=0;SixChannel<9;SixChannel++)
             {
                 if(SixChannel>=3 && SixChannel<=5) continue;
-                if((TempIndex==1 || TempIndex==2) &&
+                if((RegionGroup[RegionGroupIndex].GroupName == "1BJet" || RegionGroup[RegionGroupIndex].GroupName == "2BJet") &&
                    !(sign==3 && (SixChannel == 1 || SixChannel == 7)) ) continue;
                 
                 fout<<"\\begin{frame}"<<endl;
@@ -3100,8 +3119,11 @@ void analysis1()
                 if(SixChannel<=2) fout<<"non-ISR";
                 else fout<<"ISR";
                 
-                if(TempIndex==1) fout<<", 1BJet";
-                else if(TempIndex==2) fout<<", 2BJet";
+                if(RegionGroup[RegionGroupIndex].GroupName != "no cut")
+                {
+                    fout<<", ";
+                    fout<<RegionGroup[RegionGroupIndex].GroupName.Data();
+                }
                 
                 fout<<"\\\\"<<endl;
                 
@@ -3164,15 +3186,24 @@ void analysis1()
         }
     }
     
-    //latex for expN for CR
+    //latex for expN for CR_mll_15_mT2_30
     {
+        unsigned int startingIndex = 0;
+        for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+        {
+            if(RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
+            {
+                startingIndex = RegionGroup[RegionGroupIndex].lower;
+            }
+        }
+        
         TString PathName = "latex/data/expN_CR.tex";
         ofstream fout;
         fout.open(PathName.Data());
         
-        for(unsigned int RegionIndex=0;RegionIndex<6;RegionIndex++)
+        for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
         {
-            TString latexName = RegionInfo[12+RegionIndex].RegionName;
+            TString latexName = RegionInfo[startingIndex+RegionIndex].RegionName;
             latexName.ReplaceAll("_","\\_");
             
             fout<<"\\begin{frame}"<<endl;
@@ -3190,7 +3221,7 @@ void analysis1()
             fout<<"& Number of events & Significance \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/"<<RegionInfo[12+RegionIndex].RegionName.Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/"<<RegionInfo[startingIndex+RegionIndex].RegionName.Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -3199,9 +3230,18 @@ void analysis1()
         fout.close();
     }
     
-    //latex for plot
+    //latex for plot for CR_mll_15_mT2_30
     //plot_CR.tex
     {
+        unsigned int startingIndex = 0;
+        for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+        {
+            if(RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
+            {
+                startingIndex = RegionGroup[RegionGroupIndex].lower;
+            }
+        }
+        
         TString PathName = "latex/data/plot_CR.tex";
         ofstream fout;
         fout.open(PathName.Data());
@@ -3224,11 +3264,10 @@ void analysis1()
             fout<<"\\frametitle{"<<Var[VarIndex].VarTitle.Data()<<" (For CR)}"<<endl;;
             
             fout<<"\\Wider[5em]{"<<endl;
-            for(unsigned int RegionIndex=0;RegionIndex<6;RegionIndex++)
+            for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
-                fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
-                <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[12+RegionIndex].RegionName.Data()<<"}";
-                if(RegionIndex==2) fout<<" \\\\";
+                fout<<"\\includegraphics[width=0.5\\textwidth]{\\PathToPlot/"
+                <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[startingIndex+RegionIndex].RegionName.Data()<<"}";
                 fout<<endl;
             }
             //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
@@ -3242,19 +3281,27 @@ void analysis1()
     
     //plot_OS.tex and plot_SS.tex
     //plot_BJet_OS.tex and plot_BJet_SS.tex
-    for(unsigned int TempIndex=0;TempIndex<=2;TempIndex++)
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         unsigned int startingIndex = 0;
-        if(TempIndex==0) startingIndex = 0;
-        else if(TempIndex==1) startingIndex = 72;
-        else if(TempIndex==2) startingIndex = 84;
+        
+        if(RegionGroup[RegionGroupIndex].GroupName == "no cut" ||
+           RegionGroup[RegionGroupIndex].GroupName == "1BJet"  ||
+           RegionGroup[RegionGroupIndex].GroupName == "2BJet"  )
+        {
+            startingIndex = RegionGroup[RegionGroupIndex].lower;
+        }
+        else continue;
         
         for(unsigned int sign=0;sign<=3;sign+=3)
         {
             TString PathName = "latex/data/plot_";
             
-            if(TempIndex==1) PathName += "1BJet_";
-            else if(TempIndex==2) PathName += "2BJet_";
+            if(RegionGroup[RegionGroupIndex].GroupName != "no cut")
+            {
+                PathName += RegionGroup[RegionGroupIndex].GroupName;
+                PathName += "_";
+            }
             
             if(sign==0) PathName += "OS";
             else PathName += "SS";
