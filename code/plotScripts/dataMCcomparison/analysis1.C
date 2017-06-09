@@ -1218,7 +1218,7 @@ void analysis1()
         
         element.showData = true;
         element.showSignificance = false;
-        element.Cut = " && mll>15 && mTtwo<30";
+        element.Cut = " && mTtwo<30";
         
         element.RegionName = "CR_nonISR_SS_mumu_low_mT2";
         element.setOfChannel.clear();
