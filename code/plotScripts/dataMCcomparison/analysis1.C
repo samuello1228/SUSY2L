@@ -1220,12 +1220,12 @@ void analysis1()
         element.showSignificance = false;
         element.Cut = " && mll>15 && mTtwo<30";
         
-        element.RegionName = "CR_nonISR_SS_mumu";
+        element.RegionName = "CR_nonISR_SS_mumu_low_mT2";
         element.setOfChannel.clear();
         element.setOfChannel.push_back(4);
         RegionInfo.push_back(element);
         
-        element.RegionName = "CR_ISR_SS_mumu";
+        element.RegionName = "CR_ISR_SS_mumu_low_mT2";
         element.setOfChannel.clear();
         element.setOfChannel.push_back(10);
         RegionInfo.push_back(element);
@@ -2626,12 +2626,12 @@ void analysis1()
                             BGGroup[j].h2->Scale(4.21815);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu")
+                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_low_mT2")
                         {
                             BGGroup[j].h2->Scale(4.26277);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu")
+                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_low_mT2")
                         {
                             BGGroup[j].h2->Scale(3.80146);
                         }
