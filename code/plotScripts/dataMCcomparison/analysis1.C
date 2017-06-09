@@ -538,13 +538,13 @@ void analysis1()
         VarData element;
         
         element.VarName = "pt1";        element.VarTitle = "pt of the leading lepton";          element.unit = "[GeV]";
-        element.bin=40;         element.xmin=25;                element.xmax=250;
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "pt2";        element.VarTitle = "pt of the subleading lepton";       element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=250;
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the subleading lepton";
         Var.push_back(element);
@@ -610,7 +610,7 @@ void analysis1()
         Var.push_back(element);
         
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
-        element.bin=40;         element.xmin=20;                element.xmax=300;
+        element.bin=40;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
         Var.push_back(element);
@@ -1212,8 +1212,8 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
-        //CR_mll_15_mT2_30
-        GroupElement.GroupName = "CR_mll_15_mT2_30";
+        //CR_SS_mumu_low_mT2
+        GroupElement.GroupName = "CR_SS_mumu_low_mT2";
         GroupElement.lower = RegionInfo.size();
         
         element.showData = true;
@@ -2424,6 +2424,7 @@ void analysis1()
                     }
                     fout.close();
                     
+                    /*
                     //output file for VV
                     PathName = "latex/data/expN/BGVV_";
                     PathName += RegionInfo[RegionIndex].RegionName;
@@ -2441,6 +2442,7 @@ void analysis1()
                         fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
                     }
                     fout.close();
+                    */
                     
                     //output SR.txt file
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR")
@@ -2570,14 +2572,13 @@ void analysis1()
                     //calculate scale factor for fake BG
                     if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
                        RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet"    ||
-                       RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
+                       RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2")
                     {
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
                             if(BGGroup[j].info->GroupName == "fake lepton")
                             {
-                                double fakeBG = sumOfEvent[BGGroup.size()][0] - sumOfEvent[j][0];
-                                double factor = (sumOfEvent[BGGroup.size()+1][0] - fakeBG) / sumOfEvent[j][0];
+                                double factor = ( sumOfEvent[BGGroup.size()+1][0] - sumOfEvent[BGGroup.size()][0] )/ sumOfEvent[j][0] +1;
                                 cout<<RegionInfo[RegionIndex].RegionName.Data()<<": scale factor: "<<factor<<endl;
                             }
                         }
@@ -3244,24 +3245,26 @@ void analysis1()
         }
     }
     
-    //latex for expN for CR_mll_15_mT2_30
+    //latex for expN for CR_SS_mumu_low_mT2
     {
-        unsigned int startingIndex = 0;
-        for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+        unsigned int RegionGroupIndex = 0;
+        for(unsigned int RegionGroupIndex2=0;RegionGroupIndex2<RegionGroup.size();RegionGroupIndex2++)
         {
-            if(RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
+            if(RegionGroup[RegionGroupIndex2].GroupName == "CR_SS_mumu_low_mT2")
             {
-                startingIndex = RegionGroup[RegionGroupIndex].lower;
+                RegionGroupIndex = RegionGroupIndex2;
             }
         }
         
-        TString PathName = "latex/data/expN_CR.tex";
+        TString PathName = "latex/data/expN_";
+        PathName += RegionGroup[RegionGroupIndex].GroupName;
+        PathName += ".tex";
         ofstream fout;
         fout.open(PathName.Data());
         
         for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
         {
-            TString latexName = RegionInfo[startingIndex+RegionIndex].RegionName;
+            TString latexName = RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName;
             latexName.ReplaceAll("_","\\_");
             
             fout<<"\\begin{frame}"<<endl;
@@ -3279,7 +3282,7 @@ void analysis1()
             fout<<"& Number of events & Significance \\\\"<<endl;
             fout<<"\\hline"<<endl;
             
-            fout<<"\\input{data/expN/"<<RegionInfo[startingIndex+RegionIndex].RegionName.Data()<<".tex}"<<endl;
+            fout<<"\\input{data/expN/"<<RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName.Data()<<".tex}"<<endl;
             
             fout<<"\\end{tabular}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
@@ -3288,19 +3291,20 @@ void analysis1()
         fout.close();
     }
     
-    //latex for plot for CR_mll_15_mT2_30
-    //plot_CR.tex
+    //latex for plot for CR_SS_mumu_low_mT2
     {
-        unsigned int startingIndex = 0;
-        for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+        unsigned int RegionGroupIndex = 0;
+        for(unsigned int RegionGroupIndex2=0;RegionGroupIndex2<RegionGroup.size();RegionGroupIndex2++)
         {
-            if(RegionGroup[RegionGroupIndex].GroupName == "CR_mll_15_mT2_30")
+            if(RegionGroup[RegionGroupIndex2].GroupName == "CR_SS_mumu_low_mT2")
             {
-                startingIndex = RegionGroup[RegionGroupIndex].lower;
+                RegionGroupIndex = RegionGroupIndex2;
             }
         }
         
-        TString PathName = "latex/data/plot_CR.tex";
+        TString PathName = "latex/data/plot_";
+        PathName += RegionGroup[RegionGroupIndex].GroupName;
+        PathName += ".tex";
         ofstream fout;
         fout.open(PathName.Data());
         
@@ -3325,7 +3329,7 @@ void analysis1()
             for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
                 fout<<"\\includegraphics[width=0.5\\textwidth]{\\PathToPlot/"
-                <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[startingIndex+RegionIndex].RegionName.Data()<<"}";
+                <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName.Data()<<"}";
                 fout<<endl;
             }
             //fout<<"\\caption{"<<Var[VarIndex].latexName.Data()<<" for ee channel (left), $\\mu\\mu$ channel (middle) and e$\\mu$ channel (right), for opposite side (top) and same sign (bottom).}"<<endl;
