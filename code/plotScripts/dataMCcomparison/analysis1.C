@@ -1140,47 +1140,20 @@ void analysis1()
         RegionGroupData GroupElement;
         RegionData element;
         
-        //No cut
-        GroupElement.GroupName = "no cut";
-        GroupElement.lower = RegionInfo.size();
-        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-        {
-            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(ChannelIndex);
-
-            element.showData = !ChannelInfo[ChannelIndex].isSS;
-            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
-            
-            if(ChannelInfo[ChannelIndex].isSS)
-            {
-                //element.Cut = " && ( mll<76.18 || mll>106.18 )";
-                element.Cut = "";
-            }
-            else
-            {
-                element.Cut = "";
-            }
-            
-            RegionInfo.push_back(element);
-        }
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //Control Region
-        //1 b-jet
-        GroupElement.GroupName = "1BJet";
+        //CR_OS
+        GroupElement.GroupName = "CR_OS";
         GroupElement.lower = RegionInfo.size();
         
         element.showData = true;
         element.showSignificance = false;
+        element.Cut = "";
         
-        //element.Cut = " && nBJet == 1";
-        element.Cut = " && nBJet == 1 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
-            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
-            element.RegionName += "_1BJet";
+            if((ChannelIndex>=3 && ChannelIndex<=5) || (ChannelIndex>=9 && ChannelIndex<=11)) continue;
+            
+            element.RegionName = "CR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
@@ -1190,19 +1163,116 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
-        //2 b-jets
-        GroupElement.GroupName = "2BJet";
+        //SR_SS
+        GroupElement.GroupName = "SR_SS";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = false;
+        element.showSignificance = false;
+        element.Cut = "";
+        
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            if(ChannelIndex<=2 || (ChannelIndex>=6 && ChannelIndex<=8)) continue;
+            
+            element.RegionName = "SR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
+        //CR_OS_1B
+        GroupElement.GroupName = "CR_OS_1B";
         GroupElement.lower = RegionInfo.size();
         
         element.showData = true;
         element.showSignificance = false;
+        element.Cut = " && nBJet == 1";
         
-        //element.Cut = " && nBJet == 2";
-        element.Cut = " && nBJet == 2 && mll>81.18 && mll<101.18";
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
-            element.RegionName = ChannelInfo[ChannelIndex].ChannelName;
-            element.RegionName += "_2BJet";
+            if((ChannelIndex>=3 && ChannelIndex<=5) || (ChannelIndex>=9 && ChannelIndex<=11)) continue;
+            
+            element.RegionName = "CR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_1B";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
+        //CR_SS_1B
+        GroupElement.GroupName = "CR_SS_1B";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = true;
+        element.showSignificance = false;
+        element.Cut = " && nBJet == 1";
+        
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            if(ChannelIndex<=2 || (ChannelIndex>=6 && ChannelIndex<=8)) continue;
+            
+            element.RegionName = "CR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_1B";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
+        //CR_OS_2B
+        GroupElement.GroupName = "CR_OS_2B";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = true;
+        element.showSignificance = false;
+        element.Cut = " && nBJet == 2";
+        
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            if((ChannelIndex>=3 && ChannelIndex<=5) || (ChannelIndex>=9 && ChannelIndex<=11)) continue;
+            
+            element.RegionName = "CR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_2B";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
+        //CR_SS_2B
+        GroupElement.GroupName = "CR_SS_2B";
+        GroupElement.lower = RegionInfo.size();
+        
+        element.showData = true;
+        element.showSignificance = false;
+        element.Cut = " && nBJet == 2";
+        
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            if(ChannelIndex<=2 || (ChannelIndex>=6 && ChannelIndex<=8)) continue;
+            
+            element.RegionName = "CR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_2B";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(ChannelIndex);
@@ -1880,7 +1950,7 @@ void analysis1()
     
     TFile* fout = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=3;RegionGroupIndex<=3;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<=0;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
@@ -1926,10 +1996,10 @@ void analysis1()
                             if(dorw
                                &&
                                (
-                                RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
-                                RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
-                                RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
-                                RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                                RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_ee"   ||
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_ee"      ||
+                                RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_mumu" ||
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_mumu"
                                 )
                                &&
                                (
@@ -1962,9 +2032,7 @@ void analysis1()
                                &&
                                (
                                 RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
-                                RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
-                                RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
-                                )
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    )
                                &&
                                BGGroupElement.info->GroupName == "Zee"
                                )
@@ -2150,10 +2218,10 @@ void analysis1()
                             if(dorw
                                &&
                                (
-                                RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
-                                RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
-                                RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
-                                RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                                RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_ee"   ||
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_ee"      ||
+                                RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_mumu" ||
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_mumu"
                                 )
                                &&
                                (
@@ -2171,9 +2239,7 @@ void analysis1()
                                &&
                                (
                                 RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
-                                RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
-                                RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
-                                )
+                                RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    )
                                &&
                                BGGroup[j].info->GroupName == "Zee"
                                )
@@ -2570,8 +2636,8 @@ void analysis1()
                     }
                     
                     //calculate scale factor for fake BG
-                    if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
-                       RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet"    ||
+                    if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_1B" ||
+                       RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_1B"    ||
                        RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2")
                     {
                         for(unsigned int j=0;j<BGGroup.size();j++)
@@ -2593,8 +2659,8 @@ void analysis1()
                 }
                 
                 //scale Z+jets by 1.4 for CR
-                if(RegionGroup[RegionGroupIndex].GroupName == "1BJet"  ||
-                   RegionGroup[RegionGroupIndex].GroupName == "2BJet"  )
+                if(RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B"  ||
+                   RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B"  )
                 {
                     for(unsigned int i=0;i<tree2BGMC.size();i++)
                     {
@@ -2614,14 +2680,14 @@ void analysis1()
                 {
                     if(BGGroup[j].info->GroupName == "fake lepton")
                     {
-                        if(RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_1BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "nonISR_SS_mumu_2BJet" )
+                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_1B" ||
+                           RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_2B" )
                         {
                             BGGroup[j].h2->Scale(3.50464);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_1BJet" ||
-                           RegionInfo[RegionIndex].RegionName == "ISR_SS_mumu_2BJet" )
+                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_1B" ||
+                           RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_2B" )
                         {
                             BGGroup[j].h2->Scale(4.21815);
                         }
@@ -2932,10 +2998,10 @@ void analysis1()
                     if(dorw
                        &&
                        (
-                        RegionInfo[RegionIndex].RegionName == "nonISR_OS_ee"   ||
-                        RegionInfo[RegionIndex].RegionName == "ISR_OS_ee"      ||
-                        RegionInfo[RegionIndex].RegionName == "nonISR_OS_mumu" ||
-                        RegionInfo[RegionIndex].RegionName == "ISR_OS_mumu"
+                        RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_ee"   ||
+                        RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_ee"      ||
+                        RegionInfo[RegionIndex].RegionName == "CR_nonISR_OS_mumu" ||
+                        RegionInfo[RegionIndex].RegionName == "CR_ISR_OS_mumu"
                         )
                        &&
                        (
@@ -2955,9 +3021,7 @@ void analysis1()
                        &&
                        (
                         RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_ee" ||
-                        RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    ||
-                        RegionInfo[RegionIndex].RegionName == "CR_SS_ee"
-                        )
+                        RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_ee"    )
                        &&
                        BGGroup[j].info->GroupName == "Zee"
                        )
