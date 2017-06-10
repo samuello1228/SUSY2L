@@ -659,14 +659,14 @@ void analysis1()
         TString GroupName;
         unsigned int lower;
         unsigned int upper;
+        bool showData;
+        bool showSignificance;
     };
     
     struct RegionData
     {
         TString RegionName;
         std::vector<unsigned int> setOfChannel;
-        bool showData;
-        bool showSignificance;
         TString Cut;
     };
     
@@ -1143,9 +1143,8 @@ void analysis1()
         //CR_OS
         GroupElement.GroupName = "CR_OS";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = "";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1166,9 +1165,8 @@ void analysis1()
         //SR_SS
         GroupElement.GroupName = "SR_SS";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = false;
-        element.showSignificance = false;
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
         element.Cut = "";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1189,9 +1187,8 @@ void analysis1()
         //CR_OS_1B
         GroupElement.GroupName = "CR_OS_1B";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 1";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1213,9 +1210,8 @@ void analysis1()
         //CR_SS_1B
         GroupElement.GroupName = "CR_SS_1B";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 1";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1237,9 +1233,8 @@ void analysis1()
         //CR_OS_2B
         GroupElement.GroupName = "CR_OS_2B";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 2";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1261,9 +1256,8 @@ void analysis1()
         //CR_SS_2B
         GroupElement.GroupName = "CR_SS_2B";
         GroupElement.lower = RegionInfo.size();
-        
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 2";
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
@@ -1286,8 +1280,8 @@ void analysis1()
         GroupElement.GroupName = "CR_SS_mumu_low_mT2";
         GroupElement.lower = RegionInfo.size();
         
-        element.showData = true;
-        element.showSignificance = false;
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
         element.Cut = " && mTtwo<30";
         
         element.RegionName = "CR_nonISR_SS_mumu_low_mT2";
@@ -1306,6 +1300,9 @@ void analysis1()
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
+        
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
         
         TString ISR[2] = {"nonISR","ISR"};
         TString MT[2] = {"mT_0_100","mT_100_inf"};
@@ -1363,9 +1360,6 @@ void analysis1()
                             element.setOfChannel.clear();
                             element.setOfChannel.push_back(ChannelIndex);
                             
-                            element.showData = !ChannelInfo[ChannelIndex].isSS;
-                            element.showSignificance = ChannelInfo[ChannelIndex].isSS;
-                            
                             RegionInfo.push_back(element);
                         }
                     }
@@ -1375,8 +1369,6 @@ void analysis1()
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
-        
-
     }
     
     //Significance optimization
@@ -2460,7 +2452,7 @@ void analysis1()
                     fout<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
                     fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                     
-                    if(RegionInfo[RegionIndex].showData)
+                    if(RegionGroup[RegionGroupIndex].showData)
                     {
                         fout<<"Data & $";
                         fout<<sumOfEvent[BGGroup.size()+1][0];
@@ -2479,7 +2471,7 @@ void analysis1()
                         fout<<"\\pm";
                         fout<<sumOfEvent[BGGroup.size()+i+2][1];
                         fout<<"$ &";
-                        if(RegionInfo[RegionIndex].showSignificance)
+                        if(RegionGroup[RegionGroupIndex].showSignificance)
                         {
                             fout<<"$";
                             fout<<setprecision(3)<<std::fixed;
@@ -2768,7 +2760,7 @@ void analysis1()
                 TLegend* leg;
                 {
                     Double_t xl1, yl1, xl2, yl2;
-                    if(RegionInfo[RegionIndex].showData)
+                    if(RegionGroup[RegionGroupIndex].showData)
                     {
                         xl2=0.82;
                         yl2=0.95;
@@ -2787,7 +2779,7 @@ void analysis1()
                     leg->SetFillStyle(0);
                     leg->SetTextFont(42);
                     leg->SetBorderSize(0);
-                    if(RegionInfo[RegionIndex].showData)
+                    if(RegionGroup[RegionGroupIndex].showData)
                     {
                         leg->AddEntry(h2DataSum,"Data","p");
                     }
@@ -2814,7 +2806,7 @@ void analysis1()
                 TH1F* h2Ratio = nullptr;
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
-                if(RegionInfo[RegionIndex].showData)
+                if(RegionGroup[RegionGroupIndex].showData)
                 {
                     //size for two pads
                     const double size1 = 0.65;
@@ -2885,7 +2877,7 @@ void analysis1()
                 {
                     h2SigSum[i]->Draw("histsame");
                 }
-                if(RegionInfo[RegionIndex].showData)
+                if(RegionGroup[RegionGroupIndex].showData)
                 {
                     h2DataSum->Draw("Esame");
                 }
@@ -2908,7 +2900,7 @@ void analysis1()
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
-                if(RegionInfo[RegionIndex].showData)
+                if(RegionGroup[RegionGroupIndex].showData)
                 {
                     //Draw for pad2
                     c2->cd();
@@ -2968,7 +2960,7 @@ void analysis1()
                 //legend
                 delete leg;
                 
-                if(RegionInfo[RegionIndex].showData)
+                if(RegionGroup[RegionGroupIndex].showData)
                 {
                     //h2Ratio
                     delete h2Ratio;
@@ -3193,6 +3185,16 @@ void analysis1()
     //latex for expN
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS"    ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" )
+           ) continue;
+        
         TString PathName = "latex/data/expN_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
         PathName += ".tex";
