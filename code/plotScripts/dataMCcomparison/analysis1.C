@@ -3331,14 +3331,10 @@ void analysis1()
             TString latexName = RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName;
             latexName.ReplaceAll("_","\\_");
             
-            fout<<"\\begin{frame}"<<endl;
-            fout<<"\\frametitle{Expected number of events (For ";
-            fout<<latexName.Data();
-            fout<<")}"<<endl;
-            
+            fout<<"\\begin{frame}{Expected number of events \\\\";
             fout<<"For ";
             fout<<latexName.Data();
-            fout<<",\\\\"<<endl;
+            fout<<"}"<<endl;
             
             fout<<"\\vspace{5mm}"<<endl;
             fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
@@ -3385,9 +3381,14 @@ void analysis1()
                 Var[VarIndex].VarName=="cjetphi" )
                ) continue;
             
-            fout<<"\\begin{frame}"<<endl;
+            TString latexName = RegionGroup[RegionGroupIndex].GroupName;
+            latexName.ReplaceAll("_","\\_");
             
-            fout<<"\\frametitle{"<<Var[VarIndex].latexName.Data()<<" (For CR)}"<<endl;;
+            fout<<"\\begin{frame}{For ";
+            fout<<latexName.Data();
+            fout<<" \\\\ ";
+            fout<<Var[VarIndex].latexName.Data();
+            fout<<"}"<<endl;
             
             fout<<"\\Wider[5em]{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
