@@ -2133,6 +2133,15 @@ void analysis1()
                         CommonCut += " && nFJet>0";
                     }
                     
+                    // mll>15 for OS_ee and OS_mumu
+                    if(ChannelInfo[channelRepresentative].ChannelName == "nonISR_OS_ee"   ||
+                       ChannelInfo[channelRepresentative].ChannelName == "nonISR_OS_mumu" ||
+                       ChannelInfo[channelRepresentative].ChannelName == "ISR_OS_ee"      ||
+                       ChannelInfo[channelRepresentative].ChannelName == "ISR_OS_mumu"    )
+                    {
+                        CommonCut += " && mll>15";
+                    }
+                    
                     CommonCut += RegionInfo[RegionIndex].Cut;
                     //CommonCut += " && pt1>25 && pt2>20";
                     //CommonCut += " && mll>60";
