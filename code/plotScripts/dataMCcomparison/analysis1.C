@@ -1318,6 +1318,29 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        //SR_SS_0B
+        GroupElement.GroupName = "SR_SS_0B";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
+        element.Cut = " && nBJet == 0";
+        
+        for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+        {
+            if(ChannelIndex<=2 || (ChannelIndex>=6 && ChannelIndex<=8)) continue;
+            
+            element.RegionName = "SR_";
+            element.RegionName += ChannelInfo[ChannelIndex].ChannelName;
+            element.RegionName += "_0B";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(ChannelIndex);
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
@@ -2706,13 +2729,15 @@ void analysis1()
                     if(BGGroup[j].info->GroupName == "fake lepton")
                     {
                         if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_1B" ||
-                           RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_2B" )
+                           RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_2B" ||
+                           RegionInfo[RegionIndex].RegionName == "SR_nonISR_SS_mumu_0B" )
                         {
                             BGGroup[j].h2->Scale(4.28729);
                         }
                         
                         if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_1B" ||
-                           RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_2B" )
+                           RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_2B" ||
+                           RegionInfo[RegionIndex].RegionName == "SR_ISR_SS_mumu_0B" )
                         {
                             BGGroup[j].h2->Scale(4.18533);
                         }
