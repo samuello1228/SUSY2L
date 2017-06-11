@@ -2134,10 +2134,13 @@ void analysis1()
                     }
                     
                     // mll>15 for OS_ee and OS_mumu
-                    if(ChannelInfo[channelRepresentative].ChannelName == "nonISR_OS_ee"   ||
+                    if((
+                       ChannelInfo[channelRepresentative].ChannelName == "nonISR_OS_ee"   ||
                        ChannelInfo[channelRepresentative].ChannelName == "nonISR_OS_mumu" ||
                        ChannelInfo[channelRepresentative].ChannelName == "ISR_OS_ee"      ||
                        ChannelInfo[channelRepresentative].ChannelName == "ISR_OS_mumu"    )
+                       && Var[VarIndex].VarName!="mll")
+                       
                     {
                         CommonCut += " && mll>15";
                     }
@@ -2684,23 +2687,23 @@ void analysis1()
                         if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_1B" ||
                            RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_2B" )
                         {
-                            BGGroup[j].h2->Scale(3.50464);
+                            BGGroup[j].h2->Scale(4.28729);
                         }
                         
                         if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_1B" ||
                            RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_2B" )
                         {
-                            BGGroup[j].h2->Scale(4.21815);
+                            BGGroup[j].h2->Scale(4.18533);
                         }
                         
                         if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_low_mT2")
                         {
-                            BGGroup[j].h2->Scale(4.26277);
+                            BGGroup[j].h2->Scale(4.43166);
                         }
                         
                         if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_low_mT2")
                         {
-                            BGGroup[j].h2->Scale(3.80146);
+                            BGGroup[j].h2->Scale(3.85965);
                         }
                     }
                 }
