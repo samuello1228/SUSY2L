@@ -3242,7 +3242,12 @@ void analysis1()
         }
     }
     
-    //latex for expN
+    //expN_CR_OS.tex and expN_SR_SS.tex
+    //expN_CR_OS_1B.tex and expN_CR_SS_1B.tex
+    //expN_CR_OS_2B.tex and expN_CR_SS_2B.tex
+    //expN_CR_SS_mumu_low_mT2.tex
+    //expN_CR_SS_ee_Zmass.tex
+    //expN_SR_SS_0B.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         if(!
@@ -3252,7 +3257,9 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" )
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
            ) continue;
         
         TString PathName = "latex/data/expN_";
@@ -3268,7 +3275,9 @@ void analysis1()
             
             if(RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B" ||
                RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
-               ( (RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" || RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B") &&
+               ( (RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
+                  RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
+                  RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ) &&
                !(SixChannel == 1 || SixChannel == 4) )) continue;
             
             TString latexName = RegionInfo[RegionIndex].RegionName;
@@ -3327,15 +3336,13 @@ void analysis1()
     }
     
     //plot_CR_SS_mumu_low_mT2.tex
+    //plot_CR_SS_ee_Zmass.tex
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        unsigned int RegionGroupIndex = 0;
-        for(unsigned int RegionGroupIndex2=0;RegionGroupIndex2<RegionGroup.size();RegionGroupIndex2++)
-        {
-            if(RegionGroup[RegionGroupIndex2].GroupName == "CR_SS_mumu_low_mT2")
-            {
-                RegionGroupIndex = RegionGroupIndex2;
-            }
-        }
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass"     )
+           ) continue;
         
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
@@ -3382,6 +3389,7 @@ void analysis1()
     //plot_CR_OS.tex and plot_SR_SS.tex
     //plot_CR_OS_1B.tex and plot_CR_SS_1B.tex
     //plot_CR_OS_2B.tex and plot_CR_SS_2B.tex
+    //plot_SR_SS_0B.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         unsigned int startingIndex = 0;
@@ -3392,7 +3400,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" )
+            RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
            ) continue;
         
         
