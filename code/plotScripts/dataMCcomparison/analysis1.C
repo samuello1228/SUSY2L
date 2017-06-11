@@ -1297,6 +1297,27 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        //CR_SS_ee_Zmass
+        GroupElement.GroupName = "CR_SS_ee_Zmass";
+        GroupElement.lower = RegionInfo.size();
+        
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
+        element.Cut = " && mll>81.18 && mll<101.18";
+        
+        element.RegionName = "CR_nonISR_SS_ee_Zmass";
+        element.setOfChannel.clear();
+        element.setOfChannel.push_back(3);
+        RegionInfo.push_back(element);
+        
+        element.RegionName = "CR_ISR_SS_ee_Zmass";
+        element.setOfChannel.clear();
+        element.setOfChannel.push_back(9);
+        RegionInfo.push_back(element);
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
@@ -1942,7 +1963,7 @@ void analysis1()
     
     TFile* fout = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=6;RegionGroupIndex<=6;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=7;RegionGroupIndex<=7;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
@@ -2696,12 +2717,14 @@ void analysis1()
                             BGGroup[j].h2->Scale(4.18533);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_low_mT2")
+                        if(RegionInfo[RegionIndex].RegionName == "CR_nonISR_SS_mumu_low_mT2" ||
+                           RegionInfo[RegionIndex].RegionName == "SR_nonISR_SS_mumu"         )
                         {
                             BGGroup[j].h2->Scale(4.43166);
                         }
                         
-                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_low_mT2")
+                        if(RegionInfo[RegionIndex].RegionName == "CR_ISR_SS_mumu_low_mT2" ||
+                           RegionInfo[RegionIndex].RegionName == "SR_ISR_SS_mumu"         )
                         {
                             BGGroup[j].h2->Scale(3.85965);
                         }
