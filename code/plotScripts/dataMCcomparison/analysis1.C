@@ -1986,9 +1986,10 @@ void analysis1()
     
     TFile* fout = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=7;RegionGroupIndex<=7;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=8;RegionGroupIndex<=8;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
+        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].lower;RegionIndex++)
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -2125,8 +2126,9 @@ void analysis1()
                 initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
             }
             
-            //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++)
-            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
+            for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
+            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
@@ -2699,6 +2701,45 @@ void analysis1()
                     }
                 }
                 
+                //significance calculation
+                TH1F* hSignificance[SigMassSplitting.size()];
+                if(RegionGroup[RegionGroupIndex].showSignificance &&
+                   Var[VarIndex].VarName=="ptll")
+                {
+                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    {
+                        TString NameTemp = "Significance_";
+                        NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                        hSignificance[i] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
+                    }
+                    
+                    for(int bin=1;bin<=Var[VarIndex].bin;bin++)
+                    {
+                        double nBG = 0;
+                        double nSig = 0;
+                        for(unsigned int j=0;j<BGGroup.size();j++)
+                        {
+                            nBG += BGGroup[j].h2->Integral(bin,-1);
+                        }
+                        
+                        //expected number of events for signal
+                        for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                        {
+                            //expected number of events
+                            
+                            TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            hTemp.Add(h2SigSum[i]);
+                            hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
+                            nSig = hTemp.Integral(bin,-1);
+                            
+                            //Significance
+                            //if(SigMassSplitting[i].MassDiff == 100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
+                            hSignificance[i]->SetBinContent(bin,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
+                        }
+                    }
+                }
+                
                 //final normalization for h2SigSum for plotting
                 const int SigScale = 10;
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2866,7 +2907,8 @@ void analysis1()
                 TH1F* h2Ratio = nullptr;
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
-                if(RegionGroup[RegionGroupIndex].showData)
+                TH1F* hPad2 = nullptr;
+                if(RegionGroup[RegionGroupIndex].showData || RegionGroup[RegionGroupIndex].showSignificance)
                 {
                     //size for two pads
                     const double size1 = 0.65;
@@ -2887,25 +2929,37 @@ void analysis1()
                     h2DataSum->GetYaxis()->SetTitleSize(y_title*scale1);
                     h2DataSum->GetYaxis()->SetTitleOffset(y_offset/scale1);
                     
-                    //ratio plot
-                    h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                    h2Ratio->GetXaxis()->SetTitle(xaxis.Data());
-                    h2Ratio->GetYaxis()->SetTitle("Data/MC");
-                    h2Ratio->GetYaxis()->CenterTitle();
-                    h2Ratio->SetMarkerSize(1.0);
-                    h2Ratio->SetLineColor(1);
+                    if(RegionGroup[RegionGroupIndex].showData)
+                    {
+                        //ratio plot
+                        h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Ratio->Sumw2();
+                        h2Ratio->Add(h2DataSum);
+                        h2Ratio->Divide(h2BGSum);
+                        
+                        h2Ratio->SetMarkerSize(1.0);
+                        h2Ratio->SetLineColor(1);
+                        h2Ratio->GetYaxis()->SetTitle("Data/MC");
+                        h2Ratio->GetYaxis()->SetRangeUser(0.5,1.5);
+                        h2Ratio->GetYaxis()->SetNdivisions(8);
+                    }
+                    else if(RegionGroup[RegionGroupIndex].showSignificance)
+                    {
+                        hSignificance[0]->GetYaxis()->SetTitle("Significance");
+                        hSignificance[0]->GetYaxis()->SetRangeUser(-1,2);
+                    }
                     
-                    h2Ratio->Sumw2();
-                    h2Ratio->Add(h2DataSum);
-                    h2Ratio->Divide(h2BGSum);
+                    if(RegionGroup[RegionGroupIndex].showData) hPad2 = h2Ratio;
+                    else if(RegionGroup[RegionGroupIndex].showSignificance) hPad2 = hSignificance[0];
                     
-                    h2Ratio->GetXaxis()->SetLabelSize(x_label*scale2);
-                    h2Ratio->GetYaxis()->SetLabelSize(y_label*scale2);
-                    h2Ratio->GetYaxis()->SetRangeUser(0.5,1.5);
-                    h2Ratio->GetXaxis()->SetTitleSize(x_title*scale2);
-                    h2Ratio->GetYaxis()->SetTitleSize(y_title*scale2);
-                    h2Ratio->GetYaxis()->SetTitleOffset(y_offset/scale2);
-                    h2Ratio->GetYaxis()->SetNdivisions(8);
+                    hPad2->GetXaxis()->SetLabelSize(x_label*scale2);
+                    hPad2->GetYaxis()->SetLabelSize(y_label*scale2);
+                    
+                    hPad2->GetXaxis()->SetTitleSize(x_title*scale2);
+                    hPad2->GetYaxis()->SetTitleSize(y_title*scale2);
+                    hPad2->GetYaxis()->SetTitleOffset(y_offset/scale2);
+                    hPad2->GetXaxis()->SetTitle(xaxis.Data());
+                    hPad2->GetYaxis()->CenterTitle();
                     
                     //Two pads
                     pad1 = new TPad("pad1","pad1",0,1-size1,1,1);
@@ -2960,18 +3014,30 @@ void analysis1()
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
-                if(RegionGroup[RegionGroupIndex].showData)
+                if(RegionGroup[RegionGroupIndex].showData || RegionGroup[RegionGroupIndex].showSignificance)
                 {
                     //Draw for pad2
                     c2->cd();
                     pad2->Draw();
                     pad2->cd();
-                    h2Ratio->Draw();
                     
-                    TLine l;
-                    TLine* l1 = l.DrawLine(h2Ratio->GetXaxis()->GetXmin(), 1., h2Ratio->GetXaxis()->GetXmax(), 1.);
-                    l1->SetLineStyle(2);
-                    l1->SetLineWidth(2);
+                    if(RegionGroup[RegionGroupIndex].showData)
+                    {
+                        h2Ratio->Draw();
+                        
+                        TLine l;
+                        TLine* l1 = l.DrawLine(h2Ratio->GetXaxis()->GetXmin(), 1., h2Ratio->GetXaxis()->GetXmax(), 1.);
+                        l1->SetLineStyle(2);
+                        l1->SetLineWidth(2);
+                    }
+                    else if(RegionGroup[RegionGroupIndex].showSignificance)
+                    {
+                        hSignificance[0]->Draw();
+                        for(unsigned int i=1;i<SigMassSplitting.size();i++)
+                        {
+                            hSignificance[i]->Draw("same");
+                        }
+                    }
                 }
                 
                 {
@@ -3027,6 +3093,15 @@ void analysis1()
                     
                     //pad2
                     delete pad2;
+                }
+                
+                if(RegionGroup[RegionGroupIndex].showSignificance &&
+                   Var[VarIndex].VarName=="ptll")
+                {
+                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    {
+                        delete hSignificance[i];
+                    }
                 }
                 
                 //pad1
