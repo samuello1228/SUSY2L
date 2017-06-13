@@ -735,9 +735,9 @@ void analysis1()
             std::vector<Group> BGGroup;
             {
                 //For MC background
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                 {
-                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
                         if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
@@ -1452,9 +1452,9 @@ void analysis1()
             std::vector<Group> BGGroup;
             {
                 //For MC background
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                 {
-                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
                         if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
@@ -1482,9 +1482,9 @@ void analysis1()
                 }
                 
                 //For data-driven background
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                 {
-                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
+                    for(unsigned int j=0;j<BGDataGroupData.size();j++)
                     {
                         if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                         {
@@ -2003,9 +2003,9 @@ void analysis1()
             std::vector<Group> BGGroup;
             {
                 //For MC background
-                for(unsigned int j=0;j<BGMCGroupData.size();j++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
                 {
-                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGMC.size();k++)
+                    for(unsigned int j=0;j<BGMCGroupData.size();j++)
                     {
                         if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
@@ -2097,9 +2097,9 @@ void analysis1()
                 }
                 
                 //For data-driven background
-                for(unsigned int j=0;j<BGDataGroupData.size();j++)
+                for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
                 {
-                    for(unsigned int k=0;k<ChannelInfo[channelRepresentative].setOfBGData.size();k++)
+                    for(unsigned int j=0;j<BGDataGroupData.size();j++)
                     {
                         if(BGDataGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGData[k])
                         {
@@ -2572,6 +2572,7 @@ void analysis1()
                             unsigned int j2 = 0;
                             for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
                             {
+                                if(j2==BGGroup.size()) break;
                                 if(SRBGName[3][j1]==BGGroup[j2].info->GroupName)
                                 {
                                     fout_SR<<std::setw(8)<<sumOfEvent[j2][0];
@@ -3186,6 +3187,7 @@ void analysis1()
             unsigned int j2 = 0;
             for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
             {
+                if(j2==SRBGName[i].size()) break;
                 if(SRBGName[i][j2]==SRBGName[3][j1])
                 {
                     h2SRBG[3][j1]->Add(h2SRBG[i][j2]);
@@ -3223,6 +3225,7 @@ void analysis1()
                 unsigned int j2 = 0;
                 for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
                 {
+                    if(j2==SRBGName[i].size()) break;
                     if(SRBGName[i][j2]==SRBGName[3][j1])
                     {
                         for(unsigned int k=0;k<BGMCGroupData.size();k++)
