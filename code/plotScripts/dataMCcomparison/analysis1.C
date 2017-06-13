@@ -206,6 +206,7 @@ void analysis1()
                     element.setOfBGData.clear();
                     if(element.isSS)
                     {
+                        element.setOfBGData.push_back("fake lepton");
                         if(element.isSS_qF)
                         {
                             if(docfw)
@@ -217,8 +218,6 @@ void analysis1()
                                 element.setOfBGData.push_back("charge flip");
                             }
                         }
-                        
-                        element.setOfBGData.push_back("fake lepton");
                         
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
@@ -3258,33 +3257,33 @@ void analysis1()
         if(i==0)
         {
             //ee
-            stackSR[i].Add(h2SRBG[i][0]);
-            stackSR[i].Add(h2SRBG[i][1]);
-            stackSR[i].Add(h2SRBG[i][3]);
-            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+            stackSR[i].Add(h2SRBG[i][3]); //charge flip
         }
         else if(i==1)
         {
             //mumu
-            stackSR[i].Add(h2SRBG[i][1]);
-            stackSR[i].Add(h2SRBG[i][2]);
-            stackSR[i].Add(h2SRBG[i][0]);
+            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+            stackSR[i].Add(h2SRBG[i][0]); //VV
         }
         else if(i==2)
         {
             //emu
-            stackSR[i].Add(h2SRBG[i][0]);
-            stackSR[i].Add(h2SRBG[i][1]);
-            stackSR[i].Add(h2SRBG[i][3]);
-            stackSR[i].Add(h2SRBG[i][2]);
+            stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+            stackSR[i].Add(h2SRBG[i][3]); //charge flip
         }
         else if(i==3)
         {
             //combine
-            stackSR[i].Add(h2SRBG[i][1]);
-            stackSR[i].Add(h2SRBG[i][0]);
-            stackSR[i].Add(h2SRBG[i][2]);
-            stackSR[i].Add(h2SRBG[i][3]);
+            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][3]); //fake lepton
+            stackSR[i].Add(h2SRBG[i][2]); //charge flip
         }
         
         //Draw
