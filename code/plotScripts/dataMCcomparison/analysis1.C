@@ -2734,8 +2734,8 @@ void analysis1()
                             nSig = hTemp.Integral(bin,-1);
                             
                             //Significance
-                            //if(SigMassSplitting[i].MassDiff == 100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
-                            hSignificance[i]->SetBinContent(bin,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
+                            //cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
+                            if(nBG>0) hSignificance[i]->SetBinContent(bin,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
                         }
                     }
                 }
@@ -2908,7 +2908,9 @@ void analysis1()
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
                 TH1F* hPad2 = nullptr;
-                if(RegionGroup[RegionGroupIndex].showData || RegionGroup[RegionGroupIndex].showSignificance)
+                if(RegionGroup[RegionGroupIndex].showData ||
+                   (RegionGroup[RegionGroupIndex].showSignificance &&
+                   Var[VarIndex].VarName=="ptll"))
                 {
                     //size for two pads
                     const double size1 = 0.65;
@@ -2946,7 +2948,7 @@ void analysis1()
                     else if(RegionGroup[RegionGroupIndex].showSignificance)
                     {
                         hSignificance[0]->GetYaxis()->SetTitle("Significance");
-                        hSignificance[0]->GetYaxis()->SetRangeUser(-1,2);
+                        hSignificance[0]->GetYaxis()->SetRangeUser(-1,3);
                     }
                     
                     if(RegionGroup[RegionGroupIndex].showData) hPad2 = h2Ratio;
@@ -3014,7 +3016,9 @@ void analysis1()
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
-                if(RegionGroup[RegionGroupIndex].showData || RegionGroup[RegionGroupIndex].showSignificance)
+                if(RegionGroup[RegionGroupIndex].showData ||
+                   (RegionGroup[RegionGroupIndex].showSignificance &&
+                   Var[VarIndex].VarName=="ptll"))
                 {
                     //Draw for pad2
                     c2->cd();
