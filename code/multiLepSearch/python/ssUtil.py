@@ -155,7 +155,7 @@ basicBDTVars = [
 
 #ISR region
 isrBDTVars   = [
-                 ( "JetMET_dPhi"  , "jets.MET_dPhi[0] * (jets.MET_dPhi[0]>0)"                 ),
+                 ( "JetMET_dPhi"  , "jets.MET_dPhi[0] * (fabs(l12.dPhi) < 3.15)"              ),
                  ( "MET_JetPt_R"  , "sig.MetRel/jets.pt[0] * (sig.MetRel > 0 && jets.pt[0]>0)"),
                  ( "l1Pt_JetPt_R" , "leps.pt[0]/jets.pt[0] * (leps.pt[0] > 0 && jets.pt[0]>0)"),
                ]
