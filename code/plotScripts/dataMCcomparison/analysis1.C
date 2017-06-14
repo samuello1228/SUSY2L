@@ -1985,7 +1985,7 @@ void analysis1()
     
     TFile* fout = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=8;RegionGroupIndex<=8;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].lower;RegionIndex++)
@@ -2126,8 +2126,8 @@ void analysis1()
             }
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
-            for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
+            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
@@ -3257,33 +3257,33 @@ void analysis1()
         if(i==0)
         {
             //ee
-            stackSR[i].Add(h2SRBG[i][0]); //VV
             stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
             stackSR[i].Add(h2SRBG[i][3]); //charge flip
+            stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
         }
         else if(i==1)
         {
             //mumu
             stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
             stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
         }
         else if(i==2)
         {
             //emu
-            stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
             stackSR[i].Add(h2SRBG[i][3]); //charge flip
+            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][0]); //VV
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
         }
         else if(i==3)
         {
             //combine
             stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+            stackSR[i].Add(h2SRBG[i][3]); //charge flip
             stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][3]); //fake lepton
-            stackSR[i].Add(h2SRBG[i][2]); //charge flip
+            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
         }
         
         //Draw
