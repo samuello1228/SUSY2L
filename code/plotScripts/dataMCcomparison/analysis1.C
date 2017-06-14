@@ -1884,110 +1884,114 @@ void analysis1()
         if(Var[i].VarName == "phi1") countVariable = i;
     }
     
-    //channelRepresentative for SR
-    std::vector<unsigned int> SRchannelRepresentative;
-    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-    {
-        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
-    }
-    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-    {
-        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_mumu") SRchannelRepresentative.push_back(ChannelIndex);
-    }
-    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-    {
-        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_emu") SRchannelRepresentative.push_back(ChannelIndex);
-    }
-    for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
-    {
-        if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
-    }
-    
-    //Find all BG group name for each channel
-    std::vector< std::vector<TString> > SRBGName;
-    for(unsigned int i=0;i<SRchannelRepresentative.size();i++)
-    {
-        std::vector<TString> element;
-        const unsigned int channelRepresentative = SRchannelRepresentative[i];
-        //For MC background
-        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGMC.size();j++)
-        {
-            element.push_back(ChannelInfo[channelRepresentative].setOfBGMC[j]);
-        }
-        
-        //For data-driven background
-        for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGData.size();j++)
-        {
-            element.push_back(ChannelInfo[channelRepresentative].setOfBGData[j]);
-        }
-        
-        SRBGName.push_back(element);
-    }
-    
-    //expN for SR
-    TString PathName_SR = "latex/data/expN/SR.txt";
-    fstream fout_SR;
-    fout_SR.open(PathName_SR.Data(), ios::out);
-    fout_SR<<std::setw(46)<<"The Name of Signal Region";
-    for(unsigned int i=0;i<SRBGName[3].size();i++)
-    {
-        fout_SR<<std::setw(15)<<SRBGName[3][i].Data();
-    }
-    
-    fout_SR<<std::setw(15)<<"Total BG";
-    
-    for(unsigned int i=0;i<SigMassSplitting.size();i++)
-    {
-        fout_SR<<std::setw(22)<<SigMassSplitting[i].IDName.Data();
-    }
-    fout_SR<<endl;
-    fout_SR.close();
-    
-    //h2SR
-    std::vector< std::vector<TH1F*> > h2SRBG;
-    std::vector< std::vector<TH1F*> > h2SRSig;
-    for(unsigned int i=0;i<4;i++)
-    {
-        std::vector<TH1F*> element;
-        TH1F* hTemp = nullptr;
-        TString LeptonName;
-        if(i==0) LeptonName = "_ee";
-        else if(i==1) LeptonName = "_mumu";
-        else if(i==2) LeptonName = "_emu";
-        else if(i==3) LeptonName = "_combine";
-        
-        //h2SRBG
-        for(unsigned int j=0;j<SRBGName[i].size();j++)
-        {
-            hTemp = new TH1F((SRBGName[i][j]+LeptonName).Data(),"",18,0,18);
-            int colour = 0;
-            if(SRBGName[i][j] == "VV") colour = 2;
-            else if(SRBGName[i][j] == "Vgamma") colour = 4;
-            else if(SRBGName[i][j] == "charge flip") colour = 3;
-            else if(SRBGName[i][j] == "fake lepton") colour = 5;
-            hTemp->SetLineColor(colour);
-            hTemp->SetFillColor(colour);
-            element.push_back(hTemp);
-        }
-        h2SRBG.push_back(element);
-        element.clear();
-        
-        //h2SRSig
-        for(unsigned int j=0;j<SigMassSplitting.size();j++)
-        {
-            hTemp = new TH1F((SigMassSplitting[j].IDName+LeptonName).Data(),"",18,0,18);
-            hTemp->SetLineColor(SigMassSplitting[j].colour);
-            hTemp->SetLineStyle(1);
-            element.push_back(hTemp);
-        }
-        h2SRSig.push_back(element);
-    }
-    
     TFile* fout = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=8;RegionGroupIndex<=8;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
+        //For SR
+        TString PathName_SR = "latex/data/expN/SR.txt";
+        fstream fout_SR;
+        std::vector< std::vector<TString> > SRBGName;
+        std::vector< std::vector<TH1F*> > h2SRBG;
+        std::vector< std::vector<TH1F*> > h2SRSig;
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR")
+        {
+            //channelRepresentative for SR
+            std::vector<unsigned int> SRchannelRepresentative;
+            for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+            {
+                if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+            }
+            for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+            {
+                if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_mumu") SRchannelRepresentative.push_back(ChannelIndex);
+            }
+            for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+            {
+                if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_emu") SRchannelRepresentative.push_back(ChannelIndex);
+            }
+            for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
+            {
+                if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") SRchannelRepresentative.push_back(ChannelIndex);
+            }
+            
+            //Find all BG group name for each channel
+            for(unsigned int i=0;i<SRchannelRepresentative.size();i++)
+            {
+                std::vector<TString> element;
+                const unsigned int channelRepresentative = SRchannelRepresentative[i];
+                //For MC background
+                for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGMC.size();j++)
+                {
+                    element.push_back(ChannelInfo[channelRepresentative].setOfBGMC[j]);
+                }
+                
+                //For data-driven background
+                for(unsigned int j=0;j<ChannelInfo[channelRepresentative].setOfBGData.size();j++)
+                {
+                    element.push_back(ChannelInfo[channelRepresentative].setOfBGData[j]);
+                }
+                
+                SRBGName.push_back(element);
+            }
+            
+            //expN for SR
+            fout_SR.open(PathName_SR.Data(), ios::out);
+            fout_SR<<std::setw(46)<<"The Name of Signal Region";
+            for(unsigned int i=0;i<SRBGName[3].size();i++)
+            {
+                fout_SR<<std::setw(15)<<SRBGName[3][i].Data();
+            }
+            
+            fout_SR<<std::setw(15)<<"Total BG";
+            
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                fout_SR<<std::setw(22)<<SigMassSplitting[i].IDName.Data();
+            }
+            fout_SR<<endl;
+            fout_SR.close();
+            
+            //h2SR
+            for(unsigned int i=0;i<4;i++)
+            {
+                std::vector<TH1F*> element;
+                TH1F* hTemp = nullptr;
+                TString LeptonName;
+                if(i==0) LeptonName = "_ee";
+                else if(i==1) LeptonName = "_mumu";
+                else if(i==2) LeptonName = "_emu";
+                else if(i==3) LeptonName = "_combine";
+                
+                //h2SRBG
+                for(unsigned int j=0;j<SRBGName[i].size();j++)
+                {
+                    hTemp = new TH1F((SRBGName[i][j]+LeptonName).Data(),"",18,0,18);
+                    int colour = 0;
+                    if(SRBGName[i][j] == "VV") colour = 2;
+                    else if(SRBGName[i][j] == "Vgamma") colour = 4;
+                    else if(SRBGName[i][j] == "charge flip") colour = 3;
+                    else if(SRBGName[i][j] == "fake lepton") colour = 5;
+                    hTemp->SetLineColor(colour);
+                    hTemp->SetFillColor(colour);
+                    element.push_back(hTemp);
+                }
+                h2SRBG.push_back(element);
+                element.clear();
+                
+                //h2SRSig
+                for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                {
+                    hTemp = new TH1F((SigMassSplitting[j].IDName+LeptonName).Data(),"",18,0,18);
+                    hTemp->SetLineColor(SigMassSplitting[j].colour);
+                    hTemp->SetLineStyle(1);
+                    element.push_back(hTemp);
+                }
+                h2SRSig.push_back(element);
+            }
+        }
+        
         //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].lower;RegionIndex++)
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
@@ -2126,8 +2130,8 @@ void analysis1()
             }
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
-            //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
+            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
@@ -3170,158 +3174,161 @@ void analysis1()
                 delete tree2Sig[i];
             }
         }
+        
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR")
+        {
+            //h2SR
+            THStack stackSR[4];
+            
+            //For combined SR
+            for(unsigned int i=0;i<3;i++)
+            {
+                //h2SRBG
+                {
+                    unsigned int j2 = 0;
+                    for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+                    {
+                        if(j2==SRBGName[i].size()) break;
+                        if(SRBGName[i][j2]==SRBGName[3][j1])
+                        {
+                            h2SRBG[3][j1]->Add(h2SRBG[i][j2]);
+                            j2++;
+                        }
+                    }
+                }
+                
+                //h2SRSig
+                for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                {
+                    h2SRSig[3][j]->Add(h2SRSig[i][j]);
+                }
+            }
+            
+            for(unsigned int i=0;i<4;i++)
+            {
+                //Legend
+                TLegend* leg;
+                {
+                    Double_t xl1, yl1, xl2, yl2;
+                    {
+                        xl2=0.92;
+                        yl2=0.95;
+                        xl1=xl2-0.3;
+                        yl1=yl2-0.2;
+                    }
+                    leg = new TLegend(xl1,yl1,xl2,yl2);
+                    leg->SetNColumns(2);
+                    leg->SetFillStyle(0);
+                    leg->SetTextFont(42);
+                    leg->SetBorderSize(0);
+                    
+                    {
+                        unsigned int j2 = 0;
+                        for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
+                        {
+                            if(j2==SRBGName[i].size()) break;
+                            if(SRBGName[i][j2]==SRBGName[3][j1])
+                            {
+                                for(unsigned int k=0;k<BGMCGroupData.size();k++)
+                                {
+                                    if(BGMCGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGMCGroupData[k].LegendName.Data(),"fl");
+                                }
+                                for(unsigned int k=0;k<BGDataGroupData.size();k++)
+                                {
+                                    if(BGDataGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGDataGroupData[k].LegendName.Data(),"fl");
+                                }
+                                j2++;
+                            }
+                        }
+                    }
+                    
+                    
+                    for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                    {
+                        TString NameTemp = "";
+                        NameTemp += "(";
+                        NameTemp += TString::Itoa(SigMass1[SigMassSplitting[j].ID],10);
+                        NameTemp += ", ";
+                        NameTemp += TString::Itoa(SigMass2[SigMassSplitting[j].ID],10);
+                        NameTemp += ")";
+                        leg->AddEntry(h2SRSig[i][j],NameTemp.Data(),"l");
+                    }
+                }
+                
+                //add h2SRBG
+                if(i==0)
+                {
+                    //ee
+                    stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+                    stackSR[i].Add(h2SRBG[i][3]); //charge flip
+                    stackSR[i].Add(h2SRBG[i][0]); //VV
+                    stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+                }
+                else if(i==1)
+                {
+                    //mumu
+                    stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+                    stackSR[i].Add(h2SRBG[i][0]); //VV
+                    stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+                }
+                else if(i==2)
+                {
+                    //emu
+                    stackSR[i].Add(h2SRBG[i][3]); //charge flip
+                    stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+                    stackSR[i].Add(h2SRBG[i][0]); //VV
+                    stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+                }
+                else if(i==3)
+                {
+                    //combine
+                    stackSR[i].Add(h2SRBG[i][1]); //Vgamma
+                    stackSR[i].Add(h2SRBG[i][3]); //charge flip
+                    stackSR[i].Add(h2SRBG[i][0]); //VV
+                    stackSR[i].Add(h2SRBG[i][2]); //fake lepton
+                }
+                
+                //Draw
+                gStyle->SetOptStat(0);
+                TCanvas* c2 = new TCanvas();
+                c2->cd();
+                c2->SetLogy(1);
+                stackSR[i].SetMinimum(1);
+                stackSR[i].Draw("hist");
+                for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                {
+                    h2SRSig[i][j]->Draw("histsame");
+                }
+                leg->Draw();
+                
+                //export histograms in eps format
+                TString NameTemp = "plot/";
+                NameTemp += "SR_";
+                if(i==0) NameTemp += "ee";
+                else if(i==1) NameTemp += "mumu";
+                else if(i==2) NameTemp += "emu";
+                else if(i==3) NameTemp += "combine";
+                NameTemp += ".eps";
+                c2->Print(NameTemp,"eps");
+                delete c2;
+            }
+            
+            for(unsigned int i=0;i<4;i++)
+            {
+                for(unsigned int j=0;j<h2SRBG[i].size();j++)
+                {
+                    delete h2SRBG[i][j];
+                }
+                for(unsigned int j=0;j<h2SRSig[i].size();j++)
+                {
+                    delete h2SRSig[i][j];
+                }
+            }
+        }
     }
     
     //delete fout
     delete fout;
-    
-    //h2SR
-    THStack stackSR[4];
-    
-    //For combined SR
-    for(unsigned int i=0;i<3;i++)
-    {
-        //h2SRBG
-        {
-            unsigned int j2 = 0;
-            for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
-            {
-                if(j2==SRBGName[i].size()) break;
-                if(SRBGName[i][j2]==SRBGName[3][j1])
-                {
-                    h2SRBG[3][j1]->Add(h2SRBG[i][j2]);
-                    j2++;
-                }
-            }
-        }
-        
-        //h2SRSig
-        for(unsigned int j=0;j<SigMassSplitting.size();j++)
-        {
-            h2SRSig[3][j]->Add(h2SRSig[i][j]);
-        }
-    }
-    
-    for(unsigned int i=0;i<4;i++)
-    {
-        //Legend
-        TLegend* leg;
-        {
-            Double_t xl1, yl1, xl2, yl2;
-            {
-                xl2=0.92;
-                yl2=0.95;
-                xl1=xl2-0.3;
-                yl1=yl2-0.2;
-            }
-            leg = new TLegend(xl1,yl1,xl2,yl2);
-            leg->SetNColumns(2);
-            leg->SetFillStyle(0);
-            leg->SetTextFont(42);
-            leg->SetBorderSize(0);
-            
-            {
-                unsigned int j2 = 0;
-                for(unsigned int j1=0;j1<SRBGName[3].size();j1++)
-                {
-                    if(j2==SRBGName[i].size()) break;
-                    if(SRBGName[i][j2]==SRBGName[3][j1])
-                    {
-                        for(unsigned int k=0;k<BGMCGroupData.size();k++)
-                        {
-                            if(BGMCGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGMCGroupData[k].LegendName.Data(),"fl");
-                        }
-                        for(unsigned int k=0;k<BGDataGroupData.size();k++)
-                        {
-                            if(BGDataGroupData[k].GroupName == SRBGName[i][j2]) leg->AddEntry(h2SRBG[i][j2],BGDataGroupData[k].LegendName.Data(),"fl");
-                        }
-                        j2++;
-                    }
-                }
-            }
-            
-            
-            for(unsigned int j=0;j<SigMassSplitting.size();j++)
-            {
-                TString NameTemp = "";
-                NameTemp += "(";
-                NameTemp += TString::Itoa(SigMass1[SigMassSplitting[j].ID],10);
-                NameTemp += ", ";
-                NameTemp += TString::Itoa(SigMass2[SigMassSplitting[j].ID],10);
-                NameTemp += ")";
-                leg->AddEntry(h2SRSig[i][j],NameTemp.Data(),"l");
-            }
-        }
-        
-        //add h2SRBG
-        if(i==0)
-        {
-            //ee
-            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][3]); //charge flip
-            stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
-        }
-        else if(i==1)
-        {
-            //mumu
-            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
-        }
-        else if(i==2)
-        {
-            //emu
-            stackSR[i].Add(h2SRBG[i][3]); //charge flip
-            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
-        }
-        else if(i==3)
-        {
-            //combine
-            stackSR[i].Add(h2SRBG[i][1]); //Vgamma
-            stackSR[i].Add(h2SRBG[i][3]); //charge flip
-            stackSR[i].Add(h2SRBG[i][0]); //VV
-            stackSR[i].Add(h2SRBG[i][2]); //fake lepton
-        }
-        
-        //Draw
-        gStyle->SetOptStat(0);
-        TCanvas* c2 = new TCanvas();
-        c2->cd();
-        c2->SetLogy(1);
-        stackSR[i].SetMinimum(1);
-        stackSR[i].Draw("hist");
-        for(unsigned int j=0;j<SigMassSplitting.size();j++)
-        {
-            h2SRSig[i][j]->Draw("histsame");
-        }
-        leg->Draw();
-        
-        //export histograms in eps format
-        TString NameTemp = "plot/";
-        NameTemp += "SR_";
-        if(i==0) NameTemp += "ee";
-        else if(i==1) NameTemp += "mumu";
-        else if(i==2) NameTemp += "emu";
-        else if(i==3) NameTemp += "combine";
-        NameTemp += ".eps";
-        c2->Print(NameTemp,"eps");
-        delete c2;
-    }
-    
-    for(unsigned int i=0;i<4;i++)
-    {
-        for(unsigned int j=0;j<h2SRBG[i].size();j++)
-        {
-            delete h2SRBG[i][j];
-        }
-        for(unsigned int j=0;j<h2SRSig[i].size();j++)
-        {
-            delete h2SRSig[i][j];
-        }
-    }
     
     //expN_CR_OS.tex and expN_SR_SS.tex
     //expN_CR_OS_1B.tex and expN_CR_SS_1B.tex
