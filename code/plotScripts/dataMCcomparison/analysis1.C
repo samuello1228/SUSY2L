@@ -2130,8 +2130,8 @@ void analysis1()
             }
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
-            for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
+            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
@@ -2707,8 +2707,15 @@ void analysis1()
                 
                 //significance calculation
                 TH1F* hSignificance[SigMassSplitting.size()];
-                if(RegionGroup[RegionGroupIndex].showSignificance &&
-                   Var[VarIndex].VarName=="ptll")
+                if(RegionGroup[RegionGroupIndex].showSignificance && (
+                   Var[VarIndex].VarName=="pt1"   ||
+                   Var[VarIndex].VarName=="pt2"   ||
+                   Var[VarIndex].VarName=="ptll"  ||
+                   Var[VarIndex].VarName=="MET"   ||
+                   Var[VarIndex].VarName=="mTtwo" ||
+                   Var[VarIndex].VarName=="mt1"   ||
+                   Var[VarIndex].VarName=="mt2"   ))
+                   
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
@@ -2913,8 +2920,14 @@ void analysis1()
                 TPad* pad2 = nullptr;
                 TH1F* hPad2 = nullptr;
                 if(RegionGroup[RegionGroupIndex].showData ||
-                   (RegionGroup[RegionGroupIndex].showSignificance &&
-                   Var[VarIndex].VarName=="ptll"))
+                   (RegionGroup[RegionGroupIndex].showSignificance && (
+                    Var[VarIndex].VarName=="pt1"   ||
+                    Var[VarIndex].VarName=="pt2"   ||
+                    Var[VarIndex].VarName=="ptll"  ||
+                    Var[VarIndex].VarName=="MET"   ||
+                    Var[VarIndex].VarName=="mTtwo" ||
+                    Var[VarIndex].VarName=="mt1"   ||
+                    Var[VarIndex].VarName=="mt2"   )))
                 {
                     //size for two pads
                     const double size1 = 0.65;
@@ -3021,8 +3034,14 @@ void analysis1()
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData ||
-                   (RegionGroup[RegionGroupIndex].showSignificance &&
-                   Var[VarIndex].VarName=="ptll"))
+                   (RegionGroup[RegionGroupIndex].showSignificance && (
+                    Var[VarIndex].VarName=="pt1"   ||
+                    Var[VarIndex].VarName=="pt2"   ||
+                    Var[VarIndex].VarName=="ptll"  ||
+                    Var[VarIndex].VarName=="MET"   ||
+                    Var[VarIndex].VarName=="mTtwo" ||
+                    Var[VarIndex].VarName=="mt1"   ||
+                    Var[VarIndex].VarName=="mt2"   )))
                 {
                     //Draw for pad2
                     c2->cd();
@@ -3103,8 +3122,14 @@ void analysis1()
                     delete pad2;
                 }
                 
-                if(RegionGroup[RegionGroupIndex].showSignificance &&
-                   Var[VarIndex].VarName=="ptll")
+                if(RegionGroup[RegionGroupIndex].showSignificance && (
+                   Var[VarIndex].VarName=="pt1"   ||
+                   Var[VarIndex].VarName=="pt2"   ||
+                   Var[VarIndex].VarName=="ptll"  ||
+                   Var[VarIndex].VarName=="MET"   ||
+                   Var[VarIndex].VarName=="mTtwo" ||
+                   Var[VarIndex].VarName=="mt1"   ||
+                   Var[VarIndex].VarName=="mt2"   ))
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
