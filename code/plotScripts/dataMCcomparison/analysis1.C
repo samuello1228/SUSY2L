@@ -129,6 +129,7 @@ struct Group
 {
     GroupData* info;
     TH1F* h2;
+    TH2F* h3;
 };
 
 bool compare2(Group Group1,Group Group2)
@@ -2139,8 +2140,7 @@ void analysis1()
                 //initialize histograms
                 TString title = Var[VarIndex].VarTitle;
                 
-                TString xaxis;
-                xaxis += Var[VarIndex].VarTitle;
+                TString xaxis = Var[VarIndex].VarTitle;
                 xaxis += " ";
                 xaxis += Var[VarIndex].unit;
                 
@@ -2424,6 +2424,7 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
@@ -2723,6 +2724,7 @@ void analysis1()
                         NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
                         hSignificance[i] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
+                        hSignificance[i]->SetLineWidth(2);
                     }
                     
                     for(int bin=1;bin<=Var[VarIndex].bin;bin++)
@@ -2745,7 +2747,7 @@ void analysis1()
                             nSig = hTemp.Integral(bin,-1);
                             
                             //Significance
-                            //cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
+                            //if(SigMassSplitting[i].MassDiff==100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
                             if(nBG>0) hSignificance[i]->SetBinContent(bin,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
                         }
                     }
@@ -2966,6 +2968,7 @@ void analysis1()
                     {
                         hSignificance[0]->GetYaxis()->SetTitle("Significance");
                         hSignificance[0]->GetYaxis()->SetRangeUser(-1,3);
+                        hSignificance[0]->GetYaxis()->SetNdivisions(6);
                     }
                     
                     if(RegionGroup[RegionGroupIndex].showData) hPad2 = h2Ratio;
@@ -3144,6 +3147,220 @@ void analysis1()
                 delete c2;
             }
             
+            //2D significance plot
+            {
+                unsigned int VarIndex[2];
+                VarIndex[0] = 6; // ptll
+                VarIndex[1] = 7; // MET
+                
+                TString title = Var[VarIndex[0]].VarTitle;
+                title += ", ";
+                title += Var[VarIndex[1]].VarTitle;
+                
+                TString axis[2];
+                for(unsigned int i=0;i<=1;i++)
+                {
+                    axis[i] = Var[VarIndex[i]].VarTitle;
+                    axis[i] += " ";
+                    axis[i] += Var[VarIndex[i]].unit;
+                }
+                
+                TH2F* h2SigSum[SigMassSplitting.size()];
+                {
+                    TString CommonCut = RegionInfo[RegionIndex].Cut;
+                    //Background
+                    //For MC background
+                    for(unsigned int j=0;j<tree2BGMC.size();j++)
+                    {
+                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                                                Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                        for(unsigned int k=0;k<tree2BGMC[j].size();k++)
+                        {
+                            TH2F* hTemp = new TH2F("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                       Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                            //fill histograms from trees
+                            TString temp = Var[VarIndex[1]].VarName;
+                            temp += ":";
+                            temp += Var[VarIndex[0]].VarName;
+                            temp += ">>BGMC";
+                            
+                            //Weight
+                            TString Cut = "weight";
+                            
+                            //Cut
+                            Cut += "*(1";
+                            Cut += CommonCut;
+                            Cut += ")";
+                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            
+                            //normalization for BG
+                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                            
+                            BGGroup[j].h3->Add(hTemp);
+                            delete hTemp;
+                        }
+                    }
+                    
+                    //For data-driven background
+                    for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
+                    {
+                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                                                Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                        
+                        for(unsigned int k=0;k<DataSampleID.size();k++)
+                        {
+                            TH2F* hTemp = new TH2F("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                         Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                            
+                            //fill histograms from trees
+                            TString temp = Var[VarIndex[1]].VarName;
+                            temp += ":";
+                            temp += Var[VarIndex[0]].VarName;
+                            temp += ">>BGData";
+                            
+                            TString Cut = "1";
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += "*qFwt";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += "*fLwt";
+                            }
+                            
+                            Cut += "*(1";
+                            Cut += CommonCut;
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                Cut += " && fLwt==0";
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                Cut += " && fLwt!=0";
+                            }
+                            
+                            Cut += ")";
+                            
+                            if(BGGroup[j].info->GroupName == "charge flip")
+                            {
+                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            if(BGGroup[j].info->GroupName == "fake lepton")
+                            {
+                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                            }
+                            
+                            //Add MCData
+                            BGGroup[j].h3->Add(hTemp);
+                            delete hTemp;
+                        }
+                    }
+                    
+                    //For signal
+                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    {
+                        TString NameTemp = "SigSum_";
+                        NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                        h2SigSum[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                            Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                        unsigned int AOD = 0;
+                        for(unsigned int j=0;j<SigSampleID.size();j++)
+                        {
+                            if(SigMass1[j]-SigMass2[j] != SigMassSplitting[i].MassDiff) continue;
+                            TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                         Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                            //fill histograms from trees
+                            TString temp = Var[VarIndex[1]].VarName;
+                            temp += ":";
+                            temp += Var[VarIndex[0]].VarName;
+                            temp += ">>signal";
+                            
+                            TString Cut = "weight*(1";
+                            Cut += CommonCut;
+                            Cut += ")";
+                            tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                            
+                            h2SigSum[i]->Add(hTemp);
+                            delete hTemp;
+                            
+                            AOD += SignAOD[j];
+                        }
+                        
+                        //normalization for h2SigSum
+                        h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                    }
+                }
+                
+                TH2F* hSignificance[SigMassSplitting.size()];
+                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                {
+                    TString NameTemp = "Significance_";
+                    NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                    hSignificance[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
+                    hSignificance[i]->GetXaxis()->SetTitle(axis[0].Data());
+                    hSignificance[i]->GetYaxis()->SetTitle(axis[1].Data());
+                }
+                
+                for(int bin1=1;bin1<=Var[VarIndex[0]].bin;bin1++)
+                {
+                    for(int bin2=1;bin2<=Var[VarIndex[1]].bin;bin2++)
+                    {
+                        double nBG = 0;
+                        double nSig = 0;
+                        for(unsigned int j=0;j<BGGroup.size();j++)
+                        {
+                            nBG += BGGroup[j].h3->Integral(bin1,-1,bin2,-1);
+                            //nBG += BGGroup[j].h3->Integral(bin1,-1,0,-1);
+                        }
+                        
+                        //expected number of events for signal
+                        for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                        {
+                            //expected number of events
+                            nSig = h2SigSum[i]->Integral(bin1,-1,bin2,-1);
+                            //nSig = h2SigSum[i]->Integral(bin1,-1,0,-1);
+                            
+                            //Significance
+                            //if(SigMassSplitting[i].MassDiff==100 && bin2==1) cout<<bin1<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
+                            if(nBG>0) hSignificance[i]->SetBinContent(bin1,bin2,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
+                        }
+                    }
+                }
+                
+                for(unsigned int j=0;j<BGGroup.size();j++)
+                {
+                    delete BGGroup[j].h3;
+                }
+                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                {
+                    delete h2SigSum[i];
+                }
+                
+                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                {
+                    TCanvas* c2 = new TCanvas();
+                    c2->cd();
+                    gStyle->SetPadRightMargin(0.16);
+                    hSignificance[i]->Draw("colz");
+                    
+                    TString NameTemp = "plot/";
+                    NameTemp += "significance_";
+                    NameTemp += Var[VarIndex[0]].VarName;
+                    NameTemp += "_";
+                    NameTemp += Var[VarIndex[1]].VarName;
+                    NameTemp += "_";
+                    NameTemp += RegionInfo[RegionIndex].RegionName;
+                    NameTemp += "_";
+                    NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                    NameTemp += ".eps";
+                    c2->Print(NameTemp,"eps");
+                    
+                    delete hSignificance[i];
+                    delete c2;
+                }
+            }
+        
             //delete tree2
             for(unsigned int i=0;i<DataSampleID.size();i++)
             {
