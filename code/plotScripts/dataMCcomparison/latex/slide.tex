@@ -1,10 +1,12 @@
 \documentclass[mathserif,serif]{beamer}
 \usepackage{tabularx}
-\setbeamertemplate{footline}[frame number]
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
+\usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
-\title{Data/MC comparison}
-\author
+\title[]{Data/MC comparison}
+\author[]
 {
 Samuel Lo \inst{1}
 \and
@@ -12,7 +14,7 @@ Yanjun Tu  \inst{1}
 \and
 Dongliang Zhang  \inst{2}
 }
-\institute
+\institute[]
 {
 \inst{1}
 The University of Hong Kong
@@ -20,7 +22,7 @@ The University of Hong Kong
 \inst{2}
 University of Michigan
 }
-\date{\today}
+\date[]{\today}
 
 \newcommand\Wider[2][3em]{%
 \makebox[\linewidth][c]{%
