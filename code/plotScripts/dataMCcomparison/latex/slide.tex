@@ -1,7 +1,7 @@
 \documentclass[mathserif,serif]{beamer}
 \usepackage{tabularx}
 \setbeamertemplate{footline}[frame number]
-\title{Cut optimization}
+\title{Data/MC comparison}
 \author
 {
 Samuel Lo \inst{1}
@@ -35,24 +35,114 @@ University of Michigan
 \begin{frame}
 \frametitle{Update}
 \begin{itemize}
-\item use new ntuple AnalysisBase-02-04-30-f15e6058
-\item new trigger selection (simplify trigger list)
-\item use the new charge flip weight (the two signal leptons need to pass ElChargeID)
-\item try to use the old method for Z pt reweighting first
+\item ?
 \end{itemize}
 \end{frame}
 
-%\def \PathToPlot {../plot}
-\def \PathToPlot {../plot_nozpt}
-%\def \PathToPlot {../plot_zpt}
 \begin{frame}
-\frametitle{Z pt reweighting}
-\begin{figure}
-\includegraphics[width=\textwidth]{\PathToPlot/ptll_rw}
-\end{figure}
+\frametitle{motivation}
+\begin{itemize}
+\item Use the Control Regions (1 or 2 b-jet) to estimate the fake background
+\item Check whether the 1.4 factor comes from Z+jets (apply a cut 81 GeV $<$ mll $<$ 101 GeV)
+\end{itemize}
 \end{frame}
 
-\input{data/plot_zpt.tex}
+\begin{frame}
+\begin{center}
+\huge
+CR\_OS
+\end{center}
+\end{frame}
+
+\input{data/expN_CR_OS.tex}
+
+\def \PathToPlot {../plot}
+\input{data/plot_CR_OS.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+SR\_SS \\
+\small
+fake BG scale factor for nonISR: 4.43166 \\
+fake BG scale factor for ISR: 3.85965
+\end{center}
+\end{frame}
+
+\input{data/expN_SR_SS.tex}
+
+\input{data/plot_SR_SS.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+CR\_1B \\
+\small
+fake BG scale factor for nonISR: 4.28729 \\
+fake BG scale factor for ISR: 4.18533
+\end{center}
+\end{frame}
+
+\input{data/expN_CR_OS_1B.tex}
+\input{data/expN_CR_SS_1B.tex}
+
+\input{data/plot_CR_OS_1B.tex}
+\input{data/plot_CR_SS_1B.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+CR\_2B \\
+\small
+fake BG scale factor for nonISR: 4.28729 \\
+fake BG scale factor for ISR: 4.18533
+\end{center}
+\end{frame}
+
+\input{data/expN_CR_OS_2B.tex}
+\input{data/expN_CR_SS_2B.tex}
+
+\input{data/plot_CR_OS_2B.tex}
+\input{data/plot_CR_SS_2B.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+CR\_SS\_mumu\_low\_mT2 \\
+\small
+fake BG scale factor for nonISR: 4.43166 \\
+fake BG scale factor for ISR: 3.85965
+\end{center}
+\end{frame}
+
+\input{data/expN_CR_SS_mumu_low_mT2.tex}
+
+\input{data/plot_CR_SS_mumu_low_mT2.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+CR\_SS\_ee\_Zmass \\
+\end{center}
+\end{frame}
+
+\input{data/expN_CR_SS_ee_Zmass.tex}
+
+\input{data/plot_CR_SS_ee_Zmass.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+SR\_SS\_0B \\
+\small
+fake BG scale factor for nonISR: 4.28729 \\
+fake BG scale factor for ISR: 4.18533
+\end{center}
+\end{frame}
+
+\input{data/expN_SR_SS_0B.tex}
+
+\input{data/plot_SR_SS_0B.tex}
 
 %\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
@@ -60,15 +150,15 @@ University of Michigan
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item It does not improve much, after Z pt reweighting.
+\item The 1.4 factor mainly comes from Z+jets
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item Try to not use the fitting, and directly reweight in each bin (bin size: 2 GeV)
-\item Do I need to separate into 4 channels? (ISR\_OS\_ee,nonISR\_OS\_ee,ISR\_OS\_mumu,nonISR\_OS\_mumu)
+\item add the fake background in the OS events
+\item Z pT reweighting for CR
 \end{itemize}
 \end{frame}
 
@@ -408,9 +498,9 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \begin{frame}
 \frametitle{averageMu}
 \begin{figure}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_ISR_OS_emu} \\
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_ee}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_mumu}
+\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_emu} \\
 \caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
 \end{figure}
 \end{frame}
@@ -458,31 +548,6 @@ Definition of the Control Region.
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-opposite sign
-\end{center}
-\end{frame}
-
-\input{data/expN_OS.tex}
-%\input{data/expN_BGVV_OS.tex}
-
-%\def \PathToPlot {../plot}
-\input{data/plot_OS.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-Control Region
-\end{center}
-\end{frame}
-
-\input{data/expN_CR.tex}
-
-%\def \PathToPlot {../plot}
-\input{data/plot_CR.tex}
 
 \begin{frame}
 \begin{center}
@@ -539,18 +604,5 @@ The CMS result:
 \frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
 \includegraphics[width=1\textwidth]{\PathToPlot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
 \end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-same sign
-\end{center}
-\end{frame}
-
-\input{data/expN_SS.tex}
-%\input{data/expN_BGVV_SS.tex}
-
-%\def \PathToPlot {../plot}
-\input{data/plot_SS.tex}
 
 \end{document}

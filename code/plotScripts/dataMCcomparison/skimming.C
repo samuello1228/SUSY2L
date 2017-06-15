@@ -11,6 +11,7 @@ Double_t pt1;
 Double_t pt2;
 Double_t eta1;
 Double_t eta2;
+Double_t phi1;
 Double_t mll;
 Double_t ptll;
 Double_t MET;
@@ -18,10 +19,11 @@ Double_t mTtwo;
 Double_t mt1;
 Double_t mt2;
 Double_t mtm;
-Double_t HT;
-Double_t R2;
+
 Double_t l12_dPhi;
 Double_t l12_MET_dPhi;
+Double_t jets_MET_dPhi;
+
 Int_t nJet;
 Double_t jetpt;
 Double_t jeteta;
@@ -38,10 +40,14 @@ Int_t nFJet;
 Double_t fjetpt;
 Double_t fjeteta;
 Double_t fjetphi;
+
 Double_t weight;
 Double_t qFwt;
 Double_t fLwt;
 Double_t averageMu;
+
+Double_t HT;
+Double_t R2;
 
 struct nEvent
 {
@@ -125,14 +131,24 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("pt2",&pt2,"pt2/D");
         tree2[j]->Branch("eta1",&eta1,"eta1/D");
         tree2[j]->Branch("eta2",&eta2,"eta2/D");
+        tree2[j]->Branch("phi1",&phi1,"phi1/D");
         tree2[j]->Branch("mll",&mll,"mll/D");
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mtm",&mt2,"mtm/D");
+        tree2[j]->Branch("mt1",&mt1,"mt1/D");
+        tree2[j]->Branch("mt2",&mt2,"mt2/D");
+        tree2[j]->Branch("mtm",&mtm,"mtm/D");
+
+        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
+        tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/D");
+
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
+        tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
+        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
@@ -237,17 +253,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         ID2 = evts->leps_ID[sigIndex[1]];
         pt1 = evts->leps_pt[sigIndex[0]];
         pt2 = evts->leps_pt[sigIndex[1]];
+        eta1 = evts->leps_eta[sigIndex[0]];
+        eta2 = evts->leps_eta[sigIndex[1]];
         //pt of leading lepton
-        if(int(abs(ID1)/1000) == 11 && !(pt1>25)) continue;
-        if(int(abs(ID1)/1000) == 13 && !(pt1>20)) continue;
+        if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
+        if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt1",1);
         }
         
         //pt of subleading lepton
-        if(int(abs(ID2)/1000) == 11 && !(pt2>15)) continue;
-        if(int(abs(ID2)/1000) == 13 && !(pt2>10)) continue;
+        if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
+        if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt2",1);
@@ -267,9 +285,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             h2[m]->Fill("mll_60",1);
         }
-
-        eta1 = evts->leps_eta[sigIndex[0]];
-        eta2 = evts->leps_eta[sigIndex[1]];
+        
+        phi1 = evts->leps_phi[sigIndex[0]];
         mll = evts->l12_m;
         ptll = evts->l12_pt;
         MET = evts->sig_Met;
@@ -278,10 +295,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mt2 = evts->leps_mT[sigIndex[1]];
         if(mt1<mt2) mtm = mt1;
         else mtm = mt2;
-        HT = evts->sig_HT;
-        R2 = MET/(MET + pt1 + pt2);
+        //HT = evts->sig_HT;
+        //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
+        jets_MET_dPhi = evts->jets_MET_dPhi[0];
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
@@ -316,13 +334,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //jets
         nJet = 0;
         nBJet = 0;
-        nCJet = 0;
-        nFJet = 0;
+        //nCJet = 0;
+        //nFJet = 0;
         int nISR = 0;
         int leadingJetIndex = 0;
-        int leadingBJetIndex = 0;
-        int leadingCJetIndex = 0;
-        int leadingFJetIndex = 0;
+        //int leadingBJetIndex = 0;
+        //int leadingCJetIndex = 0;
+        //int leadingFJetIndex = 0;
         for(int k=0;k<evts->jets_;k++)
         {
             //signal jets
@@ -331,10 +349,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(nJet==1) leadingJetIndex = k;
             
             //B-jets
-            if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            //if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
+            if(evts->jets_jFlag[k] & 1<<5)
             {
                 nBJet++;
-                if(nBJet==1) leadingBJetIndex = k;
+                //if(nBJet==1) leadingBJetIndex = k;
             }
             
             if(fabs(evts->jets_eta[k]) < 2.4)
@@ -342,6 +361,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
+                /*
                 //Central jets
                 if(!(evts->jets_jFlag[k] & 1<<5))
                 {
@@ -354,15 +374,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                         if(nCJet==1) leadingCJetIndex = k;
                     }
                 }
+                */
             }
             else
             {
+                /*
                 //Forward jets
                 if(evts->jets_pt[k] > 30)
                 {
                     nFJet++;
                     if(nFJet==1) leadingFJetIndex = k;
                 }
+                */
             }
         }
         
@@ -370,15 +393,16 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             jetpt = evts->jets_pt[leadingJetIndex];
             jeteta = evts->jets_eta[leadingJetIndex];
-            jetphi = evts->jets_phi[leadingJetIndex];
+            //jetphi = evts->jets_phi[leadingJetIndex];
         }
         else
         {
             jetpt = 0;
             jeteta = 0;
-            jetphi = 0;
+            //jetphi = 0;
         }
-        
+       
+        /* 
         if(nBJet>0)
         {
             bjetpt = evts->jets_pt[leadingBJetIndex];
@@ -417,9 +441,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             fjeteta = 0;
             fjetphi = 0;
         }
-        
+        */
+
         //separate the sample into channels
-        
         if(nISR==0) {}
         else if(nISR==1) channelIndex += 6;
         else continue;
@@ -508,8 +532,8 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    //TString SamplePath = "root://eosatlas//eos/atlas/user/c/clo/ntuple/";
-    TString SamplePath = "/srv/SUSY/ntuple/";
+    TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     
     //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; TString tag = "v8.10";
@@ -517,7 +541,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
     //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
-    SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
+    //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
+    SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
     
     std::vector<nEvent> nSS;
     
@@ -538,16 +563,16 @@ void skimming()
     }
     
     //Background
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=0;i<=1;i++)
-        for(unsigned int i=0;i<BGSampleName.size();i++)
+        for(unsigned int i=68;i<=69;i++)
+        //for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
@@ -555,8 +580,8 @@ void skimming()
     }
     
     //Signal
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
