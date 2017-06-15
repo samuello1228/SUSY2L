@@ -2667,9 +2667,10 @@ void analysis1()
                         if(RegionInfo[RegionIndex].RegionName == "nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu")
                         {
                             gStyle->SetPalette(1);
-                            gStyle->SetPadRightMargin(0.16);
+                            
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
+                            c2->SetRightMargin(0.16);
                             h2->Draw();
                             g2->Draw("colzsame");
                             
@@ -3341,8 +3342,21 @@ void analysis1()
                 {
                     TCanvas* c2 = new TCanvas();
                     c2->cd();
-                    gStyle->SetPadRightMargin(0.16);
+                    c2->SetRightMargin(0.16);
                     hSignificance[i]->Draw("colz");
+                    
+                    {
+                        unsigned int index = SigMassSplitting[i].ID;
+                        TString NameTemp = RegionInfo[RegionIndex].RegionName;
+                        NameTemp += ": (";
+                        NameTemp += SigMass1[index];
+                        NameTemp += ", ";
+                        NameTemp += SigMass2[index];
+                        NameTemp += ")";
+                        
+                        TLatex lt1;
+                        lt1.DrawLatexNDC(0.05,0.05,NameTemp.Data());
+                    }
                     
                     TString NameTemp = "plot/";
                     NameTemp += "significance_";
