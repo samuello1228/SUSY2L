@@ -1,6 +1,8 @@
 \documentclass[mathserif,serif]{beamer}
 \usepackage{tabularx}
 \setbeamertemplate{footline}[frame number]
+\graphicspath{{../plot/}}
+
 \title{Data/MC comparison}
 \author
 {
@@ -55,8 +57,6 @@ CR\_OS
 \end{frame}
 
 \input{data/expN_CR_OS.tex}
-
-\def \PathToPlot {../plot}
 \input{data/plot_CR_OS.tex}
 
 \begin{frame}
@@ -70,7 +70,6 @@ fake BG scale factor for ISR: 3.85965
 \end{frame}
 
 \input{data/expN_SR_SS.tex}
-
 \input{data/plot_SR_SS.tex}
 
 \begin{frame}
@@ -116,7 +115,6 @@ fake BG scale factor for ISR: 3.85965
 \end{frame}
 
 \input{data/expN_CR_SS_mumu_low_mT2.tex}
-
 \input{data/plot_CR_SS_mumu_low_mT2.tex}
 
 \begin{frame}
@@ -127,7 +125,6 @@ CR\_SS\_ee\_Zmass \\
 \end{frame}
 
 \input{data/expN_CR_SS_ee_Zmass.tex}
-
 \input{data/plot_CR_SS_ee_Zmass.tex}
 
 \begin{frame}
@@ -141,10 +138,8 @@ fake BG scale factor for ISR: 4.18533
 \end{frame}
 
 \input{data/expN_SR_SS_0B.tex}
-
 \input{data/plot_SR_SS_0B.tex}
 
-%\def \PathToPlot {../plot}
 %\input{data/plot_special.tex}
 
 \begin{frame}
@@ -494,13 +489,12 @@ Pileup reweighting is applied. \\
 Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{frame}
 
-%\def \PathToPlot {../plot}
 \begin{frame}
 \frametitle{averageMu}
 \begin{figure}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{\PathToPlot/averageMu_CR_ISR_OS_emu} \\
+\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_ee}
+\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_mumu}
+\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_emu} \\
 \caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
 \end{figure}
 \end{frame}
@@ -579,30 +573,29 @@ The CMS result:
 \includegraphics[width=0.7\textwidth]{data/photo/BG.png}
 \end{frame}
 
-%\def \PathToPlot {../plot}
 \begin{frame}
 \frametitle{Signal Region (ee)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_ee.eps}
+\includegraphics[width=1\textwidth]{SR_ee.eps}
 \end{frame}
 
 \begin{frame}
 \frametitle{Signal Region (mumu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_mumu.eps}
+\includegraphics[width=1\textwidth]{SR_mumu.eps}
 \end{frame}
 
 \begin{frame}
 \frametitle{Signal Region (emu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_emu.eps}
+\includegraphics[width=1\textwidth]{SR_emu.eps}
 \end{frame}
 
 \begin{frame}
 \frametitle{Signal Region (combine)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_combine.eps}
+\includegraphics[width=1\textwidth]{SR_combine.eps}
 \end{frame}
 
 \begin{frame}
 \frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
-\includegraphics[width=1\textwidth]{\PathToPlot/SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
+\includegraphics[width=1\textwidth]{SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
 \end{frame}
 
 \end{document}

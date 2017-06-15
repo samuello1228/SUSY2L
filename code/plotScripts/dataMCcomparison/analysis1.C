@@ -3719,7 +3719,7 @@ void analysis1()
             fout<<"\\Wider[5em]{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
-                fout<<"\\includegraphics[width=0.5\\textwidth]{\\PathToPlot/"
+                fout<<"\\includegraphics[width=0.5\\textwidth]{"
                 <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName.Data()<<"}";
                 fout<<endl;
             }
@@ -3785,7 +3785,7 @@ void analysis1()
                     Var[VarIndex].VarName=="cjetphi" )
                    ) continue;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
+                fout<<"\\includegraphics[width=0.33\\textwidth]{"
                 <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionIndex].RegionName.Data()<<"}";
                 if(SixChannel==2) fout<<" \\\\";
                 fout<<endl;
@@ -3797,6 +3797,7 @@ void analysis1()
         fout.close();
     }
     
+    /*
     {
         TString PathName = "latex/data/plot_zpt.tex";
         ofstream fout;
@@ -3832,4 +3833,5 @@ void analysis1()
         }
         fout.close();
     }
+    */
 }
