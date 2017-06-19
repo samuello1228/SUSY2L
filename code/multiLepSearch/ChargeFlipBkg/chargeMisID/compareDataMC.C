@@ -152,8 +152,8 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
          TH1* hEtaPt_LH = 0;
          hEtaPt_LH = hData->ProjectionX((sHistName+"LH").c_str(), ptBin+1, ptBin+1, "e");
 
-         if(ptBin <= 2)hEtaPt_LH->GetYaxis()->SetRangeUser(1e-5, 0.01);
-         else hEtaPt_LH->GetYaxis()->SetRangeUser(1e-5, 0.01);
+         if(ptBin <= 2)hEtaPt_LH->GetYaxis()->SetRangeUser(1e-4, 0.01);
+         else hEtaPt_LH->GetYaxis()->SetRangeUser(5e-4, 0.05);
          hEtaPt_LH->SetTitle("");
          hEtaPt_LH->GetYaxis()->SetTitle("misID rate");
          hEtaPt_LH->GetYaxis()->SetTitleOffset(1.4);
@@ -240,8 +240,8 @@ bool draw(TH2* hData, TH2* hDataSubbed, TH2* hMC, TH2* hMCLH){
          TH1* hPtEta_LH = 0;
          hPtEta_LH = hData->ProjectionY((sHistName+"LH").c_str(), etaBin+1, etaBin+1, "e");
 
-         if(etaBin <=2)hPtEta_LH->GetYaxis()->SetRangeUser(1e-4, 5e-2);
-         else hPtEta_LH->GetYaxis()->SetRangeUser(1e-3, 0.3);
+         if(etaBin <=4) hPtEta_LH->GetYaxis()->SetRangeUser(1e-4, 1e-2);
+         else hPtEta_LH->GetYaxis()->SetRangeUser(5e-4, 5e-2);
          hPtEta_LH->SetTitle("");
          hPtEta_LH->GetXaxis()->SetTitle("p_{T} (GeV)");
          hPtEta_LH->GetYaxis()->SetTitleOffset(1.4);
