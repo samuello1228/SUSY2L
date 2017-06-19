@@ -51,8 +51,8 @@ bool passQID=true;
 //##################################
 //# Choose the bool for MC or DATA! #
 
-bool m_DT = false; //for MC
-// bool m_DT = true; //for DATA
+// bool m_DT = false; //for MC
+bool m_DT = true; //for DATA
 
 bool applyPRW = !m_DT && true;
 
@@ -60,7 +60,7 @@ bool applyPRW = !m_DT && true;
 /***************************************************************************/
 /* Binning information */
 
-row VETAS = {0, 0.5, 1, 1.37, 1.52, 1.8,llh 2.0, 2.47}; 
+row VETAS = {0, 0.5, 1, 1.37, 1.52, 1.8, 2.0, 2.47}; 
 // row VETAS = {0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.37, 1.52, 1.8, 2, 2.2, 2.47};
 // row VPTS  = {20, 30, 40, 50, 60, 80, 120, 1000.0}; 
 
