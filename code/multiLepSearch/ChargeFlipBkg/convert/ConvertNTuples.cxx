@@ -30,7 +30,7 @@ using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = true;
+bool isMC = false;
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -273,7 +273,8 @@ bool convert(TString file){
 
   // === INITIALIZE IN TREE ==== //
   TChain *inChain = new TChain("evt2l");
-  inChain->Add(file);
+  inChain->Add(file); if(inChain->GetEntries()==0) return true;
+  cout << inChain->GetEntries() << endl;
   susyEvts* mEvts = new susyEvts(inChain);
 
   // == FILL TREE
@@ -281,9 +282,9 @@ bool convert(TString file){
   for(long int i=0; i<nEntries; i++){
     loadbar(i+1,nEntries);
     mEvts->GetEntry(i);
-    
+
     // Require exactly two leptons, and the leptons are electrons
-    if(mEvts->leps.size()!=2) continue;
+    if(mEvts->leps.size()!=2) continue; 
     if (int(fabs(mEvts->leps[0].ID/1000))!=11 || int(fabs(mEvts->leps[1].ID/1000))!=11) continue;
 
     {
