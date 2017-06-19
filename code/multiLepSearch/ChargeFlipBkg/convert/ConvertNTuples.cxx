@@ -332,7 +332,7 @@ bool convert(TString file){
     elCand1_phi = mEvts->leps[0].phi;
     elCand1_ID = mEvts->leps[0].ID;
     elCand1_E = pt2E(elCand1_pt, elCand1_cl_eta);
-    elCand1_qID = mEvts->leps[0].ElChargeID;
+    elCand1_qID = true; //mEvts->leps[0].ElChargeID;
     TLorentzVector p1;
     p1.SetPtEtaPhiM(elCand1_pt, elCand1_cl_eta, elCand1_phi, 0.000511);
 
@@ -365,7 +365,7 @@ bool convert(TString file){
     elCand2_phi = mEvts->leps[1].phi;
     elCand2_ID = mEvts->leps[1].ID;
     elCand2_E = pt2E(elCand2_pt, elCand2_cl_eta);
-    elCand2_qID = mEvts->leps[1].ElChargeID;
+    elCand2_qID = true;//mEvts->leps[1].ElChargeID;
 
     TLorentzVector p2;
     p2.SetPtEtaPhiM(elCand2_pt, elCand2_cl_eta, elCand2_phi, 0.000511);
