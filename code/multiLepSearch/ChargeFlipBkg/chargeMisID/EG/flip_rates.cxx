@@ -60,11 +60,11 @@ bool applyPRW = !m_DT && true;
 /***************************************************************************/
 /* Binning information */
 
-// row VETAS = {0, 0.5, 1, 1.37, 1.52, 1.8, 2.0, 2.47}; 
+row VETAS = {0, 0.5, 1, 1.37, 1.52, 1.8,llh 2.0, 2.47}; 
 // row VETAS = {0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.37, 1.52, 1.8, 2, 2.2, 2.47};
 // row VPTS  = {20, 30, 40, 50, 60, 80, 120, 1000.0}; 
 
-row VETAS = {0, 0.6, 1.1, 1.5, 1.7, 2.3, 2.5};
+// row VETAS = {0, 0.6, 1.1, 1.5, 1.7,llh 2.3, 2.5};
 row VPTS  = {25, 60, 90, 130, 150, 1000};
 
 // PTSCALE makes sure GeV is used consistently in the code. If the input data
