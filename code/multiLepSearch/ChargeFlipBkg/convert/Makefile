@@ -37,9 +37,11 @@ PROG=ConvertNTuples
 
 data: $(PROG) ../common/inFileList-data.txt
 	./$(PROG) ../common/inFileList-data.txt /afs/cern.ch/work/g/ggallard/NTuples/convertedData/
+	find /afs/cern.ch/work/g/ggallard/NTuples/convertedData/ | grep "root/user" > ../common-inFileList-dataConverted.txt
 
-zee: $(PROG) ../common/inFileList-Zee.txt
-	./$(PROG) ../common/inFileList-Zee.txt /afs/cern.ch/work/g/ggallard/NTuples/convertedZee/
+zeesherpa: $(PROG) ../common/inFileList-ZeeSherpa.txt
+	./$(PROG) ../common/inFileList-ZeeSherpa.txt /afs/cern.ch/work/g/ggallard/NTuples/convertedZeeSherpa/
+	find /afs/cern.ch/work/g/ggallard/NTuples/convertedData/ | grep "root/user" > ../common-inFileList-ZeeSherpaConverted.txt
 
 zeeyl: $(PROG) ../common/inFileList-ZeeYL.txt
 	./$(PROG) ../common/inFileList-ZeeYL.txt /afs/cern.ch/work/g/ggallard/NTuples/convertedZeeYL/
@@ -54,6 +56,7 @@ zeetest: $(PROG) ../common/inFileList-ZeeTest.txt
 
 zeepowheg: $(PROG) ../common/inFileList-ZeePowheg.txt
 	./$(PROG) ../common/inFileList-ZeePowheg.txt /afs/cern.ch/work/g/ggallard/NTuples/convertedZeePowheg/
+	find /afs/cern.ch/work/g/ggallard/NTuples/convertedData/ | grep "root/user" > ../common-inFileList-ZeePowhegConverted.txt
 
 $(PROG): ConvertNTuples.o obj_dict.o susyEvts.o
 	$(LD) $(ROOTLIBS) $^ -o $@

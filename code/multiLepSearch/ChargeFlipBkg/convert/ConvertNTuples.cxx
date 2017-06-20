@@ -30,7 +30,7 @@ using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = false;
+bool isMC = false; // Not set here anymore. Set in main() function()!
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -402,9 +402,9 @@ bool convert(TString file){
 }
 
 int main(int argc, char *argv[]){
-	if (argc!=3){
-		cout << "Wrong number of arguments. Two required. " << endl
-			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/" << endl;
+	if (argc<3 || argc >4){
+		cout << "Wrong number of arguments. Two or Three required. " << endl
+			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/ (MC)" << endl;
 		return -1;
 	}
 
@@ -418,7 +418,14 @@ int main(int argc, char *argv[]){
       return -3;
     }
 	}
-  
+
+  isMC = false;
+  if (argc==4)
+  {
+    TString mcTag(argv[3]); mcTag.ToUpper();
+    isMC = (mcTag=="MC");
+  }
+
   vector<TString> allFiles;
   string file;
   while(getline(inFiles, file)){
