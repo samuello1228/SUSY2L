@@ -540,13 +540,13 @@ void analysis1()
         element.VarName = "pt1";        element.VarTitle = "pt of the leading lepton";          element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading lepton";
+        element.latexName = "$\\pt$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "pt2";        element.VarTitle = "pt of the subleading lepton";       element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the subleading lepton";
+        element.latexName = "$\\pt$ of the subleading lepton";
         Var.push_back(element);
         
         element.VarName = "eta1";       element.VarTitle = "eta of the leading lepton";         element.unit = "";
@@ -570,13 +570,13 @@ void analysis1()
         element.VarName = "mll";        element.VarTitle = "Dilepton invariant mass";           element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
+        element.latexName = "$m_{ll}$";
         Var.push_back(element);
         
         element.VarName = "ptll";       element.VarTitle = "Dilepton pt";                       element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=700;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "Dilepton $\\text{p}_{\\text{T}}$";
+        element.latexName = "Dilepton $\\pt$";
         Var.push_back(element);
         
         element.VarName = "MET";        element.VarTitle = "MET";                               element.unit = "[GeV]";
@@ -588,19 +588,19 @@ void analysis1()
         element.VarName = "mTtwo";      element.VarTitle = "mT2";                               element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=150;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = element.VarTitle;
+        element.latexName = "$m_{T2}$";
         Var.push_back(element);
         
         element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the leading lepton";
+        element.latexName = "$m_{\\text{T}}$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{m}_{\\text{T}}$ of the subleading lepton";
+        element.latexName = "$m_{\\text{T}}$ of the subleading lepton";
         Var.push_back(element);
         
         element.VarName = "averageMu";  element.VarTitle = "averageMu";                         element.unit = "";
@@ -612,7 +612,7 @@ void analysis1()
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
         element.bin=40;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$\\text{p}_{\\text{T}}$ of the leading jet";
+        element.latexName = "$\\pt$ of the leading jet";
         Var.push_back(element);
         
         element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
@@ -636,13 +636,13 @@ void analysis1()
         element.VarName = "l12_dPhi";   element.VarTitle = "l12_dPhi";                          element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "l12\\_dPhi";
+        element.latexName = "$\\Delta\\phi_{ll}$";
         Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";  element.VarTitle = "l12_MET_dPhi";                   element.unit = "";
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "l12\\_MET\\_dPhi";
+        element.latexName = "$\\Delta\\phi_{ll,\\text{MET}}$";
         Var.push_back(element);
         
         element.VarName = "jets_MET_dPhi"; element.VarTitle = "jets_MET_dPhi";                  element.unit = "";
