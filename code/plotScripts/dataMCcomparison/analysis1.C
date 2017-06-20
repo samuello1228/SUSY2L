@@ -2667,9 +2667,10 @@ void analysis1()
                         if(RegionInfo[RegionIndex].RegionName == "nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu")
                         {
                             gStyle->SetPalette(1);
-                            gStyle->SetPadRightMargin(0.16);
+                            
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
+                            c2->SetRightMargin(0.16);
                             h2->Draw();
                             g2->Draw("colzsame");
                             
@@ -3341,8 +3342,21 @@ void analysis1()
                 {
                     TCanvas* c2 = new TCanvas();
                     c2->cd();
-                    gStyle->SetPadRightMargin(0.16);
+                    c2->SetRightMargin(0.16);
                     hSignificance[i]->Draw("colz");
+                    
+                    {
+                        unsigned int index = SigMassSplitting[i].ID;
+                        TString NameTemp = RegionInfo[RegionIndex].RegionName;
+                        NameTemp += ": (";
+                        NameTemp += SigMass1[index];
+                        NameTemp += ", ";
+                        NameTemp += SigMass2[index];
+                        NameTemp += ")";
+                        
+                        TLatex lt1;
+                        lt1.DrawLatexNDC(0.05,0.05,NameTemp.Data());
+                    }
                     
                     TString NameTemp = "plot/";
                     NameTemp += "significance_";
@@ -3705,7 +3719,7 @@ void analysis1()
             fout<<"\\Wider[5em]{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
             {
-                fout<<"\\includegraphics[width=0.5\\textwidth]{\\PathToPlot/"
+                fout<<"\\includegraphics[width=0.5\\textwidth]{"
                 <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName.Data()<<"}";
                 fout<<endl;
             }
@@ -3771,7 +3785,7 @@ void analysis1()
                     Var[VarIndex].VarName=="cjetphi" )
                    ) continue;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{\\PathToPlot/"
+                fout<<"\\includegraphics[width=0.33\\textwidth]{"
                 <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionIndex].RegionName.Data()<<"}";
                 if(SixChannel==2) fout<<" \\\\";
                 fout<<endl;
@@ -3783,6 +3797,7 @@ void analysis1()
         fout.close();
     }
     
+    /*
     {
         TString PathName = "latex/data/plot_zpt.tex";
         ofstream fout;
@@ -3818,4 +3833,5 @@ void analysis1()
         }
         fout.close();
     }
+    */
 }
