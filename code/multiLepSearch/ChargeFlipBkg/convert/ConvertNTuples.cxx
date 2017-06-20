@@ -30,7 +30,7 @@ using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = true;
+bool isMC = false; // Not set here anymore. Set in main() function()!
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -273,7 +273,8 @@ bool convert(TString file){
 
   // === INITIALIZE IN TREE ==== //
   TChain *inChain = new TChain("evt2l");
-  inChain->Add(file);
+  inChain->Add(file); if(inChain->GetEntries()==0) return true;
+  cout << inChain->GetEntries() << endl;
   susyEvts* mEvts = new susyEvts(inChain);
 
   // == FILL TREE
@@ -281,9 +282,9 @@ bool convert(TString file){
   for(long int i=0; i<nEntries; i++){
     loadbar(i+1,nEntries);
     mEvts->GetEntry(i);
-    
+
     // Require exactly two leptons, and the leptons are electrons
-    if(mEvts->leps.size()!=2) continue;
+    if(mEvts->leps.size()!=2) continue; 
     if (int(fabs(mEvts->leps[0].ID/1000))!=11 || int(fabs(mEvts->leps[1].ID/1000))!=11) continue;
 
     {
@@ -332,7 +333,7 @@ bool convert(TString file){
     elCand1_phi = mEvts->leps[0].phi;
     elCand1_ID = mEvts->leps[0].ID;
     elCand1_E = pt2E(elCand1_pt, elCand1_cl_eta);
-    elCand1_qID = mEvts->leps[0].ElChargeID;
+    elCand1_qID = true; //mEvts->leps[0].ElChargeID;
     TLorentzVector p1;
     p1.SetPtEtaPhiM(elCand1_pt, elCand1_cl_eta, elCand1_phi, 0.000511);
 
@@ -365,7 +366,7 @@ bool convert(TString file){
     elCand2_phi = mEvts->leps[1].phi;
     elCand2_ID = mEvts->leps[1].ID;
     elCand2_E = pt2E(elCand2_pt, elCand2_cl_eta);
-    elCand2_qID = mEvts->leps[1].ElChargeID;
+    elCand2_qID = true;//mEvts->leps[1].ElChargeID;
 
     TLorentzVector p2;
     p2.SetPtEtaPhiM(elCand2_pt, elCand2_cl_eta, elCand2_phi, 0.000511);
@@ -401,9 +402,9 @@ bool convert(TString file){
 }
 
 int main(int argc, char *argv[]){
-	if (argc!=3){
-		cout << "Wrong number of arguments. Two required. " << endl
-			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/" << endl;
+	if (argc<3 || argc >4){
+		cout << "Wrong number of arguments. Two or Three required. " << endl
+			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/ (MC)" << endl;
 		return -1;
 	}
 
@@ -417,7 +418,14 @@ int main(int argc, char *argv[]){
       return -3;
     }
 	}
-  
+
+  isMC = false;
+  if (argc==4)
+  {
+    TString mcTag(argv[3]); mcTag.ToUpper();
+    isMC = (mcTag=="MC");
+  }
+
   vector<TString> allFiles;
   string file;
   while(getline(inFiles, file)){

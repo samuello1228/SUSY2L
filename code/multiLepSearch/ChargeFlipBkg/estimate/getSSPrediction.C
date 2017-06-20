@@ -16,35 +16,38 @@
 #include <TStyle.h>
 #include <TLorentzVector.h>
 #include <TSystem.h>
+#include <TLine.h>
 
 #include "../common/evt2l.C"
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-TString defaultOut="../QiD-on/estimates-data";
-// TString defaultOut="../QiD-on/Powheg/estimates-NoPt-TruthMatched";
-// TString defaultOut="../QiD-on/estimates-MCTruth-NoPt";
+// TString defaultOut="../1706-Remeasure-Wh/estimates-data-NoPt";
+// TString defaultOut="../1706-Remeasure-Wh/Powheg/estimates-NoPt-TruthMatched";
+TString defaultOut="../1706-Remeasure-Wh/Sherpa/estimates-Pt";
 
-TString defaultNTupleList="../common/inFileList-data.txt";
+// TString defaultNTupleList="../common/inFileList-data.txt";
 // TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
-// TString defaultNTupleList="../common/inFileList-Zee.txt";
+TString defaultNTupleList="../common/inFileList-ZeeSherpa.txt";
 
-TString defaultMisIdfile="../QiD-on/Powheg/rates_wSys.root";
-// TString defaultMisIdfile="../QiD-on/80.000000_100.000000_0.000000_0.000000_DATA.root";
+// TString defaultMisIdfile="../1706-Remeasure-Wh/RAWfiles/rates_wSys.root";
+// TString defaultMisIdfile="../1706-Remeasure-Wh/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
+TString defaultMisIdfile="../1706-Remeasure-Wh/Sherpa/RAWfiles/80.000000_100.000000_0.000000_0.000000_MC.root";
 
 // TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
-//TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-//TString misIDhistname="hFlipProb_MCtruth";
-TString misIDhistname="hFlipProb_MCLH";
+// TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
+TString misIDhistname="80.0_100.0_0.0_0.0_MC_misid";
+// TString misIDhistname="hFlipProb_MCtruth";
+// TString misIDhistname="hFlipProb_MCLH";
 // TString misIDhistname="hFlipProb_data";
 
-// TString defaultdPtfile="../QiD-on/Powheg/ptcorr/dEhistos.root";
-TString defaultdPtfile="../../data/root_files/dPT_signal.root";
+// TString defaultdPtfile="../1706-Remeasure-Wh/Powheg/ptcorr/dEhistos.root";
+TString defaultdPtfile="../1706-Remeasure-Wh/Sherpa/pt/dEhistos.root";
 
 
 bool onlySignal=true;
-bool applyPtCorrection=false;
+bool applyPtCorrection=true;
 bool passQID=true;
 bool isMC = true;
 bool ZWindowOnly = !isMC;
@@ -109,17 +112,17 @@ class Histos
       // ====  UPPER PLOT ====== //
       // Set range of Y axis()
       // if(SS->GetMinimum()==0) SS->GetYaxis()->SetRangeUser(1, max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
-      SS->GetYaxis()->SetRangeUser(max(1.0,SS->GetMinimum()*0.5), max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
+      ExpSS->GetYaxis()->SetRangeUser(max(1.0,SS->GetMinimum()*0.5), max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
 
       // Set colors
-      SS->SetLineColor(kAzure+1); SS->SetFillColor(kAzure+1); SS->SetMarkerColor(kAzure+1); 
-      ExpSS->SetLineColor(kRed); ExpSS->SetMarkerColor(kRed); 
+      ExpSS->SetLineColor(kAzure+1); ExpSS->SetFillColor(kAzure+1); ExpSS->SetMarkerColor(kAzure+1); 
+      SS->SetLineColor(kBlack); SS->SetMarkerColor(kBlack); SS->SetMarkerStyle(20); 
 
-      SS->Draw("bar");
-      ExpSS->Draw("same e");
+      ExpSS->Draw("bar e");
+      SS->Draw("same");
 
-      l->AddEntry(SS, "Observed SS events", "f");
-      l->AddEntry(ExpSS, "Predicted SS events from OS", "lp");
+      l->AddEntry(SS, "Observed SS events", "lp");
+      l->AddEntry(ExpSS, "Predicted SS events from OS", "f");
       l->Draw("same");
 
       // ====  LOWER PLOT ====== //
@@ -226,10 +229,10 @@ void getSSPrediction(const TString outputDir=defaultOut,
       if(onlySignal && !(((evt2lTree->leps_lFlag[0] & 2)/2) && ((evt2lTree->leps_lFlag[1] & 2)/2))) continue;
 
       // Select Zee events
-      if(ZWindowOnly && fabs(evt2lTree->l12_m - 91)>10) continue;
+      // if(ZWindowOnly && fabs(evt2lTree->l12_m - 91)>10) continue;
 
       // Select events which pass electron ChargeFlipTagger
-      if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
+      // if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
 
       // In MC, plot only events with truth-matched electrons 
       if (isMC &&
@@ -258,6 +261,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
       p1.SetPtEtaPhiM(pt1, evt2lTree->leps_eta[0], evt2lTree->leps_phi[0], 0.000511);
       p2.SetPtEtaPhiM(pt2, evt2lTree->leps_eta[1], evt2lTree->leps_phi[1], 0.000511);
       double mll = (p1+p2).M();
+      if(ZWindowOnly && fabs(mll - 91)>10) continue;
 
       // Fill histograms here ----------------------------------------
       double chargeFlipWeight=0;
