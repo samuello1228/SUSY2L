@@ -1885,7 +1885,7 @@ void analysis1()
         if(Var[i].VarName == "phi1") countVariable = i;
     }
     
-    TFile* fout = new TFile("plot/fout.root","recreate");
+    TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
     for(unsigned int RegionGroupIndex=8;RegionGroupIndex<=8;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
@@ -3083,7 +3083,7 @@ void analysis1()
                     NameTemp = Var[VarIndex].VarName;
                     NameTemp += "_";
                     NameTemp += RegionInfo[RegionIndex].RegionName;
-                    fout->cd();
+                    fout_plot->cd();
                     c2->Write(NameTemp);
                 }
                 
@@ -3583,8 +3583,8 @@ void analysis1()
         }
     }
     
-    //delete fout
-    delete fout;
+    //delete fout_plot
+    delete fout_plot;
     
     //expN_CR_OS.tex and expN_SR_SS.tex
     //expN_CR_OS_1B.tex and expN_CR_SS_1B.tex
@@ -3794,6 +3794,63 @@ void analysis1()
             fout<<"\\end{frame}"<<endl<<endl;
         }
         
+        fout.close();
+    }
+    
+    //plot_significances.tex
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+    {
+        unsigned int startingIndex = 0;
+        
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
+           ) continue;
+        
+        TString PathName = "latex/data/plot_significances_";
+        PathName += RegionGroup[RegionGroupIndex].GroupName;
+        PathName += ".tex";
+        
+        ofstream fout;
+        fout.open(PathName.Data());
+        
+        unsigned int VarIndex[2];
+        VarIndex[0] = 6; // ptll
+        VarIndex[1] = 7; // MET
+        for(unsigned int i=0;i<SigMassSplitting.size();i++)
+        {
+            TString latexName = Var[VarIndex[0]].VarName;
+            latexName += "_";
+            latexName += Var[VarIndex[1]].VarName;
+            latexName += "_";
+            latexName += RegionGroup[RegionGroupIndex].GroupName;
+            latexName += "_";
+            latexName += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+            
+            latexName.ReplaceAll("_","\\_");
+            
+            fout<<"\\begin{frame}{For ";
+            fout<<latexName.Data();
+            fout<<"}"<<endl;
+            
+            fout<<"\\Wider[5em]{"<<endl;
+            for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+            {
+                const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                
+                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                fout<<"significance_ptll_MET_";
+                fout<<RegionInfo[RegionIndex].RegionName;
+                fout<<"_";
+                fout<<TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                fout<<"}";
+                
+                if(SixChannel==2) fout<<" \\\\";
+                fout<<endl;
+            }
+            
+            fout<<"}"<<endl;
+            fout<<"\\end{frame}"<<endl<<endl;
+        }
         fout.close();
     }
     
