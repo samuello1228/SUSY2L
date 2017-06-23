@@ -764,7 +764,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.cut = 0;
 
     //event information
-    //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
@@ -996,6 +995,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       //// get trigger info, if passed, and the SF
       auto& sEvt = m_susyEvt->evt;
+      //sEvt.run = eventInfo->runNumber();
       sEvt.run = m_objTool->GetRunNumber();
       auto trigCut = getTriggerConf(sEvt.run);
 
