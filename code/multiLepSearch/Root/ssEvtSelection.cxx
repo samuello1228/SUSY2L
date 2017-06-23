@@ -807,8 +807,8 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
         if (sigLepSign0!=sigLepSign1){
           m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
-          m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
-          m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
+          m_susyEvt->evt.qFwt_sys_1up = 0; // mChargeFlipBkgTool->GetWeight( sel_Ls , 1,-1);
+          m_susyEvt->evt.qFwt_sys_1dn = 0; // mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,-1);
           auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
           if(tmpPt.size()==2){
             if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
