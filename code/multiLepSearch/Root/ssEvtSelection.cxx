@@ -164,14 +164,6 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(16,"nSumW");
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep and trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(23,"==3BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(24,"==3SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(25,"=3BaseLep and =3SigLep and trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(26,"=2BaseLep and =2SigLep and MET>50");
-  m_hCutFlow->GetXaxis()->SetBinLabel(27,"=3BaseLep and =3SigLep and MET>50");
-  m_hCutFlow->GetXaxis()->SetBinLabel(28,"=2BaseLep and =2SigLep and MET>50 and BVeto");
-  m_hCutFlow->GetXaxis()->SetBinLabel(29,"=3BaseLep and =3SigLep and MET>50 and BVeto");
   m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
@@ -739,9 +731,9 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(study == "ss")
     {
       if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
-      else if(totLs == 3) {m_hCutFlow->Fill("==3BaseLep", 1);m_hCutFlow->Fill("=3BaseLep", 1);}
+      else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
       if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
-      else if(sig_Ls.size() == 3) {m_hCutFlow->Fill("==3SigLep", 1);m_hCutFlow->Fill("=3SigLep", 1);}
+      else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
 
       if(nBaseEl >= 1) m_hCutFlow->Fill(">=1BaseEl", 1);
       if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
@@ -885,6 +877,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
+    if(cutflow) continue;
 
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
@@ -913,74 +906,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     m_susyEvt->sig.MetRel = m_susyEvt->sig.Met;
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
-
-
-    unsigned int dilepFlag = 0;
-    //for cutflow
-    for(unsigned int i=0;i<electrons_copy->size(); i++){
-      for(unsigned int j=i+1;j<electrons_copy->size(); j++){
-        if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
-        {
-          dilepFlag |= 1<<0;
-        }
-      }
-    }
-
-    for(unsigned int i=0;i<muons_copy->size(); i++){
-      for(unsigned int j=i+1;j<muons_copy->size(); j++){
-        if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
-        {
-          dilepFlag |= 1<<1;
-        }
-      }
-    }
-
-    for(unsigned int i=0;i<electrons_copy->size(); i++){
-      for(unsigned int j=0;j<muons_copy->size(); j++){
-        if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
-        {
-          dilepFlag |= 1<<2;
-        }
-      }
-    }
-
-    if(study == "ss")
-    {
-        if(totLs == 2 && sig_Ls.size() == 2)
-        {
-          if(dilepFlag > 0)
-          {
-            m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
-          }
-       
-          if(m_susyEvt->sig.Met > 50)
-          {
-            m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50", 1);
-            if(nBJet == 0)
-            {
-              m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50 and BVeto", 1);
-            }
-          }
-        }      
-        else if(totLs == 3 && sig_Ls.size() == 3)
-        {
-          if(dilepFlag > 0)
-          {
-            m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
-          }
-       
-          if(m_susyEvt->sig.Met > 50)
-          {
-            m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50", 1);
-            if(nBJet == 0)
-            {
-              m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50 and BVeto", 1);
-            }
-          }
-        }       
-
-      if(cutflow) continue;
-    }
 
     /*
     /// tau
