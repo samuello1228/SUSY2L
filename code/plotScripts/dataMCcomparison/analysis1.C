@@ -1993,7 +1993,7 @@ void analysis1()
             }
         }
         
-        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].lower;RegionIndex++)
+        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -2449,6 +2449,15 @@ void analysis1()
                     h2SigSum[i]->Scale(sumDataL/AOD);
                 }
                 
+                const bool DoSignificancePlot=
+                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" && (
+                 Var[VarIndex].VarName=="pt1"   ||
+                 Var[VarIndex].VarName=="pt2"   ||
+                 Var[VarIndex].VarName=="ptll"  ||
+                 Var[VarIndex].VarName=="MET"   ||
+                 Var[VarIndex].VarName=="mTtwo" ||
+                 Var[VarIndex].VarName=="mt1"   ||
+                 Var[VarIndex].VarName=="mt2"   );
                 
                 if(VarIndex==countVariable)
                 {
@@ -2709,15 +2718,7 @@ void analysis1()
                 
                 //significance calculation
                 TH1F* hSignificance[SigMassSplitting.size()];
-                if(RegionGroup[RegionGroupIndex].showSignificance && (
-                   Var[VarIndex].VarName=="pt1"   ||
-                   Var[VarIndex].VarName=="pt2"   ||
-                   Var[VarIndex].VarName=="ptll"  ||
-                   Var[VarIndex].VarName=="MET"   ||
-                   Var[VarIndex].VarName=="mTtwo" ||
-                   Var[VarIndex].VarName=="mt1"   ||
-                   Var[VarIndex].VarName=="mt2"   ))
-                   
+                if(DoSignificancePlot)
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
@@ -2922,15 +2923,7 @@ void analysis1()
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
                 TH1F* hPad2 = nullptr;
-                if(RegionGroup[RegionGroupIndex].showData ||
-                   (RegionGroup[RegionGroupIndex].showSignificance && (
-                    Var[VarIndex].VarName=="pt1"   ||
-                    Var[VarIndex].VarName=="pt2"   ||
-                    Var[VarIndex].VarName=="ptll"  ||
-                    Var[VarIndex].VarName=="MET"   ||
-                    Var[VarIndex].VarName=="mTtwo" ||
-                    Var[VarIndex].VarName=="mt1"   ||
-                    Var[VarIndex].VarName=="mt2"   )))
+                if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot )
                 {
                     //size for two pads
                     const double size1 = 0.65;
@@ -3037,15 +3030,7 @@ void analysis1()
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
-                if(RegionGroup[RegionGroupIndex].showData ||
-                   (RegionGroup[RegionGroupIndex].showSignificance && (
-                    Var[VarIndex].VarName=="pt1"   ||
-                    Var[VarIndex].VarName=="pt2"   ||
-                    Var[VarIndex].VarName=="ptll"  ||
-                    Var[VarIndex].VarName=="MET"   ||
-                    Var[VarIndex].VarName=="mTtwo" ||
-                    Var[VarIndex].VarName=="mt1"   ||
-                    Var[VarIndex].VarName=="mt2"   )))
+                if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
                 {
                     //Draw for pad2
                     c2->cd();
@@ -3126,14 +3111,7 @@ void analysis1()
                     delete pad2;
                 }
                 
-                if(RegionGroup[RegionGroupIndex].showSignificance && (
-                   Var[VarIndex].VarName=="pt1"   ||
-                   Var[VarIndex].VarName=="pt2"   ||
-                   Var[VarIndex].VarName=="ptll"  ||
-                   Var[VarIndex].VarName=="MET"   ||
-                   Var[VarIndex].VarName=="mTtwo" ||
-                   Var[VarIndex].VarName=="mt1"   ||
-                   Var[VarIndex].VarName=="mt2"   ))
+                if(DoSignificancePlot)
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
@@ -3149,6 +3127,7 @@ void analysis1()
             }
             
             //2D significance plot
+            if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B")
             {
                 unsigned int VarIndex[2];
                 VarIndex[0] = 6; // ptll
