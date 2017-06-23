@@ -776,7 +776,11 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
-    m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
+    
+    if(!CF_isMC) m_susyEvt->evt.weight = 1;
+    else if(fabs(eventInfo->mcEventWeight())<100) m_susyEvt->evt.weight = eventInfo->mcEventWeight();
+    else m_susyEvt->evt.weight = 1;
+    
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
     m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
 

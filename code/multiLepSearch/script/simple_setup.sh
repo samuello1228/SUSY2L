@@ -19,9 +19,7 @@ rc compile
 mkdir run
 cd run
 
-../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5.merge.DAOD_SUSY2.e5129_a766_a821_r7676_p2688/DAOD_SUSY2.09019173._000001.pool.root.1 --outputTag test1 -o t1 -w -a 1 --study ss --mcPRW "multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root" --ChargeID 0 --conf multiLepSearch/sel_conf/SUSYTools_multilepAnaMoriond.conf
-
-../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a838_r7676_p2949/DAOD_SUSY2.10748609._000001.pool.root.1 --outputTag test1 -o t1 -w -a 1 --study ss --mcPRW "multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root" --ChargeID 1 --conf multiLepSearch/sel_conf/SUSYTools_multilepAnaMoriond.conf
+../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a838_r7676_p2949/DAOD_SUSY2.10748609._000001.pool.root.1 --outputTag test1 -o t1 -w -a 1 --study ss --mcPRW "multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root" --ChargeID 1 --conf SUSYTools/SUSYTools_Default.conf
 
 ../multiLepSearch/util/run_ss_selection.py -f /afs/cern.ch/work/c/clo/sample/data16_13TeV.00297730.physics_Main.merge.DAOD_SUSY2.f694_m1583_p2880/DAOD_SUSY2.09980028._000001.pool.root.1 --outputTag test1 -o t1 -w -a 0 --study ss
 
