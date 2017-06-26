@@ -886,14 +886,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(cutflow) continue;
 
     if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
-    else m_susyEvt->sig.mjj = 0;
+    else m_susyEvt->sig.mjj = -1;
 
     //The two leading leptons
     xAOD::IParticle* l1 = dilepPair[0];
     xAOD::IParticle* l2 = dilepPair[1];
     // cout << l1->pt() << " " << l2->pt() << endl;
 
-    m_susyEvt->sig.mlj = 0;
+    m_susyEvt->sig.mlj = -1;
     if(cjet_Ls.size()>=1 && cjet_Ls.size()<=3)
     {
       TLorentzVector JetSystem;
@@ -976,7 +976,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->l12.dR = l1->p4().DeltaR(l2->p4()); 
     m_susyEvt->l12.MET_dPhi = metV.DeltaPhi(ll);
     if(jet_Ls.size()>=1) m_susyEvt->l12.jet0_dPhi = ll.DeltaPhi(jet_Ls[0]->p4());
-    else m_susyEvt->l12.jet0_dPhi = 0;
+    else m_susyEvt->l12.jet0_dPhi = -100;
 
     m_susyEvt->sig.HT += (l1->pt()+l2->pt())*iGeV;
 
