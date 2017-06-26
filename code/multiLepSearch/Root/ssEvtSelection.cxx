@@ -855,9 +855,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     int nSigJet = 0;
     int nBJet = 0;
     int nISR = 0;
-    int i=0;
-    for(auto j0: jet_Ls){
-      auto j = dynamic_cast<xAOD::Jet*>(j0);
+    for(unsigned int i=0;i<jet_Ls.size(); i++){
+      auto j = dynamic_cast<xAOD::Jet*>(jet_Ls[i]);
       
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
@@ -871,7 +870,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
       m_susyEvt->sig.HT += j->pt()*iGeV;
-      i++;
     }
 
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
