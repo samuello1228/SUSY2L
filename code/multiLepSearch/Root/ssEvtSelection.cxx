@@ -942,6 +942,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->l12.dPhi = l1->p4().DeltaPhi(l2->p4()); 
     m_susyEvt->l12.dR = l1->p4().DeltaR(l2->p4()); 
     m_susyEvt->l12.MET_dPhi = metV.DeltaPhi(ll);
+    if(jet_Ls.size()>=1) m_susyEvt->l12.jet0_dPhi = ll.DeltaPhi(jet_Ls[0]->p4());
 
     m_susyEvt->sig.HT += (l1->pt()+l2->pt())*iGeV;
 

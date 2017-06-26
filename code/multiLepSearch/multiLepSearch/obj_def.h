@@ -21,8 +21,9 @@ struct R_PAR:PAR{
   float m;
   float dPhi;
   float dR;
+  float jet0_dPhi;
 };
-const string R_PAR_s = PAR_s+":m/F:dPhi:dR";
+const string R_PAR_s = PAR_s+":m/F:dPhi:dR:jet0_dPhi";
 
 struct L_PAR:PAR{
   float mT;
@@ -84,8 +85,11 @@ struct SIGNATURE{
   float MetY;
   float mT2;
   float HT;
+  float mjj;
+  float mlj;
+  float mljj;
 };
-const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F";
+const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj:mljj";
 
 struct TR_PAR:PAR0{
   int pdgId; 
@@ -121,6 +125,7 @@ enum MFLAGS{
 enum JFALGS{
   JT_BJET_LOOSE = 1<<4, //16
   JT_BJET = 1<<5, //32
+  JT_CJET = 1<<11,
 };
 
 typedef std::vector< L_PAR > LEPTONS;
