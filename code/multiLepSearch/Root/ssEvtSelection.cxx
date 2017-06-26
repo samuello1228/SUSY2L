@@ -877,6 +877,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
     if(cutflow) continue;
 
+    if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
+
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
