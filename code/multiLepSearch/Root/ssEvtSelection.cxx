@@ -844,7 +844,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     vector< xAOD::IParticle* > jet_Ls;
     jet_Ls.reserve(10);
     for(auto jet: *jets_copy){
-      if(dec_baseline(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
+      if(cutflow && dec_baseline(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
+      if(!cutflow && dec_signal(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
     }
     sort(jet_Ls.begin(), jet_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
