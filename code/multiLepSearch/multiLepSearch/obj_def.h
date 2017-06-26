@@ -87,9 +87,8 @@ struct SIGNATURE{
   float HT;
   float mjj;
   float mlj;
-  float mljj;
 };
-const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj:mljj";
+const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
 
 struct TR_PAR:PAR0{
   int pdgId; 
