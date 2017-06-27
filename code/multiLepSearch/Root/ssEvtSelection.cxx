@@ -1266,6 +1266,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
   }
 
+  fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
 
