@@ -70,7 +70,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += SampleName;
         fileName += "_myOutput.root/*.root*";
         
-        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        fileName = "/Users/samuel/Atlas/ntuple/test.root";
         
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
@@ -111,7 +111,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString fileName = "skimming/skimming.";
         //TString fileName = "skimming_signal_old/skimming.";
         //TString fileName = "skimming_signal_new/skimming.";
-        fileName += SampleName;
+        //fileName += SampleName;
+        fileName += "test";
         fileName += "_";
         fileName += channel[j];
         fileName += ".root";
@@ -271,8 +272,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
-        if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
-        if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
+        //if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
+        //if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
         
         /*
         //mll > 60 GeV
@@ -563,8 +564,8 @@ void skimming()
     }
     
     //Background
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
@@ -580,16 +581,16 @@ void skimming()
     }
     
     //Signal
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,"Sig",4);
-        //for(unsigned int i=0;i<=1;i++)
-        for(unsigned int i=0;i<SigSampleName.size();i++)
+        for(unsigned int i=0;i<=0;i++)
+        //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
