@@ -41,7 +41,7 @@ const bool combined = 0;
 const bool docfw = 0;
 const bool doOptimize = 0;
 
-const bool doVVCount = 1;
+const bool doVVCount = 0;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -209,6 +209,7 @@ void analysis1()
                     element.setOfBGData.clear();
                     if(element.isSS)
                     {
+                        ///* Cutflow Attention
                         element.setOfBGData.push_back("fake lepton");
                         if(element.isSS_qF)
                         {
@@ -224,11 +225,13 @@ void analysis1()
                         
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
+                        //*/
                         //element.setOfBGMC.push_back("Zgamma");
                         //element.setOfBGMC.push_back("Wgamma");
                     }
                     else
                     {
+                        ///* Cutflow Attention
                         element.setOfBGMC.push_back("Zee");
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
@@ -236,6 +239,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Wt");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Wgamma");
+                        //*/
                     }
 
                     ChannelInfo.push_back(element);
@@ -272,6 +276,7 @@ void analysis1()
         }
         fin.close();
     }
+    //sumDataL = 33257+3212.96; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
@@ -347,11 +352,14 @@ void analysis1()
     {
         SigInfo element;
         
+        ///* Cutflow Attention
         element.MassDiff = 20;    element.ID = 2;   element.colour = 6;   SigMassSplitting.push_back(element);
         element.MassDiff = 50;    element.ID = 18;  element.colour = 7;   SigMassSplitting.push_back(element);
         element.MassDiff = 100;   element.ID = 19;  element.colour = 8;   SigMassSplitting.push_back(element);
         element.MassDiff = 200;   element.ID = 20;  element.colour = 9;   SigMassSplitting.push_back(element);
         element.MassDiff = 300;   element.ID = 21;  element.colour = 14;  SigMassSplitting.push_back(element);
+        //*/
+        //element.MassDiff = 50;    element.ID = 0;   element.colour = 7;   SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -2427,7 +2435,7 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                        
+                        //cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
@@ -3005,7 +3013,7 @@ void analysis1()
                 pad1->Draw();
                 pad1->cd();
                 h2DataSum->Draw("axis");
-                stack.Draw("histsame");
+                stack.Draw("histsame"); //Cutflow Attention
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     h2SigSum[i]->Draw("histsame");
