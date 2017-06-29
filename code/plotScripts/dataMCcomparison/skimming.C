@@ -149,6 +149,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
         tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
 
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
@@ -319,7 +320,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //jets
         nJet = 0;
         nBJet = 0;
-        //nCJet = 0;
+        nCJet = 0;
         //nFJet = 0;
         int nISR = 0;
         int leadingJetIndex = 0;
@@ -346,20 +347,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
-                /*
+                
                 //Central jets
                 if(!(evts->jets_jFlag[k] & 1<<5))
                 {
                     //no b-tagged
-                    if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
-                       (channelIndex==2 && evts->jets_pt[k] > 30) )
+                    if(evts->jets_pt[k] > 20)
                     {
                         //Central light jets
                         nCJet++;
-                        if(nCJet==1) leadingCJetIndex = k;
+                        //if(nCJet==1) leadingCJetIndex = k;
                     }
                 }
-                */
+                
             }
             else
             {
