@@ -164,6 +164,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(16,"nSumW");
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
+  m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
@@ -754,6 +755,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(nBaseMu == 3) m_hCutFlow->Fill("=3BaseMu", 1);
       if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
 
+      if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
       if(totLs == 3 && sig_Ls.size() == 3) m_hCutFlow->Fill("=3BaseLep and =3SigLep", 1);
     }
     /////////////////////////
@@ -1264,6 +1266,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
   }
 
+  fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
 
