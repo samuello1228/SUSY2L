@@ -430,8 +430,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
 
         //separate the sample into channels
         if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
+        else if(nISR>=1) channelIndex += 6;
+        //else continue;
         
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
