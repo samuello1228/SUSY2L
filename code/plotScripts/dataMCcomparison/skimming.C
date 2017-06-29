@@ -15,6 +15,7 @@ Double_t phi1;
 Double_t mll;
 Double_t ptll;
 Double_t MET;
+Double_t METRel;
 Double_t mTtwo;
 Double_t mt1;
 Double_t mt2;
@@ -46,7 +47,8 @@ Double_t qFwt;
 Double_t fLwt;
 Double_t averageMu;
 
-Double_t HT;
+Double_t meff;
+Double_t mlj;
 Double_t R2;
 
 struct nEvent
@@ -136,10 +138,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mll",&mll,"mll/D");
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
+        tree2[j]->Branch("METRel",&METRel,"METRel/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mt1",&mt1,"mt1/D");
         tree2[j]->Branch("mt2",&mt2,"mt2/D");
         tree2[j]->Branch("mtm",&mtm,"mtm/D");
+        tree2[j]->Branch("meff",&meff,"meff/D");
+        tree2[j]->Branch("mlj",&mlj,"mlj/D");
 
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
@@ -276,12 +281,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mll = evts->l12_m;
         ptll = evts->l12_pt;
         MET = evts->sig_Met;
+        METRel = evts->sig_MetRel;
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
         if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
-        //HT = evts->sig_HT;
+        meff = evts->sig_HT + evts->sig_Met;
+        mlj = evts->sig_mlj;
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
