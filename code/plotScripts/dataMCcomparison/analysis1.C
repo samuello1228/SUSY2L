@@ -41,6 +41,8 @@ const bool combined = 0;
 const bool docfw = 0;
 const bool doOptimize = 0;
 
+const bool doVVCount = 1;
+
 //for Zpt reweighting
 Double_t ptll;
 Double_t rw;
@@ -1860,6 +1862,7 @@ void analysis1()
     };
     
     std::vector<SampleData> BGVVData;
+    if(doVVCount)
     {
         unsigned int VVGroupIndex = 0;
         for(unsigned int i=0;i<BGMCGroupData.size();i++)
@@ -1887,7 +1890,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=8;RegionGroupIndex<=8;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=1;RegionGroupIndex<=1;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -2316,7 +2319,7 @@ void analysis1()
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
                             
                             //expN for BGVV
-                            if(VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
+                            if(doVVCount && VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
                             {
                                 sumOfEventVV[k][0] = hTemp->IntegralAndError(0,-1,sumOfEventVV[k][1]);
                                 cout<<BGVVData[k].SampleName.Data()<<": "<<sumOfEventVV[k][0]<<" +/- "<<sumOfEventVV[k][1]<<endl;

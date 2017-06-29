@@ -113,8 +113,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString fileName = "skimming/skimming.";
         //TString fileName = "skimming_signal_old/skimming.";
         //TString fileName = "skimming_signal_new/skimming.";
-        //fileName += SampleName;
-        fileName += "test";
+        fileName += SampleName;
+        //fileName += "test";
         fileName += "_";
         fileName += channel[j];
         fileName += ".root";
