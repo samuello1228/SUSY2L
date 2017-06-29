@@ -172,8 +172,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(5,"fake");
         h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
         h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"mll_60");
-        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
     }
     
     //fill histograms
@@ -217,7 +216,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //trigger
         if((evts->sig_trigCode & evts->sig_trigMask)==0)
         {
-            continue;
+            //continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -237,7 +236,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else
         {
             //exact 2 signal leptons
-            if(evts->leps_!=2) continue;
+            //if(evts->leps_!=2) continue;
             if(!(evts->leps_lFlag[0] & 1<<1)) continue;
             if(!(evts->leps_lFlag[1] & 1<<1)) continue;
             
@@ -257,34 +256,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         eta1 = evts->leps_eta[sigIndex[0]];
         eta2 = evts->leps_eta[sigIndex[1]];
         //pt of leading lepton
-        if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
-        if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
+        //if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
+        //if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt1",1);
         }
         
         //pt of subleading lepton
-        if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
-        if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
+        //if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
+        //if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt2",1);
-        }
-        
-        //if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
-        //if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
-        
-        /*
-        //mll > 60 GeV
-        if(!(evts->l12_m>60))
-        {
-            continue;
-        }
-        */
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("mll_60",1);
         }
         
         phi1 = evts->leps_phi[sigIndex[0]];
@@ -294,7 +278,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
-        if(mt1<mt2) mtm = mt1;
+        if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
         //HT = evts->sig_HT;
         //R2 = MET/(MET + pt1 + pt2);
@@ -468,14 +452,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=8;k++)
+    for(int k=1;k<=7;k++)
     {
         cout<<long(h2[1]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
-        cout<<int(h2[j]->GetBinContent(9))<<endl;
+        cout<<int(h2[j]->GetBinContent(8))<<endl;
     }
     cout<<endl;
     
