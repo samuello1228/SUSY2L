@@ -527,6 +527,7 @@ void analysis1()
     struct VarData
     {
         TString VarName;
+        TString VarFormula;
         TString VarTitle;
         TString unit;
         TString latexName;
@@ -545,114 +546,133 @@ void analysis1()
         VarData element;
         
         element.VarName = "pt1";        element.VarTitle = "pt of the leading lepton";          element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\pt$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "pt2";        element.VarTitle = "pt of the subleading lepton";       element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\pt$ of the subleading lepton";
         Var.push_back(element);
         
         element.VarName = "eta1";       element.VarTitle = "eta of the leading lepton";         element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\eta$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "eta2";       element.VarTitle = "eta of the subleading lepton";      element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\eta$ of the subleading lepton";
         Var.push_back(element);
         
         element.VarName = "phi1";       element.VarTitle = "phi of the leading lepton";         element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\phi$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "mll";        element.VarTitle = "Dilepton invariant mass";           element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$m_{ll}$";
         Var.push_back(element);
         
         element.VarName = "ptll";       element.VarTitle = "Dilepton pt";                       element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=700;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "Dilepton $\\pt$";
         Var.push_back(element);
         
         element.VarName = "MET";        element.VarTitle = "MET";                               element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=200;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
         element.VarName = "mTtwo";      element.VarTitle = "mT2";                               element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=150;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$m_{T2}$";
         Var.push_back(element);
         
         element.VarName = "mt1";        element.VarTitle = "mT of the leading lepton";          element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$m_{\\text{T}}$ of the leading lepton";
         Var.push_back(element);
         
         element.VarName = "mt2";        element.VarTitle = "mT of the subleading lepton";       element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$m_{\\text{T}}$ of the subleading lepton";
         Var.push_back(element);
         
         element.VarName = "averageMu";  element.VarTitle = "averageMu";                         element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=35;         element.xmin=0;                 element.xmax=35;
         element.log=0;          element.ymin=0;                 element.ymax=0;
         element.latexName = "Average number of interactions per bunch crossing";
         Var.push_back(element);
         
         element.VarName = "jetpt";      element.VarTitle = "pT of the leading jet";             element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\pt$ of the leading jet";
         Var.push_back(element);
         
         element.VarName = "jeteta";     element.VarTitle = "eta of the leading jet";            element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\eta$ of the leading jet";
         Var.push_back(element);
         
         element.VarName = "nJet";       element.VarTitle = "Number of jets";                    element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=15;         element.xmin=0;                 element.xmax=15;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
         element.VarName = "nBJet";      element.VarTitle = "Number of b-jets";                  element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
         element.VarName = "l12_dPhi";   element.VarTitle = "l12_dPhi";                          element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\Delta\\phi_{ll}$";
         Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";  element.VarTitle = "l12_MET_dPhi";                   element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\Delta\\phi_{ll,\\text{MET}}$";
         Var.push_back(element);
         
         element.VarName = "jets_MET_dPhi"; element.VarTitle = "jets_MET_dPhi";                  element.unit = "";
+        element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "jets\\_MET\\_dPhi";
@@ -790,7 +810,7 @@ void analysis1()
                 
                 //fill histograms from trees
                 TString temp;
-                temp += Var[VarIndex].VarName;
+                temp += Var[VarIndex].VarFormula;
                 temp += ">>Data";
                 tree2Data[j]->Draw(temp.Data(),"fLwt==0");
                 
@@ -809,7 +829,7 @@ void analysis1()
                     
                     //fill histograms from trees
                     TString temp;
-                    temp += Var[VarIndex].VarName;
+                    temp += Var[VarIndex].VarFormula;
                     temp += ">>BGMC";
                     tree2BGMC[j][k]->Draw(temp.Data(),"weight");
                     
@@ -1677,11 +1697,11 @@ void analysis1()
                             TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[CountVarIndex].VarName;
+                            TString temp = Var[CountVarIndex].VarFormula;
                             temp += ">>BGMC";
                             
                             TString Cut = "weight*(";
-                            Cut += Var[CutVarIndex].VarName;
+                            Cut += Var[CutVarIndex].VarFormula;
                             Cut += "<=";
                             Cut += TString::Itoa(jetptCut[q],10);;
                             Cut += ")";
@@ -1709,7 +1729,7 @@ void analysis1()
                             TH1F* hTemp = new TH1F("BGData",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[CountVarIndex].VarName;
+                            TString temp = Var[CountVarIndex].VarFormula;
                             temp += ">>BGData";
                             
                             TString Cut = "1";
@@ -1733,7 +1753,7 @@ void analysis1()
                             }
                             
                             Cut += " && ";
-                            Cut += Var[CutVarIndex].VarName;
+                            Cut += Var[CutVarIndex].VarFormula;
                             Cut += "<=";
                             Cut += TString::Itoa(jetptCut[q],10);;
                             Cut += ")";
@@ -1757,11 +1777,11 @@ void analysis1()
                     {
                         h2Sig = new TH1F("Sig",title.Data(),Var[CountVarIndex].bin,Var[CountVarIndex].xmin,Var[CountVarIndex].xmax);
 
-                        TString temp = Var[CountVarIndex].VarName;
+                        TString temp = Var[CountVarIndex].VarFormula;
                         temp += ">>Sig";
                         
                         TString Cut = "weight*(";
-                        Cut += Var[CutVarIndex].VarName;
+                        Cut += Var[CutVarIndex].VarFormula;
                         Cut += "<=";
                         Cut += TString::Itoa(jetptCut[q],10);;
                         Cut += ")";
@@ -2356,7 +2376,7 @@ void analysis1()
                         }
                         else
                         {
-                            temp = Var[VarIndex].VarName;
+                            temp = Var[VarIndex].VarFormula;
                         }
                         temp += ">>";
                         temp += hName2Data[j];
@@ -2391,7 +2411,7 @@ void analysis1()
                             TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[VarIndex].VarName;
+                            TString temp = Var[VarIndex].VarFormula;
                             temp += ">>BGMC";
                             
                             //Weight
@@ -2469,7 +2489,7 @@ void analysis1()
                         {
                             h2Data[k]->Scale(0);
                             
-                            TString temp = Var[VarIndex].VarName;
+                            TString temp = Var[VarIndex].VarFormula;
                             temp += ">>";
                             temp += hName2Data[k];
                             
@@ -2540,7 +2560,7 @@ void analysis1()
                         h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         
                         //Fill Signal
-                        TString temp = Var[VarIndex].VarName;
+                        TString temp = Var[VarIndex].VarFormula;
                         temp += ">>";
                         temp += NameTemp;
                         
@@ -3289,9 +3309,9 @@ void analysis1()
                             TH2F* hTemp = new TH2F("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                        Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
-                            TString temp = Var[VarIndex[1]].VarName;
+                            TString temp = Var[VarIndex[1]].VarFormula;
                             temp += ":";
-                            temp += Var[VarIndex[0]].VarName;
+                            temp += Var[VarIndex[0]].VarFormula;
                             temp += ">>BGMC";
                             
                             //Weight
@@ -3323,9 +3343,9 @@ void analysis1()
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             
                             //fill histograms from trees
-                            TString temp = Var[VarIndex[1]].VarName;
+                            TString temp = Var[VarIndex[1]].VarFormula;
                             temp += ":";
-                            temp += Var[VarIndex[0]].VarName;
+                            temp += Var[VarIndex[0]].VarFormula;
                             temp += ">>BGData";
                             
                             TString Cut = "1";
@@ -3380,9 +3400,9 @@ void analysis1()
                             TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
-                            TString temp = Var[VarIndex[1]].VarName;
+                            TString temp = Var[VarIndex[1]].VarFormula;
                             temp += ":";
-                            temp += Var[VarIndex[0]].VarName;
+                            temp += Var[VarIndex[0]].VarFormula;
                             temp += ">>signal";
                             
                             TString Cut = "weight*(1";
