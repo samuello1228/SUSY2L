@@ -66,13 +66,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     if(isPP1) tree1P = new TChain("PP1_evt2l");
     {
         TString fileName = SamplePath;
-        fileName += "user.clo.";
-        fileName += tag;
-        fileName += ".";
+        //fileName += "user.clo.";
+        //fileName += tag;
+        //fileName += ".";
         fileName += SampleName;
-        fileName += "_myOutput.root/*.root*";
+        //fileName += "_myOutput.root/*.root*";
+        fileName += "*.root";
         
-        fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
         
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
@@ -114,7 +115,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //TString fileName = "skimming_signal_old/skimming.";
         //TString fileName = "skimming_signal_new/skimming.";
         fileName += SampleName;
-        //fileName += "test";
         fileName += "_";
         fileName += channel[j];
         fileName += ".root";
@@ -242,7 +242,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else
         {
             //exact 2 signal leptons
-            //if(evts->leps_!=2) continue;
+            if(evts->leps_!=2) continue;
             if(!(evts->leps_lFlag[0] & 1<<1)) continue;
             if(!(evts->leps_lFlag[1] & 1<<1)) continue;
             
@@ -524,7 +524,8 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     
@@ -534,7 +535,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
     //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
     //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
-    SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
+    //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
+    SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
