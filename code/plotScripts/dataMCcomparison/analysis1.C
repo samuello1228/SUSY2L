@@ -1348,6 +1348,128 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        //Signal region for run 1
+        GroupElement.GroupName = "SR_SS_run1";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
+        
+        //ee_1
+        {
+            element.RegionName = "SR_SS_ee_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 20";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && METRel > 55";
+            element.Cut += " && meff > 200";
+            element.Cut += " && mlj < 90";
+
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_1
+        {
+            element.RegionName = "SR_SS_mumu_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 20";
+            element.Cut += " && fabs(eta1 - eta2) < 1.5";
+            element.Cut += " && meff > 200";
+            element.Cut += " && mtm > 110";
+            element.Cut += " && mlj < 90";
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_1
+        {
+            element.RegionName = "SR_SS_emu_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 30";
+            element.Cut += " && fabs(eta1 - eta2) < 1.5";
+            element.Cut += " && meff > 200";
+            element.Cut += " && mtm > 110";
+            element.Cut += " && mlj < 90";
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //ee_2
+        {
+            element.RegionName = "SR_SS_ee_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 20";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && METRel > 30";
+            element.Cut += " && mtm > 110";
+            element.Cut += " && mlj < 120";
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_2
+        {
+            element.RegionName = "SR_SS_mumu_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 30";
+            element.Cut += " && fabs(eta1 - eta2) < 1.5";
+            element.Cut += " && meff > 200";
+            element.Cut += " && mlj < 120";
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_2
+        {
+            element.RegionName = "SR_SS_emu_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && pt1 > 30";
+            element.Cut += " && pt2 > 30";
+            element.Cut += " && fabs(eta1 - eta2) < 1.5";
+            element.Cut += " && meff > 200";
+            element.Cut += " && mtm > 110";
+            element.Cut += " && mlj < 120";
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
@@ -1895,7 +2017,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=1;RegionGroupIndex<=1;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
