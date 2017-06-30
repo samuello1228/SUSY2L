@@ -70,8 +70,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //fileName += tag;
         //fileName += ".";
         fileName += SampleName;
+
         //fileName += "_myOutput.root/*.root*";
         fileName += "*.root";
+        //fileName += ".merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879.root";
         
         //fileName = "/Users/samuel/Atlas/ntuple/test.root";
         
@@ -537,6 +539,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
     //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
     SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
+    //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
