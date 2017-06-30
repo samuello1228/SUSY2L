@@ -657,6 +657,13 @@ void analysis1()
         element.latexName = element.VarTitle;
         Var.push_back(element);
         
+        element.VarName = "nCJet";      element.VarTitle = "Number of central jets";            element.unit = "";
+        element.VarFormula = element.VarName;
+        element.bin=6;          element.xmin=0;                 element.xmax=4;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = element.VarTitle;
+        Var.push_back(element);
+        
         element.VarName = "l12_dPhi";   element.VarTitle = "l12_dPhi";                          element.unit = "";
         element.VarFormula = element.VarName;
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
@@ -677,7 +684,48 @@ void analysis1()
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "jets\\_MET\\_dPhi";
         Var.push_back(element);
-
+        
+        element.VarName = "mllmZ";      element.VarTitle = "|mll-mZ|";                          element.unit = "[GeV]";
+        element.VarFormula = "fabs(mll-91.2)";
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$|m_{ll}-m_{Z}|$";
+        Var.push_back(element);
+        
+        element.VarName = "dEta";       element.VarTitle = "|eta1-eta2|";                       element.unit = "";
+        element.VarFormula = "fabs(eta1-eta2)";
+        element.bin=40;         element.xmin=0;                 element.xmax=3;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$\\Delta\\eta\\_{ll}$";
+        Var.push_back(element);
+        
+        element.VarName = "METRel";     element.VarTitle = "MetRel";                            element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
+        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "MetRel";
+        Var.push_back(element);
+        
+        element.VarName = "meff";       element.VarTitle = "meff";                              element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
+        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "meff";
+        Var.push_back(element);
+        
+        element.VarName = "mtm";        element.VarTitle = "maximum mT";                        element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
+        element.bin=40;         element.xmin=0;                 element.xmax=250;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "$m_{\\text{T}}^{\\text{max}}$";
+        Var.push_back(element);
+        
+        element.VarName = "mlj";        element.VarTitle = "mlj or mljj";                       element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
+        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.log=1;          element.ymin=1e-1;              element.ymax=1;
+        element.latexName = "mlj or mljj";
+        Var.push_back(element);
     }
     SetAtlasStyle();
     
@@ -2143,8 +2191,8 @@ void analysis1()
             }
         }
         
-        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
-        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
+        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
             
@@ -2282,8 +2330,8 @@ void analysis1()
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-            //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
