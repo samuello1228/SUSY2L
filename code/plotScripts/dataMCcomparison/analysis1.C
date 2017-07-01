@@ -722,6 +722,12 @@ void analysis1()
     }
     SetAtlasStyle();
     
+    struct AdditionalCutData
+    {
+        TString Cut;
+        TString RelatedVariable;
+    };
+    
     struct RegionGroupData
     {
         TString GroupName;
@@ -736,6 +742,7 @@ void analysis1()
         TString RegionName;
         std::vector<unsigned int> setOfChannel;
         TString Cut;
+        vector<AdditionalCutData> AdditionalCut;
     };
     
     if(dorw)
@@ -1207,6 +1214,7 @@ void analysis1()
     {
         RegionGroupData GroupElement;
         RegionData element;
+        AdditionalCutData AdditionalCutElement;
         
         //CR_OS
         GroupElement.GroupName = "CR_OS";
@@ -1214,6 +1222,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = "";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1236,6 +1245,7 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         element.Cut = "";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1258,6 +1268,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 1";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1281,6 +1292,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 1";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1304,6 +1316,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 2";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1327,6 +1340,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && nBJet == 2";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1351,6 +1365,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && mTtwo<30";
+        element.AdditionalCut.clear();
         
         element.RegionName = "CR_nonISR_SS_mumu_low_mT2";
         element.setOfChannel.clear();
@@ -1372,6 +1387,7 @@ void analysis1()
         GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = " && mll>81.18 && mll<101.18";
+        element.AdditionalCut.clear();
         
         element.RegionName = "CR_nonISR_SS_ee_Zmass";
         element.setOfChannel.clear();
@@ -1392,6 +1408,7 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         element.Cut = " && nBJet == 0";
+        element.AdditionalCut.clear();
         
         for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
         {
@@ -1424,12 +1441,32 @@ void analysis1()
             element.setOfChannel.push_back(9);
             
             element.Cut = " && nCJet == 1";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 20";
-            element.Cut += " && fabs(mll - 91.2) > 10";
-            element.Cut += " && METRel > 55";
-            element.Cut += " && meff > 200";
-            element.Cut += " && mlj < 90";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 55";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
 
             RegionInfo.push_back(element);
         }
@@ -1443,12 +1480,32 @@ void analysis1()
             element.setOfChannel.push_back(10);
             
             element.Cut = " && nCJet == 1";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 20";
-            element.Cut += " && fabs(eta1 - eta2) < 1.5";
-            element.Cut += " && meff > 200";
-            element.Cut += " && mtm > 110";
-            element.Cut += " && mlj < 90";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
@@ -1462,12 +1519,32 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = " && nCJet == 1";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 30";
-            element.Cut += " && fabs(eta1 - eta2) < 1.5";
-            element.Cut += " && meff > 200";
-            element.Cut += " && mtm > 110";
-            element.Cut += " && mlj < 90";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
@@ -1481,12 +1558,32 @@ void analysis1()
             element.setOfChannel.push_back(9);
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 20";
-            element.Cut += " && fabs(mll - 91.2) > 10";
-            element.Cut += " && METRel > 30";
-            element.Cut += " && mtm > 110";
-            element.Cut += " && mlj < 120";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 30";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
@@ -1500,11 +1597,28 @@ void analysis1()
             element.setOfChannel.push_back(10);
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 30";
-            element.Cut += " && fabs(eta1 - eta2) < 1.5";
-            element.Cut += " && meff > 200";
-            element.Cut += " && mlj < 120";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
@@ -1518,12 +1632,32 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && pt1 > 30";
-            element.Cut += " && pt2 > 30";
-            element.Cut += " && fabs(eta1 - eta2) < 1.5";
-            element.Cut += " && meff > 200";
-            element.Cut += " && mtm > 110";
-            element.Cut += " && mlj < 120";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
@@ -1593,6 +1727,8 @@ void analysis1()
                             const unsigned int ChannelIndex = 3 +6*i +m;
                             element.setOfChannel.clear();
                             element.setOfChannel.push_back(ChannelIndex);
+                            
+                            element.AdditionalCut.clear();
                             
                             RegionInfo.push_back(element);
                         }
@@ -2386,8 +2522,14 @@ void analysis1()
                     }
                     
                     CommonCut += RegionInfo[RegionIndex].Cut;
-                    //CommonCut += " && pt1>25 && pt2>20";
-                    //CommonCut += " && mll>60";
+                    for(unsigned int i=0;i<RegionInfo[RegionIndex].AdditionalCut.size();i++)
+                    {
+                        if(RegionInfo[RegionIndex].AdditionalCut[i].RelatedVariable != Var[VarIndex].VarName)
+                        {
+                            CommonCut += RegionInfo[RegionIndex].AdditionalCut[i].Cut;
+                        }
+                    }
+                    //cout<<CommonCut.Data()<<endl;
                     
                     //h2DataSum
                     {
