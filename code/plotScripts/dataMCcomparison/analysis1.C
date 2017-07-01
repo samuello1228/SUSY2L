@@ -685,16 +685,9 @@ void analysis1()
         element.latexName = "jets\\_MET\\_dPhi";
         Var.push_back(element);
         
-        element.VarName = "mllmZ";      element.VarTitle = "|mll-mZ|";                          element.unit = "[GeV]";
-        element.VarFormula = "fabs(mll-91.2)";
-        element.bin=40;         element.xmin=0;                 element.xmax=250;
-        element.log=1;          element.ymin=1e-1;              element.ymax=1;
-        element.latexName = "$|m_{ll}-m_{Z}|$";
-        Var.push_back(element);
-        
-        element.VarName = "dEta";       element.VarTitle = "|eta1-eta2|";                       element.unit = "";
-        element.VarFormula = "fabs(eta1-eta2)";
-        element.bin=40;         element.xmin=0;                 element.xmax=3;
+        element.VarName = "dEta";       element.VarTitle = "eta1-eta2";                         element.unit = "";
+        element.VarFormula = "eta1-eta2";
+        element.bin=40;         element.xmin=-5;                element.xmax=5;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "$\\Delta\\eta\\_{ll}$";
         Var.push_back(element);
@@ -708,7 +701,7 @@ void analysis1()
         
         element.VarName = "meff";       element.VarTitle = "meff";                              element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=0;                 element.xmax=200;
+        element.bin=40;         element.xmin=0;                 element.xmax=400;
         element.log=1;          element.ymin=1e-1;              element.ymax=1;
         element.latexName = "meff";
         Var.push_back(element);
@@ -2622,7 +2615,7 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                        if(j==22) cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
+                        if(VarIndex==countVariable && j==22) cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
