@@ -646,53 +646,33 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
       if (sig_Ls.size() == 2) {
-	dilepPair[0] = sig_Ls[0];
-	dilepPair[1] = sig_Ls[1];
+      	dilepPair[0] = sig_Ls[0];
+      	dilepPair[1] = sig_Ls[1];
         keep = true;
         m_susyEvt->evt.flag = 1;
       } 
 
-      //this catches 1SigLep1FakeLepSS -.-
-      if (sig_Ls.size() == 1) {
-	int sigLepSign = 0;
-        xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sig_Ls[0]);
-        if(mu) sigLepSign = mu->charge();
-        else{
-          xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sig_Ls[0]);
-          if(el) sigLepSign = el->charge();
-        }
-	dilepPair[0] = sig_Ls[0];
-
-	for (auto p : sel_Ls){
-	  int baseLepSign = -999;
-          xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
-          if(mu) baseLepSign = mu->charge();
-          else{
-            xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
-            if(el) baseLepSign = el->charge();
-          }
-          if (baseLepSign==sigLepSign){
-	    dilepPair[1] = p;
-            keep = true;
-            m_susyEvt->evt.flag = 2;
-	    break;
-	  }
-	}
+      //this catches 1SigLep1FakeLep
+      if (sig_Ls.size() == 1 && sel_Ls.size()==2) {
+      	dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sig_Ls[0] == sel_Ls[0] ? sel_Ls[1] : sel_Ls[0];
+        keep = true;
+        m_susyEvt->evt.flag = 2;
       }
 
       //this catches 2FakeLepSS
       if (sig_Ls.size() == 0) {
         if (sel_Ls.size() >=2) { 
-	  int baseLep0Sign = 0;
+      	  int baseLep0Sign = 0;
           xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
           if(mu) baseLep0Sign = mu->charge();
           else{
             xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
-           if(el) baseLep0Sign = el->charge();
+            if(el) baseLep0Sign = el->charge();
           }
 
-	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
-	    int baseLep1Sign = -999;
+      	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
+      	    int baseLep1Sign = -999;
             xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
             if(mu) baseLep1Sign = mu->charge();
             else{
@@ -700,28 +680,109 @@ EL::StatusCode ssEvtSelection :: execute ()
               if(el) baseLep1Sign = el->charge();
             }
             if (baseLep0Sign==baseLep1Sign){
-	      dilepPair[0] = sel_Ls[0];
-	      dilepPair[1] = sel_Ls[1];
-  	      keep = true;
+      	      dilepPair[0] = sel_Ls[0];
+      	      dilepPair[1] = sel_Ls[1];
+      	      keep = true;
               m_susyEvt->evt.flag = 3;
-	      break;
-	    }
-	  }
+      	      break;
+      	    }
+      	  }
 
-	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
-	    //no one has same sign as the first lep
-	    //=> everyone except the first lep is Same sign among themselves
-	    dilepPair[0] = sel_Ls[1];
-	    dilepPair[1] = sel_Ls[2];
-  	    keep = true;
+      	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
+      	    //no one has same sign as the first lep
+      	    //=> everyone except the first lep is Same sign among themselves
+      	    dilepPair[0] = sel_Ls[1];
+      	    dilepPair[1] = sel_Ls[2];
+      	    keep = true;
             m_susyEvt->evt.flag = 3;
-	  }
-	}
+      	  }
+      	}
       } 
 
       if (!cutflow && !keep) {continue;}
     }
     if(study == "3l" && totLs != 3) continue;
+
+    if(study=="fakes"){
+      bool keep = false;
+
+      //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
+      if (sig_Ls.size() == 2) {
+        dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sig_Ls[1];
+        keep = true;
+        m_susyEvt->evt.flag = 1;
+      } 
+
+      //this catches 1SigLep1FakeLepSS 
+      if (sig_Ls.size() == 1) {
+        int sigLepSign = 0;
+        xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sig_Ls[0]);
+        if(mu) sigLepSign = mu->charge();
+        else {
+          xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sig_Ls[0]);
+          if(el) sigLepSign = el->charge();
+        }
+        dilepPair[0] = sig_Ls[0];
+
+        for (auto p : sel_Ls){
+          int baseLepSign = -999;
+          xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
+          if(mu) baseLepSign = mu->charge();
+          else{
+            xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
+            if(el) baseLepSign = el->charge();
+          }
+          if (baseLepSign==sigLepSign){
+            dilepPair[1] = p;
+            keep = true;
+            m_susyEvt->evt.flag = 2;
+            break;
+          }
+        }
+      }
+
+      //this catches 2FakeLepSS
+      if (sig_Ls.size() == 0) {
+        if (sel_Ls.size() >=2) { 
+          int baseLep0Sign = 0;
+          xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
+          if(mu) baseLep0Sign = mu->charge();
+          else{
+            xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
+            if(el) baseLep0Sign = el->charge();
+          }
+
+          for (unsigned int i = 1; i<sel_Ls.size(); i++){
+            int baseLep1Sign = -999;
+            xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
+            if(mu) baseLep1Sign = mu->charge();
+            else{
+              xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
+              if(el) baseLep1Sign = el->charge();
+            }
+            if (baseLep0Sign==baseLep1Sign){
+              dilepPair[0] = sel_Ls[0];
+              dilepPair[1] = sel_Ls[1];
+              keep = true;
+              m_susyEvt->evt.flag = 3;
+              break;
+            }
+          }
+
+          if (dilepPair[0]==nullptr && sel_Ls.size()>2){
+            //no one has same sign as the first lep
+            //=> everyone except the first lep is Same sign among themselves
+            dilepPair[0] = sel_Ls[1];
+            dilepPair[1] = sel_Ls[2];
+            keep = true;
+            m_susyEvt->evt.flag = 3;
+          }
+        }
+      } 
+
+      if (!cutflow && !keep) {continue;}
+    }
 
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -731,7 +792,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
       for (auto p : sel_Ls){
         if (p==dilepPair[0] || p==dilepPair[1])continue;
-	dilepPair.push_back(p);
+      	dilepPair.push_back(p);
       }
       sel_Ls = dilepPair;
     }
@@ -942,39 +1003,39 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     if(study == "ss")
     {
-        if(totLs == 2 && sig_Ls.size() == 2)
+      if(totLs == 2 && sig_Ls.size() == 2)
+      {
+        if(dilepFlag > 0)
         {
-          if(dilepFlag > 0)
-          {
-            m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
-          }
-       
-          if(m_susyEvt->sig.Met > 50)
-          {
-            m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50", 1);
-            if(nBJet == 0)
-            {
-              m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50 and BVeto", 1);
-            }
-          }
-        }      
-        else if(totLs == 3 && sig_Ls.size() == 3)
+          m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
+        }
+     
+        if(m_susyEvt->sig.Met > 50)
         {
-          if(dilepFlag > 0)
+          m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50", 1);
+          if(nBJet == 0)
           {
-            m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
+            m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50 and BVeto", 1);
           }
-       
-          if(m_susyEvt->sig.Met > 50)
+        }
+      }      
+      else if(totLs == 3 && sig_Ls.size() == 3)
+      {
+        if(dilepFlag > 0)
+        {
+          m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
+        }
+     
+        if(m_susyEvt->sig.Met > 50)
+        {
+          m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50", 1);
+          if(nBJet == 0)
           {
-            m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50", 1);
-            if(nBJet == 0)
-            {
-              m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50 and BVeto", 1);
-            }
+            m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50 and BVeto", 1);
           }
-        }       
-
+        }
+      }       
+      
       if(cutflow) continue;
     }
 
