@@ -41,6 +41,7 @@ const bool combined = 0;
 const bool docfw = 0;
 const bool doOptimize = 0;
 
+// Cutflow Attention
 const bool doVVCount = 1;
 
 //for Zpt reweighting
@@ -273,7 +274,7 @@ void analysis1()
         }
         fin.close();
     }
-    sumDataL = 33257+3212.96; //Cutflow Attention
+    DataSampleID.clear(); sumDataL = 33257+3212.96; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
