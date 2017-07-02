@@ -41,7 +41,7 @@ const bool combined = 0;
 const bool docfw = 0;
 const bool doOptimize = 0;
 
-const bool doVVCount = 0;
+const bool doVVCount = 1;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -2197,8 +2197,7 @@ void analysis1()
         {
             SampleData element;
             element.SampleName = BGMCSampleID[i].Data();
-            element.SampleName.Remove(0,19);
-            element.SampleName.ReplaceAll("_","\\_");
+            element.SampleName.Remove(0,18);
             element.index = i;
             BGVVData.push_back(element);
         }
@@ -2320,8 +2319,8 @@ void analysis1()
             }
         }
         
-        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
-        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
+        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
             
@@ -2649,7 +2648,8 @@ void analysis1()
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
                             
                             //expN for BGVV
-                            if(doVVCount && VarIndex==countVariable && BGGroup[j].info->GroupName == "VV")
+                            if(doVVCount && VarIndex==countVariable && BGGroup[j].info->GroupName == "VV"
+                               && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
                             {
                                 sumOfEventVV[k][0] = hTemp->IntegralAndError(0,-1,sumOfEventVV[k][1]);
                                 cout<<BGVVData[k].SampleName.Data()<<": "<<sumOfEventVV[k][0]<<" +/- "<<sumOfEventVV[k][1]<<endl;
@@ -2757,7 +2757,8 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                        if(VarIndex==countVariable && j==22) cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
+                        if(VarIndex==countVariable && j==22 && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
+                            cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
@@ -2886,25 +2887,30 @@ void analysis1()
                     }
                     fout.close();
                     
-                    /*
                     //output file for VV
-                    PathName = "latex/data/expN/BGVV_";
-                    PathName += RegionInfo[RegionIndex].RegionName;
-                    PathName += ".tex";
-                    
-                    fout.open(PathName.Data());
-                    fout<<setprecision(3)<<std::fixed;
-                    for(unsigned int j=0;j<BGVVData.size();j++)
+                    if(doVVCount
+                       && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
                     {
-                        fout<<BGVVData[j].SampleName.Data();
-                        fout<<" & $";
-                        fout<<sumOfEventVV[j][0];
-                        fout<<"\\pm";
-                        fout<<sumOfEventVV[j][1];
-                        fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
+                        PathName = "latex/data/expN/";
+                        PathName += RegionInfo[RegionIndex].RegionName;
+                        PathName += "_BGVV.tex";
+                        
+                        fout.open(PathName.Data());
+                        fout<<setprecision(3)<<std::fixed;
+                        for(unsigned int j=0;j<BGVVData.size();j++)
+                        {
+                            TString latexName = BGVVData[j].SampleName;
+                            latexName.ReplaceAll("_","\\_");
+
+                            fout<<latexName.Data();
+                            fout<<" & $";
+                            fout<<sumOfEventVV[j][0];
+                            fout<<"\\pm";
+                            fout<<sumOfEventVV[j][1];
+                            fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
+                        }
+                        fout.close();
                     }
-                    fout.close();
-                    */
                     
                     //output SR.txt file
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR")
@@ -3915,7 +3921,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" )
            ) continue;
         
         TString PathName = "latex/data/expN_";
@@ -3957,38 +3964,48 @@ void analysis1()
         }
         
         fout.close();
-        
-        /*
-        //For VV
-        PathName = "latex/data/expN_BGVV_";
-        PathName += RegionGroup[RegionGroupIndex].GroupName;
-        PathName += ".tex";
-        fout.open(PathName.Data());
-        
-        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+    }
+    
+    //For VV
+    if(doVVCount)
+    {
+        for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
         {
-            TString latexName = RegionInfo[RegionIndex].RegionName;
-            latexName.ReplaceAll("_","\\_");
+            if(!
+               (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
+               )continue;
             
-            fout<<"\\begin{frame}{Expected number of events for VV \\\\ ";
-            fout<<"For ";
-            fout<<latexName.Data();
-            fout<<"}"<<endl;
+            TString PathName = "latex/data/expN_";
+            PathName += RegionGroup[RegionGroupIndex].GroupName;
+            PathName += "_BGVV.tex";
             
-            fout<<"\\vspace{5mm}"<<endl;
-            fout<<"\\begin{tabular}{|c|c|}"<<endl;
-            fout<<"\\hline"<<endl;
-            fout<<"& Number of events \\\\"<<endl;
-            fout<<"\\hline"<<endl;
+            ofstream fout;
+            fout.open(PathName.Data());
             
-            fout<<"\\input{data/expN/BGVV_"<<RegionInfo[RegionIndex].RegionName.Data()<<".tex}"<<endl;
+            for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+            {
+                TString latexName = RegionInfo[RegionIndex].RegionName;
+                latexName.ReplaceAll("_","\\_");
+                
+                fout<<"\\begin{frame}{Expected number of events for VV \\\\ ";
+                fout<<"For ";
+                fout<<latexName.Data();
+                fout<<"}"<<endl;
+                
+                fout<<"\\vspace{5mm}"<<endl;
+                fout<<"\\begin{tabular}{|c|c|}"<<endl;
+                fout<<"\\hline"<<endl;
+                fout<<"& Number of events \\\\"<<endl;
+                fout<<"\\hline"<<endl;
+                
+                fout<<"\\input{data/expN/"<<RegionInfo[RegionIndex].RegionName.Data()<<"_BGVV.tex}"<<endl;
+                
+                fout<<"\\end{tabular}"<<endl;
+                fout<<"\\end{frame}"<<endl<<endl;
+            }
             
-            fout<<"\\end{tabular}"<<endl;
-            fout<<"\\end{frame}"<<endl<<endl;
+            fout.close();
         }
-        
-        fout.close();
-        */
     }
     
     //plot_CR_SS_mumu_low_mT2.tex
@@ -4057,7 +4074,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" )
            ) continue;
         
         
