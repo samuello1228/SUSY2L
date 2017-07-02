@@ -44,219 +44,40 @@ University of Michigan
 
 \begin{frame}{Update}
 \begin{itemize}
-\item Add significance plot for other variables
-\item Add 2D significance plot (ptll vs MET)
+\item The VV peak for nonISR\_SS\_emu is due to a large weight (1000)
+\item finished the cutflow for the signal sample
+\item expN for VV BG
+\item Add N-1 plot for cut variables
 \end{itemize}
 \end{frame}
 
-\section{Motivation}
-\begin{frame}{Motivation}
-\begin{itemize}
-\item Use the Control Regions (1 or 2 b-jet) to estimate the fake background
-\item Understand all the discrepancies (Check whether the 1.4 factor comes from Z+jets)
-\item Optimization for signal region
-\end{itemize}
-\end{frame}
+%\section{Motivation}
+%\begin{frame}{Motivation}
+%\begin{itemize}
+%\item Optimization for signal region
+%\end{itemize}
+%\end{frame}
 
-\section{CR\_OS}
+\section{CR\_SS\_run1}
 \begin{frame}
 \sectionpage
 \end{frame}
 
-\begin{frame}{Selection}
-\begin{itemize}
-\item Opposite-sign di-lepton
-\begin{itemize}
-\item Leading lepton: $e$ $\pt>25\GeV$, $\mu$ $\pt>20\GeV$,
-\item Subleading lepton: $e$ $\pt>15\GeV$, $\mu$ $\pt>10\GeV$
-\item $m_{ll}>15\GeV$ for SF di-lepton
-\end{itemize}
-\item Used for physics background normalization
-\begin{itemize}
-\item Di-Boson
-\item $Zee$ control sample for charge flip background estimation
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_OS.tex}
-\input{data/plot_CR_OS.tex}
-
-\section{CR\_OS\_1B}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item CR\_OS
-\item 1 $b$-jet
-\item Z+jets sample is scaled by {\bf 1.4} to match data
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_OS_1B.tex}
-\input{data/plot_CR_OS_1B.tex}
-
-\section{CR\_SS\_1B}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\item 1 $b$-jet
-\item Fake background in $\mu\mu$ channel is scaled to match with data
-\begin{itemize}
-\item nonISR: 4.28729
-\item ISR: 4.18533
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_SS_1B.tex}
-\input{data/plot_CR_SS_1B.tex}
-
-\section{CR\_OS\_2B}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item CR\_OS
-\item 2 $b$-jet
-\item Z+jets sample is scaled by {\bf 1.4} to match data
-\end{itemize}
-\end{frame}
-\input{data/expN_CR_OS_2B.tex}
-\input{data/plot_CR_OS_2B.tex}
-
-\section{CR\_SS\_2B}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\item 2 $b$-jet
-\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_1B)
-\begin{itemize}
-\item nonISR: 4.28729
-\item ISR: 4.18533
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_SS_2B.tex}
-\input{data/plot_CR_SS_2B.tex}
-
-\section{CR\_SS\_mumu\_low\_mT2}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\begin{itemize}
-\item $\mu\mu$ channel only here
-\end{itemize}
-\item $m_{T2}<30\GeV$
-\item Fake background are scaled to match data
-\begin{itemize}
-\item nonISR: 4.43166
-\item ISR: 3.85965
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_SS_mumu_low_mT2.tex}
-\input{data/plot_CR_SS_mumu_low_mT2.tex}
-
-\section{CR\_SS\_ee\_Zmass}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\item $81<m_{ee}<101\GeV$
-\item To check the charge flip background
-\end{itemize}
-\end{frame}
-
-\input{data/expN_CR_SS_ee_Zmass.tex}
-\input{data/plot_CR_SS_ee_Zmass.tex}
-
-\section{SR\_SS}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\item Blinded
-\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_mumu\_low\_mT2)
-\begin{itemize}
-\item nonISR: 4.43166
-\item ISR: 3.85965
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_SR_SS.tex}
-\input{data/plot_SR_SS.tex}
-
-\section{SR\_SS\_0B}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection}
-\begin{itemize}
-\item Same-sign di-lepton
-\item no $b$-jet
-\item Blinded
-\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_1B)
-\begin{itemize}
-\item nonISR: 4.28729
-\item ISR: 4.18533
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\input{data/expN_SR_SS_0B.tex}
-\input{data/plot_SR_SS_0B.tex}
-
-\section{Optimization for signal}
-\begin{frame}
-\sectionpage
-\end{frame}
-
-\input{data/plot_significances_SR_SS_0B.tex}
-
-
+\input{data/expN_SR_SS_run1.tex}
+\input{data/expN_SR_SS_run1_BGVV.tex}
+\input{data/plot_SR_SS_run1.tex}
 
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item The 1.4 factor mainly comes from Z+jets
-\item The fake background(by using the old fake factor) is smaller by 3 to 4 times
+\item ?
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Plan}
 \begin{itemize}
-\item cutflow with Peter
-\item study VV peak for nonISR\_SS\_emu
 \item add the fake background in the OS events
-
 \end{itemize}
 \end{frame}
 
@@ -645,6 +466,189 @@ Definition of the Control Region.
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
+
+
+\section{CR\_OS}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Opposite-sign di-lepton
+\begin{itemize}
+\item Leading lepton: $e$ $\pt>25\GeV$, $\mu$ $\pt>20\GeV$,
+\item Subleading lepton: $e$ $\pt>15\GeV$, $\mu$ $\pt>10\GeV$
+\item $m_{ll}>15\GeV$ for SF di-lepton
+\end{itemize}
+\item Used for physics background normalization
+\begin{itemize}
+\item Di-Boson
+\item $Zee$ control sample for charge flip background estimation
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_OS.tex}
+\input{data/plot_CR_OS.tex}
+
+\section{CR\_OS\_1B}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item CR\_OS
+\item 1 $b$-jet
+\item Z+jets sample is scaled by {\bf 1.4} to match data
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_OS_1B.tex}
+\input{data/plot_CR_OS_1B.tex}
+
+\section{CR\_SS\_1B}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\item 1 $b$-jet
+\item Fake background in $\mu\mu$ channel is scaled to match with data
+\begin{itemize}
+\item nonISR: 4.28729
+\item ISR: 4.18533
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_SS_1B.tex}
+\input{data/plot_CR_SS_1B.tex}
+
+\section{CR\_OS\_2B}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item CR\_OS
+\item 2 $b$-jet
+\item Z+jets sample is scaled by {\bf 1.4} to match data
+\end{itemize}
+\end{frame}
+\input{data/expN_CR_OS_2B.tex}
+\input{data/plot_CR_OS_2B.tex}
+
+\section{CR\_SS\_2B}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\item 2 $b$-jet
+\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_1B)
+\begin{itemize}
+\item nonISR: 4.28729
+\item ISR: 4.18533
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_SS_2B.tex}
+\input{data/plot_CR_SS_2B.tex}
+
+\section{CR\_SS\_mumu\_low\_mT2}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\begin{itemize}
+\item $\mu\mu$ channel only here
+\end{itemize}
+\item $m_{T2}<30\GeV$
+\item Fake background are scaled to match data
+\begin{itemize}
+\item nonISR: 4.43166
+\item ISR: 3.85965
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_SS_mumu_low_mT2.tex}
+\input{data/plot_CR_SS_mumu_low_mT2.tex}
+
+\section{CR\_SS\_ee\_Zmass}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\item $81<m_{ee}<101\GeV$
+\item To check the charge flip background
+\end{itemize}
+\end{frame}
+
+\input{data/expN_CR_SS_ee_Zmass.tex}
+\input{data/plot_CR_SS_ee_Zmass.tex}
+
+\section{SR\_SS}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\item Blinded
+\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_mumu\_low\_mT2)
+\begin{itemize}
+\item nonISR: 4.43166
+\item ISR: 3.85965
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_SR_SS.tex}
+\input{data/plot_SR_SS.tex}
+
+\section{SR\_SS\_0B}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection}
+\begin{itemize}
+\item Same-sign di-lepton
+\item no $b$-jet
+\item Blinded
+\item Fake background in $\mu\mu$ channel is scaled. (use the same scale factor from CR\_SS\_1B)
+\begin{itemize}
+\item nonISR: 4.28729
+\item ISR: 4.18533
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\input{data/expN_SR_SS_0B.tex}
+\input{data/plot_SR_SS_0B.tex}
+
+\section{Optimization for signal}
+\begin{frame}
+\sectionpage
+\end{frame}
+
+\input{data/plot_significances_SR_SS_0B.tex}
 
 \begin{frame}
 \begin{center}
