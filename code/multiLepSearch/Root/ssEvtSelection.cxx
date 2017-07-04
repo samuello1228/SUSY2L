@@ -646,25 +646,25 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
       if (sig_Ls.size() == 2) {
-	dilepPair[0] = sig_Ls[0];
-	dilepPair[1] = sig_Ls[1];
+      	dilepPair[0] = sig_Ls[0];
+      	dilepPair[1] = sig_Ls[1];
         keep = true;
         m_susyEvt->evt.flag = 1;
       } 
 
       //this catches 1SigLep1FakeLepSS -.-
       if (sig_Ls.size() == 1) {
-	int sigLepSign = 0;
+      	int sigLepSign = 0;
         xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sig_Ls[0]);
         if(mu) sigLepSign = mu->charge();
         else{
           xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sig_Ls[0]);
           if(el) sigLepSign = el->charge();
         }
-	dilepPair[0] = sig_Ls[0];
+      	dilepPair[0] = sig_Ls[0];
 
-	for (auto p : sel_Ls){
-	  int baseLepSign = -999;
+      	for (auto p : sel_Ls){
+      	  int baseLepSign = -999;
           xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
           if(mu) baseLepSign = mu->charge();
           else{
@@ -672,18 +672,18 @@ EL::StatusCode ssEvtSelection :: execute ()
             if(el) baseLepSign = el->charge();
           }
           if (baseLepSign==sigLepSign){
-	    dilepPair[1] = p;
+      	    dilepPair[1] = p;
             keep = true;
             m_susyEvt->evt.flag = 2;
-	    break;
-	  }
-	}
+      	    break;
+      	  }
+      	}
       }
 
       //this catches 2FakeLepSS
       if (sig_Ls.size() == 0) {
         if (sel_Ls.size() >=2) { 
-	  int baseLep0Sign = 0;
+          int baseLep0Sign = 0;
           xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
           if(mu) baseLep0Sign = mu->charge();
           else{
@@ -691,8 +691,8 @@ EL::StatusCode ssEvtSelection :: execute ()
            if(el) baseLep0Sign = el->charge();
           }
 
-	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
-	    int baseLep1Sign = -999;
+      	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
+      	    int baseLep1Sign = -999;
             xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
             if(mu) baseLep1Sign = mu->charge();
             else{
@@ -700,23 +700,23 @@ EL::StatusCode ssEvtSelection :: execute ()
               if(el) baseLep1Sign = el->charge();
             }
             if (baseLep0Sign==baseLep1Sign){
-	      dilepPair[0] = sel_Ls[0];
-	      dilepPair[1] = sel_Ls[1];
-  	      keep = true;
+      	      dilepPair[0] = sel_Ls[0];
+      	      dilepPair[1] = sel_Ls[1];
+      	      keep = true;
               m_susyEvt->evt.flag = 3;
-	      break;
-	    }
-	  }
+      	      break;
+      	    }
+      	  }
 
-	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
-	    //no one has same sign as the first lep
-	    //=> everyone except the first lep is Same sign among themselves
-	    dilepPair[0] = sel_Ls[1];
-	    dilepPair[1] = sel_Ls[2];
-  	    keep = true;
+      	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
+      	    //no one has same sign as the first lep
+      	    //=> everyone except the first lep is Same sign among themselves
+      	    dilepPair[0] = sel_Ls[1];
+      	    dilepPair[1] = sel_Ls[2];
+      	    keep = true;
             m_susyEvt->evt.flag = 3;
-	  }
-	}
+      	  }
+      	}
       } 
 
       if (!cutflow && !keep) {continue;}
@@ -731,12 +731,12 @@ EL::StatusCode ssEvtSelection :: execute ()
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
       for (auto p : sel_Ls){
         if (p==dilepPair[0] || p==dilepPair[1])continue;
-	dilepPair.push_back(p);
+      	dilepPair.push_back(p);
       }
       sel_Ls = dilepPair;
     }
 
-    if(study == "ss")
+    if(study == "ss" || study == "fakes")
     {
       if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
       else if(totLs == 3) {m_hCutFlow->Fill("==3BaseLep", 1);m_hCutFlow->Fill("=3BaseLep", 1);}
@@ -1436,43 +1436,51 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
 }
 
 void ssEvtSelection::setupTriggers(){
-  /// try di lepton trigger for now
-  /// 2015
-  m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
-  /// 2016: A-D3
-//   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-  /// 2016: D4-
-  m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-  m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
-  m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
-  m_em_mKey = "HLT_mu14";
+  if (study=="ss") {
+      /// try di lepton trigger for now
+      /// 2015
+      m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
+      /// 2016: A-D3
+    //   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+      m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+      /// 2016: D4-
+      m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-//   /// 2016: A
-//   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-// 
-//   /// 2016: B-D3
-//   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-// 
-//   /// 2016: D4-E
-//   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: F
-//   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: G1-G2
-//   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: G3-I3
-//   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: I4-
-//   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+      m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
+      m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
+      m_em_mKey = "HLT_mu14";
+
+    //   /// 2016: A
+    //   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: B-D3
+    //   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: D4-E
+    //   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: F
+    //   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: G1-G2
+    //   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: G3-I3
+    //   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: I4-
+    //   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
 
-//   /// 2016: temp
-//   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
+    //   /// 2016: temp
+    //   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
+  }
+  else if (study=="fakes")
+  {
+    // Using lowest un-prescaled single-lepton triggers
+  }
+  
 
   for(auto& t: m_trigSel){
     unsigned long int m1(1);

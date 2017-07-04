@@ -30,7 +30,7 @@ parser.add_option("--fast", help="Fast submit for grid jobs.", action='store_tru
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
 parser.add_option("--sampleList", help="sample list", default=None)
-parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l"),default ="3l")
+parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l", "fakes"),default ="3l")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
 parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
@@ -188,6 +188,25 @@ elif(options.study == "ss" or options.study == "ssSlim" ):
     elemuonTrig = ["HLT_e17_lhloose_mu14","HLT_e24_lhmedium_L1EM20VHI_mu8noL1","HLT_e7_lhmedium_mu24","HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
     for i in elemuonTrig: alg.CF_trigNames.push_back(i)
  
+    alg.study = options.study
+
+elif(options.study == "fakes"):
+    alg.CF_outputTreeName = "evt2l"
+
+    # 2015 triggers
+    electronTrig = ["HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium"]
+    for i in electronTrig: alg.CF_trigNames.push_back(i)
+
+    muonTrig = ["HLT_mu20_iloose_L1MU15", "HLT_mu50"]
+    for i in muonTrig: alg.CF_trigNames.push_back(i)
+
+    # 2016 triggers
+    electronTrig = ["HLT_e24_lhmedium_nod0_L1EM20VH", "HLT_e24_lhtight_nod0_ivarloose", "HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_medium" ]
+    for i in electronTrig: alg.CF_trigNames.push_back(i)
+
+    muonTrig = ["HLT_mu24_ivarmedium", "HLT_mu50"]
+    for i in muonTrig: alg.CF_trigNames.push_back(i)
+
     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch
