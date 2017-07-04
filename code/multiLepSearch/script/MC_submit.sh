@@ -31,5 +31,9 @@ k=${tag}.MCBG
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.364104.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2949/DAOD_SUSY2.11084041._000011.pool.root.1
 
 #file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993820.MGPy8EG_A14N13LO_C1N2_Wh_2L_175_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993820._00001.pool.root.1
- 
+
+#file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993821.MGPy8EG_A14N13LO_C1N2_Wh_2L_165_35.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993821._00001.pool.root.1
+
+#file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993822._00001.pool.root.1
+
 #../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf}
