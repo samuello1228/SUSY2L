@@ -540,7 +540,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
     //SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
     //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
@@ -585,7 +586,7 @@ void skimming()
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
-        GetSampleName(SigSampleName,"Sig",4);
+        GetSampleName(SigSampleName,"Sig",5);
         for(unsigned int i=0;i<=0;i++)
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
