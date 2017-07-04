@@ -526,8 +526,8 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
-    //TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
-    TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
+    TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     
@@ -538,8 +538,9 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
     //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
     //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
-    SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
+    //SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
     //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
