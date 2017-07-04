@@ -350,14 +350,18 @@ void analysis1()
     {
         SigInfo element;
         
-        ///* Cutflow Attention
+        /* Cutflow Attention
         element.MassDiff = 20;    element.ID = 2;   element.colour = 6;   SigMassSplitting.push_back(element);
         //element.MassDiff = 50;    element.ID = 18;  element.colour = 7;   SigMassSplitting.push_back(element);
         element.MassDiff = 50;    element.ID = 22;  element.colour = 7;   SigMassSplitting.push_back(element);
         element.MassDiff = 100;   element.ID = 19;  element.colour = 8;   SigMassSplitting.push_back(element);
         element.MassDiff = 200;   element.ID = 20;  element.colour = 9;   SigMassSplitting.push_back(element);
         element.MassDiff = 300;   element.ID = 21;  element.colour = 14;  SigMassSplitting.push_back(element);
-        //*/
+        */
+        
+        element.MassDiff = 175;   element.ID = 0;  element.colour = 6;   SigMassSplitting.push_back(element);
+        element.MassDiff = 130;   element.ID = 1;  element.colour = 7;   SigMassSplitting.push_back(element);
+        element.MassDiff = 400;   element.ID = 2;  element.colour = 8;   SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -398,6 +402,9 @@ void analysis1()
             fin>>SigXSTemp2;
             
             double SigXSTemp;
+            fin>>SigXSTemp;
+            SigXSTemp2 *= SigXSTemp;
+            
             fin>>SigXSTemp;
             SigXSTemp2 *= SigXSTemp;
 
@@ -3096,7 +3103,7 @@ void analysis1()
                 }
                 
                 //final normalization for h2SigSum for plotting
-                const int SigScale = 10;
+                const int SigScale = 1;
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
@@ -4133,9 +4140,9 @@ void analysis1()
     {
         unsigned int startingIndex = 0;
         
-        if(!
+        /*if(! //Cutflow Attention
            (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
-           ) continue;
+           )*/ continue;
         
         TString PathName = "latex/data/plot_significances_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
