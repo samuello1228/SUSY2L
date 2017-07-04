@@ -48,8 +48,9 @@ University of Michigan
 \url{https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/CentralMC15ProductionList\#Treating\_high\_weights\_in\_Sherpa}
 \item finished the cutflow for the signal sample
 \url{https://docs.google.com/spreadsheets/d/12-hpz\_X154YYrYVbQPT6TL5JLWWPZa40NhN7AhhBpdc/edit\#gid=456557904}
-\item expN for VV BG
+\item compare the event yield of VV BG with run 1 paper
 \item Add N-1 plot for cut variables
+\item compare the signal yield with default and CFT setting
 \end{itemize}
 \end{frame}
 
@@ -71,12 +72,46 @@ University of Michigan
 
 \input{data/expN_SR_SS_run1.tex}
 
-\begin{frame}{Selection}
+\begin{frame}{event yield of VV in run 1 paper}
 \includegraphics[width=\textwidth]{data/photo/expNrun1.png}
+\end{frame}
+
+\begin{frame}{event yield of VV}
+\begin{tabular}{|c|c|c|}
+\hline
+Signal Region & run 1 & my result \\
+\hline
+SR$ee$-1     & $2.53\pm0.68$ & $13.9\pm1.3$ \\
+\hline
+SR$ee$-2     & $0.92\pm0.46$ & $2.8\pm0.4$ \\
+\hline
+SR$\mu\mu$-1 & $3.64\pm0.85$ & $6.8\pm0.7$ \\
+\hline
+SR$\mu\mu$-2 & $2.2\pm1.03$ & $16.6\pm0.7$ \\
+\hline
+SR$e\mu$-1   & $3.7\pm0.89$ & $11.1\pm0.8$ \\
+\hline
+SR$e\mu$-2   & $1.33\pm0.56$ & $6.0\pm0.4$ \\
+\hline
+\end{tabular}
 \end{frame}
 
 \input{data/expN_SR_SS_run1_BGVV.tex}
 \input{data/plot_SR_SS_run1.tex}
+
+\section{Comparison of expected number of signal}
+\begin{frame}{Comparison of expected number of signal}
+SUSYTools Default setting:
+\begin{itemize}
+\item SUSYTools-00-08-60/data/SUSYTools\_Default.conf
+\end{itemize}
+CFT setting:
+\begin{itemize}
+\item Ele.Id: MediumLLH
+\item Ele.Iso: FixedCutTight
+\item Ele.CFT: Medium
+\end{itemize}
+\end{frame}
 
 \begin{frame}{Comparison of expected number of signal (175, 0)}
 \begin{tabular}{|c|c|c|}
@@ -141,14 +176,15 @@ SR$e\mu$-2   & $9.2\pm0.8$ & $9.3\pm0.8$ \\
 \section{Conclusion}
 \begin{frame}{Conclusion}
 \begin{itemize}
-\item ?
+\item The difference of signal is small between the default and CFT setting.
 \end{itemize}
 \end{frame}
 
 \section{Plan}
 \begin{frame}{Plan}
 \begin{itemize}
-\item add the fake background in the OS events
+\item add more BG (W+jets, Z+jets, others...)
+\item do optimization for signal
 \end{itemize}
 \end{frame}
 
