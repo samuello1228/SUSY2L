@@ -723,6 +723,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     if(study == "3l" && totLs != 3) continue;
 
+    if(study=="fakes" && (totLs !=2 || totLs !=3)) continue;
+
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
@@ -1029,7 +1031,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if (jSyst>0){
           if (iSyst!=0) break; //no need to treat weight based sys for non-nominal tree
           if (!m_systInfoList[jSyst].affectsKinematics){
-	    // apply variation for weight based syst.
+      	    // apply variation for weight based syst.
             if (m_objTool) {
               ret  = m_objTool->applySystematicVariation(m_systInfoList[jSyst].systset);
               if ( ret != CP::SystematicCode::Ok) {
@@ -1042,12 +1044,12 @@ EL::StatusCode ssEvtSelection :: execute ()
 
             // set the pointer to the correct object
             m_susyEvt = m_susyEvtList[jSyst];
-	    m_susyEvt->evt  = m_susyEvtList[0]->evt;  // init value to that of the nominal susyEvt
-	    m_susyEvt->leps = m_susyEvtList[0]->leps; // needed by qFwt calculation
-	    //m_susyEvt->l12  = m_susyEvtList[0]->l12;
-	    //m_susyEvt->jets = m_susyEvtList[0]->jets;
-	    //m_susyEvt->truths = m_susyEvtList[0]->truths;
-	    //m_susyEvt->sig = m_susyEvtList[0]->sig;
+      	    m_susyEvt->evt  = m_susyEvtList[0]->evt;  // init value to that of the nominal susyEvt
+      	    m_susyEvt->leps = m_susyEvtList[0]->leps; // needed by qFwt calculation
+      	    //m_susyEvt->l12  = m_susyEvtList[0]->l12;
+      	    //m_susyEvt->jets = m_susyEvtList[0]->jets;
+      	    //m_susyEvt->truths = m_susyEvtList[0]->truths;
+      	    //m_susyEvt->sig = m_susyEvtList[0]->sig;
             if (jSyst!=0) m_hCutFlow = m_hCutFlowDummy; //to avoid repeated filling of cutflow 
 	  
           }else{
@@ -1074,25 +1076,25 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->evt.flag = 0;
       if(totLs == 2)
       {
-        if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
+        if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
+           TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
           m_susyEvt->evt.flag += 1;
           m_susyEvt->sig.trigMask = trigCut->ee_mask;
         }
 
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
+        else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
+                TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
           m_susyEvt->evt.flag += 3;
           m_susyEvt->sig.trigMask = trigCut->em_mask;
         }
 
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
+        else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
+                TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
           m_susyEvt->evt.flag += 3;
           m_susyEvt->sig.trigMask = trigCut->em_mask;
         }
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
+        else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
+                TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
           m_susyEvt->evt.flag += 2;
           m_susyEvt->sig.trigMask = trigCut->mm_mask;
         }
@@ -1299,7 +1301,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
       } else l.truthI = -1;
     }
   }
-
+  fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
 

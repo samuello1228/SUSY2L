@@ -166,7 +166,7 @@ if (options.study == "3l"):
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
     alg.study = "3l"
 
-elif(options.study == "ss" or options.study == "ssSlim" ):
+elif(options.study == "ss" or options.study == "ssSlim"): # or options.study == "fakes" ):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger
@@ -209,7 +209,7 @@ elif(options.study == "fakes"):
 
     alg.study = options.study
 
-alg.mcTruthMatch = options.mcMatch
+alg.mcTruthMatch = options.mcMatch if (options.study!="fakes") else "MCTC"
 alg.useChargeIDSelector = options.ChargeID
 
 # alg.CF_nLepCutExactly = 2
