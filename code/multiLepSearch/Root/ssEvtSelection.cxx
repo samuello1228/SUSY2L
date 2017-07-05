@@ -1200,6 +1200,42 @@ EL::StatusCode ssEvtSelection :: histFinalize ()
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsigned int index)
 {
   l.ID = 11000;
+  // TRIGGER MATCHING FOR FAKES
+  if (study=="fakes")
+  {
+    if (m_objTool->treatAsYear() == 2015)
+    {
+      if (el->pt()*iGeV > 70)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH")) l.ID +=2;
+      }
+    }
+    else
+    {
+      if (el->pt()*iGeV > 70)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")
+            || m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose")
+            || m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose")
+            ) l.ID +=1;
+          if ((m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH") && m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH"))
+              || (m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e24_lhtight_nod0_ivarloose"))
+              || (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e26_lhtight_nod0_ivarloose"))
+            ) l.ID +=2;      
+      }
+    }
+  }
   l.ID *= el->charge();
   //l.author = el->author();
 
@@ -1308,6 +1344,35 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned int index)
 {
   l.ID = 13000;
+  if (study=="fakes")
+  {
+    if (m_objTool->treatAsYear() == 2015)
+    {
+      if (mu->pt()*iGeV > 60)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
+      }
+      else if (mu->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu20_iloose_L1MU15")) l.ID +=2;
+      }
+    }
+    else
+    {
+      if (mu->pt()*iGeV > 60)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
+      }
+      else if (mu->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu24_ivarmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu24_ivarmedium")) l.ID +=2;      
+      }
+    }
+  }
   l.ID *= mu->charge();
   //l.author = mu->author();
 
