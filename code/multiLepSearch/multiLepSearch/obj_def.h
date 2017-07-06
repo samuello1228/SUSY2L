@@ -32,8 +32,10 @@ struct L_PAR:PAR{
   int truthI;
   unsigned int lFlag;
   unsigned int isoPass;
+  int truthType;
+  int truthOrig;
 };
-const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i";
+const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I";
 
 struct EL_Par:L_PAR{
   int elID;
@@ -92,6 +94,7 @@ struct TR_PAR:PAR0{
   int barcode;
   int motherI;
   int matchI;
+
 };
 const string TR_PAR_s = PAR0_s+"pdgId/I:barcode/I:motherI/I:matchI/I";
 
