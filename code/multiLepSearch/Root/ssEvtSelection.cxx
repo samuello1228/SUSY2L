@@ -723,7 +723,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     if(study == "3l" && totLs != 3) continue;
 
-    if(study=="fakes" && (totLs !=2 || totLs !=3)) continue;
+    if(study=="fakes" && (totLs !=2 && totLs !=3)) continue;
+    cout << "Passed!" <<endl;
 
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
