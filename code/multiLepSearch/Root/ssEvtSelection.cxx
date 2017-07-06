@@ -165,6 +165,9 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
+  m_hCutFlow->GetXaxis()->SetBinLabel(23,">=1BaseLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(24,">=1SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(25,">=2SigLep,w");
   m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
@@ -719,6 +722,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
+    if(cutflow)
+    {
+      if(totLs == 0) continue;
+      dilepPair[0] = sel_Ls[0];
+      dilepPair[1] = sel_Ls[0];
+    }
+
     if(!cutflow && study == "ss"){
       //for ss study we put the dilepPair at front, then others sorted by pT at tail
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -770,6 +780,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     
+    double TotalWeight = eventInfo->mcEventWeight();
     if(!CF_isMC) m_susyEvt->evt.weight = 1;
     else if(fabs(eventInfo->mcEventWeight())<100) m_susyEvt->evt.weight = eventInfo->mcEventWeight();
     else m_susyEvt->evt.weight = 1;
@@ -885,7 +896,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
-    if(cutflow) continue;
 
     if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
     else m_susyEvt->sig.mjj = -1;
@@ -1024,6 +1034,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(CF_isMC){ 
         m_susyEvt->evt.pwt = m_objTool->GetPileupWeight();
         m_susyEvt->evt.averageMu = eventInfo->averageInteractionsPerCrossing();
+        TotalWeight *= m_susyEvt->evt.pwt;
       }else{
         m_susyEvt->evt.pwt = 1;
         m_susyEvt->evt.averageMu = m_objTool->GetCorrectedAverageInteractionsPerCrossing();
@@ -1071,12 +1082,13 @@ EL::StatusCode ssEvtSelection :: execute ()
       }
 
       //Scale factor
+      double JvtSF = 1;
       if(CF_isMC){
         if( study == "ss" )
         {
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
-            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
+            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
@@ -1092,12 +1104,27 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
+        JvtSF = m_objTool->JVT_SF(jets_copy);
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*JvtSF;
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
         sEvt.BtagSF = 1;
       }
 
+      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
+      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
+      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
+      if(m_susyEvt->evt.event == 47)
+      {
+        cout<<"event: "<<m_susyEvt->evt.event<<endl;
+        cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;
+        cout<<"pileup: "<<m_susyEvt->evt.pwt<<endl;
+        cout<<"ele: "<<sEvt.ElSF<<endl;
+        cout<<"mu: "<<sEvt.MuSF<<endl;
+        cout<<"bjet: "<<sEvt.BtagSF<<endl;
+        cout<<"jvt: "<<JvtSF<<endl;
+      }
 
       /// fill events
       ATH_MSG_VERBOSE("Fill " << iSyst << " " << jSyst );
