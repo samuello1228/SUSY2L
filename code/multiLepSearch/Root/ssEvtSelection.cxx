@@ -1082,7 +1082,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       }
 
       //Scale factor
-      double JvtSF = 1;
       if(CF_isMC){
         if( study == "ss" )
         {
@@ -1104,12 +1103,13 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
-        JvtSF = m_objTool->JVT_SF(jets_copy);
-        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*JvtSF;
+        sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF;
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
         sEvt.BtagSF = 1;
+        sEvt.JvtSF = 1;
       }
 
       if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
@@ -1123,7 +1123,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         cout<<"ele: "<<sEvt.ElSF<<endl;
         cout<<"mu: "<<sEvt.MuSF<<endl;
         cout<<"bjet: "<<sEvt.BtagSF<<endl;
-        cout<<"jvt: "<<JvtSF<<endl;
+        cout<<"jvt: "<<sEvt.JvtSF<<endl;
       }
 
       /// fill events
