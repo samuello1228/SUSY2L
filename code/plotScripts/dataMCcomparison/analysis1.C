@@ -42,7 +42,7 @@ const bool docfw = 0;
 const bool doOptimize = 0;
 
 // Cutflow Attention
-const bool doVVCount = 1;
+const bool doVVCount = 0;
 
 //for Zpt reweighting
 Double_t ptll;
@@ -224,6 +224,7 @@ void analysis1()
                             }
                         }
                         */
+                        element.setOfBGMC.push_back("Zee");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                     }
@@ -274,7 +275,7 @@ void analysis1()
         }
         fin.close();
     }
-    DataSampleID.clear(); sumDataL = 33257+3212.96; //Cutflow Attention
+    DataSampleID.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
@@ -494,6 +495,7 @@ void analysis1()
         GroupData element;
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
         element.lower = 20;  element.upper = 39; BGMCGroupData.push_back(element);
+        //element.lower = 20;  element.upper = 33; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
         element.lower = 0;   element.upper = 19; BGMCGroupData.push_back(element);
@@ -1393,11 +1395,21 @@ void analysis1()
         GroupElement.GroupName = "CR_SS_ee_Zmass";
         GroupElement.lower = RegionInfo.size();
         
-        GroupElement.showData = true;
+        GroupElement.showData = false;
         GroupElement.showSignificance = false;
-        element.Cut = " && mll>81.18 && mll<101.18";
+        element.Cut = "";
         element.AdditionalCut.clear();
         
+        AdditionalCutElement.Cut = " && fabs(mll - 91.2) < 10";
+        AdditionalCutElement.RelatedVariable = "mll";
+        element.AdditionalCut.push_back(AdditionalCutElement);
+        
+        element.RegionName = "CR_SS_ee_Zmass";
+        element.setOfChannel.clear();
+        element.setOfChannel.push_back(3);
+        element.setOfChannel.push_back(9);
+        RegionInfo.push_back(element);
+        /*
         element.RegionName = "CR_nonISR_SS_ee_Zmass";
         element.setOfChannel.clear();
         element.setOfChannel.push_back(3);
@@ -1407,7 +1419,7 @@ void analysis1()
         element.setOfChannel.clear();
         element.setOfChannel.push_back(9);
         RegionInfo.push_back(element);
-        
+        */
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
@@ -2652,7 +2664,7 @@ void analysis1()
                             }
                             Cut += ")";
                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
-                            
+                            //tree2BGMC[j][k]->Scan("weight",Cut.Data());
                             //normalization for BG
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
                             
