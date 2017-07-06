@@ -166,7 +166,7 @@ if (options.study == "3l"):
     for i in dimuonTrig: alg.CF_trigNames.push_back(i)
     alg.study = "3l"
 
-elif(options.study == "ss" or options.study == "ssSlim"): # or options.study == "fakes" ):
+elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fakes" ):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger
@@ -190,24 +190,24 @@ elif(options.study == "ss" or options.study == "ssSlim"): # or options.study == 
  
     alg.study = options.study
 
-elif(options.study == "fakes"):
-    alg.CF_outputTreeName = "evt2l"
+# elif(options.study == "fakes"):
+#     alg.CF_outputTreeName = "evt2l"
 
-    # 2015 triggers
-    electronTrig = ["HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium"]
-    for i in electronTrig: alg.CF_trigNames.push_back(i)
+#     # 2015 triggers
+#     electronTrig = ["HLT_e24_lhmedium_L1EM20VH", "HLT_e60_lhmedium"]
+#     for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    muonTrig = ["HLT_mu20_iloose_L1MU15", "HLT_mu50"]
-    for i in muonTrig: alg.CF_trigNames.push_back(i)
+#     muonTrig = ["HLT_mu20_iloose_L1MU15", "HLT_mu50"]
+#     for i in muonTrig: alg.CF_trigNames.push_back(i)
 
-    # 2016 triggers
-    electronTrig = ["HLT_e24_lhmedium_nod0_L1EM20VH", "HLT_e24_lhtight_nod0_ivarloose", "HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_medium" ]
-    for i in electronTrig: alg.CF_trigNames.push_back(i)
+#     # 2016 triggers
+#     electronTrig = ["HLT_e24_lhmedium_nod0_L1EM20VH", "HLT_e24_lhtight_nod0_ivarloose", "HLT_e26_lhtight_nod0_ivarloose", "HLT_e60_medium" ]
+#     for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    muonTrig = ["HLT_mu24_ivarmedium", "HLT_mu50"]
-    for i in muonTrig: alg.CF_trigNames.push_back(i)
+#     muonTrig = ["HLT_mu24_ivarmedium", "HLT_mu50"]
+#     for i in muonTrig: alg.CF_trigNames.push_back(i)
 
-    alg.study = options.study
+#     alg.study = options.study
 
 alg.mcTruthMatch = options.mcMatch if (options.study!="fakes") else "MCTC"
 alg.useChargeIDSelector = options.ChargeID
