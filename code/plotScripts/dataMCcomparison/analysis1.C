@@ -698,36 +698,36 @@ void analysis1()
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "l12_dPhi";      element.VarTitle = "#Delta#phi_{ll}";                element.unit = "";
-        element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.VarName = "l12_dPhi";      element.VarTitle = "|#Delta#phi_{ll}|";              element.unit = "";
+        element.VarFormula = "fabs(l12_dPhi)";
+        element.bin=20;         element.xmin=0;                 element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\Delta\\phi_{ll}$";
+        element.latexName = "$|\\Delta\\phi_{ll}|$";
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "l12_MET_dPhi";  element.VarTitle = "#Delta#phi_{ll,MET}";            element.unit = "";
-        element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.VarName = "l12_MET_dPhi";  element.VarTitle = "|#Delta#phi_{ll,MET}|";          element.unit = "";
+        element.VarFormula = "fabs(l12_MET_dPhi)";
+        element.bin=20;         element.xmin=0;                 element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\Delta\\phi_{ll,\\text{MET}}$";
+        element.latexName = "$|\\Delta\\phi_{ll,\\text{MET}}|$";
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "jets_MET_dPhi"; element.VarTitle = "#Delta#phi_{jet0,MET}";          element.unit = "";
-        element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
+        element.VarName = "jets_MET_dPhi"; element.VarTitle = "|#Delta#phi_{jet0,MET}|";        element.unit = "";
+        element.VarFormula = "fabs(jets_MET_dPhi)";
+        element.bin=20;         element.xmin=0;                 element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\Delta\\phi_{\\text{jet0,MET}}$";
+        element.latexName = "$|\\Delta\\phi_{\\text{jet0,MET}}|$";
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "dEta";          element.VarTitle = "#Delta#eta_{ll}";                element.unit = "";
-        element.VarFormula = "eta1-eta2";
-        element.bin=40;         element.xmin=-5;                element.xmax=5;
+        element.VarName = "dEta";          element.VarTitle = "|#Delta#eta_{ll}|";              element.unit = "";
+        element.VarFormula = "fabs(eta1-eta2)";
+        element.bin=40;         element.xmin=0;                 element.xmax=5;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\Delta\\eta_{ll}$";
-        element.CutDirection=0;
+        element.latexName = "$|\\Delta\\eta_{ll}|$";
+        element.CutDirection=-1;
         Var.push_back(element);
         
         element.VarName = "METRel";        element.VarTitle = "E_{T}^{miss,rel}";               element.unit = "[GeV]";
