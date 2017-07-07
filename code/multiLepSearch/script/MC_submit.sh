@@ -16,7 +16,8 @@ SUSYconf=SUSYTools/SUSYTools_Default.conf
 #file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
 
 #Dongliang
-file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
+file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
+# file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
@@ -34,7 +35,7 @@ k=${tag}.MCBG
 #file=../multiLepSearch/script/MCSig_sample_list_new.txt
 #k=${tag}.MCSig
 
-../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ss --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf}
+../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf}
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.392847.MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949/DAOD_SUSY2.10662422._000002.pool.root.1
 
