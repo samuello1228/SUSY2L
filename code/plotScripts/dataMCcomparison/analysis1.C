@@ -542,6 +542,12 @@ void analysis1()
         TString VarTitle;
         TString unit;
         TString latexName;
+        int CutDirection;
+        /*
+         0: none
+         1: x > 100 GeV
+        -1: x < 100 GeV
+        */
         
         int bin;
         double xmin;
@@ -561,6 +567,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt$ of the leading lepton";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "pt2";           element.VarTitle = "p_{T} of the subleading lepton"; element.unit = "[GeV]";
@@ -568,6 +575,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt$ of the subleading lepton";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "eta1";          element.VarTitle = "#eta of the leading lepton";     element.unit = "";
@@ -575,6 +583,7 @@ void analysis1()
         element.bin=20;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\eta$ of the leading lepton";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "eta2";          element.VarTitle = "#eta of the subleading lepton";  element.unit = "";
@@ -582,6 +591,7 @@ void analysis1()
         element.bin=20;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\eta$ of the subleading lepton";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "phi1";          element.VarTitle = "#phi of the leading lepton";     element.unit = "";
@@ -589,6 +599,7 @@ void analysis1()
         element.bin=20;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\phi$ of the leading lepton";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "mll";           element.VarTitle = "m_{ll}";                         element.unit = "[GeV]";
@@ -596,6 +607,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{ll}$";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "ptll";          element.VarTitle = "Dilepton p_{T}";                 element.unit = "[GeV]";
@@ -603,6 +615,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=400;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "Dilepton $\\pt$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "MET";           element.VarTitle = "E_{T}^{miss}";                   element.unit = "[GeV]";
@@ -610,6 +623,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=200;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$E_{\\text{T}}^{\\text{miss}}$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "mTtwo";         element.VarTitle = "m_{T2}";                         element.unit = "[GeV]";
@@ -617,6 +631,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=150;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{T2}$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "mt1";           element.VarTitle = "m_{T} of the leading lepton";    element.unit = "[GeV]";
@@ -624,6 +639,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}$ of the leading lepton";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "mt2";           element.VarTitle = "m_{T} of the subleading lepton"; element.unit = "[GeV]";
@@ -631,6 +647,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}$ of the subleading lepton";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "averageMu";     element.VarTitle = "averageMu";                      element.unit = "";
@@ -638,6 +655,7 @@ void analysis1()
         element.bin=35;         element.xmin=0;                 element.xmax=35;
         element.log=0;          element.ymin=0;                 element.ymax=0;
         element.latexName = "Average number of interactions per bunch crossing";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "jetpt";         element.VarTitle = "p_{T} of the leading jet";       element.unit = "[GeV]";
@@ -645,6 +663,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt$ of the leading jet";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "jeteta";        element.VarTitle = "#eta of the leading jet";        element.unit = "";
@@ -652,6 +671,7 @@ void analysis1()
         element.bin=20;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\eta$ of the leading jet";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "nJet";          element.VarTitle = "Number of jets";                 element.unit = "";
@@ -659,6 +679,7 @@ void analysis1()
         element.bin=15;         element.xmin=0;                 element.xmax=15;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "nBJet";         element.VarTitle = "Number of b-jets";               element.unit = "";
@@ -666,6 +687,7 @@ void analysis1()
         element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "nCJet";         element.VarTitle = "Number of central jets";         element.unit = "";
@@ -673,6 +695,7 @@ void analysis1()
         element.bin=6;          element.xmin=0;                 element.xmax=4;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "l12_dPhi";      element.VarTitle = "#Delta#phi_{ll}";                element.unit = "";
@@ -680,6 +703,7 @@ void analysis1()
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\Delta\\phi_{ll}$";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "l12_MET_dPhi";  element.VarTitle = "#Delta#phi_{ll,MET}";            element.unit = "";
@@ -687,6 +711,7 @@ void analysis1()
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\Delta\\phi_{ll,\\text{MET}}$";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "jets_MET_dPhi"; element.VarTitle = "#Delta#phi_{jet0,MET}";          element.unit = "";
@@ -694,6 +719,7 @@ void analysis1()
         element.bin=40;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\Delta\\phi_{\\text{jet0,MET}}$";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "dEta";          element.VarTitle = "#Delta#eta_{ll}";                element.unit = "";
@@ -701,6 +727,7 @@ void analysis1()
         element.bin=40;         element.xmin=-5;                element.xmax=5;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\Delta\\eta_{ll}$";
+        element.CutDirection=0;
         Var.push_back(element);
         
         element.VarName = "METRel";        element.VarTitle = "E_{T}^{miss,rel}";               element.unit = "[GeV]";
@@ -708,6 +735,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=200;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$E_{\\text{T}}^{\\text{miss,rel}}$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "meff";          element.VarTitle = "m_{eff}";                        element.unit = "[GeV]";
@@ -715,6 +743,7 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=600;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{eff}}$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "mtm";           element.VarTitle = "m_{T}^{max}";                    element.unit = "[GeV]";
@@ -722,6 +751,7 @@ void analysis1()
         element.bin=40;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}^{\\text{max}}$";
+        element.CutDirection=1;
         Var.push_back(element);
         
         element.VarName = "mlj";           element.VarTitle = "m_{lj} or m_{ljj}";              element.unit = "[GeV]";
@@ -729,6 +759,7 @@ void analysis1()
         element.bin=40;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{lj}$ or $m_{ljj}$";
+        element.CutDirection=-1;
         Var.push_back(element);
     }
     SetAtlasStyle();
@@ -2805,19 +2836,8 @@ void analysis1()
                     h2SigSum[i]->Scale(sumDataL/AOD);
                 }
                 
-                const bool DoSignificancePlot=
-                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" && (
-                 Var[VarIndex].VarName=="pt1"   ||
-                 Var[VarIndex].VarName=="pt2"   ||
-                 Var[VarIndex].VarName=="ptll"  ||
-                 Var[VarIndex].VarName=="MET"   ||
-                 Var[VarIndex].VarName=="METRel"||
-                 Var[VarIndex].VarName=="mTtwo" ||
-                 Var[VarIndex].VarName=="mt1"   ||
-                 Var[VarIndex].VarName=="mt2"   ||
-                 Var[VarIndex].VarName=="mtm"   ||
-                 Var[VarIndex].VarName=="meff"  ||
-                 Var[VarIndex].VarName=="mt2"   );
+                const bool DoSignificancePlot = Var[VarIndex].CutDirection!=0 &&
+                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1";
                 
                 if(VarIndex==countVariable)
                 {
@@ -3100,7 +3120,14 @@ void analysis1()
                         double nSig = 0;
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
-                            nBG += BGGroup[j].h2->Integral(bin,-1);
+                            if(Var[VarIndex].CutDirection == 1)
+                            {
+                                nBG += BGGroup[j].h2->Integral(bin,-1);
+                            }
+                            else if(Var[VarIndex].CutDirection == -1)
+                            {
+                                nBG += BGGroup[j].h2->Integral(0,bin);
+                            }
                         }
                         
                         //expected number of events for signal
@@ -3111,7 +3138,15 @@ void analysis1()
                             TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                             hTemp.Add(h2SigSum[i]);
                             hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
-                            nSig = hTemp.Integral(bin,-1);
+                            
+                            if(Var[VarIndex].CutDirection == 1)
+                            {
+                                nSig = hTemp.Integral(bin,-1);
+                            }
+                            else if(Var[VarIndex].CutDirection == -1)
+                            {
+                                nSig = hTemp.Integral(0,bin);
+                            }
                             
                             //Significance
                             //if(SigMassSplitting[i].MassDiff==100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;

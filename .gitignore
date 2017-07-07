@@ -24,6 +24,7 @@ RootCoreBin
 *.fdb_latexmk
 *.log
 *.nab
+*.nav
 *.snm
 *.syntex.gz
 *.toc
@@ -32,10 +33,7 @@ code/plotScripts/dataMCcomparison/skimming/*.root
 code/plotScripts/dataMCcomparison/skimming_signal_*/*.root
 code/plotScripts/dataMCcomparison/plot/*.eps
 code/plotScripts/dataMCcomparison/plot/*.pdf
-code/plotScripts/dataMCcomparison/latex/data/expN_BGVV*
-code/plotScripts/dataMCcomparison/latex/data/expN/BGVV*
-code/plotScripts/dataMCcomparison/latex/slide.pdf
-code/plotScripts/dataMCcomparison/latex/slide.nav
+code/plotScripts/dataMCcomparison/latex/*.pdf
 code/run
 code/plotScripts/dataMCcomparison/plot_signal/*.eps
 code/plotScripts/dataMCcomparison/plot_signal/*.pdf
