@@ -13,17 +13,18 @@ SUSYconf=SUSYTools/SUSYTools_Default.conf
 #file=../multiLepSearch/script/MCBGttbar_sample_list.txt
 #file=../multiLepSearch/script/MCBGttV_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt
+#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
 
 #Dongliang
-file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
+file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
 
-#not ready
 #file=../multiLepSearch/script/MCBGmultitop_sample_list.txt
-#VVV
-#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
+#file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
+
+#not ready
 #file=../multiLepSearch/script/MCBGhiggs_sample_list.txt
 
 k=${tag}.MCBG
