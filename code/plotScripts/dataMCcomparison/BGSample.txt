@@ -115,9 +115,6 @@
 407321  MadGraphPythia8EvtGen_ttbarWll                      0.000266        1.34    1. 1.
 304014  MadGraph_3topSM                                         0.00164         1.      1.      1.
 410080  MadGraphPythia8EvtGen_A14NNPDF23_4topSM                 0.0091622       1.0042  1.      1.
-363490 Sherpa_221_NNPDF30NNLO_llll	1.2557	1. 1. 1.
-363491 Sherpa_221_NNPDF30NNLO_lllv 	4.5877 	1. 1. 1.
-363492 Sherpa_221_NNPDF30NNLO_llvv 	12.465 	1. 1. 1.
 361069	Sherpa_CT10_llvvjj_ss_EW4	0.025765	0.91	1.	1.
 361070	Sherpa_CT10_llvvjj_ss_EW6	0.043004	0.87	1.	1 .
 361071  Sherpa_CT10_lllvjj_EW6          0.042287        0.87    1.      1.
@@ -129,6 +126,9 @@
 363359 Sherpa_221_NNPDF30NNLO_WpqqWmlv 24.717 1. 1.      1.
 363360 Sherpa_221_NNPDF30NNLO_WplvWmqq 112.74 1. 1.      1.
 363489 Sherpa_221_NNPDF30NNLO_WlvZqq   11.413 1. 1.      1.
+363490 Sherpa_221_NNPDF30NNLO_llll	1.2557	1. 1. 1.
+363491 Sherpa_221_NNPDF30NNLO_lllv 	4.5877 	1. 1. 1.
+363492 Sherpa_221_NNPDF30NNLO_llvv 	12.465 	1. 1. 1.
 301890	Sherpa_CT10_enugammaPt35_70	15.348		1.	1.	 1.
 301891	Sherpa_CT10_enugammaPt70_140	1.5282		1.	1.	 1.
 301892	Sherpa_CT10_enugammaPt140	0.24155		1.	1.	 1.
@@ -153,3 +153,4 @@
 407312	Sherpa_221_NNPDF30NNLO_5l1v_EW6		0.00056766    	1.	1.  	1.
 407313	Sherpa_221_NNPDF30NNLO_4l2v_EW6		0.0043684     	1.   	1.  	1.
 407314	Sherpa_221_NNPDF30NNLO_3l3v_EW6		0.015846      	1.   	1.  	1.
+407315	Sherpa_221_NNPDF30NNLO_2l4v_EW6		0.0058366       1.   	1.  	1.
