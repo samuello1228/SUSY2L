@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 27 15:55:59 2017 by ROOT version 6.08/06
+// Sat Jul  8 23:38:00 2017 by ROOT version 6.04/14
 // from TTree evt2l/a angles tree
-// found on file: /Users/samuel/Atlas/ntuple/test.root
+// found on file: /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -36,6 +36,7 @@ public :
    Float_t         evt_ElSF;
    Float_t         evt_MuSF;
    Float_t         evt_BtagSF;
+   Float_t         evt_JvtSF;
    Float_t         evt_qFwt;
    Float_t         evt_qFwt_sys_1up;
    Float_t         evt_qFwt_sys_1dn;
@@ -139,9 +140,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/Users/samuel/Atlas/ntuple/test.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/Users/samuel/Atlas/ntuple/test.root");
+         f = new TFile("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 

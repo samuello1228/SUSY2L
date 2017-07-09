@@ -24,6 +24,7 @@ Double_t mtm;
 Double_t l12_dPhi;
 Double_t l12_MET_dPhi;
 Double_t jets_MET_dPhi;
+Double_t l12_jet0_dPhi;
 
 Int_t nJet;
 Double_t jetpt;
@@ -69,10 +70,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //fileName += "user.clo.";
         //fileName += tag;
         //fileName += ".";
+        
+        fileName += "all/user.*.";
         fileName += SampleName;
-
+        fileName += ".*.myOutput.root";
+        
         //fileName += "_myOutput.root/*.root*";
-        fileName += "*.root";
+        //fileName += "*.root";
         //fileName += ".merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879.root";
         
         //fileName = "/Users/samuel/Atlas/ntuple/test.root";
@@ -151,6 +155,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
         tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/D");
+        tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/D");
 
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
@@ -295,7 +300,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         jets_MET_dPhi = evts->jets_MET_dPhi[0];
-        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        l12_jet0_dPhi = evts->l12_jet0_dPhi;
+        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF * evts->evt_BtagSF * evts->evt_JvtSF;
         
         if(isPP1) qFwt = evtsP->evt_qFwt;
         else qFwt = evts->evt_qFwt;
@@ -541,7 +547,8 @@ void skimming()
     //SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
     //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
@@ -562,25 +569,26 @@ void skimming()
     }
     
     //Background
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        for(unsigned int i=68;i<=69;i++)
-        //for(unsigned int i=0;i<BGSampleName.size();i++)
+        //for(unsigned int i=114;i<=114;i++)
+        //for(unsigned int i=119;i<=120;i++)
+        for(unsigned int i=0;i<BGSampleName.size();i++)
         {
-            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
+            //BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
         }
     }
     
     //Signal
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
