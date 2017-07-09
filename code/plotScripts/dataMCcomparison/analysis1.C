@@ -290,7 +290,8 @@ void analysis1()
         fin.open("BGSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp = "mc15_13TeV.";
+            //TString SampleIDTemp = "mc15_13TeV.";
+            TString SampleIDTemp = ""; //Cutflow Attention
             TString SampleNameTemp;
             fin>>SampleNameTemp;
             if(fin.eof()) break;
@@ -309,7 +310,6 @@ void analysis1()
             BGMCXSTemp2 *= BGMCXSTemp;
             fin>>BGMCXSTemp;
             BGMCXSTemp2 *= BGMCXSTemp;
-            
             BGMCXS.push_back(BGMCXSTemp2);
             
             fin>>BGMCXSTemp;
@@ -319,7 +319,7 @@ void analysis1()
     cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
     
     //Get number of events in AOD
-    std::vector<unsigned int> BGMCnAOD;
+    std::vector<double> BGMCnAOD;
     for(unsigned int i=0;i<BGMCSampleID.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
@@ -331,8 +331,13 @@ void analysis1()
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
         TH1F *h1 = (TH1F*) file->Get("hist");
-        unsigned int nAOD = h1->GetBinContent(1);
+        double nAOD = h1->GetBinContent(1);
         cout<<nAOD<<endl;
+        if(nAOD == 0)
+        {
+            cout<<"nAOD is 0. The sample is missing."<<endl;
+            nAOD=1;
+        }
         BGMCnAOD.push_back(nAOD);
         
         delete file;
@@ -470,7 +475,7 @@ void analysis1()
     }
     
     //Get number of events in AOD
-    std::vector<unsigned int> SignAOD;
+    std::vector<double> SignAOD;
     for(unsigned int i=0;i<SigSampleID.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
@@ -482,7 +487,7 @@ void analysis1()
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
         TH1F *h1 = (TH1F*) file->Get("hist");
-        unsigned int nAOD = h1->GetBinContent(1);
+        double nAOD = h1->GetBinContent(1);
         cout<<nAOD<<endl;
         SignAOD.push_back(nAOD);
         
@@ -503,23 +508,35 @@ void analysis1()
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
         element.lower = 40;  element.upper = 59; BGMCGroupData.push_back(element);
         
+        element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
+        element.lower = 60;  element.upper = 101; BGMCGroupData.push_back(element);
+        
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 60;  element.upper = 60; BGMCGroupData.push_back(element);
+        element.lower = 102;  element.upper = 102; BGMCGroupData.push_back(element);
 
-        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
-        element.lower = 61;  element.upper = 62; BGMCGroupData.push_back(element);
+        element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
+        element.lower = 103;  element.upper = 108; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "ttV"; element.LegendName = "tt+V"; element.LatexName = "tt+V";
+        element.lower = 109;  element.upper = 114; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
+        element.lower = 115;  element.upper = 116; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 63;  element.upper = 73; BGMCGroupData.push_back(element);
+        element.lower = 117;  element.upper = 130; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 74;  element.upper = 93; BGMCGroupData.push_back(element);
+        element.lower = 131;  element.upper = 150; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        element.lower = 74;  element.upper = 82; BGMCGroupData.push_back(element);
+        element.lower = 131;  element.upper = 139; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        element.lower = 83;  element.upper = 93; BGMCGroupData.push_back(element);
+        element.lower = 140;  element.upper = 150; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
+        element.lower = 151;  element.upper = 155; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -848,7 +865,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
-            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector< std::vector<double> > BGMCGroupnAOD;
             std::vector<Group> BGGroup;
             {
                 //For MC background
@@ -860,7 +877,7 @@ void analysis1()
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
-                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            std::vector<double> BGMCGroupnAODElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
                                 BGMCGroupSampleID.push_back(BGMCSampleID[m]);
@@ -1826,7 +1843,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
-            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector< std::vector<double> > BGMCGroupnAOD;
             std::vector<Group> BGGroup;
             {
                 //For MC background
@@ -1838,7 +1855,7 @@ void analysis1()
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
-                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            std::vector<double> BGMCGroupnAODElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
                                 BGMCGroupSampleID.push_back(BGMCSampleID[m]);
@@ -2381,7 +2398,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
-            std::vector< std::vector<unsigned int> > BGMCGroupnAOD;
+            std::vector< std::vector<double> > BGMCGroupnAOD;
             std::vector<Group> BGGroup;
             {
                 //For MC background
@@ -2393,7 +2410,7 @@ void analysis1()
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
-                            std::vector<unsigned int> BGMCGroupnAODElement;
+                            std::vector<double> BGMCGroupnAODElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
                                 BGMCGroupSampleID.push_back(BGMCSampleID[m]);
