@@ -150,6 +150,7 @@ struct GroupData
     TString LatexName;
     unsigned int lower;
     unsigned int upper;
+    int colour;
 };
 
 struct Group
@@ -248,9 +249,12 @@ void analysis1()
                             }
                         }
                         */
-                        element.setOfBGMC.push_back("Zee");
+                        element.setOfBGMC.push_back("Zjets");
+                        element.setOfBGMC.push_back("Wjets");
+                        element.setOfBGMC.push_back("top");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
+                        element.setOfBGMC.push_back("VVV");
                     }
                     else
                     {
@@ -259,7 +263,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Zmumu");
                         element.setOfBGMC.push_back("Ztautau");
                         element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("Wt");
+                        element.setOfBGMC.push_back("singletop");
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Wgamma");
                         //*/
@@ -497,45 +501,56 @@ void analysis1()
     std::vector<GroupData> BGMCGroupData;
     {
         GroupData element;
+        
+        //Z+jets
+        element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
+        element.lower = 0;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 20;  element.upper = 39; BGMCGroupData.push_back(element);
-        //element.lower = 20;  element.upper = 33; BGMCGroupData.push_back(element);
+        element.lower = 20;  element.upper = 39; element.colour = 2; BGMCGroupData.push_back(element);
+        //element.lower = 20;  element.upper = 33; element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 0;   element.upper = 19; BGMCGroupData.push_back(element);
+        element.lower = 0;   element.upper = 19; element.colour = 3; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 40;  element.upper = 59; BGMCGroupData.push_back(element);
+        element.lower = 40;  element.upper = 59; element.colour = 4; BGMCGroupData.push_back(element);
         
+        //W+jets
         element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
-        element.lower = 60;  element.upper = 101; BGMCGroupData.push_back(element);
+        element.lower = 60;  element.upper = 101; element.colour = 3; BGMCGroupData.push_back(element);
+        
+        //Top
+        element.GroupName = "top"; element.LegendName = "top"; element.LatexName = "top";
+        element.lower = 102;  element.upper = 116; element.colour = 4; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 102;  element.upper = 102; BGMCGroupData.push_back(element);
+        element.lower = 102;  element.upper = 102; element.colour = 6; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
-        element.lower = 103;  element.upper = 108; BGMCGroupData.push_back(element);
+        element.lower = 103;  element.upper = 108; element.colour = 7; BGMCGroupData.push_back(element);
         
-        element.GroupName = "ttV"; element.LegendName = "tt+V"; element.LatexName = "tt+V";
-        element.lower = 109;  element.upper = 114; BGMCGroupData.push_back(element);
+        element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
+        element.lower = 109;  element.upper = 114; element.colour = 8; BGMCGroupData.push_back(element);
         
         element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
-        element.lower = 115;  element.upper = 116; BGMCGroupData.push_back(element);
+        element.lower = 115;  element.upper = 116; element.colour = 9; BGMCGroupData.push_back(element);
         
+        //
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 117;  element.upper = 130; BGMCGroupData.push_back(element);
+        element.lower = 117;  element.upper = 130; element.colour = 807; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 131;  element.upper = 150; BGMCGroupData.push_back(element);
+        element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        element.lower = 131;  element.upper = 139; BGMCGroupData.push_back(element);
+        element.lower = 131;  element.upper = 139; element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        element.lower = 140;  element.upper = 150; BGMCGroupData.push_back(element);
+        element.lower = 140;  element.upper = 150; element.colour = 3; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
-        element.lower = 151;  element.upper = 155; BGMCGroupData.push_back(element);
+        element.lower = 151;  element.upper = 155; element.colour = 6; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -2659,8 +2674,8 @@ void analysis1()
                     {
                         BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                        BGGroup[j].h2->SetLineColor(j+2);
-                        BGGroup[j].h2->SetFillColor(j+2);
+                        BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
+                        BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
