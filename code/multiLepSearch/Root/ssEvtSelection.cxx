@@ -780,7 +780,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
     
-    double TotalWeight = eventInfo->mcEventWeight();
+    double TotalWeight = 1;
+    if(CF_isMC) TotalWeight *= eventInfo->mcEventWeight();
     if(!CF_isMC) m_susyEvt->evt.weight = 1;
     else if(fabs(eventInfo->mcEventWeight())<100) m_susyEvt->evt.weight = eventInfo->mcEventWeight();
     else m_susyEvt->evt.weight = 1;
@@ -1115,7 +1116,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
       if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
       if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
-      if(m_susyEvt->evt.event == 47)
+      if(CF_isMC && m_susyEvt->evt.event == 47)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;
         cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;
