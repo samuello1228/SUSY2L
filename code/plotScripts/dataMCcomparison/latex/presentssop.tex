@@ -8,19 +8,13 @@
 \title[]{Data/MC comparison}
 \author[]
 {
-Samuel Lo \inst{1}
-\and
-Yanjun Tu  \inst{1}
-\and
-Dongliang Zhang  \inst{2}
+Samuel Lo \inst{1} \\
+for SS analysis team
 }
 \institute[]
 {
 \inst{1}
 The University of Hong Kong
-\and
-\inst{2}
-University of Michigan
 }
 \date[]{\today}
 
@@ -36,13 +30,7 @@ University of Michigan
 \begin{document}
 \frame{\titlepage}
 
-\begin{frame}{Outline}
-\tableofcontents
-\end{frame}
-
-\section{Update}
-
-\begin{frame}{Update}
+\begin{frame}{Introduction}
 \begin{itemize}
 \item Cut flow comparison
 \begin{itemize}
@@ -59,31 +47,92 @@ University of Michigan
 \end{itemize}
 \end{frame}
 
-%\section{Motivation}
-%\begin{frame}{Motivation}
-%\begin{itemize}
-%\item Optimization for signal region
-%\end{itemize}
-%\end{frame}
+\begin{frame}{Comparison for with/without charge flip tagger of Zee samples in CR}
+CR selection
+\begin{itemize}
+\item same-sign two leptons
+\item $|m_{ll} - 91.2| < 10$
+\end{itemize}
+The plot is without the mll cut. \\
+The number is after the mll cut. \\
+The CFT setting is used on the right plot for Zee and signal. \\
+The default setting is used for VV and Vgamma for both plots. \\
 
-\section{CR\_SS\_run1}
-\begin{frame}
-\sectionpage
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{mll_CR_SS_ee_Zmass_def} \\
+Default: Zee: $108,072\pm1,233$
+\end{center}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{mll_CR_SS_ee_Zmass_cft} \\
+CFT: Zee: $17,207\pm572$
+\end{center}
+\end{column}
+
+\end{columns}
+
 \end{frame}
 
-\begin{frame}{Selection}
+\begin{frame}{Selection in run1 SR}
 \includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
 \url{https://arxiv.org/pdf/1501.07110.pdf}
 \end{frame}
 
-\input{data/expN_SR_SS_run1.tex}
-\input{data/plot_SR_SS_run1.tex}
-
-\section{Conclusion}
-\begin{frame}{Conclusion}
+\begin{frame}{Dilepton \pt}
 \begin{itemize}
-\item ?
+\item The plot is after all run1 SR selection cut.
+\item A Dilepton $\pt$ cut can be used to improve the expected significance.
+\item Also checking other variables. (more plot in Backup slides)
 \end{itemize}
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{ptll_SR_SS_ee_1} \\
+SRee-1
+\end{center}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{ptll_SR_SS_mumu_1} \\
+SR$\mu\mu$-1
+\end{center}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Number of b-jets}
+\begin{itemize}
+\item Do we apply a b-jet veto?
+\end{itemize}
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{nBJet_SR_SS_ee_1} \\
+SRee-1
+\end{center}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{nBJet_SR_SS_mumu_1} \\
+SR$\mu\mu$-1
+\end{center}
+\end{column}
+
+\end{columns}
+
 \end{frame}
 
 \section{Plan}
@@ -106,6 +155,14 @@ University of Michigan
 \huge
 Backup
 \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = 0.3
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -194,16 +251,6 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{frame}
 
 \begin{frame}
-\frametitle{averageMu}
-\begin{figure}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_emu} \\
-\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
-\end{figure}
-\end{frame}
-
-\begin{frame}
 \frametitle{Definition of jets}
 \normalsize
 \begin{itemize}
@@ -218,14 +265,6 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{frame}
 
 \begin{frame}
-\frametitle{significance calculation}
-\begin{itemize}
-\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
-\item $\delta$B = 0.3
-\end{itemize}
-\end{frame}
-
-\begin{frame}
 \frametitle{definition of variables}
 \normalsize
 \begin{itemize}
@@ -236,12 +275,7 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\small
-Old signal:\\
-\begin{figure}
-\includegraphics[width=0.5\textwidth]{data/WZ.png}
-\includegraphics[width=0.5\textwidth]{data/slepton.png}
-\end{figure}
-\end{frame}
+\input{data/expN_SR_SS_run1.tex}
+\input{data/plot_SR_SS_run1.tex}
+
 \end{document}
