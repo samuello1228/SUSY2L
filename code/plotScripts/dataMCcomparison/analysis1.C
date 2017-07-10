@@ -511,10 +511,10 @@ void analysis1()
         //element.lower = 20;  element.upper = 33; element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 0;   element.upper = 19; element.colour = 3; BGMCGroupData.push_back(element);
+        element.lower = 0;   element.upper = 19; element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 40;  element.upper = 59; element.colour = 4; BGMCGroupData.push_back(element);
+        element.lower = 40;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
         
         //W+jets
         element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
@@ -544,10 +544,10 @@ void analysis1()
         element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        element.lower = 131;  element.upper = 139; element.colour = 2; BGMCGroupData.push_back(element);
+        element.lower = 131;  element.upper = 139; element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        element.lower = 140;  element.upper = 150; element.colour = 3; BGMCGroupData.push_back(element);
+        element.lower = 140;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
         element.lower = 151;  element.upper = 155; element.colour = 6; BGMCGroupData.push_back(element);
@@ -718,7 +718,7 @@ void analysis1()
         element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
-        element.CutDirection=0;
+        element.CutDirection=-1;
         Var.push_back(element);
         
         element.VarName = "nCJet";         element.VarTitle = "Number of central jets";         element.unit = "";
@@ -2732,7 +2732,7 @@ void analysis1()
                             }
                             Cut += ")";
                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
-                            //tree2BGMC[j][k]->Scan("weight",Cut.Data());
+                            //if(BGGroup[j].info->GroupName == "Zmumu") tree2BGMC[j][k]->Scan("mll:weight",Cut.Data());
                             //normalization for BG
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
                             
