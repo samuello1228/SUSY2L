@@ -285,7 +285,7 @@ elif (options.driver == "grid"):
             driver.options().setDouble(ROOT.EL.Job.optGridNFiles, 4)
             driver.options().setDouble(ROOT.EL.Job.optGridNFilesPerJob, 2)
         if options.fast:
-            job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=2,3 --useContElementBoundary");
+            job.options().setString(ROOT.EL.Job.optSubmitFlags, "--addNthFieldOfInDSToLFN=1,2,3 --useContElementBoundary");
             outname= "user."+os.environ["RUCIO_ACCOUNT"]+"."+ (options.shortName or options.outputTag)
         driver.options().setString("nc_outputSampleName", outname)
 #         driver.options().setDouble("nc_disableAutoRetry", 1)
