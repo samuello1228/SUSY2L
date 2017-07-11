@@ -2,7 +2,6 @@
 #include <fstream>
 #include <vector>
 #include "evt2l.C"
-#include "PP1_evt2l.C"
 #include <TH1F.h>
 
 Int_t ID1;
@@ -59,12 +58,10 @@ struct nEvent
     double nw;
     double nAOD;
 };
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,bool isPP1,std::vector<nEvent>& nSS)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
-    TChain *tree1P = nullptr;
-    if(isPP1) tree1P = new TChain("PP1_evt2l");
     {
         TString fileName = SamplePath;
         //fileName += "user.clo.";
@@ -83,11 +80,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
-        if(isPP1) tree1P->Add(fileName.Data());
     }
     evt2l *evts = new evt2l(tree1);
-    PP1_evt2l *evtsP = nullptr;
-    if(isPP1) evtsP = new PP1_evt2l(tree1P);
     
     //channels
     std::vector<TString> channel;
@@ -224,7 +218,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             cout<<"number of event: " <<j<<endl;
         }
         evts->GetEntry(j);
-        if(isPP1) evtsP->GetEntry(j);
         
         //trigger
         if((evts->sig_trigCode & evts->sig_trigMask)==0)
@@ -236,8 +229,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        if(isPP1) fLwt = evtsP->evt_fLwt;
-        else fLwt = evts->evt_fLwt;
+        fLwt = evts->evt_fLwt;
         
         if(!evts->evt_isMC && fLwt!=0)
         {
@@ -303,8 +295,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         l12_jet0_dPhi = evts->l12_jet0_dPhi;
         weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF * evts->evt_BtagSF * evts->evt_JvtSF;
         
-        if(isPP1) qFwt = evtsP->evt_qFwt;
-        else qFwt = evts->evt_qFwt;
+        qFwt = evts->evt_qFwt;
         
         averageMu = evts->evt_averageMu;
         
@@ -482,7 +473,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     nSS.push_back(element);
     //delete
     delete evts;
-    if(isPP1) delete evtsP;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete tree2[j];
@@ -493,7 +483,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         delete h2[j];
     }
     delete tree1;
-    if(isPP1) delete tree1P;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete f2[j];
@@ -568,7 +557,7 @@ void skimming()
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],nSS);
         }
     }
     
@@ -586,7 +575,7 @@ void skimming()
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             //BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
-            skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
+            skimming2(SamplePath,tag,BGSampleName[i],nSS);
         }
     }
     
@@ -603,7 +592,7 @@ void skimming()
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
-            skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
+            skimming2(SamplePath,tag,SigSampleName[i],nSS);
         }
     }
     
