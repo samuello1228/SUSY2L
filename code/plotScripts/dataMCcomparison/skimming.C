@@ -63,18 +63,27 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
     {
+        /*
         TString fileName = SamplePath;
-        //fileName += "user.clo.";
-        //fileName += tag;
-        //fileName += ".";
-        
+        fileName += "user.clo.";
+        fileName += tag;
+        fileName += ".";
+        fileName += SampleName;*/
+        //fileName += "_myOutput.root/*.root*";
+
+        ///*
+        TString fileName = SamplePath;
         fileName += "all/user.*.";
         fileName += SampleName;
         fileName += ".*.myOutput.root";
+        //*/
         
-        //fileName += "_myOutput.root/*.root*";
-        //fileName += "*.root";
+        /*
+        TString fileName = SamplePath;
+        fileName += SampleName;
+        fileName += "*.root";
         //fileName += ".merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879.root";
+        */
         
         //fileName = "/Users/samuel/Atlas/ntuple/test.root";
         
