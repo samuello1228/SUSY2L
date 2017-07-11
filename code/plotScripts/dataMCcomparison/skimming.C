@@ -514,11 +514,14 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
         TString SampleNameTemp2;
         fin>>SampleNameTemp2;
         if(fin.eof()) break;
-        SampleNameTemp2 += ".";
         
         TString SampleNameTemp;
-        fin>>SampleNameTemp;
-        SampleNameTemp2 += SampleNameTemp;
+        if(type != "Data")
+        {
+            SampleNameTemp2 += ".";
+            fin>>SampleNameTemp;
+            SampleNameTemp2 += SampleNameTemp;
+        }
         SampleName.push_back(SampleNameTemp2);
         
         for(int i=1;i<=skip;i++)
@@ -548,13 +551,14 @@ void skimming()
     //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
     //Data
-    //if(true)
-    if(false)
+    if(true)
+    //if(false)
     {
         //SamplePath += "data/";
         //tag += "b.Data";
@@ -569,8 +573,8 @@ void skimming()
     }
     
     //Background
-    if(true)
-    //if(false)
+    //if(true)
+    if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
