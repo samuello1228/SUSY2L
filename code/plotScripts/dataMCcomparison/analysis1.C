@@ -259,13 +259,12 @@ void analysis1()
                     else
                     {
                         ///* Cutflow Attention
-                        element.setOfBGMC.push_back("Zee");
-                        element.setOfBGMC.push_back("Zmumu");
-                        element.setOfBGMC.push_back("Ztautau");
-                        element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("singletop");
+                        element.setOfBGMC.push_back("Zjets");
+                        element.setOfBGMC.push_back("Wjets");
+                        element.setOfBGMC.push_back("top");
                         element.setOfBGMC.push_back("VV");
-                        element.setOfBGMC.push_back("Wgamma");
+                        element.setOfBGMC.push_back("Vgamma");
+                        element.setOfBGMC.push_back("VVV");
                         //*/
                     }
 
@@ -290,11 +289,6 @@ void analysis1()
             fin>>SampleIDTemp;
             if(fin.eof()) break;
             
-            TString SampleNameTemp;
-            fin>>SampleNameTemp;
-            
-            SampleIDTemp += ".";
-            SampleIDTemp += SampleNameTemp;
             DataSampleID.push_back(SampleIDTemp);
             
             double DataLTemp;
@@ -303,7 +297,7 @@ void analysis1()
         }
         fin.close();
     }
-    DataSampleID.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
+    //DataSampleID.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
@@ -1750,6 +1744,245 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        //Control region for run 1
+        GroupElement.GroupName = "CR_OS_run1";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
+        
+        //ee_1
+        {
+            element.RegionName = "CR_OS_ee_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            element.setOfChannel.push_back(6);
+            
+            element.Cut = " && nCJet == 1";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 55";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_1
+        {
+            element.RegionName = "CR_OS_mumu_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            element.setOfChannel.push_back(7);
+            
+            element.Cut = " && nCJet == 1";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_1
+        {
+            element.RegionName = "CR_OS_emu_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(2);
+            element.setOfChannel.push_back(8);
+            
+            element.Cut = " && nCJet == 1";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //ee_2
+        {
+            element.RegionName = "CR_OS_ee_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(0);
+            element.setOfChannel.push_back(6);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 30";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_2
+        {
+            element.RegionName = "CR_OS_mumu_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(1);
+            element.setOfChannel.push_back(7);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_2
+        {
+            element.RegionName = "CR_OS_emu_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(2);
+            element.setOfChannel.push_back(8);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
@@ -2300,7 +2533,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
