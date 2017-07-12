@@ -1,0 +1,16 @@
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodD.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodE.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodF.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodG.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodH.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data15_periodJ.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodA.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodB.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodC.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodD.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodE.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodF.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodG.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodI.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodK.root
+/eos/atlas/user/d/dzhang/susy_ntuples/v18.data/data16_periodL.root
