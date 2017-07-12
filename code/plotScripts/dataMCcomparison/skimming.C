@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "obj_def.h"
 #include "evt2l.C"
 #include <TH1F.h>
 
