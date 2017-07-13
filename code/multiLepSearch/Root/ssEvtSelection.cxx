@@ -1268,7 +1268,12 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   {
     if (m_objTool->treatAsYear() == 2015)
     {
-      if (el->pt()*iGeV > 70)
+      if (el->pt()*iGeV > 130)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e120_lhloose")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e120_lhloose")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 70)
       {
         if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
         if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
@@ -1281,7 +1286,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     }
     else
     {
-      if (el->pt()*iGeV > 70)
+      if (el->pt()*iGeV > 320)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e300_etcut")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e300_etcut")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 150)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e140_lhloose_nod0")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 70)
       {
         if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
         if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
@@ -1427,10 +1442,10 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   {
     if (m_objTool->treatAsYear() == 2015)
     {
-      if (mu->pt()*iGeV > 60)
+      if (mu->pt()*iGeV > 50)
       {
-        if (m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
+        if (m_objTool->IsTrigPassed("HLT_mu40")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu40")) l.ID +=2;
       }
       else if (mu->pt()*iGeV > 30)
       {
