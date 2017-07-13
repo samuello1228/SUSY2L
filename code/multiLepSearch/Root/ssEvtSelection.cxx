@@ -1333,8 +1333,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   l.nTRTHits     =el->trackParticleSummaryIntValue(numberOfTRTHits);
   l.nTRTOutliers =el->trackParticleSummaryIntValue(numberOfTRTOutliers);
   */
-  l.truthType = -1;
-  l.truthOrig = -1;
 
   // Info("fillLepton(el)", "Before CF_isMC");
   if(CF_isMC)
@@ -1348,6 +1346,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 
       l.truthType = res.first;
       l.truthOrig = res.second;
+      l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
     }
     if (mcTruthMatch == "TruthLink") {
       //l.truthType = acc_truthType(*el);
@@ -1488,8 +1487,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   */
 
   /// truth
-  l.truthType = -1;
-  l.truthOrig = -1;
   if(CF_isMC)
   {
     /*
@@ -1551,6 +1548,9 @@ void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
 
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsigned int index)
 {
+  l.truthType = 0;
+  l.truthOrig = 0;
+  l.firstEgMotherPdgId = 0;
   xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
   if(mu) fillLepton(mu, l, index);
   else{
