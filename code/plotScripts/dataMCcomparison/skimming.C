@@ -51,6 +51,7 @@ Double_t averageMu;
 Double_t meff;
 Double_t mlj;
 Double_t R2;
+Double_t mjj;
 
 struct nEvent
 {
@@ -155,6 +156,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mtm",&mtm,"mtm/D");
         tree2[j]->Branch("meff",&meff,"meff/D");
         tree2[j]->Branch("mlj",&mlj,"mlj/D");
+        tree2[j]->Branch("mjj",&mjj,"mjj/D");
 
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
@@ -298,6 +300,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else mtm = mt2;
         meff = evts->sig_HT + evts->sig_Met;
         mlj = evts->sig_mlj;
+        mjj = evts->sig_mjj;
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
