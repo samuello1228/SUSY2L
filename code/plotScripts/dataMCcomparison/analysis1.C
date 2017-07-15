@@ -151,6 +151,7 @@ struct GroupData
     unsigned int lower;
     unsigned int upper;
     int colour;
+    int statCount;
 };
 
 struct Group
@@ -252,6 +253,12 @@ void analysis1()
                         element.setOfBGMC.push_back("Zjets");
                         element.setOfBGMC.push_back("Wjets");
                         element.setOfBGMC.push_back("top");
+                        /*
+                        element.setOfBGMC.push_back("ttbar");
+                        element.setOfBGMC.push_back("singletop");
+                        element.setOfBGMC.push_back("ttV");
+                        element.setOfBGMC.push_back("multitop");
+                        */
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                         element.setOfBGMC.push_back("VVV");
@@ -1541,6 +1548,52 @@ void analysis1()
             RegionInfo.push_back(element);
         }
         
+        //ee_1 Dani
+        /*
+        {
+            element.RegionName = "SR_SS_ee_1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut = " && nBJet == 0";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 20";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 130";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff < 700";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 100";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 120 && mtm < 500";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        */
+        
         //mumu_1
         {
             element.RegionName = "SR_SS_mumu_1";
@@ -2267,6 +2320,143 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        //Signal region for Dani
+        GroupElement.GroupName = "SR_SS_Dani";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
+        
+        //ee_1
+        {
+            element.RegionName = "SR_SS_ee_Dani";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && nCJet <= 3";
+            element.Cut = " && nBJet == 0";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 20";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 25";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 110";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff < 400";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 125";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 90) || (nCJet >= 2 && mlj < 120) )";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_1
+        {
+            element.RegionName = "SR_SS_mumu_Dani";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && nCJet <= 3";
+            element.Cut = " && nBJet == 0";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 20";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 80";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm < 250";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 80) || (nCJet >= 2 && mlj < 120) )";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_1
+        {
+            element.RegionName = "SR_SS_emu_Dani";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && nCJet <= 3";
+            element.Cut = " && nBJet == 0";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 20";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 110";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 130";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 80) || (nCJet >= 2 && mlj < 125) )";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Signal region
         GroupElement.GroupName = "SR";
         GroupElement.lower = RegionInfo.size();
@@ -2817,7 +3007,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -2923,8 +3113,8 @@ void analysis1()
             }
         }
         
-        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
-        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
+        //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
             
@@ -3064,8 +3254,8 @@ void analysis1()
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
@@ -3194,6 +3384,7 @@ void analysis1()
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
+                        BGGroup[j].info->statCount = 0;
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
                             TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
@@ -3248,7 +3439,8 @@ void analysis1()
                                 Cut += TString::Itoa(35,10);
                             }
                             Cut += ")";
-                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            BGGroup[j].info->statCount += bgCount;
                             //if(BGGroup[j].info->GroupName == "Zmumu") tree2BGMC[j][k]->Scan("mll:weight",Cut.Data());
                             //normalization for BG
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
@@ -3364,7 +3556,7 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                        if(VarIndex==countVariable && j==2 && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
+                        if(VarIndex==countVariable && j==0 && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
                             cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
@@ -3390,8 +3582,9 @@ void analysis1()
                     h2SigSum[i]->Scale(sumDataL/AOD);
                 }
                 
-                const bool DoSignificancePlot = Var[VarIndex].CutDirection!=0 &&
-                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1";
+                const bool DoSignificancePlot = Var[VarIndex].CutDirection!=0 && (
+                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
                 
                 if(VarIndex==countVariable)
                 {
@@ -3406,15 +3599,18 @@ void analysis1()
                     sumOfEvent[BGGroup.size()][0]=0;
                     sumOfEvent[BGGroup.size()][1]=0;
                     
+                    int totalBGstat = 0;
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         //expected number of events for BG
                         sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<endl;
+                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
                         sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
                         sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
+                        
+                        totalBGstat += BGGroup[j].info->statCount;
                     }
-                    cout<<"Total BG: "<<sumOfEvent[BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1])<<endl<<endl;
+                    cout<<"Total BG: "<<sumOfEvent[BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1])<<" ("<<totalBGstat<<")"<<endl<<endl;
                     
                     //expected number of events for signal
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -3680,7 +3876,7 @@ void analysis1()
                             }
                             else if(Var[VarIndex].CutDirection == -1)
                             {
-                                nBG += BGGroup[j].h2->Integral(0,bin);
+                                nBG += BGGroup[j].h2->Integral(1,bin);
                             }
                         }
                         
