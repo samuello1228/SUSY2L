@@ -3524,6 +3524,13 @@ void analysis1()
                     {
                         //expected number of events for BG
                         sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
+                        if(sumOfEvent[j][0] < 0)
+                        {
+                            sumOfEvent[j][0] = 0;
+                            sumOfEvent[j][1] = 0;
+                            BGGroup[j].info->statCount = 0;
+                        }
+                        
                         cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
                         sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
                         sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
@@ -3792,11 +3799,15 @@ void analysis1()
                         {
                             if(Var[VarIndex].CutDirection == 1)
                             {
-                                nBG += BGGroup[j].h2->Integral(bin,-1);
+                                double n = BGGroup[j].h2->Integral(bin,-1);
+                                if(n<0) n=0;
+                                nBG += n;
                             }
                             else if(Var[VarIndex].CutDirection == -1)
                             {
-                                nBG += BGGroup[j].h2->Integral(1,bin);
+                                double n = BGGroup[j].h2->Integral(1,bin);
+                                if(n<0) n=0;
+                                nBG += n;
                             }
                         }
                         
