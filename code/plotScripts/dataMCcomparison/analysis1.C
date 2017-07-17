@@ -2911,6 +2911,7 @@ void analysis1()
                 for(unsigned int SigIndex=0;SigIndex<=0;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
                 {
+                    const bool findUsefulVar = 1;
                     while(true)
                     {
                         bool isChanged = false;
@@ -3123,10 +3124,17 @@ void analysis1()
                             }
                             else
                             {
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower = newLower;
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper = newUpper;
-                                isChanged = true;
-                                cout<<"The cut is changed:"<<endl;
+                                if(!findUsefulVar)
+                                {
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower = newLower;
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper = newUpper;
+                                    isChanged = true;
+                                    cout<<"The cut is changed:"<<endl;
+                                }
+                                else
+                                {
+                                    cout<<"lower value: "<<newLower<<", upper value: "<<newUpper<<endl;
+                                }
                             }
                             
                             cout<<Var[VarIndex].VarName.Data()<<" :";
@@ -3144,6 +3152,7 @@ void analysis1()
                             delete h2Sig;
                         }
                         
+                        if(findUsefulVar) break;
                         if(!isChanged)
                         {
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": (";
