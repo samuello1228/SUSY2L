@@ -3476,8 +3476,7 @@ void analysis1()
                         }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                        if(VarIndex==countVariable && j==0 && RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1")
-                            cout<<"sigCount: "<<sigCount<<endl; //Cutflow Attention
+                        
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
@@ -3502,13 +3501,10 @@ void analysis1()
                     h2SigSum[i]->Scale(sumDataL/AOD);
                 }
                 
-                /*
-                const bool DoSignificancePlot = Var[VarIndex].CutDirection!=0 && (
+                const bool DoSignificancePlot = !doOptimize &&
+                Var[VarIndex].CutDirection!=0 && (
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
-                */
-                
-                const bool DoSignificancePlot = false;
                 
                 if(VarIndex==countVariable)
                 {
