@@ -757,7 +757,7 @@ void analysis1()
         
         element.VarName = "dEta";          element.VarTitle = "|#Delta#eta_{ll}|";              element.unit = "";
         element.VarFormula = "fabs(eta1-eta2)";
-        element.bin=40;         element.xmin=0;                 element.xmax=5;
+        element.bin=20;         element.xmin=0;                 element.xmax=5;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$|\\Delta\\eta_{ll}|$";
         element.CutDirection=-1;
@@ -781,7 +781,7 @@ void analysis1()
         
         element.VarName = "mtm";           element.VarTitle = "m_{T}^{max}";                    element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=0;                 element.xmax=250;
+        element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}^{\\text{max}}$";
         element.CutDirection=1;
@@ -789,7 +789,7 @@ void analysis1()
         
         element.VarName = "mlj";           element.VarTitle = "m_{lj} or m_{ljj}";              element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=40;         element.xmin=0;                 element.xmax=300;
+        element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{lj}$ or $m_{ljj}$";
         element.CutDirection=-1;
@@ -2947,7 +2947,6 @@ void analysis1()
                                     BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                                     BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
-                                    BGGroup[j].info->statCount = 0;
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
@@ -2964,8 +2963,7 @@ void analysis1()
                                         Cut += CommonCut;
                                         Cut += ")";
                                         
-                                        int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
-                                        BGGroup[j].info->statCount += bgCount;
+                                        tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                         
                                         //normalization for BG
                                         hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
@@ -3072,7 +3070,6 @@ void analysis1()
                                     //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig;
                                     //Significance
                                     double significanceTemp;
-                                    //if(SigMassSplitting[i].MassDiff==100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
                                     if(nBG>0)
                                     {
                                         significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
@@ -3137,10 +3134,11 @@ void analysis1()
                 }
             }
             
+            const unsigned int SigOptimizingIndex = 0;
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-            //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
@@ -3202,11 +3200,33 @@ void analysis1()
                     }
                     
                     CommonCut += RegionInfo[RegionIndex].Cut;
-                    for(unsigned int i=0;i<RegionInfo[RegionIndex].AdditionalCut.size();i++)
+                    
+                    if(doOptimize)
                     {
-                        if(RegionInfo[RegionIndex].AdditionalCut[i].RelatedVariable != Var[VarIndex].VarName)
+                        for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
-                            CommonCut += RegionInfo[RegionIndex].AdditionalCut[i].Cut;
+                            if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable != Var[VarIndex].VarName)
+                            {
+                                CommonCut += " && ";
+                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
+                                CommonCut += " >= ";
+                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.lower;
+                                
+                                CommonCut += " && ";
+                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
+                                CommonCut += " < ";
+                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for(unsigned int i=0;i<RegionInfo[RegionIndex].AdditionalCut.size();i++)
+                        {
+                            if(RegionInfo[RegionIndex].AdditionalCut[i].RelatedVariable != Var[VarIndex].VarName)
+                            {
+                                CommonCut += RegionInfo[RegionIndex].AdditionalCut[i].Cut;
+                            }
                         }
                     }
                     //cout<<CommonCut.Data()<<endl;
@@ -3351,6 +3371,7 @@ void analysis1()
                         BGGroup[j].h2->SetLineColor(j+2);
                         BGGroup[j].h2->SetFillColor(j+2);
                         
+                        BGGroup[j].info->statCount = 0;
                         for(unsigned int k=0;k<DataSampleID.size();k++)
                         {
                             h2Data[k]->Scale(0);
@@ -3387,14 +3408,16 @@ void analysis1()
                             }
                             Cut += ")";
                             
+                            int bgCount = 0;
                             if(BGGroup[j].info->GroupName == "charge flip")
                             {
-                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                bgCount = tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
                             }
                             if(BGGroup[j].info->GroupName == "fake lepton")
                             {
-                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                bgCount = tree2Data[k]->Draw(temp.Data(),Cut.Data());
                             }
+                            BGGroup[j].info->statCount += bgCount;
                             
                             //Add MCData
                             BGGroup[j].h2->Add(h2Data[k]);
@@ -3467,9 +3490,13 @@ void analysis1()
                     h2SigSum[i]->Scale(sumDataL/AOD);
                 }
                 
+                /*
                 const bool DoSignificancePlot = Var[VarIndex].CutDirection!=0 && (
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
+                */
+                
+                const bool DoSignificancePlot = false;
                 
                 if(VarIndex==countVariable)
                 {
@@ -3509,7 +3536,7 @@ void analysis1()
                         //Significance
                         sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
                         
-                        cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
+                        cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
                     cout<<endl;
                     
@@ -3883,6 +3910,8 @@ void analysis1()
                     {
                         if(h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin()) > max) max = h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin());
                     }
+                    
+                    if(doOptimize) Var[VarIndex].ymin /= 100;
                     
                     if(Var[VarIndex].log)
                     {
