@@ -3138,10 +3138,26 @@ void analysis1()
                             }
                             
                             delete h2Sig;
-
-                            
                         }
-                        if(!isChanged) break;
+                        
+                        if(!isChanged)
+                        {
+                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": (";
+                            cout<<SigMass1[SigMassSplitting[SigIndex].ID]<<", ";
+                            cout<<SigMass2[SigMassSplitting[SigIndex].ID]<<"): "<<endl;
+                            
+                            for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                            {
+                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
+                                cout<<" <= ";
+                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
+                                cout<<" < ";
+                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
+                                cout<<endl;
+                            }
+                            
+                            break;
+                        }
                     }
                 }
             }
