@@ -262,6 +262,7 @@ void analysis1()
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                         element.setOfBGMC.push_back("VVV");
+                        element.setOfBGMC.push_back("Higgs");
                     }
                     else
                     {
@@ -553,6 +554,9 @@ void analysis1()
         
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
         element.lower = 151;  element.upper = 155; element.colour = 6; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
+        element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -3119,8 +3123,8 @@ void analysis1()
                             }
                             else
                             {
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBin-1) * BinSize;
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBin * BinSize;
+                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower = newLower;
+                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper = newUpper;
                                 isChanged = true;
                                 cout<<"The cut is changed:"<<endl;
                             }
