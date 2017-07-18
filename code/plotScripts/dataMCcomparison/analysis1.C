@@ -357,23 +357,15 @@ void analysis1()
         int colour;
         int linestyle;
         int statCount;
+        double scale;
     };
     std::vector<SigInfo> SigMassSplitting;
     {
         SigInfo element;
         
-        /* Cutflow Attention
-        element.MassDiff = 20;    element.ID = 2;   element.colour = 6;   SigMassSplitting.push_back(element);
-        //element.MassDiff = 50;    element.ID = 18;  element.colour = 7;   SigMassSplitting.push_back(element);
-        element.MassDiff = 50;    element.ID = 22;  element.colour = 7;   SigMassSplitting.push_back(element);
-        element.MassDiff = 100;   element.ID = 19;  element.colour = 8;   SigMassSplitting.push_back(element);
-        element.MassDiff = 200;   element.ID = 20;  element.colour = 9;   SigMassSplitting.push_back(element);
-        element.MassDiff = 300;   element.ID = 21;  element.colour = 14;  SigMassSplitting.push_back(element);
-        */
-        
-        element.MassDiff = 175;   element.ID = 0;  element.colour = 1;   element.linestyle = 2;   SigMassSplitting.push_back(element);
-        element.MassDiff = 130;   element.ID = 1;  element.colour = 920; element.linestyle = 5;   SigMassSplitting.push_back(element);
-        element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9;   SigMassSplitting.push_back(element);
+        element.MassDiff = 175;   element.ID = 0;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 130;   element.ID = 1;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
     }
     
     std::vector<TString> SigSampleID;
@@ -796,6 +788,14 @@ void analysis1()
         element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{lj}$ or $m_{ljj}$";
+        element.CutDirection=-1;
+        Var.push_back(element);
+        
+        element.VarName = "mjj";           element.VarTitle = "m_{jj}";                         element.unit = "[GeV]";
+        element.VarFormula = element.VarName;
+        element.bin=20;         element.xmin=0;                 element.xmax=300;
+        element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
+        element.latexName = "$m_{jj}$";
         element.CutDirection=-1;
         Var.push_back(element);
     }
@@ -3866,10 +3866,9 @@ void analysis1()
                 }
                 
                 //final normalization for h2SigSum for plotting
-                const int SigScale = 1;
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *SigScale);
+                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] * SigMassSplitting[i].scale);
                 }
                 
                 //scale Z+jets by 1.4 for CR
@@ -4026,7 +4025,7 @@ void analysis1()
                         NameTemp += ", ";
                         NameTemp += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
                         NameTemp += ") x";
-                        NameTemp += TString::Itoa(SigScale,10);
+                        NameTemp += TString::Itoa(SigMassSplitting[i].scale,10);
                         leg->AddEntry(h2SigSum[i],NameTemp.Data(),"l");
                     }
                 }
