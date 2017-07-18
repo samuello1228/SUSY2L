@@ -68,33 +68,7 @@ Backup
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{optimization}
-\tiny
-\begin{verbatim}
-SR_SS_ee_1_opt: (175, 0):
-30 <= pt1 < -1
-20 <= pt2 < -1
-50 <= ptll < 110
-50 <= mTtwo < 100
-0 <= fabs(eta1-eta2) < -1
-55 <= METRel < -1
-270 <= meff < 520
-125 <= mtm < 140
-0 <= mlj < 90
-
-Data: 1
-Zjets: 0 +/- 0 (0)
-Wjets: 0 +/- 0 (0)
-top: 0.00146966 +/- 0.00146966 (1)
-VV: -0.0298588 +/- 0.0611412 (29)
-Vgamma: 0 +/- 0 (0)
-VVV: 0 +/- 0 (0)
-Higgs: 0 +/- 0 (0)
-Total BG: 0.00146966 +/- 0.00146966 (30)
-
-Signal (175, 0): 1.54734 +/- 0.589634 (7), Significance: 3.97519
-\end{verbatim}
-\end{frame}
+\input{data/optimization/data.tex}
 
 \begin{frame}[fragile]
 \frametitle{Signal sample}
@@ -148,7 +122,7 @@ HLT_mu22_mu8noL1
 
 \begin{frame}{Object Definitions}
 \small
-Tool: AnalysisBase 2.4.31 \\
+Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
 
 \centering
 \begin{table}
@@ -158,13 +132,13 @@ Tool: AnalysisBase 2.4.31 \\
 \hline
 \textbf{Baseline}
 & - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
-& - $p_T>10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium
+& - $p_T>10$ GeV \newline - $|\eta| < 2.7$ \newline - Medium
 & - $p_T>20$ GeV \\
 \hline
 \textbf{Signal}
-& - $p_T > 10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - MediumLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
-& - $p_T > 10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
-& - $p_T > 20$ GeV \newline - $|\eta|<4.5$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
+& - $p_T > 25$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - TightLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 25$ GeV \newline - $|\eta| < 2.7$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
 \end{tabularx}
 \end{table}
 
@@ -185,13 +159,8 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \frametitle{Definition of jets}
 \normalsize
 \begin{itemize}
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.4$, no b-tagged
 \item B-jets: b-tagged
-\item Central jets: $|\eta|<2.4$
-\begin{itemize}
-\item Central light jets: no b-tagged, $\pt>30$ GeV
-\end{itemize}
-\item ISR region: at least one central jets.
-\item Non-ISR region: no central jets.
 \end{itemize}
 \end{frame}
 

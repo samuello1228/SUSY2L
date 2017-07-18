@@ -1,0 +1,562 @@
+\begin{frame}[fragile]{pre-selection}
+\tiny
+\begin{verbatim}
+SR_SS_ee_1:
+nCJet == 1
+nBJet == 0
+fabs(mll - 91.2) > 10
+
+SR_SS_mumu_1:
+nCJet == 1
+nBJet == 0
+fabs(eta1) < 2.4
+fabs(eta2) < 2.4
+
+SR_SS_emu_1:
+nCJet == 1
+nBJet == 0
+fabs(eta1) < 2.5
+fabs(eta2) < 2.5
+
+SR_SS_ee_2:
+nCJet == 2 || nCJet == 3
+nBJet == 0
+fabs(mll - 91.2) > 10
+
+SR_SS_mumu_2:
+nCJet == 2 || nCJet == 3
+nBJet == 0
+fabs(eta1) < 2.4
+fabs(eta2) < 2.4
+
+SR_SS_emu_2:
+nCJet == 2 || nCJet == 3
+nBJet == 0
+fabs(eta1) < 2.5
+fabs(eta2) < 2.5
+\end{verbatim}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_1_opt: (175, 0):
+30 <= pt1 < -1
+20 <= pt2 < -1
+50 <= ptll < 110
+50 <= mTtwo < 100
+0 <= fabs(eta1-eta2) < -1
+55 <= METRel < -1
+270 <= meff < 520
+125 <= mtm < 140
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.00146966 +/- 0.00146966 (1)
+VV: -0.0298588 +/- 0.0611412 (29)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.00146966 +/- 0.00146966 (30)
+
+Signal (175, 0): 1.54734 +/- 0.589634 (7), Significance: 3.97519
+Signal (165, 35): 0.232796 +/- 0.232796 (1), Significance: 0.701642
+Signal (400, 0): 0.0114094 +/- 0.0114094 (1), Significance: -1.45148
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_1_opt: (175, 0):
+30 <= pt1 < -1
+20 <= pt2 < -1
+0 <= ptll < -1
+95 <= mTtwo < 110
+0 <= fabs(eta1-eta2) < 1.5
+85 <= METRel < 165
+200 <= meff < -1
+110 <= mtm < -1
+0 <= mlj < 70
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: -0.0217223 +/- 0.118111 (16)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.000545925 +/- 0.000545925 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.000545925 +/- 0.000545925 (17)
+
+Signal (175, 0): 2.26167 +/- 0.771379 (9), Significance: 5.4749
+Signal (165, 35): 0.635427 +/- 0.460394 (2), Significance: 2.33398
+Signal (400, 0): 0.103048 +/- 0.032904 (10), Significance: 0.0355568
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_1_opt: (175, 0):
+55 <= pt1 < 130
+35 <= pt2 < 55
+0 <= ptll < 100
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel < -1
+230 <= meff < 270
+115 <= mtm < 160
+0 <= mlj < 60
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.00396882 +/- 0.00396882 (1)
+VV: -0.00383832 +/- 0.131183 (49)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.00396882 +/- 0.00396882 (50)
+
+Signal (175, 0): 1.64435 +/- 0.593237 (8), Significance: 3.74826
+Signal (165, 35): 1.39318 +/- 0.630444 (5), Significance: 3.34622
+Signal (400, 0): 0.0239312 +/- 0.0175233 (2), Significance: -1.13309
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_2_opt: (175, 0):
+30 <= pt1 < -1
+25 <= pt2 < 65
+0 <= ptll < -1
+85 <= mTtwo < 100
+0 <= fabs(eta1-eta2) < 1
+30 <= METRel < -1
+240 <= meff < 370
+110 <= mtm < -1
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: -0.00256433 +/- 0.00256433 (1)
+VV: 0.00600215 +/- 0.0922647 (10)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0.00259053 +/- 0.00185347 (2)
+Total BG: 0.00859268 +/- 0.0922834 (13)
+
+Signal (175, 0): 1.44604 +/- 0.762395 (4), Significance: 3.12548
+Signal (165, 35): 0 +/- 0 (0), Significance: -1.81137
+Signal (400, 0): 0.00872881 +/- 0.00872881 (1), Significance: -1.47961
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_2_opt: (175, 0):
+30 <= pt1 < -1
+30 <= pt2 < -1
+0 <= ptll < -1
+70 <= mTtwo < 125
+0 <= fabs(eta1-eta2) < 2
+115 <= METRel < 140
+200 <= meff < -1
+0 <= mtm < -1
+0 <= mlj < 105
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.00193921 +/- 0.00391518 (2)
+VV: -0.0174528 +/- 0.0415497 (9)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.00193921 +/- 0.00391518 (11)
+
+Signal (175, 0): 2.17909 +/- 0.782438 (8), Significance: 4.83057
+Signal (165, 35): 0.772748 +/- 0.448994 (3), Significance: 2.36231
+Signal (400, 0): 0.0460844 +/- 0.0240975 (4), Significance: -0.712443
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_2_opt: (175, 0):
+50 <= pt1 < 195
+30 <= pt2 < -1
+0 <= ptll < -1
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 1
+145 <= METRel < -1
+200 <= meff < -1
+165 <= mtm < 270
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: -0.0546401 +/- 0.0546401 (1)
+top: 0 +/- 0 (0)
+VV: 0.0110805 +/- 0.0245428 (11)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0.00138988 +/- 0.00138988 (1)
+Total BG: 0.0124704 +/- 0.0245822 (13)
+
+Signal (175, 0): 2.12679 +/- 0.838426 (8), Significance: 3.89822
+Signal (165, 35): 0.247514 +/- 0.247514 (1), Significance: 0.364401
+Signal (400, 0): 0.271055 +/- 0.057169 (25), Significance: 0.454657
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_1_opt: (165, 35):
+40 <= pt1 < 100
+20 <= pt2 < -1
+0 <= ptll < -1
+30 <= mTtwo < 80
+0 <= fabs(eta1-eta2) < -1
+55 <= METRel < -1
+200 <= meff < -1
+125 <= mtm < 150
+0 <= mlj < 80
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.009579 +/- 0.00601021 (3)
+VV: -0.768596 +/- 1.0458 (69)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.009579 +/- 0.00601021 (72)
+
+Signal (175, 0): 0.886845 +/- 0.542894 (3), Significance: 2.11352
+Signal (165, 35): 2.18073 +/- 0.804241 (8), Significance: 4.09677
+Signal (400, 0): 0 +/- 0 (0), Significance: -1.77438
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_1_opt: (165, 35):
+130 <= pt1 < 240
+20 <= pt2 < -1
+50 <= ptll < 210
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel < 90
+200 <= meff < -1
+100 <= mtm < 120
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: -0.00318423 +/- 0.00318423 (1)
+VV: -0.0176261 +/- 0.144285 (61)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.000324421 +/- 0.000324421 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.000324421 +/- 0.000324421 (63)
+
+Signal (175, 0): 0.413735 +/- 0.293086 (2), Significance: 1.73277
+Signal (165, 35): 2.364 +/- 1.00339 (6), Significance: 5.83232
+Signal (400, 0): 0.010161 +/- 0.010161 (1), Significance: -1.44055
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_1_opt: (165, 35):
+25 <= pt1 < -1
+155 <= pt2 < 195
+0 <= ptll < -1
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel < -1
+200 <= meff < -1
+185 <= mtm < 215
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: 0.000604354 +/- 0.034562 (3)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.000604354 +/- 0.034562 (3)
+
+Signal (175, 0): 0 +/- 0 (0), Significance: -2.64411
+Signal (165, 35): 1.40795 +/- 1.40795 (1), Significance: 4.03712
+Signal (400, 0): 0.0203205 +/- 0.0203205 (1), Significance: -1.11349
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_2_opt: (165, 35):
+30 <= pt1 < -1
+35 <= pt2 < 120
+0 <= ptll < -1
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < -1
+30 <= METRel < -1
+100 <= meff < 480
+130 <= mtm < 135
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: -0.0156784 +/- 0.0770235 (19)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.0109896 +/- 0.0109896 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.0109896 +/- 0.0109896 (20)
+
+Signal (175, 0): 0.182675 +/- 0.182675 (1), Significance: 0.106581
+Signal (165, 35): 1.17744 +/- 0.595486 (4), Significance: 2.59266
+Signal (400, 0): 0.0118287 +/- 0.0118287 (1), Significance: -1.36878
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_2_opt: (165, 35):
+40 <= pt1 < 145
+30 <= pt2 < 85
+10 <= ptll < 140
+25 <= mTtwo < 120
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel < -1
+250 <= meff < 540
+60 <= mtm < 235
+55 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.0855852 +/- 0.0212539 (41)
+VV: 2.62522 +/- 0.234024 (644)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.0252036 +/- 0.0147241 (3)
+Higgs: 0.00578081 +/- 0.00495489 (8)
+Total BG: 2.74179 +/- 0.2355 (696)
+
+Signal (175, 0): 6.44166 +/- 1.33042 (25), Significance: 2.39701
+Signal (165, 35): 9.13288 +/- 1.70313 (33), Significance: 3.21653
+Signal (400, 0): 0.230802 +/- 0.0534235 (20), Significance: -0.140336
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_2_opt: (165, 35):
+25 <= pt1 < 130
+75 <= pt2 < 85
+50 <= ptll < 100
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel < -1
+200 <= meff < -1
+135 <= mtm < 145
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: 0 +/- 0 (0)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.000283156 +/- 0.000283156 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.000283156 +/- 0.000283156 (1)
+
+Signal (175, 0): 0 +/- 0 (0), Significance: -2.85797
+Signal (165, 35): 1.25981 +/- 0.68261 (4), Significance: 3.98655
+Signal (400, 0): 0 +/- 0 (0), Significance: -2.85797
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_1_opt: (400, 0):
+30 <= pt1 < -1
+25 <= pt2 < 115
+70 <= ptll < 270
+80 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 3
+55 <= METRel < -1
+280 <= meff < -1
+105 <= mtm < -1
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.0128592 +/- 0.00684218 (4)
+VV: 0.0186209 +/- 0.277592 (48)
+Vgamma: 0.0274795 +/- 0.0274795 (1)
+VVV: 0.00286179 +/- 0.00249859 (3)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.0618214 +/- 0.279044 (56)
+
+Signal (175, 0): 1.60745 +/- 0.618266 (7), Significance: 2.44079
+Signal (165, 35): 0 +/- 0 (0), Significance: -1.12164
+Signal (400, 0): 1.00908 +/- 0.123451 (86), Significance: 1.62488
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_1_opt: (400, 0):
+30 <= pt1 < -1
+25 <= pt2 < 130
+0 <= ptll < -1
+90 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 3
+100 <= METRel < -1
+300 <= meff < -1
+165 <= mtm < -1
+25 <= mlj < 125
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: -0.00624522 +/- 0.128634 (25)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.019289 +/- 0.0125299 (4)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.019289 +/- 0.0125299 (29)
+
+Signal (175, 0): 0.208462 +/- 0.208462 (1), Significance: 0.125016
+Signal (165, 35): 0 +/- 0 (0), Significance: -1.53174
+Signal (400, 0): 1.01548 +/- 0.135636 (76), Significance: 2.0986
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_1_opt: (400, 0):
+30 <= pt1 < -1
+30 <= pt2 < -1
+0 <= ptll < -1
+100 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 3
+95 <= METRel < -1
+200 <= meff < -1
+125 <= mtm < -1
+20 <= mlj < 90
+
+Zjets: 0.0150102 +/- 0.0150102 (1)
+Wjets: 0 +/- 0 (0)
+top: 0.01401 +/- 0.00888758 (5)
+VV: -0.0134088 +/- 0.646095 (53)
+Vgamma: 0.0513547 +/- 0.0324214 (3)
+VVV: 0.0314345 +/- 0.0168197 (5)
+Higgs: 0.00258108 +/- 0.00258108 (1)
+Total BG: 0.11439 +/- 0.0405586 (68)
+
+Signal (175, 0): 2.17543 +/- 0.664132 (11), Significance: 2.72168
+Signal (165, 35): 0.933941 +/- 0.552928 (3), Significance: 1.26294
+Signal (400, 0): 1.72387 +/- 0.161452 (145), Significance: 2.25105
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_2_opt: (400, 0):
+30 <= pt1 < -1
+25 <= pt2 < 185
+30 <= ptll < -1
+0 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 3
+40 <= METRel < -1
+310 <= meff < -1
+170 <= mtm < -1
+55 <= mlj < 175
+
+Zjets: 0.105361 +/- 0.105361 (1)
+Wjets: 0.0417714 +/- 0.243132 (5)
+top: 0.724428 +/- 0.384693 (31)
+VV: 1.69476 +/- 0.685405 (263)
+Vgamma: 0.111391 +/- 0.0563842 (4)
+VVV: 0.0297791 +/- 0.0144241 (6)
+Higgs: 0.0121984 +/- 0.00482783 (7)
+Total BG: 2.71969 +/- 0.831501 (317)
+
+Signal (175, 0): 0.914606 +/- 0.462678 (4), Significance: 0.219743
+Signal (165, 35): 0.488084 +/- 0.345306 (2), Significance: -0.00078341
+Signal (400, 0): 1.00798 +/- 0.130244 (82), Significance: 0.266422
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_2_opt: (400, 0):
+80 <= pt1 < 250
+30 <= pt2 < -1
+0 <= ptll < -1
+85 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 2
+0 <= METRel < -1
+100 <= meff < -1
+160 <= mtm < -1
+0 <= mlj < 185
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.0126976 +/- 0.0135861 (8)
+VV: -0.00805799 +/- 0.052725 (32)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.0217483 +/- 0.0163369 (3)
+Higgs: 0.00416985 +/- 0.00314653 (2)
+Total BG: 0.0386157 +/- 0.0214797 (45)
+
+Signal (175, 0): 0.876506 +/- 0.5176 (3), Significance: 1.59313
+Signal (165, 35): 0.467114 +/- 0.330677 (2), Significance: 0.766513
+Signal (400, 0): 1.02737 +/- 0.124713 (82), Significance: 1.84542
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_2_opt: (400, 0):
+25 <= pt1 < 250
+25 <= pt2 < 160
+0 <= ptll < -1
+65 <= mTtwo < -1
+0 <= fabs(eta1-eta2) < 2
+85 <= METRel < -1
+310 <= meff < -1
+170 <= mtm < -1
+0 <= mlj < 115
+
+Zjets: 0 +/- 0 (0)
+Wjets: -0.0546401 +/- 0.0546401 (1)
+top: 0.000356436 +/- 0.00452613 (2)
+VV: -0.0364188 +/- 0.0817685 (25)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0.000146774 +/- 0.00186469 (2)
+Total BG: 0.00050321 +/- 0.00489519 (30)
+
+Signal (175, 0): 1.47596 +/- 0.564892 (7), Significance: 4.22299
+Signal (165, 35): 1.68743 +/- 0.918036 (5), Significance: 4.59689
+Signal (400, 0): 1.01567 +/- 0.115577 (91), Significance: 3.30047
+\end{verbatim}
+\end{frame}
