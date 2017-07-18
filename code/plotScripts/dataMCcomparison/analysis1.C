@@ -1676,14 +1676,6 @@ void analysis1()
                 OptimizingCutElement2.Cut.upper = 90;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
-                OptimizingCutElement2.RelatedVariable = "mjj";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 60;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     element.OptimizingCut.push_back(OptimizingCutElement1);
@@ -3003,17 +2995,16 @@ void analysis1()
                 for(unsigned int SigIndex=0;SigIndex<=0;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
                 {
-                    const bool findUsefulVar = 0;
+                    unsigned int VarIndexRecord2 = 0;
+                    int lowerCutRecord2 = 0;
+                    int upperCutRecord2 = 0;
+                    double nBGRecord2 = 0;
+                    double nSigRecord2 = 0;
+                    double significanceRecord2 = -999;
+                    
                     while(true)
                     {
                         bool isChanged = false;
-                        unsigned int VarIndexRecord2 = 0;
-                        int lowerBinRecord2 = 0;
-                        int upperBinRecord2 = 0;
-                        double nBGRecord2 = 0;
-                        double nSigRecord2 = 0;
-                        double significanceRecord2 = -999;
-                        
                         for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
                         {
                             unsigned int VarIndex = 0;
@@ -3246,36 +3237,30 @@ void analysis1()
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;
-                            double newLower = -1;
-                            double newUpper = -1;
-                            if(lowerBinRecord1!=-1) newLower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBinRecord1-1) * BinSize;
-                            if(upperBinRecord1!=-1) newUpper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBinRecord1 * BinSize;
+                            double lowerCutRecord1 = -1;
+                            double upperCutRecord1 = -1;
+                            if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBinRecord1-1) * BinSize;
+                            if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBinRecord1 * BinSize;
                             
-                            if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower == newLower &&
-                               RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper == newUpper )
-                            {
-                                cout<<"The cut is the same:"<<endl;
-                            }
-                            else
-                            {
-                                if(!findUsefulVar)
-                                {
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower = newLower;
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper = newUpper;
-                                    isChanged = true;
-                                    cout<<"The cut is changed:"<<endl;
-                                }
-                                else
-                                {
-                                    cout<<"lower value: "<<newLower<<", upper value: "<<newUpper<<endl;
-                                }
-                            }
-                            
-                            cout<<Var[VarIndex].VarName.Data()<<" :";
+                            cout<<Var[VarIndex].VarName.Data()<<": ";
                             cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
-                            cout<<", lower value: "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower;
-                            cout<<", upper value: "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper;
-                            cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl<<endl;
+                            cout<<", lowerCutRecord1: "<<lowerCutRecord1;
+                            cout<<", upperCutRecord1: "<<upperCutRecord1;
+                            cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
+                            
+                            if(significanceRecord1 > significanceRecord2)
+                            {
+                                VarIndexRecord2 = VarIndex2;
+                                lowerCutRecord2 = lowerCutRecord1;
+                                upperCutRecord2 = upperCutRecord1;
+                                nBGRecord2 = nBGRecord1;
+                                nSigRecord2 = nSigRecord1;
+                                significanceRecord2 = significanceRecord1;
+                                
+                                isChanged = true;
+                                cout<<"The cut is changed."<<endl;
+                            }
+                            cout<<endl;
                             
                             //delete
                             for(unsigned int j=0;j<BGGroup.size();j++)
@@ -3286,9 +3271,24 @@ void analysis1()
                             delete h2Sig;
                         }
                         
-                        if(findUsefulVar) break;
-                        if(!isChanged)
+                        if(isChanged)
                         {
+                            cout<<"The "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<" cut is applied."<<endl;
+                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
+                            cout<<", upperCutRecord2: "<<upperCutRecord2;
+                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].Cut.lower = lowerCutRecord2;
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].Cut.upper = upperCutRecord2;
+                        }
+                        else
+                        {
+                            cout<<"The cut is the same."<<endl;
+                            cout<<"The last cut is "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<endl;
+                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
+                            cout<<", upperCutRecord2: "<<upperCutRecord2;
+                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": (";
                             cout<<SigMass1[SigMassSplitting[SigIndex].ID]<<", ";
                             cout<<SigMass2[SigMassSplitting[SigIndex].ID]<<"): "<<endl;
@@ -3304,7 +3304,7 @@ void analysis1()
                                 cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
                                 cout<<endl;
                             }
-                            
+                            cout<<endl;
                             break;
                         }
                     }
