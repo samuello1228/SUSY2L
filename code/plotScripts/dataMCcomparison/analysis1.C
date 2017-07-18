@@ -143,6 +143,41 @@ void getnAOD(std::vector<double>& BGMCnAOD,std::vector<unsigned int>& SetOfChann
     }
 }
 
+struct VarData
+{
+    TString VarName;
+    TString VarFormula;
+    TString VarTitle;
+    TString unit;
+    TString latexName;
+    int CutDirection;
+    /*
+    0: none
+    1: x > 100 GeV
+    -1: x < 100 GeV
+    */
+    
+    int bin;
+    double xmin;
+    double xmax;
+    
+    bool log;
+    double ymin;
+    double ymax;
+};
+
+unsigned int findVarIndex(TString& VarName, std::vector<VarData>& Var)
+{
+    for(unsigned int i=0;i<Var.size();i++)
+    {
+        if(VarName == Var[i].VarName)
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
 struct GroupData
 {
     TString GroupName;
@@ -564,29 +599,6 @@ void analysis1()
     
     //plotting
     //Variables for plotting
-    struct VarData
-    {
-        TString VarName;
-        TString VarFormula;
-        TString VarTitle;
-        TString unit;
-        TString latexName;
-        int CutDirection;
-        /*
-         0: none
-         1: x > 100 GeV
-        -1: x < 100 GeV
-        */
-        
-        int bin;
-        double xmin;
-        double xmax;
-        
-        bool log;
-        double ymin;
-        double ymax;
-    };
-    
     std::vector<VarData> Var;
     {
         VarData element;
@@ -2942,15 +2954,17 @@ void analysis1()
                                 {
                                     if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable != RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].RelatedVariable)
                                     {
+                                        unsigned int VarIndex3 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                        
                                         CommonCut += " && ";
-                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
+                                        CommonCut += Var[VarIndex3].VarFormula;
                                         CommonCut += " >= ";
                                         CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
                                         
                                         if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper != -1)
                                         {
                                             CommonCut += " && ";
-                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
+                                            CommonCut += Var[VarIndex3].VarFormula;
                                             CommonCut += " < ";
                                             CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
                                         }
@@ -3194,9 +3208,11 @@ void analysis1()
                             
                             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                             {
+                                unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                
                                 cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
                                 cout<<" <= ";
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
+                                cout<<Var[VarIndex].VarFormula.Data();
                                 cout<<" < ";
                                 cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
                                 cout<<endl;
@@ -3281,15 +3297,17 @@ void analysis1()
                         {
                             if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable != Var[VarIndex].VarName)
                             {
+                                unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+                                
                                 CommonCut += " && ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
+                                CommonCut += Var[VarIndex2].VarFormula;
                                 CommonCut += " >= ";
                                 CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.lower;
                                 
                                 if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper != -1)
                                 {
                                     CommonCut += " && ";
-                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
+                                    CommonCut += Var[VarIndex2].VarFormula;
                                     CommonCut += " < ";
                                     CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper;
                                 }
