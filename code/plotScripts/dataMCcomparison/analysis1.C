@@ -1554,7 +1554,7 @@ void analysis1()
                 OptimizingCutElement2.max = 250;
                 OptimizingCutElement2.nBin = 10;
                 OptimizingCutElement2.Cut.lower = 25;
-                OptimizingCutElement2.Cut.upper = 250;
+                OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 OptimizingCutElement2.RelatedVariable = "pt2";
@@ -1562,7 +1562,7 @@ void analysis1()
                 OptimizingCutElement2.max = 250;
                 OptimizingCutElement2.nBin = 10;
                 OptimizingCutElement2.Cut.lower = 25;
-                OptimizingCutElement2.Cut.upper = 250;
+                OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 OptimizingCutElement2.RelatedVariable = "METRel";
@@ -2911,7 +2911,7 @@ void analysis1()
                 for(unsigned int SigIndex=0;SigIndex<=0;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
                 {
-                    const bool findUsefulVar = 1;
+                    const bool findUsefulVar = 0;
                     while(true)
                     {
                         bool isChanged = false;
@@ -2947,10 +2947,13 @@ void analysis1()
                                         CommonCut += " >= ";
                                         CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
                                         
-                                        CommonCut += " && ";
-                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
-                                        CommonCut += " < ";
-                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
+                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper != -1)
+                                        {
+                                            CommonCut += " && ";
+                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable;
+                                            CommonCut += " < ";
+                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
+                                        }
                                     }
                                 }
                                 cout<<CommonCut.Data()<<endl;
@@ -3070,9 +3073,12 @@ void analysis1()
                             double nBGrecord = -1;
                             double nSigrecord = -1;
                             double significance = -999;
-                            for(int bin1=1;bin1<=RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;bin1++)
+                            
+                            int bin1 = 1;
+                            while(true)
                             {
-                                for(int bin2=bin1;bin2<=RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;bin2++)
+                                int bin2 = bin1;
+                                while(true)
                                 {
                                     double nBG = 0;
                                     double nSig = 0;
@@ -3109,13 +3115,40 @@ void analysis1()
                                         //cout<<", nBG is 0 and nSig is 0!!!!!!!"<<endl;
                                         //cout<<endl;
                                     }
+                                    
+                                    if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
+                                    {
+                                        bin2 = -1;
+                                    }
+                                    else if(bin2==-1)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        bin2++;
+                                    }
+                                }
+                                
+                                if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
+                                {
+                                    bin1 = -1;
+                                }
+                                else if(bin1==-1)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    bin1++;
                                 }
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;
-                            
-                            double newLower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBin-1) * BinSize;
-                            double newUpper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBin * BinSize;
+                            double newLower = -1;
+                            double newUpper = -1;
+                            if(lowerBin!=-1) newLower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBin-1) * BinSize;
+                            if(upperBin!=-1) newUpper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBin * BinSize;
                             
                             if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower == newLower &&
                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper == newUpper )
@@ -3253,10 +3286,13 @@ void analysis1()
                                 CommonCut += " >= ";
                                 CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.lower;
                                 
-                                CommonCut += " && ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
-                                CommonCut += " < ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper;
+                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper != -1)
+                                {
+                                    CommonCut += " && ";
+                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable;
+                                    CommonCut += " < ";
+                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper;
+                                }
                             }
                         }
                     }
