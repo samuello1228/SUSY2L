@@ -3183,11 +3183,16 @@ void analysis1()
                                     //expected number of events for signal
                                     nSig = h2Sig->Integral(bin1,bin2);
                                     //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig;
+                                    
                                     //Significance
-                                    double significanceTemp;
-                                    if(nBG>0)
+                                    if(nSig > 1)
                                     {
-                                        significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+                                        if(nBG==0)
+                                        {
+                                            nBG = 1;
+                                        }
+                                        
+                                        double significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
                                         //cout<<", significance: "<<significanceTemp<<endl;
                                         if(significanceTemp > significanceRecord1)
                                         {
@@ -3197,15 +3202,6 @@ void analysis1()
                                             nSigRecord1 = nSig;
                                             significanceRecord1 = significanceTemp;
                                         }
-                                    }
-                                    else if(nSig>0)
-                                    {
-                                        cout<<", nBG is 0 but nSig > 0!!!!!!!"<<endl;
-                                    }
-                                    else
-                                    {
-                                        //cout<<", nBG is 0 and nSig is 0!!!!!!!"<<endl;
-                                        //cout<<endl;
                                     }
                                     
                                     if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
