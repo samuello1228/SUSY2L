@@ -143,6 +143,30 @@ void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfCha
     }
 }
 
+void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+{
+    for(unsigned int i=0;i<SampleID.size();i++)
+    {
+        TString fileName = "skimming/skimming.";
+        fileName += SampleID[i];
+        fileName += "_";
+        fileName += ChannelInfo[SetOfChannel[0]].ChannelName;
+        fileName += ".root";
+        
+        TFile* file = new TFile(fileName.Data(),"READ");
+        TH1F *h1 = (TH1F*) file->Get("hist");
+        int nAOD = h1->GetBinContent(1);
+        delete file;
+        
+        if(nAOD == 0)
+        {
+            cout<<"nAOD is 0. The sample: "<<SampleID[i]<<" is missing."<<endl;
+            nAOD=1;
+        }
+        BGMCnAOD.push_back(nAOD);
+    }
+}
+
 struct VarData
 {
     TString VarName;
@@ -2837,6 +2861,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
+            std::vector< std::vector<int> > BGMCGroupnAOD;
             std::vector< std::vector<double> > BGMCGroupnwAOD;
             std::vector<Group> BGGroup;
             {
@@ -2858,11 +2883,15 @@ void analysis1()
                             std::vector<TChain*> tree2BGMCElement;
                             initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
+                            std::vector<int> BGMCGroupnAODElement;
+                            getnAOD(BGMCGroupnAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            
                             std::vector<double> BGMCGroupnwAODElement;
                             getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
+                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
                             BGMCGroupnwAOD.push_back(BGMCGroupnwAODElement);
                             
                             Group BGGroupElement;
