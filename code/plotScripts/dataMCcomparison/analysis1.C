@@ -131,7 +131,7 @@ void getnAOD(std::vector<double>& BGMCnAOD,std::vector<unsigned int>& SetOfChann
         
         TFile* file = new TFile(fileName.Data(),"READ");
         TH1F *h1 = (TH1F*) file->Get("hist");
-        double nAOD = h1->GetBinContent(1);
+        double nAOD = h1->GetBinContent(2);
         delete file;
         
         if(nAOD == 0)
@@ -519,7 +519,7 @@ void analysis1()
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
         TH1F *h1 = (TH1F*) file->Get("hist");
-        double nAOD = h1->GetBinContent(1);
+        double nAOD = h1->GetBinContent(2);
         cout<<nAOD<<endl;
         SignAOD.push_back(nAOD);
         
