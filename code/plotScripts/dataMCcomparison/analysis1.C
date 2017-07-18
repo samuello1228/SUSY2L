@@ -119,7 +119,7 @@ void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetO
     }
 }
 
-void getnAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
 {
     for(unsigned int i=0;i<SampleID.size();i++)
     {
@@ -935,7 +935,7 @@ void analysis1()
                             initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             std::vector<double> BGMCGroupnwAODElement;
-                            getnAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -2859,7 +2859,7 @@ void analysis1()
                             initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             std::vector<double> BGMCGroupnwAODElement;
-                            getnAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
