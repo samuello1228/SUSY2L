@@ -1575,168 +1575,16 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            if(doOptimize)
-            {
-                element.Cut = " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                element.Cut += " && fabs(mll - 91.2) > 10";
-                
-                element.AdditionalCut.clear();
-                element.OptimizingCut.clear();
-                OptimizingCutElement1.clear();
-                
-                OptimizingCutElement2.RelatedVariable = "pt1";
-                OptimizingCutElement2.min = 25;
-                OptimizingCutElement2.max = 250;
-                OptimizingCutElement2.nBin = 45;
-                OptimizingCutElement2.Cut.lower = 30;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "pt2";
-                OptimizingCutElement2.min = 25;
-                OptimizingCutElement2.max = 250;
-                OptimizingCutElement2.nBin = 45;
-                OptimizingCutElement2.Cut.lower = 20;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                
-                OptimizingCutElement2.RelatedVariable = "ptll";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 30;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "mTtwo";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 150;
-                OptimizingCutElement2.nBin = 30;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                
-                OptimizingCutElement2.RelatedVariable = "l12_dPhi";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = TMath::Pi();
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = TMath::Pi();
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "l12_MET_dPhi";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = TMath::Pi();
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = TMath::Pi();
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "jets_MET_dPhi";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = TMath::Pi();
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = TMath::Pi();
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                
-                OptimizingCutElement2.RelatedVariable = "METRel";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 200;
-                OptimizingCutElement2.nBin = 40;
-                OptimizingCutElement2.Cut.lower = 55;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "meff";
-                OptimizingCutElement2.min = 100;
-                OptimizingCutElement2.max = 600;
-                OptimizingCutElement2.nBin = 50;
-                OptimizingCutElement2.Cut.lower = 200;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "mtm";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 60;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = -1;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "mlj";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 60;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = 90;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
-                    element.OptimizingCut.push_back(OptimizingCutElement1);
-                }
-            }
-            else
-            {
-                element.Cut = " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                
-                element.AdditionalCut.clear();
-                element.OptimizingCut.clear();
-                OptimizingCutElement1.clear();
-                
-                AdditionalCutElement.Cut = " && pt1 > 30";
-                AdditionalCutElement.RelatedVariable = "pt1";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-                
-                AdditionalCutElement.Cut = " && pt2 > 20";
-                AdditionalCutElement.RelatedVariable = "pt2";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-                
-                AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-                AdditionalCutElement.RelatedVariable = "mll";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-                
-                AdditionalCutElement.Cut = " && METRel > 55";
-                AdditionalCutElement.RelatedVariable = "METRel";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-                
-                AdditionalCutElement.Cut = " && meff > 200";
-                AdditionalCutElement.RelatedVariable = "meff";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-                
-                AdditionalCutElement.Cut = " && mlj < 90";
-                AdditionalCutElement.RelatedVariable = "mlj";
-                element.AdditionalCut.push_back(AdditionalCutElement);
-            }
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //ee_1 Dani
-        /*
-        {
-            element.RegionName = "SR_SS_ee_1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
             element.Cut = " && nCJet == 1";
-            element.Cut = " && nBJet == 0";
+            element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
             
-            AdditionalCutElement.Cut = " && pt1 > 20";
+            AdditionalCutElement.Cut = " && pt1 > 30";
             AdditionalCutElement.RelatedVariable = "pt1";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
-            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.Cut = " && pt2 > 20";
             AdditionalCutElement.RelatedVariable = "pt2";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
@@ -1744,25 +1592,20 @@ void analysis1()
             AdditionalCutElement.RelatedVariable = "mll";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
-            AdditionalCutElement.Cut = " && METRel > 130";
+            AdditionalCutElement.Cut = " && METRel > 55";
             AdditionalCutElement.RelatedVariable = "METRel";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
-            AdditionalCutElement.Cut = " && meff < 700";
+            AdditionalCutElement.Cut = " && meff > 200";
             AdditionalCutElement.RelatedVariable = "meff";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
-            AdditionalCutElement.Cut = " && mlj < 100";
+            AdditionalCutElement.Cut = " && mlj < 90";
             AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 120 && mtm < 500";
-            AdditionalCutElement.RelatedVariable = "mtm";
             element.AdditionalCut.push_back(AdditionalCutElement);
             
             RegionInfo.push_back(element);
         }
-        */
         
         //mumu_1
         {
@@ -1919,6 +1762,358 @@ void analysis1()
         //emu_2
         {
             element.RegionName = "SR_SS_emu_2";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
+        
+        //Signal region for optimization
+        GroupElement.GroupName = "SR_SS_opt";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
+        
+        //ee_1
+        {
+            element.RegionName = "SR_SS_ee_1_opt";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            if(doOptimize)
+            {
+                element.Cut = " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(mll - 91.2) > 10";
+                
+                element.AdditionalCut.clear();
+                element.OptimizingCut.clear();
+                OptimizingCutElement1.clear();
+                
+                OptimizingCutElement2.RelatedVariable = "pt1";
+                OptimizingCutElement2.min = 25;
+                OptimizingCutElement2.max = 250;
+                OptimizingCutElement2.nBin = 45;
+                OptimizingCutElement2.Cut.lower = 30;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "pt2";
+                OptimizingCutElement2.min = 25;
+                OptimizingCutElement2.max = 250;
+                OptimizingCutElement2.nBin = 45;
+                OptimizingCutElement2.Cut.lower = 20;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                
+                OptimizingCutElement2.RelatedVariable = "ptll";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 30;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mTtwo";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 150;
+                OptimizingCutElement2.nBin = 30;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                
+                OptimizingCutElement2.RelatedVariable = "l12_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "l12_MET_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "jets_MET_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                
+                OptimizingCutElement2.RelatedVariable = "METRel";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 200;
+                OptimizingCutElement2.nBin = 40;
+                OptimizingCutElement2.Cut.lower = 55;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "meff";
+                OptimizingCutElement2.min = 100;
+                OptimizingCutElement2.max = 600;
+                OptimizingCutElement2.nBin = 50;
+                OptimizingCutElement2.Cut.lower = 200;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mtm";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 60;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mlj";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 60;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = 90;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                {
+                    element.OptimizingCut.push_back(OptimizingCutElement1);
+                }
+            }
+            else
+            {
+                element.Cut = " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                
+                element.AdditionalCut.clear();
+                element.OptimizingCut.clear();
+                OptimizingCutElement1.clear();
+                
+                AdditionalCutElement.Cut = " && pt1 > 30";
+                AdditionalCutElement.RelatedVariable = "pt1";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+                
+                AdditionalCutElement.Cut = " && pt2 > 20";
+                AdditionalCutElement.RelatedVariable = "pt2";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+                
+                AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+                AdditionalCutElement.RelatedVariable = "mll";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+                
+                AdditionalCutElement.Cut = " && METRel > 55";
+                AdditionalCutElement.RelatedVariable = "METRel";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+                
+                AdditionalCutElement.Cut = " && meff > 200";
+                AdditionalCutElement.RelatedVariable = "meff";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+                
+                AdditionalCutElement.Cut = " && mlj < 90";
+                AdditionalCutElement.RelatedVariable = "mlj";
+                element.AdditionalCut.push_back(AdditionalCutElement);
+            }
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_1
+        {
+            element.RegionName = "SR_SS_mumu_1_opt";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && nCJet == 1";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_1
+        {
+            element.RegionName = "SR_SS_emu_1_opt";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && nCJet == 1";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 90";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //ee_2
+        {
+            element.RegionName = "SR_SS_ee_2_opt";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 20";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
+            AdditionalCutElement.RelatedVariable = "mll";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && METRel > 30";
+            AdditionalCutElement.RelatedVariable = "METRel";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mtm > 110";
+            AdditionalCutElement.RelatedVariable = "mtm";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_2
+        {
+            element.RegionName = "SR_SS_mumu_2_opt";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            
+            element.AdditionalCut.clear();
+            
+            AdditionalCutElement.Cut = " && pt1 > 30";
+            AdditionalCutElement.RelatedVariable = "pt1";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && pt2 > 30";
+            AdditionalCutElement.RelatedVariable = "pt2";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
+            AdditionalCutElement.RelatedVariable = "dEta";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && meff > 200";
+            AdditionalCutElement.RelatedVariable = "meff";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            AdditionalCutElement.Cut = " && mlj < 120";
+            AdditionalCutElement.RelatedVariable = "mlj";
+            element.AdditionalCut.push_back(AdditionalCutElement);
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_2
+        {
+            element.RegionName = "SR_SS_emu_2_opt";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2737,7 +2932,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=9;RegionGroupIndex<=9;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -2988,9 +3183,11 @@ void analysis1()
             }
             
             //Significance optimization
-            if(doOptimize && (
+            const bool doOptimize2 = doOptimize && (
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" ))
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt"  );
+            
+            if(doOptimize2)
             {
                 for(unsigned int SigIndex=0;SigIndex<=0;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
@@ -3374,7 +3571,7 @@ void analysis1()
                     
                     CommonCut += RegionInfo[RegionIndex].Cut;
                     
-                    if(doOptimize)
+                    if(doOptimize2)
                     {
                         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
@@ -3690,14 +3887,15 @@ void analysis1()
                     {
                         //expected number of events for BG
                         sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
+                        
+                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
+                        
                         if(sumOfEvent[j][0] < 0)
                         {
                             sumOfEvent[j][0] = 0;
                             sumOfEvent[j][1] = 0;
-                            BGGroup[j].info->statCount = 0;
                         }
                         
-                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
                         sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
                         sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         
@@ -4095,11 +4293,11 @@ void analysis1()
                         if(h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin()) > max) max = h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin());
                     }
                     
-                    if(doOptimize) Var[VarIndex].ymin /= 100;
-                    
                     if(Var[VarIndex].log)
                     {
                         h2DataSum->SetMaximum(max*100);
+                        
+                        //if(doOptimize) Var[VarIndex].ymin /= 100;
                         if(min<0.1)
                         {
                             h2DataSum->SetMinimum(Var[VarIndex].ymin);
