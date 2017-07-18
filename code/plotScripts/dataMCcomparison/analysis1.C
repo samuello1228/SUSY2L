@@ -1564,49 +1564,100 @@ void analysis1()
                 OptimizingCutElement2.RelatedVariable = "pt1";
                 OptimizingCutElement2.min = 25;
                 OptimizingCutElement2.max = 250;
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 25;
+                OptimizingCutElement2.nBin = 45;
+                OptimizingCutElement2.Cut.lower = 30;
                 OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 OptimizingCutElement2.RelatedVariable = "pt2";
                 OptimizingCutElement2.min = 25;
                 OptimizingCutElement2.max = 250;
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 25;
+                OptimizingCutElement2.nBin = 45;
+                OptimizingCutElement2.Cut.lower = 20;
                 OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                
+                OptimizingCutElement2.RelatedVariable = "ptll";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 30;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mTtwo";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 150;
+                OptimizingCutElement2.nBin = 30;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                
+                OptimizingCutElement2.RelatedVariable = "l12_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "l12_MET_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "jets_MET_dPhi";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = TMath::Pi();
+                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = TMath::Pi();
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
                 
                 OptimizingCutElement2.RelatedVariable = "METRel";
                 OptimizingCutElement2.min = 0;
                 OptimizingCutElement2.max = 200;
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 60;
-                OptimizingCutElement2.Cut.upper = 200;
+                OptimizingCutElement2.nBin = 40;
+                OptimizingCutElement2.Cut.lower = 55;
+                OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 OptimizingCutElement2.RelatedVariable = "meff";
                 OptimizingCutElement2.min = 100;
                 OptimizingCutElement2.max = 600;
-                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.nBin = 50;
                 OptimizingCutElement2.Cut.lower = 200;
-                OptimizingCutElement2.Cut.upper = 600;
-                OptimizingCutElement1.push_back(OptimizingCutElement2);
-                
-                OptimizingCutElement2.RelatedVariable = "mlj";
-                OptimizingCutElement2.min = 0;
-                OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 10;
-                OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = 90;
+                OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 OptimizingCutElement2.RelatedVariable = "mtm";
                 OptimizingCutElement2.min = 0;
                 OptimizingCutElement2.max = 300;
-                OptimizingCutElement2.nBin = 10;
+                OptimizingCutElement2.nBin = 60;
                 OptimizingCutElement2.Cut.lower = 0;
-                OptimizingCutElement2.Cut.upper = 300;
+                OptimizingCutElement2.Cut.upper = -1;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mlj";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 60;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = 90;
+                OptimizingCutElement1.push_back(OptimizingCutElement2);
+                
+                OptimizingCutElement2.RelatedVariable = "mjj";
+                OptimizingCutElement2.min = 0;
+                OptimizingCutElement2.max = 300;
+                OptimizingCutElement2.nBin = 60;
+                OptimizingCutElement2.Cut.lower = 0;
+                OptimizingCutElement2.Cut.upper = -1;
                 OptimizingCutElement1.push_back(OptimizingCutElement2);
                 
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
