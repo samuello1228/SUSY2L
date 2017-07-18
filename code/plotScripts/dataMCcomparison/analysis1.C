@@ -3007,6 +3007,13 @@ void analysis1()
                     while(true)
                     {
                         bool isChanged = false;
+                        unsigned int VarIndexRecord2 = 0;
+                        int lowerBinRecord2 = 0;
+                        int upperBinRecord2 = 0;
+                        double nBGRecord2 = 0;
+                        double nSigRecord2 = 0;
+                        double significanceRecord2 = -999;
+                        
                         for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
                         {
                             unsigned int VarIndex = 0;
@@ -3162,11 +3169,11 @@ void analysis1()
                                 }
                             }
                             
-                            int lowerBin = 1;
-                            int upperBin = 1;
-                            double nBGrecord = -1;
-                            double nSigrecord = -1;
-                            double significance = -999;
+                            int lowerBinRecord1 = 1;
+                            int upperBinRecord1 = 1;
+                            double nBGRecord1 = -1;
+                            double nSigRecord1 = -1;
+                            double significanceRecord1 = -999;
                             
                             int bin1 = 1;
                             while(true)
@@ -3191,13 +3198,13 @@ void analysis1()
                                     {
                                         significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
                                         //cout<<", significance: "<<significanceTemp<<endl;
-                                        if(significanceTemp > significance)
+                                        if(significanceTemp > significanceRecord1)
                                         {
-                                            lowerBin = bin1;
-                                            upperBin = bin2;
-                                            nBGrecord = nBG;
-                                            nSigrecord = nSig;
-                                            significance = significanceTemp;
+                                            lowerBinRecord1 = bin1;
+                                            upperBinRecord1 = bin2;
+                                            nBGRecord1 = nBG;
+                                            nSigRecord1 = nSig;
+                                            significanceRecord1 = significanceTemp;
                                         }
                                     }
                                     else if(nSig>0)
@@ -3241,8 +3248,8 @@ void analysis1()
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;
                             double newLower = -1;
                             double newUpper = -1;
-                            if(lowerBin!=-1) newLower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBin-1) * BinSize;
-                            if(upperBin!=-1) newUpper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBin * BinSize;
+                            if(lowerBinRecord1!=-1) newLower = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBinRecord1-1) * BinSize;
+                            if(upperBinRecord1!=-1) newUpper = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBinRecord1 * BinSize;
                             
                             if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower == newLower &&
                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper == newUpper )
@@ -3265,10 +3272,10 @@ void analysis1()
                             }
                             
                             cout<<Var[VarIndex].VarName.Data()<<" :";
-                            cout<<"lowerBin: "<<lowerBin<<", upperBin: "<<upperBin;
+                            cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
                             cout<<", lower value: "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower;
                             cout<<", upper value: "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper;
-                            cout<<", nBG: "<<nBGrecord<<", nSig: "<<nSigrecord<<", significance: "<<significance<<endl<<endl;
+                            cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl<<endl;
                             
                             //delete
                             for(unsigned int j=0;j<BGGroup.size();j++)
