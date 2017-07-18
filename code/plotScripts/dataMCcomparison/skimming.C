@@ -184,14 +184,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         f2[j]->cd();
         h2[j] = new TH1F(hName2.Data(), "cut flow", 20, 0, 20);
-        h2[j]->GetXaxis()->SetBinLabel(1,"AOD");
-        h2[j]->GetXaxis()->SetBinLabel(2,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(3,"trigger");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
+        h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
+        h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
+        h2[j]->GetXaxis()->SetBinLabel(4,"trigger");
+        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
     }
     
     //fill histograms
@@ -208,7 +209,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             for(unsigned int j=0;j<channel.size();j++)
             {
-                h2[j]->Fill("AOD",h1->GetBinContent(2));
+                h2[j]->Fill("nAOD",h1->GetBinContent(1));
+                h2[j]->Fill("nwAOD",h1->GetBinContent(2));
                 h2[j]->Fill("ntuple",tree1->GetEntries());
             }
             delete f1;
@@ -219,7 +221,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     element.name = SampleName;
     element.n = 0;
     element.nw = 0;
-    element.nAOD = h2[0]->GetBinContent(1);
+    element.nAOD = h2[0]->GetBinContent(2);
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -471,14 +473,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=7;k++)
+    for(int k=1;k<=8;k++)
     {
         cout<<long(h2[1]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
-        cout<<int(h2[j]->GetBinContent(8))<<endl;
+        cout<<int(h2[j]->GetBinContent(9))<<endl;
     }
     cout<<endl;
     
@@ -559,7 +561,6 @@ void skimming()
     std::vector<nEvent> nSS;
     
     //Data
-    if(true)
     //if(false)
     {
         //SamplePath += "data/";
@@ -575,7 +576,6 @@ void skimming()
     }
     
     //Background
-    //if(true)
     if(false)
     {
         //SamplePath += "bkg/";
@@ -593,7 +593,6 @@ void skimming()
     }
     
     //Signal
-    //if(true)
     if(false)
     {
         //SamplePath += "sig/";
