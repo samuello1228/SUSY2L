@@ -119,7 +119,7 @@ void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetO
     }
 }
 
-void getnAOD(std::vector<double>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+void getnAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
 {
     for(unsigned int i=0;i<SampleID.size();i++)
     {
@@ -139,7 +139,7 @@ void getnAOD(std::vector<double>& BGMCnAOD,std::vector<unsigned int>& SetOfChann
             cout<<"nAOD is 0. The sample: "<<SampleID[i]<<" is missing."<<endl;
             nAOD=1;
         }
-        BGMCnAOD.push_back(nAOD);
+        BGMCnwAOD.push_back(nAOD);
     }
 }
 
@@ -913,7 +913,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
-            std::vector< std::vector<double> > BGMCGroupnAOD;
+            std::vector< std::vector<double> > BGMCGroupnwAOD;
             std::vector<Group> BGGroup;
             {
                 //For MC background
@@ -934,12 +934,12 @@ void analysis1()
                             std::vector<TChain*> tree2BGMCElement;
                             initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
-                            std::vector<double> BGMCGroupnAODElement;
-                            getnAOD(BGMCGroupnAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            std::vector<double> BGMCGroupnwAODElement;
+                            getnAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
-                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            BGMCGroupnwAOD.push_back(BGMCGroupnwAODElement);
                             
                             Group BGGroupElement;
                             BGGroupElement.info = &(BGMCGroupData[j]);
@@ -991,7 +991,7 @@ void analysis1()
                     tree2BGMC[j][k]->Draw(temp.Data(),"weight");
                     
                     //normalization for BG
-                    hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                    hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                     
                     //add BG
                     BGGroup[j].h2->Add(hTemp);
@@ -2837,7 +2837,7 @@ void analysis1()
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
-            std::vector< std::vector<double> > BGMCGroupnAOD;
+            std::vector< std::vector<double> > BGMCGroupnwAOD;
             std::vector<Group> BGGroup;
             {
                 //For MC background
@@ -2858,12 +2858,12 @@ void analysis1()
                             std::vector<TChain*> tree2BGMCElement;
                             initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
-                            std::vector<double> BGMCGroupnAODElement;
-                            getnAOD(BGMCGroupnAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            std::vector<double> BGMCGroupnwAODElement;
+                            getnAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
-                            BGMCGroupnAOD.push_back(BGMCGroupnAODElement);
+                            BGMCGroupnwAOD.push_back(BGMCGroupnwAODElement);
                             
                             Group BGGroupElement;
                             BGGroupElement.info = &(BGMCGroupData[j]);
@@ -3051,7 +3051,7 @@ void analysis1()
                                         tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                         
                                         //normalization for BG
-                                        hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                                        hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                                         
                                         BGGroup[j].h2->Add(hTemp);
                                         delete hTemp;
@@ -3494,7 +3494,7 @@ void analysis1()
                             BGGroup[j].info->statCount += bgCount;
                             //if(BGGroup[j].info->GroupName == "Zmumu") tree2BGMC[j][k]->Scan("mll:weight",Cut.Data());
                             //normalization for BG
-                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                             
                             //expN for BGVV
                             if(doVVCount && VarIndex==countVariable && BGGroup[j].info->GroupName == "VV"
@@ -4390,7 +4390,7 @@ void analysis1()
                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                             
                             //normalization for BG
-                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnAOD[j][k] *sumDataL);
+                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                             
                             BGGroup[j].h3->Add(hTemp);
                             delete hTemp;
