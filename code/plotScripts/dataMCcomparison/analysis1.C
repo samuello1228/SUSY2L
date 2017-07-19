@@ -3825,11 +3825,13 @@ void analysis1()
                             int bin1 = 1;
                             while(true)
                             {
-                                int bin2 = bin1;
+                                int bin2 = -1;
+                                double significanceRecord0;
                                 while(true)
                                 {
                                     double nBG = 0;
                                     double nSig = 0;
+                                    double nSigError = 0;
                                     for(unsigned int j=0;j<BGGroup.size();j++)
                                     {
                                         double n = BGGroup[j].h2->Integral(bin1,bin2);
@@ -3837,10 +3839,11 @@ void analysis1()
                                     }
                                     
                                     //expected number of events for signal
-                                    nSig = h2Sig->Integral(bin1,bin2);
-                                    //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig;
+                                    nSig = h2Sig->IntegralAndError(bin1,bin2,nSigError);
+                                    //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
                                     
                                     //Significance
+                                    double significanceTemp = -999;
                                     if(nSig > 1)
                                     {
                                         if(nBG==0)
@@ -3848,25 +3851,52 @@ void analysis1()
                                             nBG = 1;
                                         }
                                         
-                                        double significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+                                        significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
                                         //cout<<", significance: "<<significanceTemp<<endl;
-                                        if(significanceTemp > significanceRecord1)
+                                        if(
+                                           (
+                                            (bin2 == -1) ||
+                                            (bin2 != -1 &&
+                                             (Var[VarIndex].VarName != "METRel" && Var[VarIndex].VarName != "pt1" && Var[VarIndex].VarName != "pt2" && Var[VarIndex].VarName != "ptll")
+                                            && significanceRecord0>0 && significanceTemp/significanceRecord0 > 1.2
+                                            )
+                                           ) &&
+                                           (
+                                            (bin1==0) ||
+                                            (bin1!=0 && Var[VarIndex].VarName != "mlj")
+                                           )
+                                          )
                                         {
-                                            lowerBinRecord1 = bin1;
-                                            upperBinRecord1 = bin2;
-                                            nBGRecord1 = nBG;
-                                            nSigRecord1 = nSig;
-                                            significanceRecord1 = significanceTemp;
+                                            if(significanceTemp > significanceRecord1 && nSig/nSigError>2)
+                                            {
+                                                lowerBinRecord1 = bin1;
+                                                upperBinRecord1 = bin2;
+                                                nBGRecord1 = nBG;
+                                                nSigRecord1 = nSig;
+                                                significanceRecord1 = significanceTemp;
+                                            }
                                         }
+                                    }
+                                    else
+                                    {
+                                        //cout<<endl;
                                     }
                                     
                                     if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
                                     {
-                                        bin2 = -1;
+                                        break;
                                     }
                                     else if(bin2==-1)
                                     {
-                                        break;
+                                        if(bin1==-1)
+                                        {
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            significanceRecord0 = significanceTemp;
+                                            bin2 = bin1;
+                                        }
                                     }
                                     else
                                     {
