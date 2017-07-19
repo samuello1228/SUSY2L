@@ -3645,10 +3645,10 @@ void analysis1()
             const bool doOptimize2 = doOptimize && (
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt"  );
-            
+            const unsigned int SigOptimizingIndex = 0;
             if(doOptimize2)
             {
-                for(unsigned int SigIndex=0;SigIndex<=0;SigIndex++)
+                for(unsigned int SigIndex=SigOptimizingIndex;SigIndex<=SigOptimizingIndex;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
                 {
                     unsigned int VarIndexRecord2 = 0;
@@ -3963,12 +3963,13 @@ void analysis1()
                 }
             }
             
-            const unsigned int SigOptimizingIndex = 0;
+            
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
             //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
             for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
+                //if(Var[VarIndex].VarName!="pt1") continue;
                 if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
                 //initialize histograms
@@ -4967,6 +4968,11 @@ void analysis1()
                     NameTemp += Var[VarIndex].VarName;
                     NameTemp += "_";
                     NameTemp += RegionInfo[RegionIndex].RegionName;
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                    {
+                        NameTemp += "_";
+                        NameTemp += TString::Itoa(SigOptimizingIndex,10);
+                    }
                     NameTemp += ".eps";
                     c2->Print(NameTemp,"eps");
                     
