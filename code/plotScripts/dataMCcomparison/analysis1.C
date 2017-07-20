@@ -39,7 +39,9 @@ const bool simple = 1;
 const bool combined = 0;
 
 const bool docfw = 0;
-const bool doOptimize = 1;
+
+const bool doOptimize = 0;
+const unsigned int SigOptimizingIndex = 0;
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -823,7 +825,7 @@ void analysis1()
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$m_{lj}$ or $m_{ljj}$";
+        element.latexName = "$m_{lj}$/$m_{ljj}$";
         element.CutDirection=-1;
         Var.push_back(element);
         
@@ -3436,7 +3438,6 @@ void analysis1()
             const bool doOptimize2 = doOptimize && (
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt"  );
-            const unsigned int SigOptimizingIndex = 0;
             if(doOptimize2)
             {
                 for(unsigned int SigIndex=SigOptimizingIndex;SigIndex<=SigOptimizingIndex;SigIndex++)
@@ -4344,17 +4345,13 @@ void analysis1()
                     {
                         //expected number of events for BG
                         sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                        
                         cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
                         
-                        if(sumOfEvent[j][0] < 0)
+                        if(sumOfEvent[j][0] > 0)
                         {
-                            sumOfEvent[j][0] = 0;
-                            sumOfEvent[j][1] = 0;
+                            sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
+                            sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         }
-                        
-                        sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
-                        sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         
                         totalBGstat += BGGroup[j].info->statCount;
                     }
@@ -4378,11 +4375,16 @@ void analysis1()
                     //output file
                     TString PathName = "latex/data/expN/";
                     PathName += RegionInfo[RegionIndex].RegionName;
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                    {
+                        PathName += "_";
+                        PathName += TString::Itoa(SigOptimizingIndex,10);
+                    }
                     PathName += ".tex";
                     
                     ofstream fout;
                     fout.open(PathName.Data());
-                    fout<<setprecision(1)<<std::fixed;
+                    fout<<setprecision(6)<<std::fixed;
                     
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
@@ -4391,14 +4393,18 @@ void analysis1()
                         fout<<sumOfEvent[j][0];
                         fout<<"\\pm";
                         fout<<sumOfEvent[j][1];
-                        fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
+                        fout<<"$ (";
+                        fout<<BGGroup[j].info->statCount;
+                        fout<<") & \\\\"<<endl<<"\\hline"<<endl;
                     }
                     
                     fout<<"Total BG & $";
                     fout<<sumOfEvent[BGGroup.size()][0];
                     fout<<"\\pm";
                     fout<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
-                    fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
+                    fout<<"$ (";
+                    fout<<totalBGstat;
+                    fout<<") & \\\\"<<endl<<"\\hline"<<endl;
                     
                     if(RegionGroup[RegionGroupIndex].showData)
                     {
@@ -4414,11 +4420,13 @@ void analysis1()
                         fout<<", ";
                         fout<<SigMass2[SigMassSplitting[i].ID];
                         fout<<") & $";
-                        fout<<setprecision(1)<<std::fixed;
+                        fout<<setprecision(2)<<std::fixed;
                         fout<<sumOfEvent[BGGroup.size()+i+2][0];
                         fout<<"\\pm";
                         fout<<sumOfEvent[BGGroup.size()+i+2][1];
-                        fout<<"$ &";
+                        fout<<"$ (";
+                        fout<<SigMassSplitting[i].statCount;
+                        fout<<") &";
                         if(RegionGroup[RegionGroupIndex].showSignificance)
                         {
                             fout<<"$";
@@ -5748,6 +5756,52 @@ void analysis1()
             fout<<"}"<<endl;
             fout<<"\\end{frame}"<<endl<<endl;
         }
+        fout.close();
+    }
+    
+    //opt_*.tex
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+    {
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+           ) continue;
+        
+        TString PathName = "latex/data/optimization/opt_";
+        PathName += RegionGroup[RegionGroupIndex].GroupName;
+        PathName += "_";
+        PathName += TString::Itoa(SigOptimizingIndex,10);
+        PathName += ".tex";
+        
+        ofstream fout;
+        fout.open(PathName.Data());
+        
+        for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+        {
+            TString latexName = RegionInfo[RegionIndex].RegionName;
+            latexName.ReplaceAll("_","\\_");
+            
+            fout<<"\\begin{frame}{optimization}"<<endl;
+            fout<<"\\tiny"<<endl;
+            fout<<"\\input{data/optimization/cut_latex/cut_";
+            fout<<RegionInfo[RegionIndex].RegionName.Data();
+            fout<<"_";
+            fout<<SigOptimizingIndex;
+            fout<<".tex}"<<endl;
+
+            fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& Number of events & Significance \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            
+            fout<<"\\input{data/expN/";
+            fout<<RegionInfo[RegionIndex].RegionName.Data();
+            fout<<"_";
+            fout<<SigOptimizingIndex;
+            fout<<".tex}"<<endl;
+            fout<<"\\end{tabular}"<<endl;
+            fout<<"\\end{frame}"<<endl<<endl;
+        }
+        
         fout.close();
     }
     
