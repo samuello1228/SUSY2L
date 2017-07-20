@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "obj_def.h"
 #include "evt2l.C"
-#include "PP1_evt2l.C"
 #include <TH1F.h>
 
 Int_t ID1;
@@ -15,6 +15,7 @@ Double_t phi1;
 Double_t mll;
 Double_t ptll;
 Double_t MET;
+Double_t METRel;
 Double_t mTtwo;
 Double_t mt1;
 Double_t mt2;
@@ -23,6 +24,7 @@ Double_t mtm;
 Double_t l12_dPhi;
 Double_t l12_MET_dPhi;
 Double_t jets_MET_dPhi;
+Double_t l12_jet0_dPhi;
 
 Int_t nJet;
 Double_t jetpt;
@@ -46,8 +48,10 @@ Double_t qFwt;
 Double_t fLwt;
 Double_t averageMu;
 
-Double_t HT;
+Double_t meff;
+Double_t mlj;
 Double_t R2;
+Double_t mjj;
 
 struct nEvent
 {
@@ -56,29 +60,39 @@ struct nEvent
     double nw;
     double nAOD;
 };
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,bool isPP1,std::vector<nEvent>& nSS)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
-    TChain *tree1P = nullptr;
-    if(isPP1) tree1P = new TChain("PP1_evt2l");
     {
+        /*
         TString fileName = SamplePath;
         fileName += "user.clo.";
         fileName += tag;
         fileName += ".";
+        fileName += SampleName;*/
+        //fileName += "_myOutput.root/*.root*";
+
+        ///*
+        TString fileName = SamplePath;
+        fileName += "all/user.*.";
         fileName += SampleName;
-        fileName += "_myOutput.root/*.root*";
+        fileName += ".*.myOutput.root";
+        //*/
+        
+        /*
+        TString fileName = SamplePath;
+        fileName += SampleName;
+        fileName += "*.root";
+        //fileName += ".merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879.root";
+        */
         
         //fileName = "/Users/samuel/Atlas/ntuple/test.root";
         
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
-        if(isPP1) tree1P->Add(fileName.Data());
     }
     evt2l *evts = new evt2l(tree1);
-    PP1_evt2l *evtsP = nullptr;
-    if(isPP1) evtsP = new PP1_evt2l(tree1P);
     
     //channels
     std::vector<TString> channel;
@@ -135,19 +149,25 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mll",&mll,"mll/D");
         tree2[j]->Branch("ptll",&ptll,"ptll/D");
         tree2[j]->Branch("MET",&MET,"MET/D");
+        tree2[j]->Branch("METRel",&METRel,"METRel/D");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
         tree2[j]->Branch("mt1",&mt1,"mt1/D");
         tree2[j]->Branch("mt2",&mt2,"mt2/D");
         tree2[j]->Branch("mtm",&mtm,"mtm/D");
+        tree2[j]->Branch("meff",&meff,"meff/D");
+        tree2[j]->Branch("mlj",&mlj,"mlj/D");
+        tree2[j]->Branch("mjj",&mjj,"mjj/D");
 
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
         tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/D");
+        tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/D");
 
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
         tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
 
         tree2[j]->Branch("weight",&weight,"weight/D");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
@@ -164,14 +184,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         f2[j]->cd();
         h2[j] = new TH1F(hName2.Data(), "cut flow", 20, 0, 20);
-        h2[j]->GetXaxis()->SetBinLabel(1,"AOD");
-        h2[j]->GetXaxis()->SetBinLabel(2,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(3,"trigger");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"mll_60");
+        h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
+        h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
+        h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
+        h2[j]->GetXaxis()->SetBinLabel(4,"trigger");
+        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
         h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
     }
     
@@ -189,7 +209,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             for(unsigned int j=0;j<channel.size();j++)
             {
-                h2[j]->Fill("AOD",h1->GetBinContent(2));
+                h2[j]->Fill("nAOD",h1->GetBinContent(1));
+                h2[j]->Fill("nwAOD",h1->GetBinContent(2));
                 h2[j]->Fill("ntuple",tree1->GetEntries());
             }
             delete f1;
@@ -200,7 +221,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     element.name = SampleName;
     element.n = 0;
     element.nw = 0;
-    element.nAOD = h2[0]->GetBinContent(1);
+    element.nAOD = h2[0]->GetBinContent(2);
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -211,20 +232,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             cout<<"number of event: " <<j<<endl;
         }
         evts->GetEntry(j);
-        if(isPP1) evtsP->GetEntry(j);
         
         //trigger
         if((evts->sig_trigCode & evts->sig_trigMask)==0)
         {
-            continue;
+            //continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("trigger",1);
         }
         
-        if(isPP1) fLwt = evtsP->evt_fLwt;
-        else fLwt = evts->evt_fLwt;
+        fLwt = evts->evt_fLwt;
         
         if(!evts->evt_isMC && fLwt!=0)
         {
@@ -256,54 +275,42 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         eta1 = evts->leps_eta[sigIndex[0]];
         eta2 = evts->leps_eta[sigIndex[1]];
         //pt of leading lepton
-        if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
-        if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
+        //if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
+        //if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt1",1);
         }
         
         //pt of subleading lepton
-        if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
-        if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
+        //if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
+        //if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt2",1);
-        }
-        
-        if(!evts->leps_ElChargeID[sigIndex[0]]) continue;
-        if(!evts->leps_ElChargeID[sigIndex[1]]) continue;
-        
-        /*
-        //mll > 60 GeV
-        if(!(evts->l12_m>60))
-        {
-            continue;
-        }
-        */
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("mll_60",1);
         }
         
         phi1 = evts->leps_phi[sigIndex[0]];
         mll = evts->l12_m;
         ptll = evts->l12_pt;
         MET = evts->sig_Met;
+        METRel = evts->sig_MetRel;
         mTtwo = evts->sig_mT2;
         mt1 = evts->leps_mT[sigIndex[0]];
         mt2 = evts->leps_mT[sigIndex[1]];
-        if(mt1<mt2) mtm = mt1;
+        if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
-        //HT = evts->sig_HT;
+        meff = evts->sig_HT + evts->sig_Met;
+        mlj = evts->sig_mlj;
+        mjj = evts->sig_mjj;
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = evts->l12_dPhi;
         l12_MET_dPhi = evts->l12_MET_dPhi;
         jets_MET_dPhi = evts->jets_MET_dPhi[0];
-        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF;
+        l12_jet0_dPhi = evts->l12_jet0_dPhi;
+        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF * evts->evt_BtagSF * evts->evt_JvtSF;
         
-        if(isPP1) qFwt = evtsP->evt_qFwt;
-        else qFwt = evts->evt_qFwt;
+        qFwt = evts->evt_qFwt;
         
         averageMu = evts->evt_averageMu;
         
@@ -334,7 +341,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //jets
         nJet = 0;
         nBJet = 0;
-        //nCJet = 0;
+        nCJet = 0;
         //nFJet = 0;
         int nISR = 0;
         int leadingJetIndex = 0;
@@ -361,20 +368,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //ISR
                 if(evts->jets_pt[k] > 40) nISR++;
                 
-                /*
+                
                 //Central jets
                 if(!(evts->jets_jFlag[k] & 1<<5))
                 {
                     //no b-tagged
-                    if((channelIndex!=2 && evts->jets_pt[k] > 20) ||
-                       (channelIndex==2 && evts->jets_pt[k] > 30) )
+                    if(evts->jets_pt[k] > 20)
                     {
                         //Central light jets
                         nCJet++;
-                        if(nCJet==1) leadingCJetIndex = k;
+                        //if(nCJet==1) leadingCJetIndex = k;
                     }
                 }
-                */
+                
             }
             else
             {
@@ -445,8 +451,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
 
         //separate the sample into channels
         if(nISR==0) {}
-        else if(nISR==1) channelIndex += 6;
-        else continue;
+        else if(nISR>=1) channelIndex += 6;
+        //else continue;
         
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
@@ -482,7 +488,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     nSS.push_back(element);
     //delete
     delete evts;
-    if(isPP1) delete evtsP;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete tree2[j];
@@ -493,7 +498,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         delete h2[j];
     }
     delete tree1;
-    if(isPP1) delete tree1P;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete f2[j];
@@ -514,11 +518,14 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
         TString SampleNameTemp2;
         fin>>SampleNameTemp2;
         if(fin.eof()) break;
-        SampleNameTemp2 += ".";
         
         TString SampleNameTemp;
-        fin>>SampleNameTemp;
-        SampleNameTemp2 += SampleNameTemp;
+        if(type != "Data")
+        {
+            SampleNameTemp2 += ".";
+            fin>>SampleNameTemp;
+            SampleNameTemp2 += SampleNameTemp;
+        }
         SampleName.push_back(SampleNameTemp2);
         
         for(int i=1;i<=skip;i++)
@@ -533,6 +540,7 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 void skimming()
 {
     TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
     
@@ -542,13 +550,18 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
     //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
     //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
-    SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
+    //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
+    //SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
+    //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
     //Data
-    //if(true)
-    if(false)
+    //if(false)
     {
         //SamplePath += "data/";
         //tag += "b.Data";
@@ -558,41 +571,40 @@ void skimming()
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],0,nSS);
+            skimming2(SamplePath,tag,DataSampleName[i],nSS);
         }
     }
     
     //Background
-    if(true)
-    //if(false)
+    if(false)
     {
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        for(unsigned int i=68;i<=69;i++)
-        //for(unsigned int i=0;i<BGSampleName.size();i++)
+        //for(unsigned int i=114;i<=114;i++)
+        //for(unsigned int i=119;i<=120;i++)
+        for(unsigned int i=0;i<BGSampleName.size();i++)
         {
-            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
-            skimming2(SamplePath,tag,BGSampleName[i],false,nSS);
+            //BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
+            skimming2(SamplePath,tag,BGSampleName[i],nSS);
         }
     }
     
     //Signal
-    //if(true)
     if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         SigSampleName.reserve(20);
-        GetSampleName(SigSampleName,"Sig",4);
-        //for(unsigned int i=0;i<=1;i++)
-        for(unsigned int i=0;i<SigSampleName.size();i++)
+        GetSampleName(SigSampleName,"Sig",5);
+        for(unsigned int i=0;i<=0;i++)
+        //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
-            skimming2(SamplePath,tag,SigSampleName[i],false,nSS);
+            skimming2(SamplePath,tag,SigSampleName[i],nSS);
         }
     }
     

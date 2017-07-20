@@ -1,7 +1,7 @@
 \documentclass[mathserif,serif]{beamer}
 \usepackage{tabularx}
-% \setbeamertemplate{footline}[frame number]
-\useoutertheme{infolines}
+\setbeamertemplate{footline}[frame number]
+% \useoutertheme{infolines}
 \usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
@@ -36,126 +36,68 @@ University of Michigan
 \begin{document}
 \frame{\titlepage}
 
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Update}
+
+\begin{frame}{Update}
+\begin{itemize}
+\item Cut flow comparison
+\begin{itemize}
+\item The weighted number get close (within 2\%) between Daniela and me for Zmumu background. But some small difference still need to be resolved.
+\url{https://docs.google.com/spreadsheets/d/12-hpz\_X154YYrYVbQPT6TL5JLWWPZa40NhN7AhhBpdc/edit\#gid=1424837111}
+\end{itemize}
+\item SR Optimization
+\begin{itemize}
+\item Comparison for with/without charge flip tagger. The Zee BG is reduced by 6 times, while the signal has small change.
+\url{https://its.cern.ch/jira/browse/SUSYEWKWH-14}
+\item Comparison of signal and BG in the SR of run 1
+\url{https://its.cern.ch/jira/projects/SUSYEWKWH/issues/SUSYEWKWH-9?filter=allopenissues}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%\section{Motivation}
+%\begin{frame}{Motivation}
+%\begin{itemize}
+%\item Optimization for signal region
+%\end{itemize}
+%\end{frame}
+
+\section{CR\_SS\_run1}
 \begin{frame}
-\frametitle{Update}
+\sectionpage
+\end{frame}
+
+\begin{frame}{Selection in run1 SR}
+\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
+\url{https://arxiv.org/pdf/1501.07110.pdf}
+\end{frame}
+
+\input{data/expN_SR_SS_run1.tex}
+\input{data/plot_SR_SS_run1.tex}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
 \begin{itemize}
 \item ?
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{motivation}
+\section{Plan}
+\begin{frame}{Plan}
 \begin{itemize}
-\item Use the Control Regions (1 or 2 b-jet) to estimate the fake background
-\item Check whether the 1.4 factor comes from Z+jets (apply a cut 81 GeV $<$ mll $<$ 101 GeV)
+\item BG composition need to be understood
+\begin{itemize}
+\item large contribution of Zmumu in mumu channel
+\item large contribution of top in ee and emu channel
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-CR\_OS
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_OS.tex}
-\input{data/plot_CR_OS.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-SR\_SS \\
-\small
-fake BG scale factor for nonISR: 4.43166 \\
-fake BG scale factor for ISR: 3.85965
-\end{center}
-\end{frame}
-
-\input{data/expN_SR_SS.tex}
-\input{data/plot_SR_SS.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-CR\_1B \\
-\small
-fake BG scale factor for nonISR: 4.28729 \\
-fake BG scale factor for ISR: 4.18533
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_OS_1B.tex}
-\input{data/expN_CR_SS_1B.tex}
-
-\input{data/plot_CR_OS_1B.tex}
-\input{data/plot_CR_SS_1B.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-CR\_2B \\
-\small
-fake BG scale factor for nonISR: 4.28729 \\
-fake BG scale factor for ISR: 4.18533
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_OS_2B.tex}
-\input{data/expN_CR_SS_2B.tex}
-
-\input{data/plot_CR_OS_2B.tex}
-\input{data/plot_CR_SS_2B.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-CR\_SS\_mumu\_low\_mT2 \\
-\small
-fake BG scale factor for nonISR: 4.43166 \\
-fake BG scale factor for ISR: 3.85965
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_SS_mumu_low_mT2.tex}
-\input{data/plot_CR_SS_mumu_low_mT2.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-CR\_SS\_ee\_Zmass \\
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_SS_ee_Zmass.tex}
-\input{data/plot_CR_SS_ee_Zmass.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-SR\_SS\_0B \\
-\small
-fake BG scale factor for nonISR: 4.28729 \\
-fake BG scale factor for ISR: 4.18533
-\end{center}
-\end{frame}
-
-\input{data/expN_SR_SS_0B.tex}
-\input{data/plot_SR_SS_0B.tex}
-
-%\input{data/plot_special.tex}
-
-\begin{frame}
-\frametitle{Conclusion}
-\begin{itemize}
-\item The 1.4 factor mainly comes from Z+jets
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Plan}
-\begin{itemize}
-\item add the fake background in the OS events
-\item Z pT reweighting for CR
+\item 2D optimization
+\item Check with data in CR
+\item Estimate charge flip BG from data
+\item Estimate fake BG from data
 \end{itemize}
 \end{frame}
 
@@ -166,272 +108,32 @@ Backup
 \end{center}
 \end{frame}
 
-\begin{frame}
-\small
-Signal:\\
-\begin{figure}
-\includegraphics[width=0.5\textwidth]{data/WZ.png}
-\includegraphics[width=0.5\textwidth]{data/slepton.png}
-\end{figure}
-\end{frame}
-
 \begin{frame}[fragile]
-\frametitle{signal sample (mass splitting: 50 GeV)}
+\frametitle{Signal sample}
 \small
-The signal sample I used to count the number of events and to calculate the significance in the tables:
+Sample Name(p2972 tag):
 \tiny
 \begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_400_350_0p95_2L5
-\end{verbatim}
-\small
-Cross section: 0.1098 pb \\
-Filter efficiency: 17\% \\
-\vspace{5mm}
-The following 9 signal samples are combined to increase statistics for drawing the plots:
-\tiny
-\begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_200_150_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_300_250_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_400_350_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_600_550_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_700_650_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_800_750_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_900_850_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_1000_950_0p95_2L5
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{signal sample (mass splitting: 100 GeV)}
-\small
-The signal sample I used to count the number of events and to calculate the significance in the tables:
-\tiny
-\begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_400_300_0p95_2L5
-\end{verbatim}
-\small
-Cross section: 0.1099 pb \\
-Filter efficiency: 28\% \\
-\vspace{5mm}
-The following 9 signal samples are combined to increase statistics for drawing the plots:
-\tiny
-\begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_200_100_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_300_200_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_400_300_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_500_400_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_600_500_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_700_600_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_800_700_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_900_800_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_1000_900_0p95_2L5
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{signal sample (mass splitting: 200 GeV)}
-\small
-The signal sample I used to count the number of events and to calculate the significance in the tables:
-\tiny
-\begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_400_200_0p95_2L5
-\end{verbatim}
-\small
-Cross section: 0.1097 pb \\
-Filter efficiency: 36\% \\
-\vspace{5mm}
-The following 8 signal samples are combined to increase statistics for drawing the plots:
-\tiny
-\begin{verbatim}
-MGPy8EG_A14N23LO_C1N2_Slep_300_100_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_400_200_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_500_300_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_600_400_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_700_500_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_800_600_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_900_700_0p95_2L5
-MGPy8EG_A14N23LO_C1N2_Slep_1000_800_0p95_2L5
+mc15_13TeV.993820.MGPy8EG_A14N13LO_C1N2_Wh_2L_175_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+mc15_13TeV.993821.MGPy8EG_A14N13LO_C1N2_Wh_2L_165_35.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
 \end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Data}
 \small
-GRL (33.3 fb$^{-1}$):\\
-use both 2015 and 2016 data (3212.96 + 33257.2) /pb
+use both 2015 and 2016 data (3212.96 + 32861.6) /pb
 \tiny
 \begin{verbatim}
+GRL:
 GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
 GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Data}
-\small
-Data Sample Name(p2880 tag):
-\tiny
-\begin{verbatim}
-data15_13TeV.periodD.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data15_13TeV.periodE.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data15_13TeV.periodF.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data15_13TeV.periodG.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data15_13TeV.periodH.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data15_13TeV.periodJ.physics_Main.PhysCont.DAOD_SUSY2.grp15_v01_p2880
-data16_13TeV.periodA.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodB.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodC.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodD.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodE.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodF.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodG.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodI.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodK.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-data16_13TeV.periodL.physics_Main.PhysCont.DAOD_SUSY2.grp16_v01_p2880
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background(top)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-mc15_13TeV.410000.
-PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_SUSY2.e3698_s2608_s2183_r7725_r7676_p2879
-
-mc15_13TeV.410015.
-PowhegPythiaEvtGen_P2012_Wt_dilepton_top.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879
-
-mc15_13TeV.410016.
-PowhegPythiaEvtGen_P2012_Wt_dilepton_antitop.merge.DAOD_SUSY2.e3753_s2608_s2183_r7725_r7676_p2879
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background Di-Boson(Sherpa)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-mc15_13TeV.363490.Sherpa_221_NNPDF30NNLO_llll.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
-mc15_13TeV.363491.Sherpa_221_NNPDF30NNLO_lllv.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
-mc15_13TeV.363492.Sherpa_221_NNPDF30NNLO_llvv.merge.DAOD_SUSY2.e5332_s2726_r7772_r7676_p2879
-mc15_13TeV.361069.Sherpa_CT10_llvvjj_ss_EW4.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879
-mc15_13TeV.361070.Sherpa_CT10_llvvjj_ss_EW6.merge.DAOD_SUSY2.e3836_s2608_r7772_r7676_p2879
-mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
-mc15_13TeV.361072.Sherpa_CT10_lllljj_EW6.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
-mc15_13TeV.361073.Sherpa_CT10_ggllll.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
-mc15_13TeV.361077.Sherpa_CT10_ggllvv.merge.DAOD_SUSY2.e3836_s2608_s2183_r7772_r7676_p2879
-mc15_13TeV.363358.Sherpa_221_NNPDF30NNLO_WqqZll.merge.DAOD_SUSY2.e5525_s2726_r7772_r7676_p2879
-mc15_13TeV.363356.Sherpa_221_NNPDF30NNLO_ZqqZll.merge.DAOD_SUSY2.e5525_s2726_r7772_r7676_p2879
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background V+gamma(Sherpa)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-mc15_13TeV.301535.Sherpa_CT10_eegammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301536.Sherpa_CT10_mumugammaPt10_35.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301890.Sherpa_CT10_enugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301891.Sherpa_CT10_enugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301892.Sherpa_CT10_enugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301893.Sherpa_CT10_munugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301894.Sherpa_CT10_munugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301895.Sherpa_CT10_munugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301896.Sherpa_CT10_taunugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301897.Sherpa_CT10_taunugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301898.Sherpa_CT10_taunugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301899.Sherpa_CT10_eegammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301900.Sherpa_CT10_eegammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301901.Sherpa_CT10_eegammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301902.Sherpa_CT10_mumugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301903.Sherpa_CT10_mumugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301904.Sherpa_CT10_mumugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301905.Sherpa_CT10_tautaugammaPt35_70.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301906.Sherpa_CT10_tautaugammaPt70_140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-mc15_13TeV.301907.Sherpa_CT10_tautaugammaPt140.merge.DAOD_SUSY2.e3952_s2608_s2183_r7725_r7676_p2879
-\end{verbatim}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Z+jets(Sherpa)
-\end{center}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background Z+jets(Sherpa)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364115.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364116.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364117.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364118.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364119.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364120.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364121.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364122.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364123.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364124.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364125.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364126.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-364127.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2879
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background Z+jets(Sherpa)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-364100.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364101.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364102.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364103.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364104.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364105.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364106.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364107.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364108.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364109.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364110.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364111.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364112.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-364113.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2879
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Background Z+jets(Sherpa)}
-\small
-Sample Name(p2879 tag):
-\tiny
-\begin{verbatim}
-364128.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364129.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364130.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV0_70_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364131.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364132.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364133.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV70_140_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364134.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364135.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_CFilterBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364136.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV140_280_BFilter.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364137.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CVetoBVeto.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364138.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_CFilterBVeto.merge.DAOD_SUSY2.e5313_s2726_r7772_r7676_p2879
-364139.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV280_500_BFilter.merge.DAOD_SUSY2.e5313_s2726_r7772_r7676_p2879
-364140.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV500_1000.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-364141.Sherpa_221_NNPDF30NNLO_Ztautau_MAXHTPTV1000_E_CMS.merge.DAOD_SUSY2.e5307_s2726_r7772_r7676_p2879
-\end{verbatim}
+\begin{frame}{MC BG}
+p-tag: p2949
 \end{frame}
 
 \begin{frame}[fragile]
@@ -456,9 +158,9 @@ HLT_mu22_mu8noL1
 \end{verbatim}
 \end{frame}
 
-\begin{frame}{Selection}
+\begin{frame}{Object Definitions}
 \small
-Tool: AnalysisBase 2.4.30 \\
+Tool: AnalysisBase 2.4.31 \\
 
 \centering
 \begin{table}
@@ -481,8 +183,8 @@ Tool: AnalysisBase 2.4.30 \\
 \raggedright
 Selection:
 \begin{itemize}
-\item Trigger selection
-\item Exactly 2 signal leptons
+%\item Trigger selection
+\item Exactly 2 baseline leptons and exactly 2 signal leptons
 \end{itemize}
 
 \tiny
@@ -508,22 +210,11 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \item B-jets: b-tagged
 \item Central jets: $|\eta|<2.4$
 \begin{itemize}
-\item Central light jets: no b-tagged,\\
-and $p_T>30$ GeV if the two leptons are $e\mu$
+\item Central light jets: no b-tagged, $\pt>30$ GeV
 \end{itemize}
-\item Forward jets: $|\eta|>2.4$ and $p_T>30$ GeV
 \item ISR region: at least one central jets.
 \item Non-ISR region: no central jets.
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Control Region}
-Definition of the Control Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$ or $\mu\mu$
-\item $81.18 < m_{ll} < 101.18$
-\end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -546,58 +237,11 @@ Definition of the Control Region.
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\huge
-Signal Region
-\end{center}
+\small
+Old signal:\\
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{data/WZ.png}
+\includegraphics[width=0.5\textwidth]{data/slepton.png}
+\end{figure}
 \end{frame}
-
-\begin{frame}
-\frametitle{Signal Region}
-Definition of the Signal Region.
-\begin{enumerate}
-\item Exactly two same sign $ee$, $\mu\mu$ or $e\mu$
-\item pt1 $>$ 25 (20) and pt2 $>$ 15 (10) for electron (muon)
-\item Events are vetoed if they contain an OSSF pair formed from loose $e$ or $\mu$ in a 15 GeV window around the Z boson mass.(Don't understand the meaning, difficult to implement)
-\item Definition of ISR jet: $|\eta| < 2.4$ and $p_T > 40$ GeV
-\item The minimum $M_T$ of the two leptons
-\end{enumerate}
-\includegraphics[width=1\textwidth]{data/photo/SR.png}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region}
-The CMS result:
-\includegraphics[width=1\textwidth]{data/photo/result.png}
-\end{frame}
-
-\begin{frame}
-\includegraphics[width=0.7\textwidth]{data/photo/BG.png}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (ee)}
-\includegraphics[width=1\textwidth]{SR_ee.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (mumu)}
-\includegraphics[width=1\textwidth]{SR_mumu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (emu)}
-\includegraphics[width=1\textwidth]{SR_emu.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{Signal Region (combine)}
-\includegraphics[width=1\textwidth]{SR_combine.eps}
-\end{frame}
-
-\begin{frame}
-\frametitle{significance plot (SR\_nonISR\_mT\_100\_inf\_ptll\_no\_cut\_MET\_150\_inf\_mumu)}
-\includegraphics[width=1\textwidth]{SR_nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu.eps}
-\end{frame}
-
 \end{document}

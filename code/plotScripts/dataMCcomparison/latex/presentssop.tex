@@ -1,0 +1,406 @@
+\documentclass[mathserif,serif]{beamer}
+\usepackage{tabularx}
+\setbeamertemplate{footline}[frame number]
+% \useoutertheme{infolines}
+\usepackage{slidesphysics}
+\graphicspath{{../plot/}}
+
+\title[]{Signal Optimization}
+\author[]
+{
+Samuel Lo \inst{1}
+\and
+Yanjun Tu  \inst{1}
+\and
+Dongliang Zhang  \inst{2}
+}
+\institute[]
+{
+\inst{1}
+The University of Hong Kong
+\and
+\inst{2}
+University of Michigan
+}
+\date[]{\today}
+
+\newcommand\Wider[2][3em]{%
+\makebox[\linewidth][c]{%
+\begin{minipage}{\dimexpr\textwidth+#1\relax}
+\raggedright
+\centering#2
+\end{minipage}%
+}%
+}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item In this week, I am so confused that what I should do.
+\begin{itemize}
+\item Wednesday: Jeanette send me the to-do-list: Dani and I should agree on SR optimization (compare and agree on the final signal selection cuts), and Dongliang think it is good.
+\item Thursday to Fridays: try to talk with Dani, and follow Dani's suggestion, just cross-check the yields from Dani's cut, and wait for her result.
+\item Weekend: Dongliang think that I need to develop my tool to do my own optimization, cannot wait for Dani's result. I follow Dongliang's suggestion, and start to develop my code.
+\item Monday: Dani has new results, but I need to find my optimized cut first, and want to compare my optimized cut with her.
+\item Tuesday: Get some result for my own optimization, Jeanette knows I am doing my own optimization. Jeanette think I should not do my own optimization, but Dongliang do not think so.
+\end{itemize}
+\item Used the updated cross section for signal.
+\item See separate slides for N-1 plots
+\end{itemize}
+\end{frame}
+
+\section{optimization}
+\begin{frame}{Method to deal with low statistics}
+\begin{itemize}
+\item If the weighted yield for a type of BG is negative, set the weighted yield to 0.
+\item Weighted yield for signal need to be larger than 1.
+\item nSig/nSigError $>$ 2.
+\item If unweighted yield for total BG is 0, set the weighted yield to 1.
+\item For METRel, pt1 and pt2, there is no upper cut if gain in significance $<$ 20\%.
+\item For mlj/mljj, there is no lower cut.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{significance table}
+\begin{itemize}
+\item The optimized cuts for (175,0) signal point can be used.
+\item Combined significance: \\
+(175,0): 11.9, (165,35): 4.2, (400,0): 2.9
+\end{itemize}
+\includegraphics[width=\textwidth]{data/optimization/dongliang.png}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_1_opt: (175, 0):
+45 <= pt1
+20 <= pt2
+0 <= ptll
+70 <= mTtwo
+0 <= fabs(eta1-eta2)
+55 <= METRel
+280 <= meff < 430
+135 <= mtm
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: -0.0121278 +/- 0.280146 (50)
+Vgamma: 0 +/- 0 (0)
+VVV: 6.26348e-05 +/- 6.26348e-05 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 6.26348e-05 +/- 6.26348e-05 (51)
+
+Signal (175, 0): 1.39928 +/- 0.582325 (6), Significance: 4.71305
+Signal (165, 35): 0 +/- 0 (0), Significance: -3.26392
+Signal (400, 0): 0.558645 +/- 0.0989239 (46), Significance: 2.55986
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_1_opt: (175, 0):
+30 <= pt1
+20 <= pt2
+0 <= ptll
+95 <= mTtwo < 110
+0 <= fabs(eta1-eta2) < 1.5
+90 <= METRel
+200 <= meff
+140 <= mtm
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0 +/- 0 (0)
+VV: -0.0682857 +/- 0.118165 (15)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.000545925 +/- 0.000545925 (1)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.000545925 +/- 0.000545925 (16)
+
+Signal (175, 0): 1.96123 +/- 0.765857 (7), Significance: 5.01703
+Signal (165, 35): 0 +/- 0 (0), Significance: -2.67333
+Signal (400, 0): 0.124436 +/- 0.0389975 (11), Significance: 0.207614
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_1_opt: (175, 0):
+30 <= pt1
+35 <= pt2
+0 <= ptll < 120
+95 <= mTtwo
+0 <= fabs(eta1-eta2)
+75 <= METRel
+230 <= meff
+70 <= mtm
+0 <= mlj < 90
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.00927442 +/- 0.00985018 (5)
+VV: -0.442302 +/- 0.637069 (32)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.018226 +/- 0.0111345 (4)
+Higgs: 0 +/- 0 (0)
+Total BG: 0.0275004 +/- 0.0148661 (41)
+
+Signal (175, 0): 4.86875 +/- 2.15685 (14), Significance: 6.06079
+Signal (165, 35): 1.31551 +/- 0.543934 (6), Significance: 2.43184
+Signal (400, 0): 0.398847 +/- 0.0677367 (37), Significance: 0.680404
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_ee_2_opt: (175, 0):
+30 <= pt1
+20 <= pt2
+0 <= ptll
+85 <= mTtwo < 100
+0 <= fabs(eta1-eta2)
+10 <= METRel
+240 <= meff < 370
+110 <= mtm
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.00365115 +/- 0.0100206 (6)
+VV: -0.0432296 +/- 0.112286 (18)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0.00259053 +/- 0.00185347 (2)
+Total BG: 0.00624168 +/- 0.0101906 (26)
+
+Signal (175, 0): 2.03314 +/- 0.834362 (7), Significance: 4.10945
+Signal (165, 35): 0 +/- 0 (0), Significance: -1.91897
+Signal (400, 0): 0.0177716 +/- 0.0125684 (2), Significance: -1.27025
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_mumu_2_opt: (175, 0):
+50 <= pt1
+30 <= pt2
+60 <= ptll
+70 <= mTtwo
+0 <= fabs(eta1-eta2) < 1.5
+0 <= METRel
+200 <= meff
+75 <= mtm
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: 0 +/- 0 (0)
+top: 0.0155577 +/- 0.0116699 (11)
+VV: 0.472923 +/- 0.116725 (126)
+Vgamma: 0 +/- 0 (0)
+VVV: 0.0932022 +/- 0.0559424 (5)
+Higgs: 0.00298778 +/- 0.00454967 (6)
+Total BG: 0.58467 +/- 0.130043 (148)
+
+Signal (175, 0): 6.47802 +/- 1.50372 (22), Significance: 4.18942
+Signal (165, 35): 2.57524 +/- 0.822315 (10), Significance: 1.9832
+Signal (400, 0): 0.720309 +/- 0.102326 (59), Significance: 0.43552
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{optimization}
+\tiny
+\begin{verbatim}
+SR_SS_emu_2_opt: (175, 0):
+30 <= pt1
+25 <= pt2
+0 <= ptll
+65 <= mTtwo
+0 <= fabs(eta1-eta2) < 2
+85 <= METRel
+200 <= meff
+160 <= mtm < 215
+0 <= mlj < 120
+
+Zjets: 0 +/- 0 (0)
+Wjets: -0.0546401 +/- 0.0546401 (1)
+top: 0.0091173 +/- 0.00862592 (8)
+VV: -0.0114641 +/- 0.0777707 (32)
+Vgamma: 0 +/- 0 (0)
+VVV: 0 +/- 0 (0)
+Higgs: 0.00476373 +/- 0.00333049 (5)
+Total BG: 0.013881 +/- 0.00924655 (46)
+
+Signal (175, 0): 2.94275 +/- 0.842809 (13), Significance: 4.77428
+Signal (165, 35): 1.40231 +/- 0.575725 (6), Significance: 2.85739
+Signal (400, 0): 0.477849 +/- 0.0808605 (43), Significance: 1.07351
+\end{verbatim}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+\item Conclusion:
+\begin{itemize}
+\item We should see significant excess if the signal exist
+\item We can exclude the signal if they are not exist
+\end{itemize}
+\item Few issues need to further study:
+\begin{itemize}
+\item The global maximum for significance is difficult to find.
+\item The low statistics of background sample.
+\item need to understand some of the optimization results.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Plan}
+\begin{frame}{Plan}
+\begin{itemize}
+\item Dani and Samuel will agree on the SR selection (compare and agree on the final signal selection cuts).
+\item Dongliang and Samuel will work on data/MC plots after pre-selection level (all lepton cuts, possibly also jets and b-jets cuts).
+\item Plot the electron eta to make a decision about whether we use the electrons in the crack region.
+\item Estimate charge flip BG and fake BG from data, both in SR and pre-selection level.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+Backup
+\end{center}
+\end{frame}
+
+\begin{frame}{Selection in run1 SR}
+\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
+\url{https://arxiv.org/pdf/1501.07110.pdf}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = 0.3
+\end{itemize}
+\end{frame}
+
+\input{data/optimization/data.tex}
+
+\begin{frame}[fragile]
+\frametitle{Signal sample}
+\small
+Sample Name(p2972 tag):
+\tiny
+\begin{verbatim}
+mc15_13TeV.993820.MGPy8EG_A14N13LO_C1N2_Wh_2L_175_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+mc15_13TeV.993821.MGPy8EG_A14N13LO_C1N2_Wh_2L_165_35.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\small
+use both 2015 and 2016 data (3212.96 + 32861.6) /pb
+\tiny
+\begin{verbatim}
+GRL:
+GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
+GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{MC BG}
+p-tag: p2949
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+Trigger list:\\
+\scriptsize
+\begin{verbatim}
+2015
+HLT_2e12_lhloose_L12EM10VH
+HLT_e17_lhloose_mu14
+HLT_mu18_mu8noL1
+
+2016(A-D3)
+HLT_2e17_lhvloose_nod0
+HLT_e17_lhloose_nod0_mu14
+HLT_mu20_mu8noL1
+
+2016(D3-)
+HLT_2e17_lhvloose_nod0
+HLT_e17_lhloose_nod0_mu14
+HLT_mu22_mu8noL1
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Object Definitions}
+\small
+Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
+
+\centering
+\begin{table}
+\small
+\begin{tabularx}{\textwidth}{p{1.5cm} | p{3cm} | p{3cm} | p{3cm}}
+& \textbf{Electron} & \textbf{Muon} & \textbf{Jet}\\
+\hline
+\textbf{Baseline}
+& - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
+& - $p_T>10$ GeV \newline - $|\eta| < 2.7$ \newline - Medium
+& - $p_T>20$ GeV \\
+\hline
+\textbf{Signal}
+& - $p_T > 25$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - TightLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 25$ GeV \newline - $|\eta| < 2.7$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
+\end{tabularx}
+\end{table}
+
+\raggedright
+Selection:
+\begin{itemize}
+%\item Trigger selection
+\item Exactly 2 baseline leptons and exactly 2 signal leptons
+\end{itemize}
+
+\tiny
+Note: \\
+Pileup reweighting is applied. \\
+Scale factor for reconstruction, isolation, ID and trigger is applied.
+\end{frame}
+
+\begin{frame}
+\frametitle{Definition of jets}
+\normalsize
+\begin{itemize}
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.4$, no b-tagged
+\item B-jets: b-tagged
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{definition of variables}
+\normalsize
+\begin{itemize}
+\item HT: Sum of the $p_T$ of all signal jets and the two leptons.
+\item R2 = MET / (MET + pt1 + pt2)
+\item l12\_dPhi: difference in phi between the two leptons.
+\item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
+\end{itemize}
+\end{frame}
+
+%\input{data/expN_SR_SS_run1.tex}
+%\input{data/plot_SR_SS_run1.tex}
+
+\end{document}

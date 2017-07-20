@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sat Apr 29 03:54:33 2017 by ROOT version 6.06/08
+// Sat Jul  8 23:38:00 2017 by ROOT version 6.04/14
 // from TTree evt2l/a angles tree
-// found on file: /srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root
+// found on file: /eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -36,6 +36,7 @@ public :
    Float_t         evt_ElSF;
    Float_t         evt_MuSF;
    Float_t         evt_BtagSF;
+   Float_t         evt_JvtSF;
    Float_t         evt_qFwt;
    Float_t         evt_qFwt_sys_1up;
    Float_t         evt_qFwt_sys_1dn;
@@ -56,7 +57,6 @@ public :
    Int_t           leps_truthI[kMaxleps];   //[leps_]
    UInt_t          leps_lFlag[kMaxleps];   //[leps_]
    UInt_t          leps_isoPass[kMaxleps];   //[leps_]
-   Bool_t          leps_ElChargeID[kMaxleps];   //[leps_]
    Float_t         l12_pt;
    Float_t         l12_eta;
    Float_t         l12_phi;
@@ -64,6 +64,7 @@ public :
    Float_t         l12_m;
    Float_t         l12_dPhi;
    Float_t         l12_dR;
+   Float_t         l12_jet0_dPhi;
    Int_t           jets_;
    Float_t         jets_pt[kMaxjets];   //[jets_]
    Float_t         jets_eta[kMaxjets];   //[jets_]
@@ -86,6 +87,8 @@ public :
    Float_t         sig_MetY;
    Float_t         sig_mT2;
    Float_t         sig_HT;
+   Float_t         sig_mjj;
+   Float_t         sig_mlj;
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -101,7 +104,6 @@ public :
    TBranch        *b_leps_truthI;   //!
    TBranch        *b_leps_lFlag;   //!
    TBranch        *b_leps_isoPass;   //!
-   TBranch        *b_leps_ElChargeID;   //!
    TBranch        *b_l12;   //!
    TBranch        *b_jets_;   //!
    TBranch        *b_jets_pt;   //!
@@ -138,9 +140,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/srv/SUSY/ntuple/AnalysisBase-02-04-30-f15e6058/user.clo.v9.3.mc15_13TeV.392825.MGPy8EG_A14N23LO_C1N2_Slep_200_180_0p95_2L5_myOutput.root/user.clo.11241661._000001.myOutput.root");
+         f = new TFile("/eos/atlas/user/c/clo/ntuple/AnalysisBase-02-04-31-ccd99030/user.clo.v10.2_myOutput.root/user.clo.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.11629785._000009.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -202,7 +204,6 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("leps.truthI", leps_truthI, &b_leps_truthI);
    fChain->SetBranchAddress("leps.lFlag", leps_lFlag, &b_leps_lFlag);
    fChain->SetBranchAddress("leps.isoPass", leps_isoPass, &b_leps_isoPass);
-   fChain->SetBranchAddress("leps.ElChargeID", leps_ElChargeID, &b_leps_ElChargeID);
    fChain->SetBranchAddress("l12", &l12_pt, &b_l12);
    fChain->SetBranchAddress("jets", &jets_, &b_jets_);
    fChain->SetBranchAddress("jets.pt", jets_pt, &b_jets_pt);

@@ -1,1 +1,1 @@
-pdflatex slide.tex
+pdflatex -shell-escape slide.tex
