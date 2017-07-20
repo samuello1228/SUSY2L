@@ -3873,13 +3873,11 @@ void analysis1()
                                                 nBGRecord1 = nBG;
                                                 nSigRecord1 = nSig;
                                                 significanceRecord1 = significanceTemp;
+                                                //cout<<", accepted";
                                             }
                                         }
                                     }
-                                    else
-                                    {
-                                        //cout<<endl;
-                                    }
+                                    //cout<<endl;
                                     
                                     if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
                                     {
@@ -3931,15 +3929,24 @@ void analysis1()
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
-                                VarIndexRecord2 = VarIndex2;
-                                lowerCutRecord2 = lowerCutRecord1;
-                                upperCutRecord2 = upperCutRecord1;
-                                nBGRecord2 = nBGRecord1;
-                                nSigRecord2 = nSigRecord1;
-                                significanceRecord2 = significanceRecord1;
-                                
-                                isChanged = true;
-                                cout<<"The cut is changed."<<endl;
+                                if(lowerCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower &&
+                                   upperCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper )
+                                {
+                                    cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
+                                }
+                                else
+                                {
+                                    cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
+                                    
+                                    VarIndexRecord2 = VarIndex2;
+                                    lowerCutRecord2 = lowerCutRecord1;
+                                    upperCutRecord2 = upperCutRecord1;
+                                    nBGRecord2 = nBGRecord1;
+                                    nSigRecord2 = nSigRecord1;
+                                    significanceRecord2 = significanceRecord1;
+                                    
+                                    isChanged = true;
+                                }
                             }
                             cout<<endl;
                             
