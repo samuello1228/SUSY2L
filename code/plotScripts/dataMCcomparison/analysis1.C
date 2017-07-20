@@ -3382,7 +3382,6 @@ void analysis1()
     }
     
     //plot graph
-    const bool optimize = 0;
     unsigned int countVariable = 0;
     for(unsigned int i=0;i<Var.size();i++)
     {
@@ -4132,12 +4131,6 @@ void analysis1()
                         TString Cut = "(1";
                         Cut += CommonCut;
                         Cut += " && fLwt==0";
-                        
-                        if(optimize)
-                        {
-                            Cut += " && jetpt<=";
-                            Cut += TString::Itoa(35,10);
-                        }
                         Cut += ")";
                         tree2Data[j]->Draw(temp.Data(),Cut.Data());
                         
@@ -4202,12 +4195,6 @@ void analysis1()
                             //Cut
                             Cut += "*(1";
                             Cut += CommonCut;
-                            
-                            if(optimize)
-                            {
-                                Cut += " && jetpt<=";
-                                Cut += TString::Itoa(35,10);
-                            }
                             Cut += ")";
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                             BGGroup[j].info->statCount += bgCount;
@@ -4265,12 +4252,6 @@ void analysis1()
                             {
                                 Cut += " && fLwt!=0";
                             }
-                            
-                            if(optimize)
-                            {
-                                Cut += " && jetpt<=";
-                                Cut += TString::Itoa(35,10);
-                            }
                             Cut += ")";
                             
                             int bgCount = 0;
@@ -4321,12 +4302,6 @@ void analysis1()
                         
                         TString Cut = "weight*(1";
                         Cut += CommonCut;
-                        
-                        if(optimize)
-                        {
-                            Cut += " && jetpt<=";
-                            Cut += TString::Itoa(35,10);
-                        }
                         Cut += ")";
                         double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                         
