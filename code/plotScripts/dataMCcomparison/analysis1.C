@@ -1618,7 +1618,7 @@ void analysis1()
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4"
+            element.Cut += " && fabs(eta2) < 2.4";
             
             element.AdditionalCut.clear();
             
@@ -1742,7 +1742,7 @@ void analysis1()
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4"
+            element.Cut += " && fabs(eta2) < 2.4";
             
             element.AdditionalCut.clear();
             
@@ -3471,7 +3471,9 @@ void analysis1()
                             xaxis += Var[VarIndex].unit;
                             
                             //Fill histograms from trees
-                            TH1F* h2Sig;
+                            TH1F* BGGroupRaw[BGGroup.size()];
+                            TH1F* h2SigRaw[SigSampleID.size()];
+                            TH1F* h2Sig[SigSampleID.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
@@ -3587,23 +3589,23 @@ void analysis1()
                                 }
                                 
                                 //h2Sig
+                                for(unsigned int j=0;j<SigSampleID.size();j++)
                                 {
-                                    TString NameTemp = "Sig";
-                                    h2Sig = new TH1F(NameTemp.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    TString NameTemp = "Sig_";
+                                    NameTemp += TString::Itoa(j,10);
+                                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].max);
                                     
                                     //Fill Signal
                                     TString temp = Var[VarIndex].VarFormula;
-                                    temp += ">>Sig";
+                                    temp += ">>";
+                                    temp += NameTemp;
                                     
                                     TString Cut = "weight*(1";
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    double sigCount = tree2Sig[SigIndex]->Draw(temp.Data(),Cut.Data());
-                                    
-                                    SigMassSplitting[SigIndex].statCount = sigCount;
-                                    
-                                    h2Sig->Scale(SigXS[SigIndex]/SignAOD[SigIndex] *sumDataL);
+                                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                                    h2Sig[j]->Scale(SigXS[j]/SignAOD[j] *sumDataL);
                                 }
                             }
                             
@@ -3630,7 +3632,7 @@ void analysis1()
                                     }
                                     
                                     //expected number of events for signal
-                                    nSig = h2Sig->IntegralAndError(bin1,bin2,nSigError);
+                                    nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
                                     //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
                                     
                                     //Significance
@@ -3748,7 +3750,10 @@ void analysis1()
                                 delete BGGroup[j].h2;
                             }
                             
-                            delete h2Sig;
+                            for(unsigned int j=0;j<SigSampleID.size();j++)
+                            {
+                                delete h2Sig[j];
+                            }
                         }
                         
                         if(isChanged)
