@@ -42,6 +42,8 @@ Execution:
 
 using std::cout;
 using std::endl;
+using std::make_pair;
+using std::pair;
 
 // ======= CONFIG VARIABLES ======== //
 const double ptBins[] = {20, 40, 80, 150};
@@ -452,17 +454,18 @@ public:
 		return true;
 	} 
 
-	std::pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, double pt, double eta)
+	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, double pt, double eta)
 	{
 		int ptBin = GetPtBin(pt); int etaBin = GetEtaBin(eta);
-		return GetWeight(s, p, ptBin, etaBin);
+		return GetWeight(s, p, make_pair(ptBin, etaBin));
 	}
 
-	std::pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, int ptBin, int etaBin)
+	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, pair<int, int> binNum)
 	{
-		if(ptBin<0 || etaBin<0) return std::make_pair(0,0);
-		if(s==REAL) return std::make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
-		else return std::make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
+		int ptBin = binNum.first; int etaBin = binNum.second;
+		if(ptBin<0 || etaBin<0) return make_pair(0,0);
+		if(s==REAL) return make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
+		else return make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
 	}
 
 	static int GetPtBin(double pt)
@@ -578,16 +581,18 @@ public:
 		return Eff;
 	}
 
-	std::pair<double, double> GetEff(double pt, double eta)
+	pair<double, double> GetEff(double pt, double eta)
 	{
 		int ptBin = LepProp::GetPtBin(pt); 
 		int etaBin = LepProp::GetPtBin(eta);
-		return GetEff(ptBin, etaBin);
+		return GetEff(make_pair(ptBin, etaBin));
 	}
 
-	std::pair<double, double> GetEff(int ptBin, int etaBin)
+	pair<double, double> GetEff(pair<int, int> binNum)
 	{
-		return std::make_pair(
+		int ptBin = binNum.first;
+		int etaBin = binNum.second;
+		return make_pair(
 			Eff->GetBinContent(ptBin, etaBin),
 			Eff->GetBinError(ptBin, etaBin)
 		);
@@ -632,16 +637,18 @@ public:
 		c->Print(hRatio->GetName()+(TString)".pdf");
 	}
 
-	std::pair<double, double> GetSF(double pt, double eta)
+	pair<double, double> GetSF(double pt, double eta)
 	{
 		int ptBin = LepProp::GetPtBin(pt);
 		int etaBin = LepProp::GetEtaBin(eta);
-		return GetSF(ptBin, etaBin);
+		return GetSF(make_pair(ptBin, etaBin));
 	}
 
-	std::pair<double, double> GetSF(int ptBin, int etaBin)
+	pair<double, double> GetSF(pair<int, int> binNum)
 	{
-		return std::make_pair(
+		int ptBin = binNum.first;
+		int etaBin = binNum.second;
+		return make_pair(
 			hRatio->GetBinContent(ptBin, etaBin),
 			hRatio->GetBinError(ptBin, etaBin)
 		);
@@ -993,7 +1000,7 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 			// if (tree->sig_Met>40) continue; TMath::Sqrt(2*leps[0].pt*sig.Met*(1-TMath::Cos(leps[0].MET_dPhi)))<40
 
 			if (DEBUG) cout << "Heavy lep tag-and-probe" << endl;
-			std::pair<double, double> mT_lep_MET;
+			pair<double, double> mT_lep_MET;
 			mT_lep_MET.first  = TMath::Sqrt(2*tree->leps_pt[0]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[0])));
 			mT_lep_MET.second = TMath::Sqrt(2*tree->leps_pt[1]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[1])));
 			if(mT_lep_MET.first>40 || mT_lep_MET.second>40) return false;
@@ -1169,20 +1176,22 @@ void calcFinalEffs()
 		double elFakeRate, elFakeUnc, muFakeRate, muFakeUnc;
 		elFakeRate = elFakeUnc = muFakeRate = muFakeUnc = 0;
 
+		pair<int, int> binNum(ptBin, etaBin);
+
 		// Each term is Rates are Sum(e). e = (unweighted eff) * (SF) * (LepComp fraction)
 		// Uncertainty Sqrt(Sum((Unc_i)^2)), (Unc_i)^2 = e^2 ( Sum(Sq(sigma/val)) ), assuming uncorrelated uncertainties
 		for(int p=0; p<N_PROC; p++)
 		{
-			auto elEff 	= hElReal[0][p]->GetEff(ptBin, etaBin);
-			auto elSF 	= std::make_pair(1.,0.); // hEl_RealScaleFactors->GetSF(ptBin, etaBin);
-			auto elLP 	= lp_El->GetWeight(REAL, (LEP_PROC) p, ptBin, etaBin);
+			auto elEff 	= hElReal[0][p]->GetEff(binNum);
+			auto elSF 	= make_pair(1.,0.); // hEl_RealScaleFactors->GetSF(binNum);
+			auto elLP 	= lp_El->GetWeight(REAL, (LEP_PROC) p, binNum);
 
 			elRealRate += elEff.first*elSF.first*elLP.first;
 			elRealUnc  += elRealRate*elRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
 
-			auto muEff 	= hMuReal[0][p]->GetEff(ptBin, etaBin);
-			auto muSF 	= std::make_pair(1.,0.); // hMu_RealScaleFactors->GetSF(ptBin, etaBin);
-			auto muLP 	= lp_Mu->GetWeight(REAL, (LEP_PROC) p, ptBin, etaBin);
+			auto muEff 	= hMuReal[0][p]->GetEff(binNum);
+			auto muSF 	= make_pair(1.,0.); // hMu_RealScaleFactors->GetSF(binNum);
+			auto muLP 	= lp_Mu->GetWeight(REAL, (LEP_PROC) p, binNum);
 
 			muRealRate += muEff.first*muSF.first*muLP.first;
 			muRealUnc  += muRealRate*muRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
@@ -1190,18 +1199,18 @@ void calcFinalEffs()
 			for(int s=0; s<N_FAKES_SOURCE; s++)
 			{
 
-				auto elEff 	= hElFake[s][p]->GetEff(ptBin, etaBin);
-				auto elSF 	= std::make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? std::make_pair(1.,0.0) : sfhEl_FakeScaleFactors[s]->GetSF(ptBin, etaBin);
-				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, ptBin, etaBin);
+				auto elEff 	= hElFake[s][p]->GetEff(binNum);
+				auto elSF 	= make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? make_pair(1.,0.0) : sfhEl_FakeScaleFactors[s]->GetSF(binNum);
+				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				elFakeRate += elEff.first*elSF.first*elLP.first;
 				elFakeUnc  += elFakeRate*elFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
 
 				if(((LEP_SOURCE) s)==CONV) continue;
 
-				auto muEff 	= hMuFake[s][p]->GetEff(ptBin, etaBin);
-				auto muSF 	= std::make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? std::make_pair(1.,0.0) : sfhMu_FakeScaleFactors[s]->GetSF(ptBin, etaBin);
-				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, ptBin, etaBin);
+				auto muEff 	= hMuFake[s][p]->GetEff(binNum);
+				auto muSF 	= make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? make_pair(1.,0.0) : sfhMu_FakeScaleFactors[s]->GetSF(binNum);
+				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				muFakeRate += muEff.first*muSF.first*muLP.first;
 				muFakeUnc  += muFakeRate*muFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
