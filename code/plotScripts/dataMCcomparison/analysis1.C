@@ -4315,7 +4315,7 @@ void analysis1()
                 //Add Signal for the same mass splitting
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
-                    unsigned int AOD = 0;
+                    double AOD = 0;
                     for(unsigned int j=0;j<SigSampleID.size();j++)
                     {
                         if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
@@ -4326,7 +4326,7 @@ void analysis1()
                     }
                     
                     //preliminary normalization for h2SigSum
-                    h2SigSum[i]->Scale(sumDataL/AOD);
+                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
                 }
                 
                 const bool DoSignificancePlot = !doOptimize &&
@@ -4374,7 +4374,6 @@ void analysis1()
                         //expected number of events
                         TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hTemp.Add(h2SigSum[i]);
-                        hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
                         sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                         
                         //Significance
@@ -4647,7 +4646,6 @@ void analysis1()
                             
                             TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                             hTemp.Add(h2SigSum[i]);
-                            hTemp.Scale(SigXS[SigMassSplitting[i].ID]);
                             
                             if(Var[VarIndex].CutDirection == 1)
                             {
@@ -4668,7 +4666,7 @@ void analysis1()
                 //final normalization for h2SigSum for plotting
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] * SigMassSplitting[i].scale);
+                    h2SigSum[i]->Scale(SigMassSplitting[i].scale);
                 }
                 
                 //scale Z+jets by 1.4 for CR
