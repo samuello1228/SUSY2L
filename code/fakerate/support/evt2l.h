@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Jul  7 18:40:06 2017 by ROOT version 6.04/16
+// Mon Jul 17 09:26:26 2017 by ROOT version 6.04/16
 // from TTree evt2l/a angles tree
-// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11615061._000001.myOutput.root
+// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -21,7 +21,7 @@ public :
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
    static const Int_t kMaxleps = 3;
-   static const Int_t kMaxjets = 19;
+   static const Int_t kMaxjets = 16;
    static const Int_t kMaxtruths = 25;
 
    // Declaration of leaf types
@@ -58,6 +58,7 @@ public :
    UInt_t          leps_isoPass[kMaxleps];   //[leps_]
    Int_t           leps_truthType[kMaxleps];   //[leps_]
    Int_t           leps_truthOrig[kMaxleps];   //[leps_]
+   Int_t           leps_firstEgMotherPdgId[kMaxleps];   //[leps_]
    Float_t         l12_pt;
    Float_t         l12_eta;
    Float_t         l12_phi;
@@ -104,6 +105,7 @@ public :
    TBranch        *b_leps_isoPass;   //!
    TBranch        *b_leps_truthType;   //!
    TBranch        *b_leps_truthOrig;   //!
+   TBranch        *b_leps_firstEgMotherPdgId;   //!
    TBranch        *b_l12;   //!
    TBranch        *b_jets_;   //!
    TBranch        *b_jets_pt;   //!
@@ -140,9 +142,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11615061._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11615061._000001.myOutput.root");
+         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -206,6 +208,7 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("leps.isoPass", leps_isoPass, &b_leps_isoPass);
    fChain->SetBranchAddress("leps.truthType", leps_truthType, &b_leps_truthType);
    fChain->SetBranchAddress("leps.truthOrig", leps_truthOrig, &b_leps_truthOrig);
+   fChain->SetBranchAddress("leps.firstEgMotherPdgId", leps_firstEgMotherPdgId, &b_leps_firstEgMotherPdgId);
    fChain->SetBranchAddress("l12", &l12_pt, &b_l12);
    fChain->SetBranchAddress("jets", &jets_, &b_jets_);
    fChain->SetBranchAddress("jets.pt", jets_pt, &b_jets_pt);
