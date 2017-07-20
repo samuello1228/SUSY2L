@@ -51,6 +51,10 @@ typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
 //static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
 // static SG::AuxElement::Accessor< float > acc_truthProb("truthMatchProbability"); // only ID track
 static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
+typedef ElementLink< xAOD::ElectronContainer > RecoElLink;
+static SG::AuxElement::Accessor< RecoElLink > acc_recoElLink("recoElectronLink");
+typedef ElementLink< xAOD::MuonContainer > RecoMuLink;
+static SG::AuxElement::Accessor< RecoMuLink > acc_recoMuLink("recoMuonLink");
 //static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
 //static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
 
@@ -1352,53 +1356,41 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   // Info("fillLepton(el)", "Before CF_isMC");
   if(CF_isMC)
   {
-    if (study=="fakes")
-    {
-      std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      // Info("fillLepton(el)", "About to run particleTruthClassifier()");
-      res = m_truthClassifier->particleTruthClassifier(el);
-      // Info("fillLepton(el)", "After particleTruthClassifier()");
+    std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+    // Info("fillLepton(el)", "About to run particleTruthClassifier()");
+    res = m_truthClassifier->particleTruthClassifier(el);
+    // Info("fillLepton(el)", "After particleTruthClassifier()");
 
-      l.truthType = res.first;
-      l.truthOrig = res.second;
-      l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
-    }
-    if (mcTruthMatch == "TruthLink") {
+    l.truthType = res.first;
+    l.truthOrig = res.second;
+    l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
+
+    xAOD::TruthParticle *tp = 0;
+    if (mcTruthMatch == "TruthLink" || (mcTruthMatch=="tryAll" && !tp)) {
       //l.truthType = acc_truthType(*el);
       //l.truthOrig = acc_truthOrig(*el);
 
-      /// save truth match and parents if exist, otherwise save -1.
       auto tl = acc_truthLink(*el);
-      //if(tl.isValid()) l.truthI = tl.isValid()? addTruthPar(*tl, m_susyEvt->truths, -1):-1;
-      
-      if(tl.isValid())
-      {
-        l.truthI = addTruthPar(*tl, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
+      if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+    }
+
+    else if (mcTruthMatch == "MCTC" || (mcTruthMatch=="tryAll" && !tp)){
+      tp = const_cast<xAOD::TruthParticle*>(m_truthClassifier->getGenPart());
+    }
+
+    else if (mcTruthMatch == "reverseTruthLink" || (mcTruthMatch=="tryAll" && !tp)){
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!(particle->isElectron())) continue;
+        auto matchedPart = acc_recoElLink(*particle);
+        if(matchedPart.isValid() && const_cast<xAOD::Electron*>(*matchedPart)==el) {
+          tp = const_cast<xAOD::TruthParticle*>(particle); break;
+        }
       }
-      else l.truthI = -1;
-      
-      //auto trk = el->trackParticle();
-      //l.truthProb = trk?acc_truthProb(*trk):-1;
     }
 
-    else if (mcTruthMatch == "MCTC"){
-      //std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      //res = m_truthClassifier->particleTruthClassifier(el);
-
-      //l.truthType = res.first;
-      //l.truthOrig = res.second;
-
-      auto truthP = m_truthClassifier->getGenPart();
-      if (truthP) {
-        l.truthI = addTruthPar(truthP, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
-      } else l.truthI = -1;
-    }
-
-    else if (mcTruthMatch == "dR"){
-      xAOD::TruthParticle *tp = 0;
-
+    else if (mcTruthMatch == "dR" || (mcTruthMatch=="tryAll" && !tp)){
       // Set up truth particle container
       const xAOD::TruthParticleContainer* tContainer = 0;
       CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
@@ -1423,11 +1415,14 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         }
         else continue;
       }
-      if (tp){
-        l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
-      } else l.truthI = -1;
     }
+
+    /// save truth match and parents if exist, otherwise save -1.
+    if (tp) {
+      l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
+      m_susyEvt->truths[l.truthI].matchI = index;
+    } else l.truthI = -1;
+
   }
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
@@ -1510,27 +1505,69 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       l.truthOrig = acc_truthOrig(*trk);
     }
     */
-    if (study=="fakes")
-    {
-      std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      res = m_truthClassifier->particleTruthClassifier(mu);
+    std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+    res = m_truthClassifier->particleTruthClassifier(mu);
+    l.firstEgMotherPdgId = 0;
 
-      l.truthType = res.first;
-      l.truthOrig = res.second;
+    l.truthType = res.first;
+    l.truthOrig = res.second;
 
-      l.truthI = -1;
+    xAOD::TruthParticle *tp = 0;
+    auto tl = acc_truthLink(*mu);
+    if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+
+    // MCTruthClassifier
+    else if (mcTruthMatch=="tryAll" && !tp){
+      tp = const_cast<xAOD::TruthParticle*>(m_truthClassifier->getGenPart());
     }
 
-    /// save truth match and parents if exist, otherwise save -1.
-    auto tl = acc_truthLink(*mu);
-    //l.truthI = tl.isValid()? addTruthPar(*tl, m_susyEvt->truths, -1):-1;
-    //if(l.truthI>=0) m_susyEvt->truths[l.truthI].matchI = index;
+    // Reverse truthLink
+    else if (mcTruthMatch=="tryAll" && !tp){
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!(particle->isMuon())) continue;
+        auto matchedPart = acc_recoMuLink(*particle);
+        if(matchedPart.isValid() && (const_cast<xAOD::Muon*>(*matchedPart))==mu) {
+          tp = const_cast<xAOD::TruthParticle*>(particle); break;
+        }
+      }
+    }
 
-    if(tl.isValid())
-    {
-      l.truthI = addTruthPar(*tl, m_susyEvt->truths, -1);
+    // dR
+    else if (mcTruthMatch=="tryAll" && !tp){
+      // Set up truth particle container
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+   
+      // Momentum vectors
+      TLorentzVector p_tp(0,0,0,0);
+      TLorentzVector p_m = mu->p4();
+      bool firstTry = true;
+   
+      // Find electron with smallest dR < 0.1
+      for(auto particle : *tContainer){
+        if(!(particle->isElectron())) continue;
+   
+        TLorentzVector p_particle = particle->p4();
+        Double_t dR = p_m.DeltaR(p_particle);
+        if (dR > 0.1) continue;
+         
+        if (firstTry || dR < p_m.DeltaR(p_tp)){
+          tp = const_cast<xAOD::TruthParticle*>(particle);
+          p_tp = p_particle;
+          firstTry = false;
+        }
+        else continue;
+      }
+    }
+    
+    /// save truth match and parents if exist, otherwise save -1.
+    if (tp) {
+      l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
       m_susyEvt->truths[l.truthI].matchI = index;
-      }else l.truthI = -1;
+    } else l.truthI = -1;
+
   }
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
