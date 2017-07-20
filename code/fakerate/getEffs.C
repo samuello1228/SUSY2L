@@ -246,18 +246,16 @@ private:
 
 	bool NormalizeVec(binsOfSource &v, binsOfSource &vSumW2)
 	{
-		for(int ptBin=0; ptBin<nPtBins; ptBin++)
+		for(int ptBin=0; ptBin<nPtBins; ptBin++){
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
 		{
 			double sumW = 0;
-			for(uint s=0; s<v.size(); s++)
-			for(int p=0; p<N_PROC; p++)
-				sumW +=v[s][p][ptBin][etaBin];
+			for(uint s=0; s<v.size(); s++){ for(int p=0; p<N_PROC; p++)
+				{sumW +=v[s][p][ptBin][etaBin];}}
 
-			for(uint s=0; s<v.size(); s++)
-			for(int p=0; p<N_PROC; p++)
-				{v[s][p][ptBin][etaBin] /= sumW; vSumW2[s][p][ptBin][etaBin] /= (sumW*sumW);}
-		}
+			for(uint s=0; s<v.size(); s++){ for(int p=0; p<N_PROC; p++)
+				{v[s][p][ptBin][etaBin] /= sumW; vSumW2[s][p][ptBin][etaBin] /= (sumW*sumW);}}
+		}}
 		
 		return true;
 	}
@@ -398,8 +396,8 @@ public:
 		}
 
 		// FILL HISTOGRAMS
-		for(int p=0; p<N_PROC; p++)
-		for(int ptBin=0; ptBin<nPtBins; ptBin++)
+		for(int p=0; p<N_PROC; p++){
+		for(int ptBin=0; ptBin<nPtBins; ptBin++){
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
 		{
 			histVector[ptBin][etaBin].hReal->Fill(p, reals[0][p][ptBin][etaBin]);
@@ -412,11 +410,11 @@ public:
 				double statUnc = TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]);
 				histVector[ptBin][etaBin].hFake->SetBinError(p+1, s+1, statUnc);
 			}
-		}
+		}}}
 
 		// OUTPUT HISTOGRAMS
 		TCanvas *c = new TCanvas();
-		for(int ptBin=0; ptBin<nPtBins; ptBin++)
+		for(int ptBin=0; ptBin<nPtBins; ptBin++){
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
 		{
 			// Real composition 
@@ -449,7 +447,7 @@ public:
 			histVector[ptBin][etaBin].hFakeSource->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
 			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
-		}
+		}}
 
 		return true;
 	} 
@@ -1163,9 +1161,8 @@ void calcFinalEffs()
 	hEl_final_realRate->SetDirectory(dir_weightedRates);
 	hMu_final_realRate->SetDirectory(dir_weightedRates);
 
-	for(int etaBin=0; etaBin<nEtaBins; etaBin++)
-	for(int  ptBin=0;  ptBin< nPtBins;  ptBin++)
-	{
+	for(int etaBin=0; etaBin<nEtaBins; etaBin++){
+	for(int  ptBin=0;  ptBin< nPtBins;  ptBin++){
 		// Initialize
 		double elRealRate, elRealUnc, muRealRate, muRealUnc;
 		elRealRate = elRealUnc = muRealRate = muRealUnc = 0;
@@ -1222,7 +1219,7 @@ void calcFinalEffs()
 		hMu_final_fakeRate->SetBinContent(ptBin, etaBin, muFakeRate); hMu_final_fakeRate->SetBinError(ptBin, etaBin, muFakeUnc);
 		hEl_final_realRate->SetBinContent(ptBin, etaBin, elRealRate); hEl_final_realRate->SetBinError(ptBin, etaBin, elRealUnc);
 		hMu_final_realRate->SetBinContent(ptBin, etaBin, muRealRate); hMu_final_realRate->SetBinError(ptBin, etaBin, muRealUnc);
-	}
+	}}
     TCanvas c;
 	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".pdf");
 	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".pdf");
