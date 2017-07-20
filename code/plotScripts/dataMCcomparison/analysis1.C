@@ -4966,7 +4966,7 @@ void analysis1()
                             TLine l;
                             TLine* l1 = nullptr;
                             TLine* l2 = nullptr;
-                            if(lower == -1)
+                            if(lower == 0)
                             {
                                 if(upper == -1)
                                 {
@@ -5739,12 +5739,18 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||*/
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" )
            ) continue;
         
         
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+        {
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+        }
         PathName += ".tex";
         
         ofstream fout;
@@ -5779,8 +5785,16 @@ void analysis1()
                     Var[VarIndex].VarName=="cjetphi" )
                    ) continue;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{"
-                <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionIndex].RegionName.Data()<<"}";
+                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                fout<<Var[VarIndex].VarName.Data();
+                fout<<"_";
+                fout<<RegionInfo[RegionIndex].RegionName.Data();
+                if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                {
+                    fout<<"_";
+                    fout<<TString::Itoa(SigOptimizingIndex,10);
+                }
+                fout<<"}";
                 if(SixChannel==2) fout<<" \\\\";
                 fout<<endl;
             }
