@@ -4939,6 +4939,95 @@ void analysis1()
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
+                //Draw vertical line for optimized cut
+                if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                {
+                    TString PathName = "latex/data/optimization/cut_txt/cut_";
+                    PathName += RegionInfo[RegionIndex].RegionName;
+                    PathName += "_";
+                    PathName += TString::Itoa(SigOptimizingIndex,10);
+                    PathName += ".txt";
+                    
+                    ifstream fin;
+                    fin.open(PathName.Data());
+                    
+                    for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
+                    {
+                        TString VarName;
+                        double lower;
+                        double upper;
+                        fin>>VarName;
+                        if(VarName == Var[VarIndex].VarName)
+                        {
+                            fin>>lower;
+                            fin>>upper;
+                            
+                            TString NameTemp;
+                            TLine l;
+                            TLine* l1 = nullptr;
+                            TLine* l2 = nullptr;
+                            if(lower == -1)
+                            {
+                                if(upper == -1)
+                                {
+                                }
+                                else
+                                {
+                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += " < ";
+                                    NameTemp += upper;
+                                    
+                                    l1 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                    l1->SetLineStyle(9);
+                                    l1->SetLineWidth(2);
+                                }
+                            }
+                            else
+                            {
+                                if(upper == -1)
+                                {
+                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += " >= ";
+                                    NameTemp += lower;
+                                    
+                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                    l1->SetLineStyle(9);
+                                    l1->SetLineWidth(2);
+                                }
+                                else
+                                {
+                                    NameTemp += lower;
+                                    NameTemp += " <= ";
+                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += " < ";
+                                    NameTemp += upper;
+                                    
+                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                    l1->SetLineStyle(9);
+                                    l1->SetLineWidth(2);
+                                    
+                                    l2 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                    l2->SetLineStyle(9);
+                                    l2->SetLineWidth(2);
+                                }
+                            }
+                            
+                            TLatex lt2;
+                            lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
+                            lt2.SetTextSize(lt2.GetTextSize());
+                            
+                            break;
+                        }
+                        else
+                        {
+                            fin>>lower;
+                            fin>>upper;
+                        }
+                    }
+                    
+                    fin.close();
+                }
+                
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
                 {
                     //Draw for pad2
