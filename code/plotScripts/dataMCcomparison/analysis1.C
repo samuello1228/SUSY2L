@@ -3648,66 +3648,76 @@ void analysis1()
                                     double nSig = 0;
                                     double nSigError = 0;
                                     bool skip = false;
-                                    for(unsigned int j=0;j<BGGroup.size();j++)
+                                    
+                                    if((Var[VarIndex].VarName == "pt1" ||
+                                        Var[VarIndex].VarName == "pt2" ||
+                                        Var[VarIndex].VarName == "ptll" ||
+                                        Var[VarIndex].VarName == "mTtwo" ||
+                                        Var[VarIndex].VarName == "METRel" ||
+                                        Var[VarIndex].VarName == "meff" ||
+                                        Var[VarIndex].VarName == "mtm" ) &&
+                                        bin2!=-1) skip = true;
+                                    
+                                    if((Var[VarIndex].VarName == "dEta" ||
+                                        Var[VarIndex].VarName == "mlj" ) &&
+                                        bin1!=0) skip=true;
+                                    
+                                    if(!skip)
                                     {
-                                        if(BGGroup[j].info->GroupName == "VV" ||
-                                           BGGroup[j].info->GroupName == "ttV")
+                                        for(unsigned int j=0;j<BGGroup.size();j++)
                                         {
-                                            double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
-                                            if(nBGRaw<=10)
+                                            if(BGGroup[j].info->GroupName == "VV" ||
+                                               BGGroup[j].info->GroupName == "ttV")
                                             {
-                                                //cout<<"VV or ttV do not have 10 raw events."<<endl;
-                                                skip = true;
+                                                double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
+                                                if(nBGRaw<=10)
+                                                {
+                                                    //cout<<"VV or ttV do not have 10 raw events."<<endl;
+                                                    skip = true;
+                                                }
                                             }
+                                            
+                                            double n = BGGroup[j].h2->Integral(bin1,bin2);
+                                            if(n>0) nBG += n;
                                         }
-                                        
-                                        double n = BGGroup[j].h2->Integral(bin1,bin2);
-                                        if(n>0) nBG += n;
                                     }
                                     
+                                    if(!skip)
                                     {
                                         double nSig1Error = 0;
                                         double nSig1 = h2Sig[1]->IntegralAndError(bin1,bin2,nSig1Error);
-                                        if(nSig1/nSig1Error<=2) skip = true;
+                                        
+                                        if(nSig1 <=1) skip = true;
+                                        else if(nSig1Error == 0) skip = true;
+                                        else if(nSig1/nSig1Error<=2) skip = true;
                                     }
-                                    //expected number of events for signal
-                                    nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
-                                    //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
+                                    
+                                    if(!skip)
+                                    {
+                                        //expected number of events for signal
+                                        nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
+                                        //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
+                                        
+                                        if(nSig <= 1) skip = true;
+                                        else if(nSigError == 0) skip = true;
+                                        else if(nSig/nSigError<=2) skip = true;
+                                    }
                                     
                                     //Significance
                                     double significanceTemp = -999;
-                                    if(nSig > 1 && !skip)
+                                    if(!skip)
                                     {
-                                        if(nBG==0)
-                                        {
-                                            nBG = 1;
-                                        }
-                                        
                                         significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
                                         //cout<<", significance: "<<significanceTemp<<endl;
-                                        if(
-                                           (
-                                            (bin2 == -1) ||
-                                            (bin2 != -1 &&
-                                             (Var[VarIndex].VarName != "METRel" && Var[VarIndex].VarName != "pt1" && Var[VarIndex].VarName != "pt2" && Var[VarIndex].VarName != "ptll" && Var[VarIndex].VarName != "meff")
-                                            && significanceRecord0>0 && significanceTemp/significanceRecord0 > 1.2
-                                            )
-                                           ) &&
-                                           (
-                                            (bin1==0) ||
-                                            (bin1!=0 && Var[VarIndex].VarName != "mlj")
-                                           )
-                                          )
+                                        
+                                        if(significanceTemp > significanceRecord1)
                                         {
-                                            if(significanceTemp > significanceRecord1 && nSig/nSigError>2)
-                                            {
-                                                lowerBinRecord1 = bin1;
-                                                upperBinRecord1 = bin2;
-                                                nBGRecord1 = nBG;
-                                                nSigRecord1 = nSig;
-                                                significanceRecord1 = significanceTemp;
-                                                //cout<<", accepted";
-                                            }
+                                            lowerBinRecord1 = bin1;
+                                            upperBinRecord1 = bin2;
+                                            nBGRecord1 = nBG;
+                                            nSigRecord1 = nSig;
+                                            significanceRecord1 = significanceTemp;
+                                            //cout<<", accepted";
                                         }
                                     }
                                     //cout<<endl;
