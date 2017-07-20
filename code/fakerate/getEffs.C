@@ -90,6 +90,7 @@ bool passRatesCR(evt2l* tree){
 	// Exactly two leptons
 	bool pass = true;
 	pass *= tree->leps_==2;
+	pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
 	pass *= tree->jets_<=3;
 	for(int i=0; i<tree->jets_; i++) pass *= !(tree->jets_jFlag[i] & JT_BJET);
 
@@ -114,6 +115,7 @@ bool passLepCompCR(evt2l* tree)
 	pass *= tree->leps_==2;
 	pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
 	pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
+	pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
 	pass *= tree->jets_<=3;
 
 	// // No b-jets
@@ -1313,7 +1315,7 @@ TChain* loadData(TString fileList, bool isMC){
 	   	allFiles.push_back(line);
 	}
 
- 	if (fileList==inFileZjets && isMC) // Weight MC trees
+ 	if (false && isMC) // Weight MC trees
  	{
  		cout << "Weighting MC trees from " << fileList << endl;
  		for(auto it=allFiles.begin(); it!=allFiles.end(); )
