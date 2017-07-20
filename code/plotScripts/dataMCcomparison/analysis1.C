@@ -581,20 +581,20 @@ void analysis1()
         element.lower = 102;  element.upper = 116; element.colour = 4; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 102;  element.upper = 102; element.colour = 6; BGMCGroupData.push_back(element);
+        element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
-        element.lower = 103;  element.upper = 108; element.colour = 7; BGMCGroupData.push_back(element);
+        element.lower = 103;  element.upper = 108; element.colour = 419; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
-        element.lower = 109;  element.upper = 114; element.colour = 8; BGMCGroupData.push_back(element);
+        element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
         
         element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
-        element.lower = 115;  element.upper = 116; element.colour = 9; BGMCGroupData.push_back(element);
+        element.lower = 115;  element.upper = 116; element.colour = 635; BGMCGroupData.push_back(element);
         
         //
         element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 117;  element.upper = 130; element.colour = 807; BGMCGroupData.push_back(element);
+        element.lower = 117;  element.upper = 130; element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
@@ -606,7 +606,7 @@ void analysis1()
         element.lower = 140;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
-        element.lower = 151;  element.upper = 155; element.colour = 6; BGMCGroupData.push_back(element);
+        element.lower = 151;  element.upper = 155; element.colour = 607; BGMCGroupData.push_back(element);
         
         element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
         element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
