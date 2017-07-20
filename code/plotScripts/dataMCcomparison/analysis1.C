@@ -3684,7 +3684,7 @@ void analysis1()
                                            (
                                             (bin2 == -1) ||
                                             (bin2 != -1 &&
-                                             (Var[VarIndex].VarName != "METRel" && Var[VarIndex].VarName != "pt1" && Var[VarIndex].VarName != "pt2" && Var[VarIndex].VarName != "ptll")
+                                             (Var[VarIndex].VarName != "METRel" && Var[VarIndex].VarName != "pt1" && Var[VarIndex].VarName != "pt2" && Var[VarIndex].VarName != "ptll" && Var[VarIndex].VarName != "meff")
                                             && significanceRecord0>0 && significanceTemp/significanceRecord0 > 1.2
                                             )
                                            ) &&
