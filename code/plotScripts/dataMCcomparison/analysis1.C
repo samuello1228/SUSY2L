@@ -311,13 +311,13 @@ void analysis1()
                         */
                         element.setOfBGMC.push_back("Zjets");
                         element.setOfBGMC.push_back("Wjets");
-                        element.setOfBGMC.push_back("top");
-                        /*
+                        //element.setOfBGMC.push_back("top");
+                        
                         element.setOfBGMC.push_back("ttbar");
                         element.setOfBGMC.push_back("singletop");
                         element.setOfBGMC.push_back("ttV");
                         element.setOfBGMC.push_back("multitop");
-                        */
+                        
                         element.setOfBGMC.push_back("VV");
                         element.setOfBGMC.push_back("Vgamma");
                         element.setOfBGMC.push_back("VVV");
@@ -3472,7 +3472,6 @@ void analysis1()
                             
                             //Fill histograms from trees
                             TH1F* BGGroupRaw[BGGroup.size()];
-                            TH1F* h2SigRaw[SigSampleID.size()];
                             TH1F* h2Sig[SigSampleID.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
@@ -3508,29 +3507,52 @@ void analysis1()
                                     BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                                     BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
+                                    BGGroupRaw[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
-                                        TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
-                                        
-                                        //fill histograms from trees
-                                        TString temp = Var[VarIndex].VarFormula;
-                                        temp += ">>BGMC";
-                                        
-                                        //Weight
-                                        TString Cut = "weight";
-                                        
-                                        //Cut
-                                        Cut += "*(1";
-                                        Cut += CommonCut;
-                                        Cut += ")";
-                                        
-                                        tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
-                                        
-                                        //normalization for BG
-                                        hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
-                                        
-                                        BGGroup[j].h2->Add(hTemp);
-                                        delete hTemp;
+                                        {
+                                            TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            
+                                            //fill histograms from trees
+                                            TString temp = Var[VarIndex].VarFormula;
+                                            temp += ">>BGMC";
+                                            
+                                            //Weight
+                                            TString Cut = "weight";
+                                            
+                                            //Cut
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            Cut += ")";
+                                            
+                                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                                            
+                                            //normalization for BG
+                                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
+                                            
+                                            BGGroup[j].h2->Add(hTemp);
+                                            delete hTemp;
+                                        }
+                                        {
+                                            TH1F* hTemp = new TH1F("BGMCRaw",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            
+                                            TString temp = Var[VarIndex].VarFormula;
+                                            temp += ">>BGMCRaw";
+                                            
+                                            //Weight
+                                            TString Cut = "1";
+                                            
+                                            //Cut
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            Cut += ")";
+                                            
+                                            tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                                            
+                                            BGGroupRaw[j]->Add(hTemp);
+                                            delete hTemp;
+                                        }
                                     }
                                 }
                                 
@@ -3625,8 +3647,20 @@ void analysis1()
                                     double nBG = 0;
                                     double nSig = 0;
                                     double nSigError = 0;
+                                    bool skip = false;
                                     for(unsigned int j=0;j<BGGroup.size();j++)
                                     {
+                                        if(BGGroup[j].info->GroupName == "VV" ||
+                                           BGGroup[j].info->GroupName == "ttV")
+                                        {
+                                            double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
+                                            if(nBGRaw<=10)
+                                            {
+                                                //cout<<"VV or ttV do not have 10 raw events."<<endl;
+                                                skip = true;
+                                            }
+                                        }
+                                        
                                         double n = BGGroup[j].h2->Integral(bin1,bin2);
                                         if(n>0) nBG += n;
                                     }
@@ -3637,7 +3671,7 @@ void analysis1()
                                     
                                     //Significance
                                     double significanceTemp = -999;
-                                    if(nSig > 1)
+                                    if(nSig > 1 && !skip)
                                     {
                                         if(nBG==0)
                                         {
@@ -3748,6 +3782,7 @@ void analysis1()
                             for(unsigned int j=0;j<BGGroup.size();j++)
                             {
                                 delete BGGroup[j].h2;
+                                delete BGGroupRaw[j];
                             }
                             
                             for(unsigned int j=0;j<SigSampleID.size();j++)
