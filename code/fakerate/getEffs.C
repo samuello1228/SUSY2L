@@ -7,9 +7,18 @@ non-prompt lepton estimation for the 2LSS C1N2->Wh analysis.
 Written by [Gabriel Gallardo](mailto:gabriel.gallardo@cern.ch)
 June-July 2017
 
+Works on the evt2l trees produced by the multiLepSearch package found at
+https://gitlab.cern.ch/hku/SUSY2L
 
 Execution:
-root -l -b -q getEffs.C+
+
+	```
+	setupATLAS
+	rcSetup
+	rc compile # Make sure SUSYTools is there
+	root -l -b -q getEffs.C+
+	```
+
 */
 
 #include <vector>
@@ -29,6 +38,7 @@ root -l -b -q getEffs.C+
 #include <TSystem.h>
 #include <TLorentzVector.h>
 #include "SUSYTools/SUSYCrossSection.h"
+#include <TDirectory.h>
 
 using std::cout;
 using std::endl;
@@ -40,43 +50,72 @@ const double etaBins[] = {0, 1.37, 2.5};
 const int nEtaBins = sizeof(etaBins)/sizeof(double)-1;
 const double LUMI=36074.56;
 
-// const TString inFileData="support/inFileList-dataTest.txt";
-const TString inFileData="support/inFileList-data.txt";
+// const TString inFileData="../support/inFileList-dataTest.txt";
+const TString inFileData="../support/inFileList-data.txt";
 
-// TString inFileBBCC="support/inFileList-.txt";
-const TString inFileTTbar="support/inFileList-ttbar.txt";
-const TString inFileZjets="support/inFileList-Zjets.txt";
-const TString inFileWjets="support/inFileList-Wjets.txt";
-const TString inFileVV="support/inFileList-VV.txt";
-const TString inFileVgamma="support/inFileList-Vgamma.txt";
-const TString inFileSingleTop="support/inFileList-SingleTop.txt";
-const TString inFileMC="support/inFileList-allMC.txt";
+// TString inFileBBCC="../support/inFileList-.txt";
+const TString inFileTTbar="../support/inFileList-ttbar.txt";
+const TString inFileZjets="../support/inFileList-Zjets.txt";
+// const TString inFileZjets="../support/inFileList-ZPowheg.txt";
+const TString inFileWjets="../support/inFileList-Wjets.txt";
+const TString inFileVV="../support/inFileList-VV.txt";
+const TString inFileVgamma="../support/inFileList-Vgamma.txt";
+const TString inFileSingleTop="../support/inFileList-SingleTop.txt";
+const TString inFileMC="../support/inFileList-allMC.txt";
 
-const bool DEBUG=true;
+const bool DEBUG=false;
 const bool VERBOSE=DEBUG || true;
 
 const TString outDir="output/";
 
+const bool measureUnweightedRates = true;
+const bool measureLepComp = true;
+const bool measureSF = true;
+const bool doDataTP = true;
 
-bool passRatesCR(evt2l* tree)
-{
+bool passRatesCR(evt2l* tree){
+	/* RATES MEASUREMENT CONTROL REGION
+
+	- Exactly two baseline leptons
+		- May or may not be signal
+		- No sign requirement
+	- No more than three jets
+	- No b-jets
+	- Relative missing ET < 70?
+	*/
+
+	if (!measureUnweightedRates) return false;
 	// Exactly two leptons
 	bool pass = true;
 	pass *= tree->leps_==2;
-	pass *= tree->jets_>=1;
+	pass *= tree->jets_<=3;
+	for(int i=0; i<tree->jets_; i++) pass *= !(tree->jets_jFlag[i] & JT_BJET);
 
 	return pass;
 }
 
 bool passLepCompCR(evt2l* tree)
 {
+	/* LEPTON COMPOSOTION CONTROL REGION
+	- Exactly two leptons
+		- Same sign
+		- Signal
+	- No more than three jets
+	- No b-jets
+	- Relative missing ET < 70?
+
+	Recall f= N(tight)/N(loose), should require signal leptons
+	*/
+
+	if (!measureLepComp) return false;
 	bool pass = true;
 	pass *= tree->leps_==2;
+	pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
 	pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
-	pass *= tree->jets_>=1;
+	pass *= tree->jets_<=3;
 
 	// // No b-jets
-	// for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
+	for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
 
 	return pass;
 }
@@ -84,8 +123,21 @@ bool passLepCompCR(evt2l* tree)
 // ======= INFRASTRUCTURE ===== //
 
 SUSY::CrossSectionDB *xsecDB;
-TFile* effsFile;
-TFile* nEventsFile;
+
+// Output histogram file structure
+TFile* outFile;
+TDirectory* dir_weightedRates;
+TDirectory* dir_unweightedRatesMeasurement;
+TDirectory* dir_unweightedRatesMeasurement_rates;
+TDirectory* dir_unweightedRatesMeasurement_nEvents;
+TDirectory* dir_sfMeasurement;
+TDirectory* dir_sfMeasurement_scaleFactors;
+TDirectory* dir_sfMeasurement_effs;
+TDirectory* dir_sfMeasurement_nEvents;
+TDirectory* dir_lepCompMeasurement;
+TDirectory* dir_lepCompMeasurement_lepComp;
+TDirectory* dir_lepCompMeasurement_nEvents;
+
 TH2D* hPrototype= new TH2D("hPrototype", ";p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
 
 enum LEP_SOURCE {
@@ -93,9 +145,9 @@ enum LEP_SOURCE {
 	HEAVY=0,
 	LIGHT=1,
 	CONV=2,
-	OTHER=3, // To check lepton composition
+	// OTHER=3, // To check lepton composition
 };
-const int N_FAKES_SOURCE=4;
+const int N_FAKES_SOURCE=3;
 
 const TString LS_TOSTRING(LEP_SOURCE s)
 {
@@ -103,7 +155,7 @@ const TString LS_TOSTRING(LEP_SOURCE s)
 	if(s==HEAVY) return "Heavy";
 	if(s==LIGHT) return "Light";
 	if(s==CONV) return "Conv";
-	if(s==OTHER) return "Other";
+	// if(s==OTHER) return "Other";
 	return "Unknown";
 }
 
@@ -137,6 +189,11 @@ enum DATA_TYPE {
 	MC,
 };
 
+enum LEP_TYPE {
+	ELEC,
+	MUON,
+};
+
 struct lepInfo
 {
 	double pt;
@@ -146,84 +203,8 @@ struct lepInfo
 	bool isTight;
 };
 class Histos;
-std::vector<Histos*> allHistos;
-
-class Histos
-{
-private:
-	TH2D* NTight;
-	TH2D* NLoose;
-	TH2D* Eff;
-	bool ignoreTagTag=false;
-
-public:
-	Histos(): Histos("Test") {}
-	Histos(TString name)
-	{
-		NTight = (TH2D*) hPrototype->Clone(name+"_NTight");
-		NLoose = (TH2D*) hPrototype->Clone(name+"_NLoose");
-		Eff = (TH2D*) hPrototype->Clone(name+"_Eff"); Eff->SetTitle(name+"_Eff");
-
-		NTight->SetDirectory(nEventsFile);
-		NLoose->SetDirectory(nEventsFile);
-		Eff->SetDirectory(effsFile);
-
-		allHistos.push_back(this);
-	}
-	~Histos(){}
-
-	bool Fill(lepInfo &lep)
-	{
-		NLoose->Fill(lep.pt, fabs(lep.eta), lep.w);
-		if(lep.isTight) NTight->Fill(lep.pt, fabs(lep.eta), lep.w);
-		return true;
-	}
-
-	bool Fill(lepInfo &lep1, lepInfo &lep2)
-	{
-		if (ignoreTagTag && (lep1.isTag && lep2.isTag)) return false;
-		if (lep1.isTag)
-		{
-			NLoose->Fill(lep2.pt, fabs(lep2.eta), lep2.w);
-			if(lep2.isTight) NTight->Fill(lep2.pt, fabs(lep2.eta), lep2.w);
-			// return true;
-		}
-		if (lep2.isTag)
-		{
-			NLoose->Fill(lep1.pt, fabs(lep1.eta), lep1.w);
-			if(lep1.isTight) NTight->Fill(lep1.pt, fabs(lep1.eta), lep1.w);
-			// return true;
-		}
-		return true;
-	}
-
-	bool calcEff() {Eff->Add(NTight); Eff->Divide(NLoose); return true;}
-
-	void Draw()
-	{
-		TCanvas can;
-
-		Eff->Draw("text colz");
-		can.Print(outDir+TString(Eff->GetName())+".pdf");
-
-		// Eff->ProfileX()->Draw();
-		// can.Print(outDir+TString(Eff->GetName())+"Pt.pdf");
-
-		// Eff->ProfileY()->Draw();
-		// can.Print(outDir+TString(Eff->GetName())+"Eta.pdf");
-
-		NTight->Draw("text");
-		can.Print(outDir+TString(NTight->GetName())+".pdf");
-
-		NLoose->Draw("text");
-		can.Print(outDir+TString(NLoose->GetName())+".pdf");
-
-	}
-
-	void vetoTagTag(bool b=true){ignoreTagTag=b;}
-};
-
 class LepProp;
+
 class LepProp
 {
 private:
@@ -234,8 +215,13 @@ private:
 	typedef std::vector<binsOfPt> binsOfProc;
 	typedef std::vector<binsOfProc> binsOfSource;
 
-	binsOfSource fakes;
-	binsOfSource reals;
+	binsOfSource fakes; 
+	binsOfSource fakeSumW2; 
+	binsOfSource nFakeEntries;
+
+	binsOfSource reals; 
+	binsOfSource realSumW2; 
+	binsOfSource nRealEntries;
 
 	TString name;
 
@@ -258,7 +244,7 @@ private:
 		return true;
 	}
 
-	bool NormalizeVec(binsOfSource &v)
+	bool NormalizeVec(binsOfSource &v, binsOfSource &vSumW2)
 	{
 		for(int ptBin=0; ptBin<nPtBins; ptBin++)
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
@@ -270,25 +256,10 @@ private:
 
 			for(uint s=0; s<v.size(); s++)
 			for(int p=0; p<N_PROC; p++)
-				v[s][p][ptBin][etaBin] /= sumW;
+				{v[s][p][ptBin][etaBin] /= sumW; vSumW2[s][p][ptBin][etaBin] /= (sumW*sumW);}
 		}
 		
 		return true;
-	}
-
-	int GetPtBin(double pt)
-	{
-		if (pt<ptBins[0]) return -1; // Underflow
-		for(int i=0; i<nPtBins; i++) if (pt<ptBins[i+1]) return i;
-		return nPtBins-1; // Overflow, place in largest ptBin.
-	}
-
-	int GetEtaBin(double eta)
-	{
-		eta = TMath::Abs(eta);
-		if (eta<etaBins[0]) return -1; // Underflow, not really possible for 
-		for(int i=0; i<nEtaBins; i++) if (eta<etaBins[i+1]) return i;
-		return nEtaBins-1; // Overflow, place in largest etaBin.
 	}
 
 public:
@@ -297,6 +268,14 @@ public:
 		this->name = name;
 		AddSourceToVec(reals);
 		for(int i=0; i<N_FAKES_SOURCE; i++) AddSourceToVec(fakes);
+
+		// Initialize sumW vectors
+		realSumW2=reals;
+		fakeSumW2=fakes;
+
+		// Initialize counters for uncertainties
+		nRealEntries = reals;
+		nFakeEntries = fakes;
 
 		if (DEBUG){
 			cout << "LepProp " << name << "initialized." << endl;
@@ -316,10 +295,14 @@ public:
 		if(s==REAL) {
 			if (DEBUG) cout << "### Filling real for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
 			reals[0][p][ptBin][etaBin] +=w;
+			realSumW2[0][p][ptBin][etaBin] += w*w;
+			nRealEntries[0][p][ptBin][etaBin] += 1;
 		}
 		else {
 			if (DEBUG) cout << "### Filling fakes for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
 			fakes[s][p][ptBin][etaBin]+=w;
+			fakeSumW2[s][p][ptBin][etaBin] += w*w;
+			nFakeEntries[s][p][ptBin][etaBin] += 1;
 		}
 		if (DEBUG) cout << "### LepProp filled. Return now." << endl;
 
@@ -329,18 +312,17 @@ public:
 	bool Normalize()
 	{
 		if(normalized) return true;
-		NormalizeVec(reals);
-		NormalizeVec(fakes);
+		NormalizeVec(reals, realSumW2);
+		NormalizeVec(fakes, fakeSumW2);
 		return true;
 	};
 
-	bool Write(){
+	bool Draw()
+	{
 
 		Normalize(); // Normalize histograms first
 
 		// PROTOTYPE HISTOGRAMS
-		TFile *lepCompFile = new TFile(outDir+"lepComp.root", "recreate");
-
 		TH2D* hFakesPrototype2D = new TH2D("hFakesPrototype2D", "Fake lepton composition fractions;Process;Source", N_PROC, 0, N_PROC, N_FAKES_SOURCE, 0, N_FAKES_SOURCE);
 		TH1D* hRealsPrototype = new TH1D("hRealsPrototype", "Real lepton composition fractions;Process;Fraction", N_PROC, 0, N_PROC);
 
@@ -398,16 +380,16 @@ public:
 				sprintf(tmpStr, "%4.2f", etaBins[etaBin+1]);
 				ptEtaTitle += tmpStr; ptEtaTitle += ")";
 
-				TString fakesName = (TString) "h" + name + (TString) + "_FakeComp_" + ptEtaStr;
+				TString fakesName = (TString) "h" + name + (TString) "_FakeComp_" + ptEtaStr;
 				tmp.hFake = (TH2*) hFakesPrototype2D->Clone(fakesName);
 				tmp.hFake->SetTitle(ptEtaTitle.Prepend(tmp.hFake->GetTitle()));
-				tmp.hFake->SetDirectory(lepCompFile);
+				tmp.hFake->SetDirectory(dir_lepCompMeasurement_lepComp);
 				tmp.hFake->GetZaxis()->SetRangeUser(0,1);
 
-				TString realsName = (TString) "h" + name + (TString) + "_RealComp_" + ptEtaStr;
+				TString realsName = (TString) "h" + name + (TString) "_RealComp_" + ptEtaStr;
 				tmp.hReal = (TH1*) hRealsPrototype->Clone(realsName);
 				tmp.hReal->SetTitle(ptEtaTitle.Prepend(tmp.hReal->GetTitle()));
-				tmp.hReal->SetDirectory(lepCompFile);
+				tmp.hReal->SetDirectory(dir_lepCompMeasurement_lepComp);
 				tmp.hReal->GetYaxis()->SetRangeUser(0,1);
 
 				v.push_back(tmp);
@@ -415,16 +397,20 @@ public:
 			histVector.push_back(v);
 		}
 
-
 		// FILL HISTOGRAMS
 		for(int p=0; p<N_PROC; p++)
 		for(int ptBin=0; ptBin<nPtBins; ptBin++)
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
 		{
 			histVector[ptBin][etaBin].hReal->Fill(p, reals[0][p][ptBin][etaBin]);
+			double statUnc = TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]);
+			histVector[ptBin][etaBin].hReal->SetBinError(p+1, statUnc);
+
 			for(int s=0;s<N_FAKES_SOURCE; s++)
 			{
 				histVector[ptBin][etaBin].hFake->Fill(p, s, fakes[s][p][ptBin][etaBin]);
+				double statUnc = TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]);
+				histVector[ptBin][etaBin].hFake->SetBinError(p+1, s+1, statUnc);
 			}
 		}
 
@@ -436,50 +422,236 @@ public:
 			// Real composition 
 			histVector[ptBin][etaBin].hReal->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hReal->Draw("hist bar text");
-			c->Print(outDir+((TString)".pdf").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
 
 			// Fake composition 2D
 			histVector[ptBin][etaBin].hFake->Draw("colz text");
-			c->Print(outDir+((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
 
 			// Fake composition by process
 			histVector[ptBin][etaBin].hFakeProc = histVector[ptBin][etaBin].hFake->ProjectionX();
-			histVector[ptBin][etaBin].hFakeProc->SetDirectory(lepCompFile);
+			histVector[ptBin][etaBin].hFakeProc->SetDirectory(dir_lepCompMeasurement_lepComp);
 			histVector[ptBin][etaBin].hFakeProc->SetName(((TString)"_byProcess").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
 			histVector[ptBin][etaBin].hFakeProc->SetTitle(((TString)" by process").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
 			histVector[ptBin][etaBin].hFakeProc->GetXaxis()->SetRangeUser(0, N_PROC);
 			histVector[ptBin][etaBin].hFakeProc->GetYaxis()->SetRangeUser(0, 1);
 			histVector[ptBin][etaBin].hFakeProc->SetFillColor(kAzure+10);
-			histVector[ptBin][etaBin].hFakeProc->Draw("hist bar text");
-			c->Print(outDir+((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
+			histVector[ptBin][etaBin].hFakeProc->Draw("bar text");
+			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
 
 			// Fake composition by source
 			histVector[ptBin][etaBin].hFakeSource = histVector[ptBin][etaBin].hFake->ProjectionY();
-			histVector[ptBin][etaBin].hFakeSource->SetDirectory(lepCompFile);
+			histVector[ptBin][etaBin].hFakeSource->SetDirectory(dir_lepCompMeasurement_lepComp);
 			histVector[ptBin][etaBin].hFakeSource->SetName(((TString)"_bySource").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
 			histVector[ptBin][etaBin].hFakeSource->SetTitle(((TString)" by source").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
 			histVector[ptBin][etaBin].hFakeSource->GetXaxis()->SetRangeUser(0, N_FAKES_SOURCE);
 			histVector[ptBin][etaBin].hFakeSource->GetYaxis()->SetRangeUser(0, 1);
 			histVector[ptBin][etaBin].hFakeSource->SetFillColor(kAzure+10);
-			histVector[ptBin][etaBin].hFakeSource->Draw("hist bar text");
-			c->Print(outDir+((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
-
+			histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
+			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
 		}
-		lepCompFile->Write();
-		lepCompFile->Close();
-
 
 		return true;
-	} // Should write this
+	} 
 
-	double GetWeight(LEP_SOURCE s, LEP_PROC p, double pt, double eta)
+	std::pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, double pt, double eta)
 	{
 		int ptBin = GetPtBin(pt); int etaBin = GetEtaBin(eta);
-		if(ptBin<0 || etaBin<0) return 0;
-		if(s==REAL) return reals[0][p][ptBin][etaBin];
-		else return fakes[s][p][ptBin][etaBin];
+		return GetWeight(s, p, ptBin, etaBin);
+	}
+
+	std::pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, int ptBin, int etaBin)
+	{
+		if(ptBin<0 || etaBin<0) return std::make_pair(0,0);
+		if(s==REAL) return std::make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
+		else return std::make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
+	}
+
+	static int GetPtBin(double pt)
+	{
+		if (pt<ptBins[0]) return -1; // Underflow
+		for(int i=0; i<nPtBins; i++) if (pt<ptBins[i+1]) return i;
+		return nPtBins-1; // Overflow, place in largest ptBin.
+	}
+
+	static int GetEtaBin(double eta)
+	{
+		eta = TMath::Abs(eta);
+		if (eta<etaBins[0]) return -1; // Underflow, not really possible for eta
+		for(int i=0; i<nEtaBins; i++) if (eta<etaBins[i+1]) return i;
+		return nEtaBins-1; // Overflow, place in largest etaBin.
 	}
 };
+
+std::vector<Histos*> allHistos;
+
+class Histos
+{
+private:
+	TH2D* NTight;
+	TH2D* NLoose;
+	TH2D* Eff;
+	bool ignoreTagTag=false;
+	bool EffCalced=false;
+
+public:
+	Histos(): Histos("Test") {}
+	Histos(TString name)
+	{
+		NTight = (TH2D*) hPrototype->Clone(name+"_NTight"); NTight->SetTitle(name+"_NTight"); NTight->Sumw2();
+		NLoose = (TH2D*) hPrototype->Clone(name+"_NLoose"); NLoose->SetTitle(name+"_NLoose"); NLoose->Sumw2();
+		Eff = (TH2D*) hPrototype->Clone(name+"_Eff"); Eff->SetTitle(name+"_Eff"); Eff->Sumw2();
+
+		NTight->SetDirectory(dir_unweightedRatesMeasurement_nEvents);
+		NLoose->SetDirectory(dir_unweightedRatesMeasurement_nEvents);
+		Eff->SetDirectory(dir_unweightedRatesMeasurement_rates);
+
+		allHistos.push_back(this);
+	}
+	~Histos(){}
+
+	bool Fill(lepInfo &lep)
+	{
+		NLoose->Fill(lep.pt, fabs(lep.eta), lep.w);
+		if(lep.isTight) NTight->Fill(lep.pt, fabs(lep.eta), lep.w);
+		return true;
+	}
+
+	bool Fill(lepInfo &lep1, lepInfo &lep2)
+	{
+		if (ignoreTagTag && (lep1.isTag && lep2.isTag)) return false;
+		if (lep1.isTag)
+		{
+			double pt = lep2.pt > ptBins[nPtBins-1]? ptBins[nPtBins-1]-1 : lep2.pt;
+			NLoose->Fill(pt, fabs(lep2.eta), lep2.w);
+			if(lep2.isTight) NTight->Fill(pt, fabs(lep2.eta), lep2.w);
+			// return true;
+		}
+		if (lep2.isTag)
+		{
+			double pt = lep1.pt > ptBins[nPtBins-1]? ptBins[nPtBins-1]-1 : lep1.pt;
+			NLoose->Fill(pt, fabs(lep1.eta), lep1.w);
+			if(lep1.isTight) NTight->Fill(pt, fabs(lep1.eta), lep1.w);
+			// return true;
+		}
+		return true;
+	}
+
+	bool calcEff() 
+	{
+		if (EffCalced) return true;
+		Eff->Add(NTight); Eff->Divide(NLoose); 
+		EffCalced=true; 
+		return true;
+	}
+
+	void Draw()
+	{
+		TCanvas can;
+
+		Eff->Draw("text colz");
+		can.Print(TString(Eff->GetName())+".pdf");
+
+		// Eff->ProfileX()->Draw();
+		// can.Print(TString(Eff->GetName())+"Pt.pdf");
+
+		// Eff->ProfileY()->Draw();
+		// can.Print(TString(Eff->GetName())+"Eta.pdf");
+
+		NTight->Draw("text");
+		can.Print(TString(NTight->GetName())+".pdf");
+
+		NLoose->Draw("text");
+		can.Print(TString(NLoose->GetName())+".pdf");
+
+	}
+
+	void SetHistDir(TDirectory* nDir, TDirectory* effDir)
+	{
+		NTight->SetDirectory(nDir);
+		NLoose->SetDirectory(nDir);
+		Eff->SetDirectory(effDir);
+	}
+
+	void vetoTagTag(bool b=true){ignoreTagTag=b;}
+
+	TH2* GetEffHist() {
+		calcEff();
+		return Eff;
+	}
+
+	std::pair<double, double> GetEff(double pt, double eta)
+	{
+		int ptBin = LepProp::GetPtBin(pt); 
+		int etaBin = LepProp::GetPtBin(eta);
+		return GetEff(ptBin, etaBin);
+	}
+
+	std::pair<double, double> GetEff(int ptBin, int etaBin)
+	{
+		return std::make_pair(
+			Eff->GetBinContent(ptBin, etaBin),
+			Eff->GetBinError(ptBin, etaBin)
+		);
+	}
+
+};
+
+class SFhist
+{
+private:
+	TString name;
+
+	TH2 const* hData;
+	TH2 const* hMC;
+	TH2* hRatio;
+
+	// SFhist(): SFhist("hist"){};
+	// SFhist(TString name) : SFhist(name, 0, 0) {};
+public:
+	
+	SFhist(TString n, Histos* d, Histos* m):
+		name(n), hData(d->GetEffHist()), hMC(m->GetEffHist())
+	{
+		int nameLength = ((TString)hData->GetName()).Length();
+		TString histName = (TString)(((TString) hData->GetName())(0, nameLength-8));
+		histName += "SF";
+
+		hRatio = (TH2*) hData->Clone(histName); 
+		hRatio->SetTitle(histName);
+
+		hRatio->Divide(hMC);
+
+		hRatio->SetDirectory(dir_sfMeasurement_scaleFactors);
+
+        Draw();
+	}
+
+	void Draw()
+	{
+		TCanvas *c = new TCanvas();
+		hRatio->Draw("colz text");
+		c->Print(hRatio->GetName()+(TString)".pdf");
+	}
+
+	std::pair<double, double> GetSF(double pt, double eta)
+	{
+		int ptBin = LepProp::GetPtBin(pt);
+		int etaBin = LepProp::GetEtaBin(eta);
+		return GetSF(ptBin, etaBin);
+	}
+
+	std::pair<double, double> GetSF(int ptBin, int etaBin)
+	{
+		return std::make_pair(
+			hRatio->GetBinContent(ptBin, etaBin),
+			hRatio->GetBinError(ptBin, etaBin)
+		);
+	}
+
+
+};
+
 LepProp* lp_Mu;
 LepProp* lp_El;
 
@@ -494,16 +666,38 @@ Histos* hMu_Light_MCTP;
 Histos* hEl_Light_MCTP;
 Histos* hEl_Conv_MCTP;
 
+Histos* hMu_Real_Data;
+Histos* hEl_Real_Data;
+Histos* hMu_Heavy_Data;
+Histos* hEl_Heavy_Data;
+Histos* hEl_Conv_Data;
+
+
+TH2* hEl_final_fakeRate;
+TH2* hMu_final_fakeRate;
+TH2* hEl_final_realRate;
+TH2* hMu_final_realRate;
+
+std::vector< std::vector<Histos*> > hElReal;
+std::vector< std::vector<Histos*> > hElFake;
+std::vector< std::vector<Histos*> > hMuReal;
+std::vector< std::vector<Histos*> > hMuFake;
+
+std::vector<SFhist*> sfhEl_FakeScaleFactors;
+std::vector<SFhist*> sfhMu_FakeScaleFactors;
+SFhist* hEl_RealScaleFactors;
+SFhist* hMu_RealScaleFactors;
 // ======= FUNCTION PROTOTYPES ===== //
 
 int getEffs();
 bool initialize();
 TChain* loadData(TString, bool isMC=false);
 bool finalize();
-bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv);
+bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w=1);
 bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, Histos *hEl_Heavy, Histos *hMu_Light, Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p);
-LEP_SOURCE castSource(MCTC::ParticleOrigin);
+LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l);
 void labelMCTChist(TH2* h);
+void calcFinalEffs();
 
 // ======== FUNCTION DEFINITIONS ======= //
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -534,186 +728,241 @@ void labelMCTChist(TH2* h)
 
 bool initialize()
 {
-	if(DEBUG) cout << "Begin initialize()" <<endl;
+	cout << "Begin initialize()" <<endl;
+
+	// Set output directory
+	if(!gSystem->cd(outDir)){
+		gSystem->mkdir(outDir);
+		gSystem->cd(outDir);
+	}
+
+	// Drawing options
 	gStyle->SetOptStat(0); 
 	gStyle->SetPalette(kLightTerrain);
 
-	effsFile = new TFile(outDir+"efficiencies.root", "recreate");
-	nEventsFile = new TFile(outDir+"nEvents.root", "recreate");
+	// Define output file and structure
+	outFile = new TFile("output.root", "recreate");
+	// {
+		dir_weightedRates = outFile->mkdir("weightedRates");
 
+		dir_unweightedRatesMeasurement = outFile->mkdir("unweightedRatesMeasurement");
+		dir_unweightedRatesMeasurement_rates = dir_unweightedRatesMeasurement->mkdir("rates");
+		dir_unweightedRatesMeasurement_nEvents = dir_unweightedRatesMeasurement->mkdir("nEvents");
+
+		dir_sfMeasurement = outFile->mkdir("sfMeasurement");
+		dir_sfMeasurement_scaleFactors = dir_sfMeasurement->mkdir("scaleFactors");
+		dir_sfMeasurement_effs = dir_sfMeasurement->mkdir("effs");
+		dir_sfMeasurement_nEvents = dir_sfMeasurement->mkdir("nEvents");
+
+		dir_lepCompMeasurement = outFile->mkdir("lepCompMeasurement");
+		dir_lepCompMeasurement_lepComp = dir_lepCompMeasurement->mkdir("lepComp");
+		dir_lepCompMeasurement_nEvents = dir_lepCompMeasurement->mkdir("nEvents");
+	// }
+
+	// Load cross section database
 	gROOT->Macro("$ROOTCOREDIR/scripts/load_packages.C");
 	xsecDB = new SUSY::CrossSectionDB(gSystem->ExpandPathName("$ROOTCOREBIN/data/SUSYTools/mc15_13TeV/"));
 	if (!xsecDB){
 	   cout << "CrossSectionDB could not be loaded" << endl;
 	   return false;
-	}
+	} else cout << "CrossSectionDB loaded" << endl;
 
+	// // //  Set up some histograms // // // 
+
+	// Unweighted efficiencies 
+	std::vector<Histos*> v(N_PROC, 0);
+	hElFake.reserve(N_FAKES_SOURCE);
+	for(int i=0; i<N_FAKES_SOURCE; i++) {hElFake.push_back(v);}
+	hElReal.reserve(1); hElReal.push_back(v);
+
+	hMuFake.reserve(N_FAKES_SOURCE);
+	for(int i=0; i<N_FAKES_SOURCE; i++) {hMuFake.push_back(v);}
+	hMuReal.reserve(1); hMuReal.push_back(v);
+
+	// Lepton composition
 	hMu_MCTC = new TH2D("hMu_MCTC", "MCTC Mu;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
 	hEl_MCTC = new TH2D("hEl_MCTC", "MCTC El;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
-
-	hMu_MCTC->SetDirectory(effsFile);
-	hEl_MCTC->SetDirectory(effsFile);
+	hMu_MCTC->SetDirectory(dir_lepCompMeasurement_nEvents);
+	hEl_MCTC->SetDirectory(dir_lepCompMeasurement_nEvents);
 
 	lp_El = new LepProp("El");
 	lp_Mu = new LepProp("Mu");
 
-	hMu_Real_MCTP = new Histos("hMu_Real_MCTP");
-	hEl_Real_MCTP = new Histos("hEl_Real_MCTP");
-	hMu_Heavy_MCTP = new Histos("hMu_Heavy_MCTP");
-	hEl_Heavy_MCTP = new Histos("hEl_Heavy_MCTP");
-	hMu_Light_MCTP = new Histos("hMu_Light_MCTP");
-	hEl_Light_MCTP = new Histos("hEl_Light_MCTP");
-	hEl_Conv_MCTP = new Histos("hEl_Conv_MCTP");
+	// Tag-and-probe histograms for MC
+	hMu_Real_MCTP = new Histos("hMu_Real_MCTP"); hMu_Real_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Real_MCTP = new Histos("hEl_Real_MCTP"); hEl_Real_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hMu_Heavy_MCTP = new Histos("hMu_Heavy_MCTP"); hMu_Heavy_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Heavy_MCTP = new Histos("hEl_Heavy_MCTP"); hEl_Heavy_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hMu_Light_MCTP = new Histos("hMu_Light_MCTP"); hMu_Light_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Light_MCTP = new Histos("hEl_Light_MCTP"); hEl_Light_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Conv_MCTP = new Histos("hEl_Conv_MCTP"); hEl_Conv_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
 
+	// Tag-and-probe histograms for Data
+	hMu_Real_Data = new Histos("hMu_Real_Data"); hMu_Real_Data->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Real_Data = new Histos("hEl_Real_Data"); hEl_Real_Data->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hMu_Heavy_Data = new Histos("hMu_Heavy_Data"); hMu_Heavy_Data->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Heavy_Data = new Histos("hEl_Heavy_Data"); hEl_Heavy_Data->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
+	hEl_Conv_Data = new Histos("hEl_Conv_Data"); hEl_Conv_Data->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
 
-	if(VERBOSE) cout << "initialize() complete" << endl;
+	// SF histograms
+	sfhEl_FakeScaleFactors.reserve(N_FAKES_SOURCE);
+	sfhMu_FakeScaleFactors.reserve(N_FAKES_SOURCE);
+	for(int i=0; i<N_FAKES_SOURCE; i++) {sfhEl_FakeScaleFactors[i]=0; sfhMu_FakeScaleFactors[i]=0;}
+	hEl_RealScaleFactors = 0;
+	hMu_RealScaleFactors = 0;
+
+	cout << "initialize() complete" << endl;
 	return true;
 }
 
 int getEffs()
 {
-	initialize();
+	initialize(); 
 	TChain* tcMC = new TChain("evt2l");
 
-	// lp_El->Fill(REAL, TTBAR, 25, 1.4, 1);
-	// lp_Mu->Fill(REAL, TTBAR, 25, 1.4, 1);
-
-	// TTBAR
-	evt2l* ttEvts = new evt2l(loadData(inFileTTbar, true));  tcMC->Add((TChain*) ttEvts->fChain);
-	Histos* hMu_Real_TT = new Histos("hMu_Real_TT");
-	Histos* hEl_Real_TT = new Histos("hEl_Real_TT");
-	Histos* hMu_Heavy_TT = new Histos("hMu_Heavy_TT");
-	Histos* hEl_Heavy_TT = new Histos("hEl_Heavy_TT");
-	Histos* hMu_Light_TT = new Histos("hMu_Light_TT");
-	Histos* hEl_Light_TT = new Histos("hEl_Light_TT");
-	Histos* hEl_Conv_TT = new Histos("hEl_Conv_TT");
-	cout << "Begin loop over ttBar: " << ttEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(ttEvts, hMu_Real_TT, hEl_Real_TT, hMu_Heavy_TT, hEl_Heavy_TT, hMu_Light_TT, hEl_Light_TT, hEl_Conv_TT, TTBAR);
-	cout << "ttBar loop finished" << endl << endl;
 
 	// BBBAR/CCBAR
 	// evt2l* bbccEvts = new evt2l(loadData(inFileBBCC, true)); // tcMC->Add((TChain*) bbccEvts->fChain);
-	// Histos* = new Histos hMu_Real_BBCC("hMu_Real_BBCC");
-	// Histos* = new Histos hEl_Real_BBCC("hEl_Real_BBCC");
-	// Histos* = new Histos hMu_Heavy_BBCC("hMu_Heavy_BBCC");
-	// Histos* = new Histos hEl_Heavy_BBCC("hEl_Heavy_BBCC");
-	// Histos* = new Histos hMu_Light_BBCC("hMu_Light_BBCC");
-	// Histos* = new Histos hEl_Light_BBCC("hEl_Light_BBCC");
-	// Histos* = new Histos hEl_Conv_BBCC("hEl_Conv_BBCC");
+	// hMuReal[0][BBCC]= new Histos hMu_Real_BBCC("hMu_Real_BBCC");
+	// hElReal[0][BBCC]= new Histos hEl_Real_BBCC("hEl_Real_BBCC");
+	// hMuFake[HEAVY][BBCC]= new Histos hMu_Heavy_BBCC("hMu_Heavy_BBCC");
+	// hElFake[HEAVY][BBCC]= new Histos hEl_Heavy_BBCC("hEl_Heavy_BBCC");
+	// hMuFake[LIGHT][BBCC]= new Histos hMu_Light_BBCC("hMu_Light_BBCC");
+	// hElFake[LIGHT][BBCC]= new Histos hEl_Light_BBCC("hEl_Light_BBCC");
+	// hElFake[CONV][BBCC]= new Histos hEl_Conv_BBCC("hEl_Conv_BBCC");
 	// cout << "Begin loop over bb/cc: " << bbccEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(bbccEvts, hMu_Real_BBCC, hEl_Real_BBCC, hMu_Heavy_BBCC, hEl_Heavy_BBCC, hMu_Light_BBCC, hEl_Light_BBCC, hEl_Conv_BBCC);
+	// loopMC(bbccEvts, hMuReal[0][BBCC], hElReal[0][BBCC], hMuFake[HEAVY][BBCC], hElFake[HEAVY][BBCC], hMuFake[LIGHT][BBCC], hElFake[LIGHT][BBCC], hElFake[CONV][BBCC], BBCC);
 	// cout << "bb/cc loop finished" << endl << endl;
+	//
+	
+	// TTBAR
+	evt2l* ttEvts = new evt2l(loadData(inFileTTbar, true));  tcMC->Add((TChain*) ttEvts->fChain);
+	hMuReal[0][TTBAR] = new Histos("hMu_Real_TT");
+	hElReal[0][TTBAR] = new Histos("hEl_Real_TT");
+	hMuFake[HEAVY][TTBAR] = new Histos("hMu_Heavy_TT");
+	hElFake[HEAVY][TTBAR] = new Histos("hEl_Heavy_TT");
+	hMuFake[LIGHT][TTBAR] = new Histos("hMu_Light_TT");
+	hElFake[LIGHT][TTBAR] = new Histos("hEl_Light_TT");
+	hElFake[CONV][TTBAR] = new Histos("hEl_Conv_TT");
+	cout << "Begin loop over ttBar: " << ttEvts->fChain->GetEntries() << " events" << endl;
+	loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
+	cout << "ttBar loop finished" << endl << endl;
+
 
 	// // Z+jets
 	evt2l* zJetsEvts = new evt2l(loadData(inFileZjets, true));  tcMC->Add((TChain*) zJetsEvts->fChain);
-	Histos* hMu_Real_Zjets = new Histos("hMu_Real_Zjets");
-	Histos* hEl_Real_Zjets = new Histos("hEl_Real_Zjets");
-	Histos* hMu_Heavy_Zjets = new Histos("hMu_Heavy_Zjets");
-	Histos* hEl_Heavy_Zjets = new Histos("hEl_Heavy_Zjets");
-	Histos* hMu_Light_Zjets = new Histos("hMu_Light_Zjets");
-	Histos* hEl_Light_Zjets = new Histos("hEl_Light_Zjets");
-	Histos* hEl_Conv_Zjets = new Histos("hEl_Conv_Zjets");
+	hMuReal[0][ZJETS] = new Histos("hMu_Real_Zjets");
+	hElReal[0][ZJETS] = new Histos("hEl_Real_Zjets");
+	hMuFake[HEAVY][ZJETS] = new Histos("hMu_Heavy_Zjets");
+	hElFake[HEAVY][ZJETS] = new Histos("hEl_Heavy_Zjets");
+	hMuFake[LIGHT][ZJETS] = new Histos("hMu_Light_Zjets");
+	hElFake[LIGHT][ZJETS] = new Histos("hEl_Light_Zjets");
+	hElFake[CONV][ZJETS] = new Histos("hEl_Conv_Zjets");
 	cout << "Begin loop over Z+jets: " << zJetsEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(zJetsEvts, hMu_Real_Zjets, hEl_Real_Zjets, hMu_Heavy_Zjets, hEl_Heavy_Zjets, hMu_Light_Zjets, hEl_Light_Zjets, hEl_Conv_Zjets, ZJETS);
+	loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
 	cout << "Z+jets loop finished" << endl << endl;
 
 	// // W+jets
 	evt2l* wJetsEvts = new evt2l(loadData(inFileWjets, true));  tcMC->Add((TChain*) wJetsEvts->fChain);
-	Histos* hMu_Real_Wjets = new Histos("hMu_Real_Wjets");
-	Histos* hEl_Real_Wjets = new Histos("hEl_Real_Wjets");
-	Histos* hMu_Heavy_Wjets = new Histos("hMu_Heavy_Wjets");
-	Histos* hEl_Heavy_Wjets = new Histos("hEl_Heavy_Wjets");
-	Histos* hMu_Light_Wjets = new Histos("hMu_Light_Wjets");
-	Histos* hEl_Light_Wjets = new Histos("hEl_Light_Wjets");
-	Histos* hEl_Conv_Wjets = new Histos("hEl_Conv_Wjets");
+	hMuReal[0][WJETS] = new Histos("hMu_Real_Wjets");
+	hElReal[0][WJETS] = new Histos("hEl_Real_Wjets");
+	hMuFake[HEAVY][WJETS] = new Histos("hMu_Heavy_Wjets");
+	hElFake[HEAVY][WJETS] = new Histos("hEl_Heavy_Wjets");
+	hMuFake[LIGHT][WJETS] = new Histos("hMu_Light_Wjets");
+	hElFake[LIGHT][WJETS] = new Histos("hEl_Light_Wjets");
+	hElFake[CONV][WJETS] = new Histos("hEl_Conv_Wjets");
 	cout << "Begin loop over W+jets: " << wJetsEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(wJetsEvts, hMu_Real_Wjets, hEl_Real_Wjets, hMu_Heavy_Wjets, hEl_Heavy_Wjets, hMu_Light_Wjets, hEl_Light_Wjets, hEl_Conv_Wjets, WJETS);
+	loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
 	cout << "W+jets loop finished" << endl << endl;
 
 	// DIBOSON
 	evt2l* vvEvts = new evt2l(loadData(inFileVV, true));  tcMC->Add((TChain*) vvEvts->fChain);
-	Histos* hMu_Real_VV = new Histos ("hMu_Real_VV");
-	Histos* hEl_Real_VV = new Histos ("hEl_Real_VV");
-	Histos* hMu_Heavy_VV = new Histos ("hMu_Heavy_VV");
-	Histos* hEl_Heavy_VV = new Histos ("hEl_Heavy_VV");
-	Histos* hMu_Light_VV = new Histos ("hMu_Light_VV");
-	Histos* hEl_Light_VV = new Histos ("hEl_Light_VV");
-	Histos* hEl_Conv_VV = new Histos ("hEl_Conv_VV");
+	hMuReal[0][VV] = new Histos ("hMu_Real_VV");
+	hElReal[0][VV] = new Histos ("hEl_Real_VV");
+	hMuFake[HEAVY][VV] = new Histos ("hMu_Heavy_VV");
+	hElFake[HEAVY][VV] = new Histos ("hEl_Heavy_VV");
+	hMuFake[LIGHT][VV] = new Histos ("hMu_Light_VV");
+	hElFake[LIGHT][VV] = new Histos ("hEl_Light_VV");
+	hElFake[CONV][VV] = new Histos ("hEl_Conv_VV");
 	cout << "Begin loop over VV: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(vvEvts, hMu_Real_VV, hEl_Real_VV, hMu_Heavy_VV, hEl_Heavy_VV, hMu_Light_VV, hEl_Light_VV, hEl_Conv_VV, VV);
+	loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
 	cout << "VV loop finished" << endl << endl;
 
 	// VGAMMA
 	evt2l* vgammaEvts = new evt2l(loadData(inFileVgamma, true));  tcMC->Add((TChain*) vgammaEvts->fChain);
-	Histos* hMu_Real_Vgamma = new Histos("hMu_Real_Vgamma");
-	Histos* hEl_Real_Vgamma = new Histos("hEl_Real_Vgamma");
-	Histos* hMu_Heavy_Vgamma = new Histos("hMu_Heavy_Vgamma");
-	Histos* hEl_Heavy_Vgamma = new Histos("hEl_Heavy_Vgamma");
-	Histos* hMu_Light_Vgamma = new Histos("hMu_Light_Vgamma");
-	Histos* hEl_Light_Vgamma = new Histos("hEl_Light_Vgamma");
-	Histos* hEl_Conv_Vgamma = new Histos("hEl_Conv_Vgamma");
+	hMuReal[0][VGAMMA] = new Histos("hMu_Real_Vgamma");
+	hElReal[0][VGAMMA] = new Histos("hEl_Real_Vgamma");
+	hMuFake[HEAVY][VGAMMA] = new Histos("hMu_Heavy_Vgamma");
+	hElFake[HEAVY][VGAMMA] = new Histos("hEl_Heavy_Vgamma");
+	hMuFake[LIGHT][VGAMMA] = new Histos("hMu_Light_Vgamma");
+	hElFake[LIGHT][VGAMMA] = new Histos("hEl_Light_Vgamma");
+	hElFake[CONV][VGAMMA] = new Histos("hEl_Conv_Vgamma");
 	cout << "Begin loop over Vgamma: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(vgammaEvts, hMu_Real_Vgamma, hEl_Real_Vgamma, hMu_Heavy_Vgamma, hEl_Heavy_Vgamma, hMu_Light_Vgamma, hEl_Light_Vgamma, hEl_Conv_Vgamma, VGAMMA);
+	loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
 	cout << "Vgamma loop finished" << endl << endl;
 
 	// SingleTop
-	evt2l* singleTopEvts = new evt2l(loadData(inFileSingleTop, true));  tcMC->Add((TChain*) vgammaEvts->fChain);
-	Histos* hMu_Real_SingleTop = new Histos("hMu_Real_SingleTop");
-	Histos* hEl_Real_SingleTop = new Histos("hEl_Real_SingleTop");
-	Histos* hMu_Heavy_SingleTop = new Histos("hMu_Heavy_SingleTop");
-	Histos* hEl_Heavy_SingleTop = new Histos("hEl_Heavy_SingleTop");
-	Histos* hMu_Light_SingleTop = new Histos("hMu_Light_SingleTop");
-	Histos* hEl_Light_SingleTop = new Histos("hEl_Light_SingleTop");
-	Histos* hEl_Conv_SingleTop = new Histos("hEl_Conv_SingleTop");
+	evt2l* singleTopEvts = new evt2l(loadData(inFileSingleTop, true));  tcMC->Add((TChain*) singleTopEvts->fChain);
+	hMuReal[0][SINGLETOP] = new Histos("hMu_Real_SingleTop");
+	hElReal[0][SINGLETOP] = new Histos("hEl_Real_SingleTop");
+	hMuFake[HEAVY][SINGLETOP] = new Histos("hMu_Heavy_SingleTop");
+	hElFake[HEAVY][SINGLETOP] = new Histos("hEl_Heavy_SingleTop");
+	hMuFake[LIGHT][SINGLETOP] = new Histos("hMu_Light_SingleTop");
+	hElFake[LIGHT][SINGLETOP] = new Histos("hEl_Light_SingleTop");
+	hElFake[CONV][SINGLETOP] = new Histos("hEl_Conv_SingleTop");
 	cout << "Begin loop over single top: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(singleTopEvts, hMu_Real_SingleTop, hEl_Real_SingleTop, hMu_Heavy_SingleTop, hEl_Heavy_SingleTop, hMu_Light_SingleTop, hEl_Light_SingleTop, hEl_Conv_SingleTop, SINGLETOP);
-	cout << "single top loop finished" << endl << endl;
+	loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
+	cout << "Single top loop finished" << endl << endl;
 
-	// ALL MC
-	// evt2l* mcEvts = new evt2l(tcMC); 
-	// Histos* hMu_Real_MC = new Histos("hMu_Real_MC");
-	// Histos* hEl_Real_MC = new Histos("hEl_Real_MC");
-	// Histos* hMu_Heavy_MC = new Histos("hMu_Heavy_MC");
-	// Histos* hEl_Heavy_MC = new Histos("hEl_Heavy_MC");
-	// Histos* hMu_Light_MC = new Histos("hMu_Light_MC");
-	// Histos* hEl_Light_MC = new Histos("hEl_Light_MC");
-	// Histos* hEl_Conv_MC = new Histos("hEl_Conv_MC");
-	// cout << "Begin loop over all MC: " << mcEvts->fChain->GetEntries() << " events" << endl;
-	// doTP(mcEvts, hMu_Real_MC, hEl_Real_MC, hMu_Heavy_MC, hEl_Heavy_MC, hEl_Conv_MC);
-	// cout << "All MC loop finished" << endl;
 
 	// DATA TAG-AND-PROBE
-	evt2l* dataEvts = new evt2l(loadData(inFileData));
-	cout << "Executing tag-and-probe on data" << endl;
-	Histos* hMu_Real_Data = new Histos("hMu_Real_Data");
-	Histos* hEl_Real_Data = new Histos("hEl_Real_Data");
-	Histos* hMu_Heavy_Data = new Histos("hMu_Heavy_Data");
-	Histos* hEl_Heavy_Data = new Histos("hEl_Heavy_Data");
-	Histos* hEl_Conv_Data = new Histos("hEl_Conv_Data");
-	int nDataEntries = dataEvts->fChain->GetEntries();
-	cout << "Begin loop over data" << endl;
-	for(int i=0; i<nDataEntries; i++)
-	{
-		loadbar(i+1, nDataEntries);
-		dataEvts->GetEntry(i);
-		doTP(dataEvts, hMu_Real_Data, hEl_Real_Data, hMu_Heavy_Data, hEl_Heavy_Data, hEl_Conv_Data);
+	if(doDataTP){
+		evt2l* dataEvts = new evt2l(loadData(inFileData));
+		cout << "Executing tag-and-probe on data" << endl;
+		int nDataEntries = dataEvts->fChain->GetEntries();
+		cout << "Begin loop over data:" << nDataEntries << " events" << endl;
+		for(int i=0; i<nDataEntries; i++)
+		{
+			loadbar(i+1, nDataEntries);
+			dataEvts->GetEntry(i);
+			if (DEBUG) cout << "Event no " << i << endl;
+			doTP(dataEvts, hMu_Real_Data, hEl_Real_Data, hMu_Heavy_Data, hEl_Heavy_Data, hEl_Conv_Data);
+		}
+		cout << endl;
+		cout << "Data tag-and-probe finished" << endl;
 	}
-	cout << "Data tag-and-probe finished" << endl;
 
+	if (measureSF) 
+	{
+		sfhEl_FakeScaleFactors[HEAVY] = new SFhist("El_Heavy", hEl_Heavy_Data, hEl_Heavy_MCTP);
+		// sfhEl_FakeScaleFactors[LIGHT] = new SFhist("El_Light", hEl_Light_Data, hEl_Light_MCTP);
+		sfhEl_FakeScaleFactors[CONV] = new SFhist("El_Conv", hEl_Conv_Data, hEl_Conv_MCTP);
+
+		sfhMu_FakeScaleFactors[HEAVY] = new SFhist("Mu_Heavy", hMu_Heavy_Data, hMu_Heavy_MCTP);
+		// sfhMu_FakeScaleFactors[LIGHT] = new SFhist("Mu_Light", hMu_Light_Data, hMu_Light_MCTP);
+
+		hEl_RealScaleFactors = new SFhist("El_Real", hEl_Real_Data, hEl_Real_MCTP);
+		hMu_RealScaleFactors = new SFhist("Mu_Real", hMu_Real_Data, hMu_Real_MCTP);
+	}
+
+	if (measureSF && measureLepComp && measureUnweightedRates) calcFinalEffs();
+	// */
 	finalize();
 
 	return 0;
 }
 
-bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv)
+bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w)
 {
-	if (tree->sig_trigCode==0) return false;
+	// const bool DEBUG = true;
+
+	if (DEBUG) cout << "Enter doTP()" << endl;
+	// if (tree->sig_trigCode==0) return false;
 	if (tree->leps_==2)
 	{			
-
 		// mm and ee
-		bool mumu = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[0]/1000))==169;
-		bool elel = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[0]/1000))==121;
+		bool mumu = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==169;
+		bool elel = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121;
 		bool isOS = (tree->leps_ID[0]*tree->leps_ID[1])<0;
 
 		// "Tight" defined as signal electron
@@ -723,14 +972,19 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 		/** UNWEIGHTED REAL EFFICIENCIES MEASURED BY Z_ll TAG-AND-PROBE IN DATA **/
 		if(fabs(tree->l12_m - 91)<10 && isOS) // Select Z mass pair
 		{
+			if (DEBUG) cout << "Zll\t";
 			// Tag requirement: pT >25, passes signal ("tight") cut, passes trigger, and is trigger matched
-			bool lep1isTag = (tree->leps_pt[0]>25 && lep1isTight && (tree->leps_ID[0] & 1) && (tree->leps_ID[0] & 2));
-			bool lep2isTag = (tree->leps_pt[1]>25 && lep2isTight && (tree->leps_ID[1] & 1) && (tree->leps_ID[1] & 2));
+			bool lep1isTag = (tree->leps_pt[0]>25 && lep1isTight && (TMath::Abs(tree->leps_ID[0]) & 1) && (TMath::Abs(tree->leps_ID[0]) & 2));
+			bool lep2isTag = (tree->leps_pt[1]>25 && lep2isTight && (TMath::Abs(tree->leps_ID[1]) & 1) && (TMath::Abs(tree->leps_ID[1]) & 2));
 
-			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], 1, lep1isTag, lep1isTight};
-			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], 1, lep2isTag, lep2isTight};
+			if (DEBUG) cout << "Lep 1: " << (lep1isTag?"*":" ") << '\t'
+							<< "Lep 2: " << (lep2isTag?"*":" ") << '\t';
+
+			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], w, lep1isTag, lep1isTight};
+			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], w, lep2isTag, lep2isTight};
 			if (mumu) hMu_Real->Fill(l1info, l2info);
 			else if (elel) hEl_Real->Fill(l1info, l2info);	
+			// if (DEBUG) cout << "Histograms filled" << endl;
 		}
 
 		/* UNWEIGHTED HEAVY EFFICIENCIES MEASURED BY ll TAG-AND-PROBE IN DATA */
@@ -740,32 +994,40 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 			// To suppress W background and signal
 			// if (tree->sig_Met>40) continue; TMath::Sqrt(2*leps[0].pt*sig.Met*(1-TMath::Cos(leps[0].MET_dPhi)))<40
 
+			if (DEBUG) cout << "Heavy lep tag-and-probe" << endl;
 			std::pair<double, double> mT_lep_MET;
 			mT_lep_MET.first  = TMath::Sqrt(2*tree->leps_pt[0]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[0])));
 			mT_lep_MET.second = TMath::Sqrt(2*tree->leps_pt[1]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[1])));
 			if(mT_lep_MET.first>40 || mT_lep_MET.second>40) return false;
 
-			bool lep1isTag = (tree->leps_pt[0]>20 && lep1isTight && TMath::Abs(int(tree->leps_ID[0]/1000))==13 && (tree->leps_ID[0] & 1) && (tree->leps_ID[0] & 2));
-			bool lep2isTag = (tree->leps_pt[1]>20 && lep2isTight && TMath::Abs(int(tree->leps_ID[1]/1000))==13 && (tree->leps_ID[1] & 1) && (tree->leps_ID[1] & 2));
+			bool lep1isTag = (tree->leps_pt[0]>20 && lep1isTight && TMath::Abs(int(tree->leps_ID[0]/1000))==13 && (TMath::Abs(tree->leps_ID[0]) & 1) && (TMath::Abs(tree->leps_ID[0]) & 2));
+			bool lep2isTag = (tree->leps_pt[1]>20 && lep2isTight && TMath::Abs(int(tree->leps_ID[1]/1000))==13 && (TMath::Abs(tree->leps_ID[1]) & 1) && (TMath::Abs(tree->leps_ID[1]) & 2));
 
-			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], 1, lep1isTag, lep1isTight};
-			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], 1, lep2isTag, lep2isTight};
+			if (DEBUG) cout << "Lep 1: " << (lep1isTag?"*":" ") << '\t'
+							<< "Lep 2: " << (lep2isTag?"*":" ") << '\t';
+
+			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], w, lep1isTag, lep1isTight};
+			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], w, lep2isTag, lep2isTight};
 
 			// Select mumu with mll cut, or emu
 			if (mumu && tree->l12_m>40) hMu_Heavy->Fill(l1info, l2info);
 			else hEl_Heavy->Fill(l1info, l2info);
+			if (DEBUG) cout << "Histograms filled" << endl;
+
 		}		
 	}
 
 	/** UNWEIGHTED PHOTON CONVERSTION EFFICIENCIES MEASURED BY mumu-e TAG-AND-PROBE IN DATA **/ 
-	else if (tree->leps_==3)
+	else if (false && tree->leps_==3)
 	{
+		if (DEBUG) cout << "PhotonConv lep tag-and-probe" << endl;
+
 		// Select Z_mumu pair and electron 
 		if ((int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000) != -169)	|| TMath::Abs(int(tree->leps_ID[2])/1000)!= 11)
 			return false;
 
 		// Dimuon trigger match
-		if (!(tree->sig_trigMask && tree->sig_trigCode)) return false;
+		if (!(tree->sig_trigMask & tree->sig_trigCode)) return false;
 
 		TLorentzVector p1, p2, p3;
 		p1.SetPtEtaPhiM(tree->leps_pt[0], tree->leps_eta[0], tree->leps_phi[0], 0.105658);
@@ -776,9 +1038,13 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 
 		bool elIsTight = (tree->leps_lFlag[2] & IS_SIGNAL);
 
-		lepInfo elInfo = {tree->leps_pt[2], tree->leps_eta[2], 1, false, elIsTight};
+		lepInfo elInfo = {tree->leps_pt[2], tree->leps_eta[2], w, false, elIsTight};
 		hEl_Conv->Fill(elInfo);
+		if (DEBUG) cout << "Histograms filled" << endl;
+
 	}
+
+	if (DEBUG) cout << "End of doTP()" << endl;
 	return true;
 }
 
@@ -807,28 +1073,39 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 		{
 			if(tree->leps_pt[j]<20) continue;
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
-			bool isRecoEl = TMath::Abs(int(tree->leps_ID[j]/1000)) == 11;
-			bool isRecoMu = TMath::Abs(int(tree->leps_ID[j]/1000)) == 13;
+
+			LEP_TYPE recoLepType;
+			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
+			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
+			else continue;
 
 			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
 			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
-			LEP_SOURCE 	   source = castSource(orig);
+			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
+
+			// Charge flip. (+lep_ID) * (-pdgId) is no flip
+			// if (source==CONV && recoLepType==ELEC && tree->leps_ID[j]*tree->leps_firstEgMotherPdgId[j]>0)
+			// 	continue;
 
 			lepInfo l = {tree->leps_pt[j], tree->leps_eta[j], w, true, lepIsTight};
 
-			if (isRecoEl && type==IsoElectron) hEl_Real->Fill(l); 
-			else if (isRecoMu && type==IsoMuon) hMu_Real->Fill(l); 
-			else if (isRecoEl && (type==UnknownElectron || type==NonIsoElectron || type==BkgElectron))
+			if (recoLepType==ELEC){ switch (source)
 			{
-				if (source==HEAVY) hEl_Heavy->Fill(l); 
-				else if (source==CONV) hEl_Conv->Fill(l);
-				else if (source==LIGHT) hEl_Light->Fill(l); 
-			}
-			else if (isRecoMu && (type==UnknownMuon || type==NonIsoMuon || type==BkgMuon))
+				case REAL: hEl_Real->Fill(l); break;
+				case HEAVY: hEl_Heavy->Fill(l); break;
+				case LIGHT: hEl_Light->Fill(l); break;
+				case CONV: hEl_Conv->Fill(l); break;
+				default: break;
+			}}
+
+			else if (recoLepType==MUON){ switch (source)
 			{
-				if (source==HEAVY) hMu_Heavy->Fill(l);
-				else if (source==LIGHT) hMu_Light->Fill(l);
-			}
+				case REAL: hMu_Real->Fill(l); break;
+				case HEAVY: hMu_Heavy->Fill(l); break;
+				case LIGHT: hMu_Light->Fill(l); break;
+				// case CONV: hMu_Conv->Fill(l); break;
+				default: break;
+			}}
 			if (DEBUG) cout << "# Filled rates histograms for lepton " << j << endl;
 		}}
 
@@ -838,32 +1115,30 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			if(tree->leps_pt[j]<20) continue;
 
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
-			bool isRecoEl = TMath::Abs(int(tree->leps_ID[j]/1000)) == 11;
-			bool isRecoMu = TMath::Abs(int(tree->leps_ID[j]/1000)) == 13;
+			LEP_TYPE recoLepType;
+			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
+			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
+			else continue;
 
 			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
 			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
-			LEP_SOURCE 	   source = castSource(orig);
+			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
 
-			if (isRecoEl)
+			if (recoLepType==ELEC)
 			{
-				// if (DEBUG && type!=IsoElectron) cout << LS_TOSTRING(source) << "\t" << int(orig) << " electron" << endl;
-				if (type!=IsoElectron) lp_El->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
-				else lp_El->Fill(REAL, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				lp_El->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
 				hEl_MCTC->Fill(type, orig);
 			}
-			else if (isRecoMu)
+			else if (recoLepType==MUON)
 			{
-				// if (DEBUG && type!=IsoMuon) cout << LS_TOSTRING(source) << "\t" << int(orig) << " muon" << endl;
-				if (type!=IsoMuon) lp_Mu->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
-				else lp_Mu->Fill(REAL, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				lp_Mu->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
 				hMu_MCTC->Fill(type, orig);
 			}
 			if (DEBUG) cout << "# Filled lepton composition histograms for lepton " << j << endl;
 		}}
 
 		// Tag and probe for data/MC scale factors
-		doTP(tree, hMu_Real_MCTP, hEl_Real_MCTP, hMu_Heavy_MCTP, hEl_Heavy_MCTP, hEl_Conv_MCTP);
+		if(measureSF) doTP(tree, hMu_Real_MCTP, hEl_Real_MCTP, hMu_Heavy_MCTP, hEl_Heavy_MCTP, hEl_Conv_MCTP, w);
 
 		if (DEBUG) cout << "# After lepton loop" << endl;
 	}
@@ -871,45 +1146,144 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 	return true;
 }
 
-
-LEP_SOURCE castSource(MCTC::ParticleOrigin orig)
+// /*
+void calcFinalEffs()
 {
-	using namespace MCTC;
-	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
-		|| orig==CharmedBaryon || orig==BottomBaryon)
-		return HEAVY;
-	else if (orig==LightMeson || orig==StrangeMeson || orig==LightBaryon || orig==StrangeBaryon 
-		|| orig==PionDecay || orig==KaonDecay || orig==PiZero|| orig==QCD || orig==NonDefined)
-		return LIGHT;
-	else if (orig==PhotonConv || orig==BremPhot || orig==PromptPhot || orig==UndrPhot 
-		|| orig==ISRPhot || orig==FSRPhot)
-		return CONV;
-	else if (orig==NonDefined) return LIGHT;
+	for(auto h: allHistos) h->calcEff(); 
+    lp_El->Normalize();
+    lp_Mu->Normalize();
 
-	return OTHER;
+	hEl_final_fakeRate = new TH2D("hEl_final_fakeRate", "El Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
+	hMu_final_fakeRate = new TH2D("hMu_final_fakeRate", "Mu Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
+	hEl_final_realRate = new TH2D("hEl_final_realRate", "El Real rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
+	hMu_final_realRate = new TH2D("hMu_final_realRate", "Mu Real rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
+
+	hEl_final_fakeRate->SetDirectory(dir_weightedRates);
+	hMu_final_fakeRate->SetDirectory(dir_weightedRates);
+	hEl_final_realRate->SetDirectory(dir_weightedRates);
+	hMu_final_realRate->SetDirectory(dir_weightedRates);
+
+	for(int etaBin=0; etaBin<nEtaBins; etaBin++)
+	for(int  ptBin=0;  ptBin< nPtBins;  ptBin++)
+	{
+		// Initialize
+		double elRealRate, elRealUnc, muRealRate, muRealUnc;
+		elRealRate = elRealUnc = muRealRate = muRealUnc = 0;
+		double elFakeRate, elFakeUnc, muFakeRate, muFakeUnc;
+		elFakeRate = elFakeUnc = muFakeRate = muFakeUnc = 0;
+
+		// Each term is Rates are Sum(e). e = (unweighted eff) * (SF) * (LepComp fraction)
+		// Uncertainty Sqrt(Sum((Unc_i)^2)), (Unc_i)^2 = e^2 ( Sum(Sq(sigma/val)) ), assuming uncorrelated uncertainties
+		for(int p=0; p<N_PROC; p++)
+		{
+			auto elEff 	= hElReal[0][p]->GetEff(ptBin, etaBin);
+			auto elSF 	= std::make_pair(1.,0.); // hEl_RealScaleFactors->GetSF(ptBin, etaBin);
+			auto elLP 	= lp_El->GetWeight(REAL, (LEP_PROC) p, ptBin, etaBin);
+
+			elRealRate += elEff.first*elSF.first*elLP.first;
+			elRealUnc  += elRealRate*elRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
+
+			auto muEff 	= hMuReal[0][p]->GetEff(ptBin, etaBin);
+			auto muSF 	= std::make_pair(1.,0.); // hMu_RealScaleFactors->GetSF(ptBin, etaBin);
+			auto muLP 	= lp_Mu->GetWeight(REAL, (LEP_PROC) p, ptBin, etaBin);
+
+			muRealRate += muEff.first*muSF.first*muLP.first;
+			muRealUnc  += muRealRate*muRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
+
+			for(int s=0; s<N_FAKES_SOURCE; s++)
+			{
+
+				auto elEff 	= hElFake[s][p]->GetEff(ptBin, etaBin);
+				auto elSF 	= std::make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? std::make_pair(1.,0.0) : sfhEl_FakeScaleFactors[s]->GetSF(ptBin, etaBin);
+				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, ptBin, etaBin);
+
+				elFakeRate += elEff.first*elSF.first*elLP.first;
+				elFakeUnc  += elFakeRate*elFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
+
+				if(((LEP_SOURCE) s)==CONV) continue;
+
+				auto muEff 	= hMuFake[s][p]->GetEff(ptBin, etaBin);
+				auto muSF 	= std::make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? std::make_pair(1.,0.0) : sfhMu_FakeScaleFactors[s]->GetSF(ptBin, etaBin);
+				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, ptBin, etaBin);
+
+				muFakeRate += muEff.first*muSF.first*muLP.first;
+				muFakeUnc  += muFakeRate*muFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
+			}
+		}
+
+		elRealUnc = TMath::Sqrt(elRealUnc);
+		muRealUnc = TMath::Sqrt(muRealUnc);
+
+		elFakeUnc = TMath::Sqrt(elFakeUnc);
+		muFakeUnc = TMath::Sqrt(muFakeUnc);
+
+		// Fill histograms
+		hEl_final_fakeRate->SetBinContent(ptBin, etaBin, elFakeRate); hEl_final_fakeRate->SetBinError(ptBin, etaBin, elFakeUnc);
+		hMu_final_fakeRate->SetBinContent(ptBin, etaBin, muFakeRate); hMu_final_fakeRate->SetBinError(ptBin, etaBin, muFakeUnc);
+		hEl_final_realRate->SetBinContent(ptBin, etaBin, elRealRate); hEl_final_realRate->SetBinError(ptBin, etaBin, elRealUnc);
+		hMu_final_realRate->SetBinContent(ptBin, etaBin, muRealRate); hMu_final_realRate->SetBinError(ptBin, etaBin, muRealUnc);
+	}
+    TCanvas c;
+	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".pdf");
+	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".pdf");
+	hEl_final_realRate->Draw("colz text"); c.Print(TString(hEl_final_realRate->GetName())+".pdf");
+	hMu_final_realRate->Draw("colz text"); c.Print(TString(hMu_final_realRate->GetName())+".pdf");
 }
 
+// // */
+
+LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l)
+{
+	/* cf https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/FakeObjectBgEstimation */
+	using namespace MCTC;
+
+	if (l==MUON && type==IsoMuon) return REAL;
+	if (l==ELEC && type==IsoElectron) return REAL;
+
+	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
+		|| orig==CharmedBaryon || orig==BottomBaryon || orig==JPsi)
+		return HEAVY;
+
+	if (orig==LightMeson || orig==StrangeMeson || orig==LightBaryon || orig==StrangeBaryon 
+		|| orig==PionDecay || orig==KaonDecay || orig==PiZero|| orig==NonDefined || orig==DalitzDec)
+		return LIGHT;
+
+	if (l==ELEC && orig==Mu && type==NonIsoElectron) return LIGHT;
+
+	if (orig==PhotonConv || orig==BremPhot || orig==PromptPhot || orig==UndrPhot 
+		|| orig==ISRPhot || orig==FSRPhot)
+		return CONV;
+
+	 return LIGHT;
+}
 
 bool finalize()
 {
 	if (VERBOSE) cout << "Cleaning up..." << endl;
 
 	if (VERBOSE) cout << "Histograms" << endl;
-	for (auto h : allHistos){h->calcEff(); h->Draw();}
+	if (sfhEl_FakeScaleFactors[HEAVY]) sfhEl_FakeScaleFactors[HEAVY]->Draw();
+	if (sfhEl_FakeScaleFactors[LIGHT]) sfhEl_FakeScaleFactors[LIGHT]->Draw();
+	if (sfhEl_FakeScaleFactors[CONV]) sfhEl_FakeScaleFactors[CONV]->Draw();
+	if (sfhMu_FakeScaleFactors[HEAVY]) sfhMu_FakeScaleFactors[HEAVY]->Draw();
+	if (sfhMu_FakeScaleFactors[LIGHT]) sfhMu_FakeScaleFactors[LIGHT]->Draw();
+	if (hEl_RealScaleFactors) hEl_RealScaleFactors->Draw();
+	if (hMu_RealScaleFactors) hMu_RealScaleFactors->Draw();
 
-	if (VERBOSE) cout << "Writing lepton composition" << endl;
-	lp_El->Normalize(); lp_El->Write();
-	lp_Mu->Normalize(); lp_Mu->Write();
+	for(auto h : allHistos) h->Draw();
+
+	if (VERBOSE) cout << "Drawing lepton composition" << endl;
+	lp_El->Normalize(); lp_El->Draw();
+	lp_Mu->Normalize(); lp_Mu->Draw();
 
 	if (VERBOSE) cout << "Draw MCTC " << endl;
 	TCanvas *can = new TCanvas("cMCTC", "cMCTC", 1280,800); can->SetGrid();
-	if (hMu_MCTC) {labelMCTChist(hMu_MCTC); hMu_MCTC->Draw("text"); can->Print(outDir+"hMu_MCTC.pdf");}
-	if (hEl_MCTC) {labelMCTChist(hEl_MCTC); hEl_MCTC->Draw("text");can->Print(outDir+"hEl_MCTC.pdf");}
+	if (hMu_MCTC) {labelMCTChist(hMu_MCTC); hMu_MCTC->Draw("text"); can->Print("hMu_MCTC.pdf");}
+	if (hEl_MCTC) {labelMCTChist(hEl_MCTC); hEl_MCTC->Draw("text");can->Print("hEl_MCTC.pdf");}
 	delete can; can=0;
 
 	if (VERBOSE) cout << "Write to file" << endl;
-	effsFile->Write(); effsFile->Close();
-	nEventsFile->Write(); nEventsFile->Close();
+	outFile->Write();
 	for (auto h: allHistos) if (h!=0) {delete h; h=0;}
 
 	if (xsecDB!=0){delete xsecDB; xsecDB=0;}
@@ -922,7 +1296,7 @@ bool finalize()
 
 TChain* loadData(TString fileList, bool isMC){
 	//return a TChain linked to the data files
-	bool DEBUG = false;
+	// bool DEBUG = true;
 	TChain* tc = new TChain("evt2l");
 
 	ifstream inF(fileList.Data());
@@ -933,7 +1307,7 @@ TChain* loadData(TString fileList, bool isMC){
 	   	allFiles.push_back(line);
 	}
 
- 	if (false && isMC) // Weight MC trees
+ 	if (fileList==inFileZjets && isMC) // Weight MC trees
  	{
  		cout << "Weighting MC trees from " << fileList << endl;
  		for(auto it=allFiles.begin(); it!=allFiles.end(); )
@@ -943,7 +1317,7 @@ TChain* loadData(TString fileList, bool isMC){
  			// Get sampleID
  			auto s = *it;
  			int sampleID = TString(s(s.Index("TeV")+4,6)).Atoi();
- 			if(DEBUG) cout << "sampleID: " << sampleID << '\n';
+ 			if(DEBUG) cout << "sampleID: " << sampleID << '\t';
  			int s1 = sampleID;
  			while(sampleID == s1)
  			{
@@ -965,8 +1339,8 @@ TChain* loadData(TString fileList, bool isMC){
 				f.Close(0);
 	 		}
 	 		double xSecxEff = 1;
-	 		if (DEBUG) cout << "Getting cross section now..." << endl;
-	 		if (DEBUG && xsecDB) cout << "database is initialized" << endl; 
+	 		// if (DEBUG) cout << "Getting cross section now..." << endl;
+	 		// if (DEBUG && xsecDB) cout << "database is initialized" << endl; 
 	 		xSecxEff *= xsecDB->xsectTimesEff(sampleID);
 	 		if (DEBUG) cout << "xSecxEff = " << xSecxEff << endl;
 	 		double mcEvtW = xSecxEff * LUMI / sumW;
@@ -1003,6 +1377,7 @@ TChain* loadData(TString fileList, bool isMC){
  			tc->Add(fname);
  		} else tc->Add(f);
  	}
+ 	if(DEBUG) cout << "Trees loaded " << endl;
 
 	return tc;
 }
