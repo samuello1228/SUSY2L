@@ -3665,6 +3665,11 @@ void analysis1()
                                         if(n>0) nBG += n;
                                     }
                                     
+                                    {
+                                        double nSig1Error = 0;
+                                        double nSig1 = h2Sig[1]->IntegralAndError(bin1,bin2,nSig1Error);
+                                        if(nSig1/nSig1Error<=2) skip = true;
+                                    }
                                     //expected number of events for signal
                                     nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
                                     //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
