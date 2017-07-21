@@ -1,6 +1,6 @@
-#include "support/evt2l.C"
-#include "support/obj_def.h"
-#include "support/MCTruthClassifierDefs.h"
+#include "../support/evt2l.C"
+#include "../support/obj_def.h"
+#include "../support/MCTruthClassifierDefs.h"
 #include <TString.h>
 #include <TChain.h>
 #include <fstream>
@@ -10,8 +10,9 @@ using namespace MCTC;
 using std::cout; 
 using std::endl;
 
-const TString inFileZjets="support/inFileList-Zjets.txt";
-int nEvents = 1000;
+// const TString inFileZjets="../support/inFileList-Zjets.txt";
+const TString inFileZjets="../support/inFileList-ZPowheg.txt";
+int nEvents = -1;
 
 
 enum LEP_SOURCE {
@@ -50,22 +51,26 @@ void printDecay()
 {
 	using namespace MCTC;
 	ofstream outTxt("decays.txt");
+	ofstream outLightText("decays-Light.txt");
 
-	lightOriginEl = TH1D("lightOriginEl", "Origin of light fakes (El)", 2, 0, 2);
-	lightOriginEl.SetBinLabel(1, "UnknownEl+NonDefined origin");
-	lightOriginEl.SetBinLabel(2, "Other");
+	// lightOriginEl = TH1D("lightOriginEl", "Origin of light fakes (El)", 2, 0, 2);
+	// lightOriginEl.SetBinLabel(1, "UnknownEl+NonDefined origin");
+	// lightOriginEl.SetBinLabel(2, "Other");
 
-	lightOriginMu = TH1D("lightOriginMu", "Origin of light fakes (Mu)", 2, 0, 2);
-	lightOriginMu.SetBinLabel(1, "UnknownMu+NonDefined origin");
-	lightOriginMu.SetBinLabel(2, "Other");
+	// lightOriginMu = TH1D("lightOriginMu", "Origin of light fakes (Mu)", 2, 0, 2);
+	// lightOriginMu.SetBinLabel(1, "UnknownMu+NonDefined origin");
+	// lightOriginMu.SetBinLabel(2, "Other");
 
 	evt2l* zTree = new evt2l(loadData(inFileZjets));
 
 	int nTotalEvents = zTree->fChain->GetEntries();
-	if (nEvents<0) nEvents = nTotalEvents;
+	if (nEvents<0 || nEvents>nTotalEvents) nEvents = nTotalEvents;
 
 	outTxt << "There are " << nTotalEvents << " events in " << inFileZjets
 			<< ", we will look at " << nEvents << endl;
+
+	int nReal, nHeavy, nLight, nConv;
+	nReal = nHeavy = nLight = nConv = 0;
 
 	for(int i=0; i<nEvents; i++)
 	{
@@ -80,6 +85,7 @@ void printDecay()
 			if(zTree->leps_pt[j]<20) {outTxt << "Pt <20" << endl; continue;}
 
 			bool lepIsTight = zTree->leps_lFlag[j] & IS_SIGNAL;
+			outTxt << (lepIsTight? "Tight":"Loose");
 			LEP_TYPE recoLepType;
 			if (TMath::Abs(int(zTree->leps_ID[j]/1000)) == 11) {recoLepType=ELEC; outTxt << " Reco el, ";}
 			else if (TMath::Abs(int(zTree->leps_ID[j]/1000)) == 13) {recoLepType=MUON; outTxt << " Reco mu, ";}
@@ -92,22 +98,36 @@ void printDecay()
 			outTxt << "Type " << (int) type << ", Origin " << (int) orig << ", ";
 			outTxt << LS_TOSTRING(source) << endl << "  ==> ";
 
-			if(recoLepType==ELEC)
-			{
-				if(type==UnknownElectron || type==Unknown)
+			switch(source){
+				case (REAL):   nReal++; break;
+				case (LIGHT): nLight++;
+							outLightText << "Reco " << (recoLepType==ELEC? "el":"mu") << " from event #" << i
+										<< "\t| Type " << (int) type << ", Origin " << (int) orig << endl;
+								break;
+				case (HEAVY): nHeavy++; break;
+				case (CONV):   nConv++; break;
 			}
+
 
 			int truthI = zTree->leps_truthI[j];
 			while(truthI >=0)
 			{
 				outTxt << zTree->truths_pdgId[truthI] << " ";
+				if (source==LIGHT) outLightText << zTree->truths_pdgId[truthI] << " ";
 				truthI = zTree->truths_motherI[truthI];
 			}
 			outTxt << endl;
+			if(source==LIGHT) outLightText << endl << endl;
+
+
 		}
 		outTxt << endl << endl;
 	}
-
+	outTxt << "Total number of electrons: " << endl
+			<< "REAL  : " << nReal << endl
+			<< "LIGHT : " << nLight << endl
+			<< "HEAVY : " << nHeavy << endl
+			<< "CONV  : " << nConv  << endl;
 	cout << endl << endl;
 }
 
@@ -118,6 +138,7 @@ bool passLepCompCR(evt2l* tree)
 		- Same sign
 		- Signal
 	- No more than three jets
+	- Z mass veto
 
 	Recall f= N(tight)/N(loose), should require signal leptons
 	*/
@@ -126,6 +147,7 @@ bool passLepCompCR(evt2l* tree)
 	pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
 	pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
 	pass *= tree->jets_<=3;
+	pass *= fabs(tree->l12_m-91.2)>10;  
 
 	// // No b-jets
 	// for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
