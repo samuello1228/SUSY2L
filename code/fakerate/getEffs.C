@@ -290,7 +290,7 @@ public:
 	bool Fill(LEP_SOURCE s, LEP_PROC p, double pt, double eta, double w)
 	{
 		if (DEBUG) cout << "### Enter " << name << "::Fill()" << endl;
-		int ptBin = GetPtBin(pt); int etaBin = GetEtaBin(eta);
+		int ptBin = GetPtBin(pt)-1; int etaBin = GetEtaBin(eta)-1;
 		if (DEBUG) cout << "### Pt/Eta Bin acquired" << endl;
 		if(ptBin<0 || etaBin<0) return false;
 
@@ -464,8 +464,8 @@ public:
 
 	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, pair<int, int> binNum)
 	{
-		int ptBin = binNum.first; int etaBin = binNum.second;
-		if(ptBin<0 || etaBin<0) return make_pair(0,0);
+		int ptBin = binNum.first-1; int etaBin = binNum.second-1; // -1 to be consistent with the binning scheme of TH1
+		if(ptBin<1 || etaBin<1) return make_pair(0,0);
 		if(s==REAL) return make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
 		else return make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
 	}
@@ -473,16 +473,16 @@ public:
 	static int GetPtBin(double pt)
 	{
 		if (pt<ptBins[0]) return -1; // Underflow
-		for(int i=0; i<nPtBins; i++) if (pt<ptBins[i+1]) return i;
-		return nPtBins-1; // Overflow, place in largest ptBin.
+		for(int i=0; i<nPtBins; i++) if (pt<ptBins[i+1]) return i+1;
+		return nPtBins; // Overflow, place in largest ptBin.
 	}
 
 	static int GetEtaBin(double eta)
 	{
 		eta = TMath::Abs(eta);
 		if (eta<etaBins[0]) return -1; // Underflow, not really possible for eta
-		for(int i=0; i<nEtaBins; i++) if (eta<etaBins[i+1]) return i;
-		return nEtaBins-1; // Overflow, place in largest etaBin.
+		for(int i=0; i<nEtaBins; i++) if (eta<etaBins[i+1]) return i+1;
+		return nEtaBins; // Overflow, place in largest etaBin.
 	}
 };
 
@@ -586,7 +586,7 @@ public:
 	pair<double, double> GetEff(double pt, double eta)
 	{
 		int ptBin = LepProp::GetPtBin(pt); 
-		int etaBin = LepProp::GetPtBin(eta);
+		int etaBin = LepProp::GetEtaBin(eta);
 		return GetEff(make_pair(ptBin, etaBin));
 	}
 
@@ -1156,9 +1156,14 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 // /*
 void calcFinalEffs()
 {
+	// bool DEBUG=true;
+
+	if(DEBUG) cout << "calcFinalEffs() begins" << endl;
+
 	for(auto h: allHistos) h->calcEff(); 
     lp_El->Normalize();
     lp_Mu->Normalize();
+    if(DEBUG) cout << "Unweighted efficiencies and lepton compositions calculated" << endl;
 
 	hEl_final_fakeRate = new TH2D("hEl_final_fakeRate", "El Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
 	hMu_final_fakeRate = new TH2D("hMu_final_fakeRate", "Mu Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
@@ -1170,8 +1175,11 @@ void calcFinalEffs()
 	hEl_final_realRate->SetDirectory(dir_weightedRates);
 	hMu_final_realRate->SetDirectory(dir_weightedRates);
 
-	for(int etaBin=0; etaBin<nEtaBins; etaBin++){
-	for(int  ptBin=0;  ptBin< nPtBins;  ptBin++){
+	if(DEBUG) cout << "Final rate histograms created" << endl
+					<< "Begin loop over all bins " << endl;
+
+	for(int etaBin=1; etaBin<=nEtaBins; etaBin++){
+	for(int  ptBin=1;  ptBin<= nPtBins;  ptBin++){
 		// Initialize
 		double elRealRate, elRealUnc, muRealRate, muRealUnc;
 		elRealRate = elRealUnc = muRealRate = muRealUnc = 0;
@@ -1200,9 +1208,8 @@ void calcFinalEffs()
 
 			for(int s=0; s<N_FAKES_SOURCE; s++)
 			{
-
 				auto elEff 	= hElFake[s][p]->GetEff(binNum);
-				auto elSF 	= make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? make_pair(1.,0.0) : sfhEl_FakeScaleFactors[s]->GetSF(binNum);
+				auto elSF 	= make_pair(1.,0.); // sfhEl_FakeScaleFactors[s]->GetSF(binNum);
 				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				elFakeRate += elEff.first*elSF.first*elLP.first;
@@ -1211,7 +1218,7 @@ void calcFinalEffs()
 				if(((LEP_SOURCE) s)==CONV) continue;
 
 				auto muEff 	= hMuFake[s][p]->GetEff(binNum);
-				auto muSF 	= make_pair(1.,0.); // ((LEP_SOURCE) s)==LIGHT? make_pair(1.,0.0) : sfhMu_FakeScaleFactors[s]->GetSF(binNum);
+				auto muSF 	= make_pair(1.,0.); // sfhMu_FakeScaleFactors[s]->GetSF(binNum);
 				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				muFakeRate += muEff.first*muSF.first*muLP.first;
@@ -1231,6 +1238,7 @@ void calcFinalEffs()
 		hEl_final_realRate->SetBinContent(ptBin, etaBin, elRealRate); hEl_final_realRate->SetBinError(ptBin, etaBin, elRealUnc);
 		hMu_final_realRate->SetBinContent(ptBin, etaBin, muRealRate); hMu_final_realRate->SetBinError(ptBin, etaBin, muRealUnc);
 	}}
+
     TCanvas c;
 	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".pdf");
 	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".pdf");
