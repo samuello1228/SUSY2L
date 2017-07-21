@@ -465,7 +465,7 @@ public:
 	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, pair<int, int> binNum)
 	{
 		int ptBin = binNum.first-1; int etaBin = binNum.second-1; // -1 to be consistent with the binning scheme of TH1
-		if(ptBin<1 || etaBin<1) return make_pair(0,0);
+		if(ptBin<0 || etaBin<0) return make_pair(0,0);
 		if(s==REAL) return make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
 		else return make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
 	}
