@@ -629,43 +629,43 @@ void analysis1()
     {
         VarData element;
         
-        element.VarName = "pt1";           element.VarTitle = "p_{T} of the leading lepton";    element.unit = "[GeV]";
+        element.VarName = "pt1";           element.VarTitle = "p_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt$ of the leading lepton";
+        element.latexName = "$\\pt^{l1}$";
         element.CutDirection=1;
         Var.push_back(element);
         
-        element.VarName = "pt2";           element.VarTitle = "p_{T} of the subleading lepton"; element.unit = "[GeV]";
+        element.VarName = "pt2";           element.VarTitle = "p_{T}^{l2}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt$ of the subleading lepton";
+        element.latexName = "$\\pt^{l2}$";
         element.CutDirection=1;
         Var.push_back(element);
         
-        element.VarName = "eta1";          element.VarTitle = "#eta of the leading lepton";     element.unit = "";
+        element.VarName = "eta1";          element.VarTitle = "#eta^{l1}";                      element.unit = "";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\eta$ of the leading lepton";
+        element.latexName = "$\\eta^{l1}$";
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "eta2";          element.VarTitle = "#eta of the subleading lepton";  element.unit = "";
+        element.VarName = "eta2";          element.VarTitle = "#eta^{l2}";                      element.unit = "";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=-3;                element.xmax=3;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\eta$ of the subleading lepton";
+        element.latexName = "$\\eta^{l2}$";
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "phi1";          element.VarTitle = "#phi of the leading lepton";     element.unit = "";
+        element.VarName = "phi1";          element.VarTitle = "#phi^{l1}";                      element.unit = "";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=-TMath::Pi();      element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\phi$ of the leading lepton";
+        element.latexName = "$\\phi^{l1}$";
         element.CutDirection=0;
         Var.push_back(element);
         
@@ -677,11 +677,11 @@ void analysis1()
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "ptll";          element.VarTitle = "Dilepton p_{T}";                 element.unit = "[GeV]";
+        element.VarName = "ptll";          element.VarTitle = "p_{T}^{ll}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=400;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "Dilepton $\\pt$";
+        element.latexName = "$\\pt^{ll}$";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -701,19 +701,19 @@ void analysis1()
         element.CutDirection=1;
         Var.push_back(element);
         
-        element.VarName = "mt1";           element.VarTitle = "m_{T} of the leading lepton";    element.unit = "[GeV]";
+        element.VarName = "mt1";           element.VarTitle = "m_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$m_{\\text{T}}$ of the leading lepton";
+        element.latexName = "$m_{\\text{T}}^{l1}$";
         element.CutDirection=1;
         Var.push_back(element);
         
-        element.VarName = "mt2";           element.VarTitle = "m_{T} of the subleading lepton"; element.unit = "[GeV]";
+        element.VarName = "mt2";           element.VarTitle = "m_{T}^{l2}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$m_{\\text{T}}$ of the subleading lepton";
+        element.latexName = "$m_{\\text{T}}^{l2}$";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -4975,7 +4975,7 @@ void analysis1()
                                 }
                                 else
                                 {
-                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += Var[VarIndex].VarTitle;
                                     NameTemp += " < ";
                                     NameTemp += upper;
                                     
@@ -4988,7 +4988,7 @@ void analysis1()
                             {
                                 if(upper == -1)
                                 {
-                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += Var[VarIndex].VarTitle;
                                     NameTemp += " >= ";
                                     NameTemp += lower;
                                     
@@ -5000,7 +5000,7 @@ void analysis1()
                                 {
                                     NameTemp += lower;
                                     NameTemp += " <= ";
-                                    NameTemp += Var[VarIndex].VarFormula;
+                                    NameTemp += Var[VarIndex].VarTitle;
                                     NameTemp += " < ";
                                     NameTemp += upper;
                                     
