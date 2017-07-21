@@ -4327,11 +4327,11 @@ void analysis1()
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
                 
+                double sumOfEvent[BGGroup.size()+SigMassSplitting.size()+2][3];
+                //sample,expN/error/significance
+                int totalBGstat = 0;
                 if(VarIndex==countVariable)
                 {
-                    double sumOfEvent[BGGroup.size()+SigMassSplitting.size()+2][3];
-                    //sample,expN/error/significance
-                    
                     //expected number of events for Data
                     sumOfEvent[BGGroup.size()+1][0] = h2DataSum->Integral(0,-1);
                     cout<<"Data: "<<sumOfEvent[BGGroup.size()+1][0]<<endl;
@@ -4340,7 +4340,6 @@ void analysis1()
                     sumOfEvent[BGGroup.size()][0]=0;
                     sumOfEvent[BGGroup.size()][1]=0;
                     
-                    int totalBGstat = 0;
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         //expected number of events for BG
@@ -4371,7 +4370,10 @@ void analysis1()
                         cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
                     cout<<endl;
-                    
+                }
+                
+                if(VarIndex==countVariable)
+                {
                     //output file
                     TString PathName = "latex/data/expN/";
                     PathName += RegionInfo[RegionIndex].RegionName;
