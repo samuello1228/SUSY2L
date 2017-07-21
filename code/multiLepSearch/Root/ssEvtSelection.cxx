@@ -1513,16 +1513,19 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     l.truthOrig = res.second;
 
     xAOD::TruthParticle *tp = 0;
-    auto tl = acc_truthLink(*mu);
-    if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+    if(mcTruthMatch=="TruthLink" || (mcTruthMatch=="tryAll" && !tp))
+    {
+      auto tl = acc_truthLink(*mu);
+      if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+    }
 
     // MCTruthClassifier
-    else if (mcTruthMatch=="tryAll" && !tp){
+    else if (mcTruthMatch=="MCTC" || (mcTruthMatch=="tryAll" && !tp)){
       tp = const_cast<xAOD::TruthParticle*>(m_truthClassifier->getGenPart());
     }
 
     // Reverse truthLink
-    else if (mcTruthMatch=="tryAll" && !tp){
+    else if (mcTruthMatch=="reverseTruthLink" || (mcTruthMatch=="tryAll" && !tp)){
       const xAOD::TruthParticleContainer* tContainer = 0;
       CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
       for(auto particle : *tContainer){
@@ -1535,7 +1538,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     }
 
     // dR
-    else if (mcTruthMatch=="tryAll" && !tp){
+    else if (mcTruthMatch=="dR" || (mcTruthMatch=="tryAll" && !tp)){
       // Set up truth particle container
       const xAOD::TruthParticleContainer* tContainer = 0;
       CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
