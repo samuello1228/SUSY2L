@@ -4330,7 +4330,7 @@ void analysis1()
                 double sumOfEvent[BGGroup.size()+SigMassSplitting.size()+2][3];
                 //sample,expN/error/significance
                 int totalBGstat = 0;
-                if(VarIndex==countVariable)
+                if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
                     //expected number of events for Data
                     sumOfEvent[BGGroup.size()+1][0] = h2DataSum->Integral(0,-1);
@@ -4432,7 +4432,7 @@ void analysis1()
                         if(RegionGroup[RegionGroupIndex].showSignificance)
                         {
                             fout<<"$";
-                            fout<<setprecision(3)<<std::fixed;
+                            fout<<setprecision(2)<<std::fixed;
                             fout<<sumOfEvent[BGGroup.size()+i+2][2];
                             fout<<"$";
                         }
@@ -4931,7 +4931,7 @@ void analysis1()
                     
                     TLatex lt2;
                     TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
-                    NameTemp += TString::Itoa(sumDataL/1000,10);
+                    NameTemp += TString::Format("%.1f",sumDataL/1000);
                     NameTemp += " fb^{-1}";
                     lt2.DrawLatexNDC(0.2,0.83, NameTemp.Data());
                     lt2.SetTextSize(lt2.GetTextSize());
@@ -5028,6 +5028,13 @@ void analysis1()
                     }
                     
                     fin.close();
+                    
+                    {
+                        TString NameTemp = TString::Format("Z_{n} = %.2f",sumOfEvent[BGGroup.size()+SigOptimizingIndex+2][2]);
+                        TLatex lt2;
+                        lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
+                        lt2.SetTextSize(lt2.GetTextSize());
+                    }
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
