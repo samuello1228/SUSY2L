@@ -5737,7 +5737,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
         TString PathName = "latex/data/expN_";
@@ -5891,7 +5892,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||*/
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
         
