@@ -584,7 +584,7 @@ void analysis1()
         element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
-        element.lower = 103;  element.upper = 108; element.colour = 419; BGMCGroupData.push_back(element);
+        element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
         element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
