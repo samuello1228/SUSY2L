@@ -4319,7 +4319,9 @@ void analysis1()
                             Cut += ")";
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                             BGGroup[j].info->statCount += bgCount;
-                            //if(BGGroup[j].info->GroupName == "Zmumu") tree2BGMC[j][k]->Scan("mll:weight",Cut.Data());
+                            
+                            //if(BGGroup[j].info->GroupName == "VV") cout<<k<<" "<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
+                            //if(BGGroup[j].info->GroupName == "VV") tree2BGMC[j][k]->Scan("weight",Cut.Data());
                             //normalization for BG
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                             
