@@ -821,7 +821,7 @@ void analysis1()
         element.CutDirection=1;
         Var.push_back(element);
         
-        element.VarName = "mlj";           element.VarTitle = "m_{lj} or m_{ljj}";              element.unit = "[GeV]";
+        element.VarName = "mlj";           element.VarTitle = "m_{lj}/m_{ljj}";                 element.unit = "[GeV]";
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
@@ -2406,6 +2406,134 @@ void analysis1()
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
         
+        
+        //Signal region for preselection
+        GroupElement.GroupName = "SR_SS_pre";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = false;
+        GroupElement.showSignificance = true;
+        
+        //ee_1
+        {
+            element.RegionName = "SR_SS_ee_1_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_1
+        {
+            element.RegionName = "SR_SS_mumu_1_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(eta1) < 2.4";
+            element.Cut += " && fabs(eta2) < 2.4";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_1
+        {
+            element.RegionName = "SR_SS_emu_1_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(eta1) < 2.5";
+            element.Cut += " && fabs(eta2) < 2.5";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //ee_2
+        {
+            element.RegionName = "SR_SS_ee_2_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu_2
+        {
+            element.RegionName = "SR_SS_mumu_2_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(eta1) < 2.4";
+            element.Cut += " && fabs(eta2) < 2.4";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu_2
+        {
+            element.RegionName = "SR_SS_emu_2_pre";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            element.Cut += " && fabs(eta1) < 2.5";
+            element.Cut += " && fabs(eta2) < 2.5";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            OptimizingCutElement1.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
+        
         //Control region for run 1
         GroupElement.GroupName = "CR_OS_run1";
         GroupElement.lower = RegionInfo.size();
@@ -3184,7 +3312,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=11;RegionGroupIndex<=11;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -4942,10 +5070,23 @@ void analysis1()
                 }
                 
                 //Draw vertical line for optimized cut
-                if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+                   RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
                 {
+                    TString optGroupName = "SR_SS_opt";
+                    unsigned int optRegionGroupIndex;
+                    for(unsigned int i=0;i<RegionGroup.size();i++)
+                    {
+                        if(RegionGroup[i].GroupName == optGroupName)
+                        {
+                            optRegionGroupIndex = i;
+                        }
+                    }
+                    
+                    const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                    
                     TString PathName = "latex/data/optimization/cut_txt/cut_";
-                    PathName += RegionInfo[RegionIndex].RegionName;
+                    PathName += RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].RegionName;
                     PathName += "_";
                     PathName += TString::Itoa(SigOptimizingIndex,10);
                     PathName += ".txt";
@@ -4953,7 +5094,7 @@ void analysis1()
                     ifstream fin;
                     fin.open(PathName.Data());
                     
-                    for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
+                    for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].OptimizingCut[SigOptimizingIndex].size();i++)
                     {
                         TString VarName;
                         double lower;
@@ -5029,6 +5170,7 @@ void analysis1()
                     
                     fin.close();
                     
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
                         TString NameTemp = TString::Format("Z_{n} = %.2f",sumOfEvent[BGGroup.size()+SigOptimizingIndex+2][2]);
                         TLatex lt2;
