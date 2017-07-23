@@ -3995,69 +3995,6 @@ void analysis1()
                                 fout.close();
                             }
                             
-                            {
-                                TString PathName = "latex/data/optimization/cut_latex/cut_";
-                                PathName += RegionInfo[RegionIndex].RegionName;
-                                PathName += "_";
-                                PathName += TString::Itoa(SigIndex,10);
-                                PathName += ".tex";
-                                
-                                ofstream fout;
-                                fout.open(PathName.Data());
-                                
-                                
-                                TString latexName = RegionInfo[RegionIndex].RegionName;
-                                latexName.ReplaceAll("_","\\_");
-                                fout<<latexName.Data()<<": (";
-                                fout<<SigMass1[SigMassSplitting[SigIndex].ID]<<", ";
-                                fout<<SigMass2[SigMassSplitting[SigIndex].ID]<<"): \\\\"<<endl;
-                                
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
-                                {
-                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
-                                    
-                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower == 0)
-                                    {
-                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper == -1)
-                                        {
-                                        }
-                                        else
-                                        {
-                                            // x < a
-                                            fout<<Var[VarIndex].latexName.Data();
-                                            fout<<" $<";
-                                            fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
-                                            fout<<"$";
-                                            fout<<" \\\\"<<endl;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper == -1)
-                                        {
-                                            // x >= a
-                                            fout<<Var[VarIndex].latexName.Data();
-                                            fout<<" $\\geq ";
-                                            fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
-                                            fout<<"$";
-                                            fout<<" \\\\"<<endl;
-                                        }
-                                        else
-                                        {
-                                            // a <= x < b
-                                            fout<<"$";
-                                            fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
-                                            fout<<" \\leq$ ";
-                                            fout<<Var[VarIndex].latexName.Data();
-                                            fout<<" $<";
-                                            fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
-                                            fout<<"$";
-                                            fout<<" \\\\"<<endl;
-                                        }
-                                    }
-                                }
-                                fout.close();
-                            }
                             break;
                         }
                     }
@@ -6061,6 +5998,101 @@ void analysis1()
         }
         
         fout.close();
+    }
+    
+    for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+    {
+        TString optGroupName = "SR_SS_opt";
+        unsigned int optRegionGroupIndex;
+        for(unsigned int i=0;i<RegionGroup.size();i++)
+        {
+            if(RegionGroup[i].GroupName == optGroupName)
+            {
+                optRegionGroupIndex = i;
+            }
+        }
+        
+        const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
+        
+        ifstream fin;
+        {
+            TString PathName = "latex/data/optimization/cut_txt/cut_";
+            PathName += RegionInfo[RegionIndex].RegionName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".txt";
+            fin.open(PathName.Data());
+        }
+        
+        ofstream fout;
+        {
+            TString PathName = "latex/data/optimization/cut_latex/cut_";
+            PathName += RegionInfo[RegionIndex].RegionName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".tex";
+            fout.open(PathName.Data());
+        }
+        
+        TString latexName = RegionInfo[RegionIndex].RegionName;
+        latexName.ReplaceAll("_","\\_");
+        fout<<latexName.Data()<<": (";
+        fout<<SigMass1[SigMassSplitting[SigOptimizingIndex].ID]<<", ";
+        fout<<SigMass2[SigMassSplitting[SigOptimizingIndex].ID]<<"): \\\\"<<endl;
+
+        for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
+        {
+            TString VarName;
+            double lower;
+            double upper;
+            fin>>VarName;
+            fin>>lower;
+            fin>>upper;
+            
+            unsigned int VarIndex = findVarIndex(VarName,Var);
+            
+            if(lower == 0)
+            {
+                if(upper == -1)
+                {
+                }
+                else
+                {
+                    // x < a
+                    fout<<Var[VarIndex].latexName.Data();
+                    fout<<" $<";
+                    fout<<upper;
+                    fout<<"$";
+                    fout<<" \\\\"<<endl;
+                }
+            }
+            else
+            {
+                if(upper == -1)
+                {
+                    // x >= a
+                    fout<<Var[VarIndex].latexName.Data();
+                    fout<<" $\\geq ";
+                    fout<<lower;
+                    fout<<"$";
+                    fout<<" \\\\"<<endl;
+                }
+                else
+                {
+                    // a <= x < b
+                    fout<<"$";
+                    fout<<lower;
+                    fout<<" \\leq$ ";
+                    fout<<Var[VarIndex].latexName.Data();
+                    fout<<" $<";
+                    fout<<upper;
+                    fout<<"$";
+                    fout<<" \\\\"<<endl;
+                }
+            }
+        }
+        fout.close();
+        fin.close();
     }
     
     /*
