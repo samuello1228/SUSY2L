@@ -3813,6 +3813,7 @@ void analysis1()
                                 while(true)
                                 {
                                     double nBG = 0;
+                                    double nBGError2 = 0;
                                     double nSig = 0;
                                     double nSigError = 0;
                                     bool skip = false;
@@ -3845,8 +3846,13 @@ void analysis1()
                                                 }
                                             }
                                             
-                                            double n = BGGroup[j].h2->Integral(bin1,bin2);
-                                            if(n>0) nBG += n;
+                                            double Error;
+                                            double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
+                                            if(n>0)
+                                            {
+                                                nBG += n;
+                                            }
+                                            nBGError2 += Error * Error;
                                         }
                                     }
                                     
@@ -3864,7 +3870,7 @@ void analysis1()
                                     {
                                         //expected number of events for signal
                                         nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
-                                        //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
+                                        //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
                                         
                                         if(nSig <= 1) skip = true;
                                         else if(nSigError == 0) skip = true;
@@ -3875,7 +3881,7 @@ void analysis1()
                                     double significanceTemp = -999;
                                     if(!skip)
                                     {
-                                        significanceTemp = GetSignificance(nSig,nBG);
+                                        significanceTemp = GetSignificance(nSig,nBG,nBGError2);
                                         //cout<<", significance: "<<significanceTemp<<endl;
                                         
                                         if(significanceTemp > significanceRecord1)
@@ -4458,8 +4464,8 @@ void analysis1()
                         if(sumOfEvent[j][0] > 0)
                         {
                             sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
-                            sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         }
+                        sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         
                         totalBGstat += BGGroup[j].info->statCount;
                     }
@@ -4474,7 +4480,7 @@ void analysis1()
                         sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                         
                         //Significance
-                        sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0]);
+                        sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
                         
                         cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
@@ -4657,7 +4663,7 @@ void analysis1()
                                     expN *= SigXS[j];
                                     
                                     //Significance
-                                    double significance = GetSignificance(expN,sumOfEvent[BGGroup.size()][0]);
+                                    double significance = GetSignificance(expN,sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
                                     
                                     fout<<setprecision(3)<<std::fixed;
                                     fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
