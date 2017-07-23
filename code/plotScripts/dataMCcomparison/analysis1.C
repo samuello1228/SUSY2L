@@ -171,6 +171,11 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
     }
 }
 
+double GetSignificance(double nSig, double nBG, double nBGError = 0)
+{
+    return RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+}
+
 struct VarData
 {
     TString VarName;
@@ -3870,7 +3875,7 @@ void analysis1()
                                     double significanceTemp = -999;
                                     if(!skip)
                                     {
-                                        significanceTemp = RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+                                        significanceTemp = GetSignificance(nSig,nBG);
                                         //cout<<", significance: "<<significanceTemp<<endl;
                                         
                                         if(significanceTemp > significanceRecord1)
@@ -4469,7 +4474,7 @@ void analysis1()
                         sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
                         
                         //Significance
-                        sumOfEvent[BGGroup.size()+i+2][2] = RooStats::NumberCountingUtils::BinomialExpZ(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],0.3);
+                        sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0]);
                         
                         cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
@@ -4652,7 +4657,7 @@ void analysis1()
                                     expN *= SigXS[j];
                                     
                                     //Significance
-                                    double significance = RooStats::NumberCountingUtils::BinomialExpZ(expN,sumOfEvent[BGGroup.size()][0],0.3);
+                                    double significance = GetSignificance(expN,sumOfEvent[BGGroup.size()][0]);
                                     
                                     fout<<setprecision(3)<<std::fixed;
                                     fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
@@ -4763,8 +4768,8 @@ void analysis1()
                             }
                             
                             //Significance
-                            //if(SigMassSplitting[i].MassDiff==100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
-                            if(nBG>0) hSignificance[i]->SetBinContent(bin,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
+                            //if(SigMassSplitting[i].MassDiff==100) cout<<bin<<": "<<nBG<<", "<<nSig<<", "<<GetSignificance(nSig,nBG)<<endl;
+                            if(nBG>0) hSignificance[i]->SetBinContent(bin,GetSignificance(nSig,nBG));
                         }
                     }
                 }
@@ -5435,8 +5440,8 @@ void analysis1()
                             //nSig = h2SigSum[i]->Integral(bin1,-1,0,-1);
                             
                             //Significance
-                            //if(SigMassSplitting[i].MassDiff==100 && bin2==1) cout<<bin1<<": "<<nBG<<", "<<nSig<<", "<<RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3)<<endl;
-                            if(nBG>0) hSignificance[i]->SetBinContent(bin1,bin2,RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3));
+                            //if(SigMassSplitting[i].MassDiff==100 && bin2==1) cout<<bin1<<": "<<nBG<<", "<<nSig<<", "<<GetSignificance(nSig,nBG)<<endl;
+                            if(nBG>0) hSignificance[i]->SetBinContent(bin1,bin2,GetSignificance(nSig,nBG));
                         }
                     }
                 }
