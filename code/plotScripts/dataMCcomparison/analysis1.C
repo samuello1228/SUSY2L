@@ -43,6 +43,8 @@ const bool docfw = 0;
 const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
+const bool useDani = 0;
+
 // Cutflow Attention
 const bool doVVCount = 0;
 
@@ -1929,8 +1931,11 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
+            if(!useDani)
+            {
+                element.Cut += " && fabs(eta1) < 2.4";
+                element.Cut += " && fabs(eta2) < 2.4";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2026,8 +2031,11 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
+            if(!useDani)
+            {
+                element.Cut += " && fabs(eta1) < 2.5";
+                element.Cut += " && fabs(eta2) < 2.5";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2219,8 +2227,11 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
+            if(!useDani)
+            {
+                element.Cut += " && fabs(eta1) < 2.4";
+                element.Cut += " && fabs(eta2) < 2.4";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2316,8 +2327,11 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
+            if(!useDani)
+            {
+                element.Cut += " && fabs(eta1) < 2.5";
+                element.Cut += " && fabs(eta2) < 2.5";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2413,6 +2427,8 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         
+        if(useDani) element.Cut = " && nBJet == 0";
+        
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_pre";
@@ -2421,9 +2437,12 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(mll - 91.2) > 10";
+            if(!useDani)
+            {
+                element.Cut = " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(mll - 91.2) > 10";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2440,10 +2459,13 @@ void analysis1()
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
+            if(!useDani)
+            {
+                element.Cut = " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(eta1) < 2.4";
+                element.Cut += " && fabs(eta2) < 2.4";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2460,10 +2482,13 @@ void analysis1()
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
+            if(!useDani)
+            {
+                element.Cut = " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(eta1) < 2.5";
+                element.Cut += " && fabs(eta2) < 2.5";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2480,9 +2505,12 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(mll - 91.2) > 10";
+            if(!useDani)
+            {
+                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(mll - 91.2) > 10";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2499,10 +2527,13 @@ void analysis1()
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
+            if(!useDani)
+            {
+                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(eta1) < 2.4";
+                element.Cut += " && fabs(eta2) < 2.4";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2519,10 +2550,13 @@ void analysis1()
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
+            if(!useDani)
+            {
+                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                element.Cut += " && fabs(eta1) < 2.5";
+                element.Cut += " && fabs(eta2) < 2.5";
+            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -4096,7 +4130,10 @@ void analysis1()
                     {
                         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                         {
-                            TString PathName = "latex/data/optimization/cut_txt/cut_";
+                            TString PathName = "latex/data/optimization/";
+                            if(useDani) PathName += "cut_txt_Dani/";
+                            else PathName += "cut_txt/";
+                            PathName += "cut_";
                             PathName += RegionInfo[RegionIndex].RegionName;
                             PathName += "_";
                             PathName += TString::Itoa(SigOptimizingIndex,10);
@@ -5024,7 +5061,10 @@ void analysis1()
                     
                     const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
                     
-                    TString PathName = "latex/data/optimization/cut_txt/cut_";
+                    TString PathName = "latex/data/optimization/";
+                    if(useDani) PathName += "cut_txt_Dani/";
+                    else PathName += "cut_txt/";
+                    PathName += "cut_";
                     PathName += RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].RegionName;
                     PathName += "_";
                     PathName += TString::Itoa(SigOptimizingIndex,10);
@@ -6016,7 +6056,10 @@ void analysis1()
         
         ifstream fin;
         {
-            TString PathName = "latex/data/optimization/cut_txt/cut_";
+            TString PathName = "latex/data/optimization/";
+            if(useDani) PathName += "cut_txt_Dani/";
+            else PathName += "cut_txt/";
+            PathName += "cut_";
             PathName += RegionInfo[RegionIndex].RegionName;
             PathName += "_";
             PathName += TString::Itoa(SigOptimizingIndex,10);
