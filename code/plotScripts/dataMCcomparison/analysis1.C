@@ -171,9 +171,12 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
     }
 }
 
-double GetSignificance(double nSig, double nBG, double nBGError = 0)
+double GetSignificance(double nSig, double nBG, double nBGError2 = 0)
 {
-    return RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+    //return RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
+    
+    double Error = sqrt((0.25*0.25) + nBGError2/(nBG*nBG));
+    return RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,Error);
 }
 
 struct VarData
