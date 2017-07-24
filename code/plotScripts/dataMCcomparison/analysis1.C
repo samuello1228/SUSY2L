@@ -1861,7 +1861,8 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
+            //OptimizingCutElement2.Cut.lower = 20;
+            OptimizingCutElement2.Cut.lower = 25;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -1961,7 +1962,8 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
+            //OptimizingCutElement2.Cut.lower = 20;
+            OptimizingCutElement2.Cut.lower = 25;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -2157,7 +2159,8 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
+            //OptimizingCutElement2.Cut.lower = 20;
+            OptimizingCutElement2.Cut.lower = 25;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
