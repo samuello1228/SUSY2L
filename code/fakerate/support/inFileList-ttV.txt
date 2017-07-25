@@ -1,0 +1,8 @@
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.407321.MadGraphPythia8EvtGen_A14NNPDF23LO_ttbarWll_myOutput.root/user.ggallard.11727516._000001.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410081.MadGraphPythia8EvtGen_A14NNPDF23_ttbarWW_myOutput.root/user.ggallard.11727515._000001.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410218.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_ttee_myOutput.root/user.ggallard.11727511._000001.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410218.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_ttee_myOutput.root/user.ggallard.11727511._000002.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410219.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_ttmumu_myOutput.root/user.ggallard.11727512._000001.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410219.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_ttmumu_myOutput.root/user.ggallard.11727512._000002.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410220.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_tttautau_myOutput.root/user.ggallard.11727513._000001.myOutput.root
+/afs/cern.ch/user/g/ggallard/CERNBox/data/user.ggallard.v11.4.MCTC.mc15_13TeV.410220.aMcAtNloPythia8EvtGen_MEN30NLO_A14N23LO_tttautau_myOutput.root/user.ggallard.11727513._000002.myOutput.root
