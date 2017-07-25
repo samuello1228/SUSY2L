@@ -37,28 +37,46 @@ University of Michigan
 \frame{\titlepage}
 
 \begin{frame}{Introduction}
+\small
 The following constraints are applied to reduce the bias from low statistics:
 \begin{itemize}
+\small
 \item At least 10 unweighted events in VV and ttV background.
 \begin{itemize}
+\tiny
 \item New requirement suggested by Jeanette.
 \end{itemize}
-\item If the yield for one group of BG is negative, 0 yield is used.
+\item If the yield for one group of BG is negative, 0 yield is used. But the statistical error still keep unchanged to calculate the statistical error of total BG.
 \begin{itemize}
+\tiny
 \item Negative value means it is small.
 \end{itemize}
 \item nSig$>$1 and nSig/nSigError $>$ 2 for both (175,0) and (165,35).
 \begin{itemize}
+\tiny
 \item The optimization is still trying to find the largest significance for (175,0) point.
 \item New requirement for (165,35) point is added, so that the SR also works for this point.
 \end{itemize}
 \item For $\pt^{l1}$, $\pt^{l1}$, $\pt^{ll}$, $m_{T2}$, $E_{\text{T}}^{\text{miss,rel}}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$, there is no upper cut.
 \begin{itemize}
+\tiny
 \item In the old result, both lower and upper cut are applied to $\pt^{ll}$,  $m_{T2}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$.
 \end{itemize}
 \item For $|\Delta\eta_{ll}|$ and $m_{lj}$/$m_{ljj}$, there is no lower cut.
 \begin{itemize}
+\tiny
 \item In the old result, both lower and upper cut are applied to $|\Delta\eta_{ll}|$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -168,19 +186,23 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{columns}
 \end{frame}
 
+\begin{frame}{Cuts in SR}
+\vspace{5mm}
+\tiny
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& SR$ee$-1 & SR$ee$-2 & SR$\mu\mu$-1 & SR$\mu\mu$-2 & SR$e\mu$-1 & SR$e\mu$-2 \\
+\hline
+Lepton flavours & $ee$ & $ee$ & $\mu\mu$ & $\mu\mu$ & $e\mu$ & $e\mu$ \\
+\hline
+$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\
+\hline
+\input{data/optimization/cut_table_SR_SS_opt_0.tex}
+\end{tabular}
+\end{frame}
+
 \input{data/optimization/opt_SR_SS_opt_0.tex}
 \input{data/plot_SR_SS_opt_0.tex}
-
-\begin{frame}{negative VV BG}
-\begin{itemize}
-\item In SRee1, at least 10 VV raw events are require and we have 125 raw events.
-\item 112 raw events have positive weight, while 13 raw events have negative weight.
-\item Sum of positive weight is 1.37. Sum of negative weight is -1.78. Total yield is -0.41.
-\item The problem is due to the only one event after selection, which has negative weight in the sample
-Sherpa\_221\_NNPDF30NNLO\_WplvWmqq (This sample has a bug, will move to a bug fixed version)
-\includegraphics[width=0.5\textwidth]{data/optimization/negativeVV.png}
-\end{itemize}
-\end{frame}
 
 \begin{frame}{significance table}
 \includegraphics[width=\textwidth]{data/optimization/dongliang.png}
@@ -216,14 +238,6 @@ Backup
 
 \input{data/expN_SR_SS_pre.tex}
 \input{data/plot_SR_SS_pre.tex}
-
-\begin{frame}
-\frametitle{significance calculation}
-\begin{itemize}
-\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
-\item $\delta$B = 0.3
-\end{itemize}
-\end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Signal sample}
