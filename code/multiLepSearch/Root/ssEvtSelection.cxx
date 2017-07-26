@@ -1099,7 +1099,7 @@ EL::StatusCode ssEvtSelection :: execute ()
             sEvt.ElSF = 1;
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey, true);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
           }
         }
