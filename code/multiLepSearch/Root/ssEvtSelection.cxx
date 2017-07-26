@@ -934,6 +934,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
 
     // Save Z decay chain
+    // Info("execute()", "Save Z decay chain");
     if(CF_isMC && mcTruthMatch.back()=='Z')
     {
       const xAOD::TruthParticle* truthZ=0;
@@ -948,6 +949,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       addTruthPar(truthZ, m_susyEvt->truths, 1);
     }
+    // Info("execute()", "Z decay saved");
 
     // Info("execute()", "Before fillLepton");
     /// save leptons
@@ -1433,12 +1435,14 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         else continue;
       }
     }
+    // Info("fillLepton(el)", "After trying to find a match");
 
     /// save truth match and parents if exist, otherwise save -1.
-    if (tp) {
+    if (tp!=0) {
       l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
       m_susyEvt->truths[l.truthI].matchI = index;
     } else l.truthI = -1;
+    // Info("fillLepton(el)", "truthI = %d", l.truthI);
 
   }
   fillLeptonCommon(el, l);
@@ -1522,6 +1526,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       l.truthOrig = acc_truthOrig(*trk);
     }
     */
+    // Info("fillLepton(mu)", "Before MCTruthClassifier");
     std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
     res = m_truthClassifier->particleTruthClassifier(mu);
     l.firstEgMotherPdgId = 0;
@@ -1583,10 +1588,11 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     }
     
     /// save truth match and parents if exist, otherwise save -1.
-    if (tp) {
+    if (tp!=NULL) {
       l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
       m_susyEvt->truths[l.truthI].matchI = index;
     } else l.truthI = -1;
+    // Info("fillLepton(mu)", "l.truthI = %d", l.truthI);
 
   }
   fillLeptonCommon(mu, l);
@@ -1623,6 +1629,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
   l.truthType = 0;
   l.truthOrig = 0;
   l.firstEgMotherPdgId = 0;
+  // Info("fillLepton(p)", "Casting leptons");
   xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
   if(mu) {
     fillLepton(mu, l, index);
@@ -1634,6 +1641,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
     if(CF_isMC && mcTruthMatch=="MCTCZ") m_truthClassifier->particleTruthClassifier(el);
   }
 
+  // Info("fillLepton(p)", "Before Z fill");
   if(CF_isMC && mcTruthMatch.back()=='Z')
   {
     const xAOD::TruthParticle* tp=0;
@@ -1663,13 +1671,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
       tp = m_truthClassifier->getGenPart();
     }
 
-    if(tp) l.truthI=addTruthPar(tp, m_susyEvt->truths, 0);
+    if(tp!=NULL) {
+      l.truthI=addTruthPar(tp, m_susyEvt->truths, 0);
+      m_susyEvt->truths[l.truthI].matchI = index;
+    }
     else l.truthI=-1;
   }
   return EL::StatusCode::SUCCESS;
 }
 int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLevel){
   /// check if already exist
+  if(!p) return -1;
   const int bcode = p->barcode();
   int nv = v.size();
   for(int i=0;i<nv;i++){if(v[i].barcode == bcode) {return i;}}

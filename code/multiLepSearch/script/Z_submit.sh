@@ -4,26 +4,25 @@ mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/me
 # SUSYconf=multiLepSearch/sel_conf/SUSYTools_multilepAnaMoriond.conf
 SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh.conf
 
+tag=v11.4.2
 ####
-tag=v11.4.1.MCTCZ
 echo "########## MCTCZ Sherpa #############"
-k=${tag}.Sherpa
+k=${tag}.MCTCZ.Sherpa
 file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.364118.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2949/DAOD_SUSY2.11084342._000011.pool.root.1
 ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study fakes --mcMatch MCTCZ --doSys 0 --ChargeID 1 --conf ${SUSYconf}
 
 echo "########## MCTCZ PowhegPythia #############"
-k=${tag}.PowhegPythia
+k=${tag}.MCTCZ.PowhegPythia
 file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2949/DAOD_SUSY2.11608161._000011.pool.root.1
 ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study fakes --mcMatch MCTCZ --doSys 0 --ChargeID 1 --conf ${SUSYconf}
 
 ####
-tag=v11.4.1.dRZ
 echo "########## dRZ Sherpa #############"
-k=${tag}.Sherpa
+k=${tag}.dRZ.Sherpa
 file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.364118.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5299_s2726_r7772_r7676_p2949/DAOD_SUSY2.11084342._000011.pool.root.1
 ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study fakes --mcMatch dRZ --doSys 0 --ChargeID 1 --conf ${SUSYconf}
 
 echo "########## dRZ PowhegPythia #############"
-k=${tag}.PowhegPythia
+k=${tag}.dRZ.PowhegPythia
 file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2949/DAOD_SUSY2.11608161._000011.pool.root.1
 ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study fakes --mcMatch dRZ --doSys 0 --ChargeID 1 --conf ${SUSYconf}
