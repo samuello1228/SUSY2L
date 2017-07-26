@@ -1,7 +1,7 @@
 #!/bin/bash
 tag=v10.5
 dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
-mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/Wh_all_merged_PRW.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 #SUSYconf=SUSYTools/SUSYTools_Default.conf
 SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
@@ -29,6 +29,7 @@ k=${tag}.MCBG
 #For signal MC
 #file=../multiLepSearch/script/MCSig_sample_list.txt
 #file=../multiLepSearch/script/MCSig_sample_list_new.txt
+#file=../multiLepSearch/script/MCSig_sample_Wh_p2949.txt
 #k=${tag}.MCSig
 
 ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
