@@ -1,17 +1,17 @@
-mkdir AnalysisBase-02-04-30
-cd AnalysisBase-02-04-30
+mkdir AnalysisBase-02-04-31
+cd AnalysisBase-02-04-31
 
 #https://gitlab.cern.ch/hku/SUSY2L/tree/master/code/multiLepSearch
 git clone https://:@gitlab.cern.ch:8443/hku/SUSY2L.git
 cd SUSY2L/code/
 
 setupATLAS
-#localSetupRucioClients
 #voms-proxy-init -voms atlas
-#localSetupPandaClient
+#lsetup rucio
+#lsetup panda
 
 #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/SUSYPhys/SUSYTools/tags/
-rcSetup Base,2.4.30
+rcSetup Base,2.4.31
 
 rc find_packages
 rc clean
