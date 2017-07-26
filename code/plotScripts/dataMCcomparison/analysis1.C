@@ -307,26 +307,18 @@ void analysis1()
                     element.setOfBGData.clear();
                     if(element.isSS)
                     {
-                        /* Cutflow Attention
-                        element.setOfBGData.push_back("fake lepton");
+                        ///* Cutflow Attention
+                        //element.setOfBGData.push_back("fake lepton");
                         if(element.isSS_qF)
                         {
-                            if(docfw)
-                            {
-                                element.setOfBGMC.push_back("Zee");
-                            }
-                            else
-                            {
-                                element.setOfBGData.push_back("charge flip");
-                            }
+                            element.setOfBGData.push_back("charge flip");
                         }
-                        */
-                        element.setOfBGMC.push_back("Zjets");
+                        //*/
+                        //element.setOfBGMC.push_back("Zjets");
                         element.setOfBGMC.push_back("Wjets");
-                        //element.setOfBGMC.push_back("top");
                         
                         element.setOfBGMC.push_back("ttbar");
-                        element.setOfBGMC.push_back("singletop");
+                        //element.setOfBGMC.push_back("singletop");
                         element.setOfBGMC.push_back("ttV");
                         element.setOfBGMC.push_back("multitop");
                         
@@ -627,10 +619,10 @@ void analysis1()
     {
         GroupData element;
         element.GroupName = "charge flip"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
-        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
+        element.lower = 0;  element.upper = 0; element.colour = 2; BGDataGroupData.push_back(element);
         
         element.GroupName = "fake lepton"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
-        element.lower = 0;  element.upper = 0; BGDataGroupData.push_back(element);
+        element.lower = 0;  element.upper = 0; element.colour = 3; BGDataGroupData.push_back(element);
     }
     
     //plotting
@@ -769,7 +761,7 @@ void analysis1()
         
         element.VarName = "nCJet";         element.VarTitle = "Number of central jets";         element.unit = "";
         element.VarFormula = element.VarName;
-        element.bin=6;          element.xmin=0;                 element.xmax=4;
+        element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
         element.CutDirection=0;
@@ -1531,7 +1523,7 @@ void analysis1()
         GroupElement.GroupName = "CR_SS_ee_Zmass";
         GroupElement.lower = RegionInfo.size();
         
-        GroupElement.showData = false;
+        GroupElement.showData = true;
         GroupElement.showSignificance = false;
         element.Cut = "";
         element.AdditionalCut.clear();
@@ -3357,7 +3349,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=11;RegionGroupIndex<=11;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=7;RegionGroupIndex<=7;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -3735,8 +3727,8 @@ void analysis1()
                                 {
                                     BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
                                     BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                                    BGGroup[j].h2->SetLineColor(j+2);
-                                    BGGroup[j].h2->SetFillColor(j+2);
+                                    BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
+                                    BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
@@ -4334,8 +4326,8 @@ void analysis1()
                     {
                         BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                        BGGroup[j].h2->SetLineColor(j+2);
-                        BGGroup[j].h2->SetFillColor(j+2);
+                        BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
+                        BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
                         BGGroup[j].info->statCount = 0;
                         for(unsigned int k=0;k<DataSampleID.size();k++)
