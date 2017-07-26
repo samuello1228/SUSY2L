@@ -933,6 +933,21 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
 
+    // Save Z decay chain
+    if(CF_isMC && mcTruthMatch.back()=='Z')
+    {
+      xAOD::TruthParticle* truthZ=0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!particle->isZ()) continue;
+        truthZ = particle;
+        while(truthZ->parent() && truthZ->parent()->isZ()){truthZ = truthZ->parent();}
+        break;
+      }
+
+      addTruthPar(truthZ, m_susyEvt->truths, 1);
+    }
+
     // Info("execute()", "Before fillLepton");
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size()); 
@@ -1613,6 +1628,39 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
     xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
     if(el) fillLepton(el, l, index);
   }
+
+  if(CF_isMC && mcTruthMatch.back()=='Z')
+  {
+    xAOD::TruthParticle* tp=0;
+    if(mcTruthMatch=="dRZ")
+    {
+      TLorentzVector p_tp(0,0,0,0);
+      TLorentzVector p_lep = p->p4();
+      bool firstTry = true;
+    
+      // Find particle with smallest dR < 0.1
+      for(auto particle : *tContainer){       
+        TLorentzVector p_particle = particle->p4();
+        Double_t dR = p_lep.DeltaR(p_particle);
+        if (dR > 0.1) continue;
+         
+        if (firstTry || dR < p_lep.DeltaR(p_tp)){
+          tp = const_cast<xAOD::TruthParticle*>(particle);
+          p_tp = p_particle;
+          tp = particle;
+          firstTry = false;
+        }
+        else continue;
+      }
+    } else if (mcTruthMatch=="MCTCZ")
+    {
+      m_truthClassifier->particleTruthClassifier(p);
+      tp = m_truthClassifier->getGenPart();
+    }
+
+    if(tp) l.motherI=addTruthPar(tp, m_susyEvt->truths, 0);
+    else l.motherI=-1;
+  }
   return EL::StatusCode::SUCCESS;
 }
 int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLevel){
@@ -1638,15 +1686,18 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.particleOrigin = res.second;
   */
 
-  /// add parents if exist
+  /// add first parent and children if exist
   if(pLevel){
     auto m = p->parent();
     if(m){
       while(m->parent() && m->pdgId() == m->parent()->pdgId()) m=m->parent();
       int id = addTruthPar(m, v, pLevel-1);
       v[nv].motherI = id;
+
+      for(int i=0; i<p->nChildren(); i++) addTruthPar(p->child(i), v, pLevel+1);
     }
   }
+
   return nv;
 }
 
