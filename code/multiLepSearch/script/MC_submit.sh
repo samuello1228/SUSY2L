@@ -31,7 +31,7 @@ k=${tag}.MCBG
 #file=../multiLepSearch/script/MCSig_sample_list_new.txt
 #k=${tag}.MCSig
 
-# ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
+../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.392847.MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949/DAOD_SUSY2.10662422._000002.pool.root.1
 
@@ -43,5 +43,4 @@ k=${tag}.MCBG
 
 #file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993822._00001.pool.root.1
 
-file=/net/s3_data_home/dzhang/mc15_13TeV.393822.MGPy8EG_A14N23LO_C1N2_Wh_hall_162p5_12p5_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949/DAOD_SUSY2.11760178._000003.pool.root.1
-../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf}
+# ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf}
