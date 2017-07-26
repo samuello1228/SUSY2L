@@ -42,7 +42,7 @@ University of Michigan
 
 \section{Update}
 
-\begin{frame}{Update}
+\begin{frame}{Introduction}
 \begin{itemize}
 \item Cut flow comparison
 \begin{itemize}
@@ -58,13 +58,6 @@ University of Michigan
 \end{itemize}
 \end{itemize}
 \end{frame}
-
-%\section{Motivation}
-%\begin{frame}{Motivation}
-%\begin{itemize}
-%\item Optimization for signal region
-%\end{itemize}
-%\end{frame}
 
 \section{CR\_SS\_run1}
 \begin{frame}
@@ -160,7 +153,7 @@ HLT_mu22_mu8noL1
 
 \begin{frame}{Object Definitions}
 \small
-Tool: AnalysisBase 2.4.31 \\
+Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
 
 \centering
 \begin{table}
@@ -170,13 +163,13 @@ Tool: AnalysisBase 2.4.31 \\
 \hline
 \textbf{Baseline}
 & - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
-& - $p_T>10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium
+& - $p_T>10$ GeV \newline - $|\eta| < 2.7$ \newline - Medium
 & - $p_T>20$ GeV \\
 \hline
 \textbf{Signal}
-& - $p_T > 10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - MediumLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
-& - $p_T > 10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
-& - $p_T > 20$ GeV \newline - $|\eta|<4.5$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
+& - $p_T > 25$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - TightLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 25$ GeV \newline - $|\eta| < 2.7$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
 \end{tabularx}
 \end{table}
 
@@ -207,13 +200,11 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \frametitle{Definition of jets}
 \normalsize
 \begin{itemize}
-\item B-jets: b-tagged
-\item Central jets: $|\eta|<2.4$
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.4$, no b-tagged
 \begin{itemize}
-\item Central light jets: no b-tagged, $\pt>30$ GeV
+\item This is the run 1 definition.
 \end{itemize}
-\item ISR region: at least one central jets.
-\item Non-ISR region: no central jets.
+\item B-jets: b-tagged
 \end{itemize}
 \end{frame}
 
@@ -221,7 +212,10 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \frametitle{significance calculation}
 \begin{itemize}
 \item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
-\item $\delta$B = 0.3
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
+\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -238,10 +232,9 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 
 \begin{frame}
 \small
-Old signal:\\
+SUSY scenario:\\
 \begin{figure}
-\includegraphics[width=0.5\textwidth]{data/WZ.png}
-\includegraphics[width=0.5\textwidth]{data/slepton.png}
+\includegraphics[width=0.6\textwidth]{data/photo/Wh.png}
 \end{figure}
 \end{frame}
 \end{document}
