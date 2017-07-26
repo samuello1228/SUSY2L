@@ -641,8 +641,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
-    bool cutflow = false;
-    //cutflow = true;
+    const bool cutflow = false;
+    //const bool cutflow = true;
 
     vector< IParticle* > dilepPair(2, nullptr);
     if(study == "ss"){
@@ -754,24 +754,25 @@ EL::StatusCode ssEvtSelection :: execute ()
         dilepPair[0] = sel_Ls[0];
         dilepPair[1] = sel_Ls[1];
       }
-      else if (totLs==3 && sig_Ls.size()==3) // Exactly three leptons, all signal, for photon conv SF
+      else if (totLs==3 && sig_Ls.size()>=2) // Exactly three leptons, at least two signal
       {
-        sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
         dilepPair[0] = sig_Ls[0];
         dilepPair[1] = sig_Ls[1];
       }
-      else if (totLs==3 && sig_Ls.size()==2) // Exactly three leptons, exactly two signal, for photon conv SF
+      else if (totLs==3 && sig_Ls.size()==1) // Exactly three leptons, one signal
       {
         dilepPair[0] = sig_Ls[0];
-        dilepPair[1] = sig_Ls[1];
+        dilepPair[1] = sel_Ls[0];
+      }
+      else if (totLs==3 && sig_Ls.size()==0) // Exactly three leptons, no signal
+      {
+        dilepPair[0] = sel_Ls[0];
+        dilepPair[1] = sel_Ls[1];
       }
       else continue;
 
       m_susyEvt->evt.flag = totLs + sig_Ls.size()*4; 
-
-
     }
-
 
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -859,10 +860,10 @@ EL::StatusCode ssEvtSelection :: execute ()
           m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
           m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
           m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
-          auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
-          if(tmpPt.size()==2){
-            if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
-            if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
+          // auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
+          // if(tmpPt.size()==2){
+          //   if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
+          //   if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
             //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
             //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
           }
@@ -1158,8 +1159,8 @@ EL::StatusCode ssEvtSelection :: execute ()
              (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
             m_susyEvt->evt.flag += 3;
 
-          if(nISR==1) m_susyEvt->evt.flag += 6;
-          else if(nISR!=0) m_susyEvt->evt.flag = 0;
+          // if(nISR==1) m_susyEvt->evt.flag += 6;
+          // else if(nISR!=0) m_susyEvt->evt.flag = 0;
         }
       }
       // else if (study=="fakes")
