@@ -838,36 +838,36 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.qFwt_sys_1up = 0.0;
     m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if (((study!="fakes")&&(sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)) || (study=="fakes" && m_susyEvt->evt.flag==10)){
-        //ugly code to get lep0 type and charge :(
-        xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
-        int sigLepSign0 = 0;
-        tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
-        if(tmpMu0) sigLepSign0 = tmpMu0->charge();
-        else{
-          tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
-          if(tmpE0) sigLepSign0 = tmpE0->charge();
-        }
-        //get lep1 type and charge
-        xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
-        int sigLepSign1 = 0;
-        tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
-        if(tmpMu1) sigLepSign1 = tmpMu1->charge();
-        else{
-          tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
-          if(tmpE1) sigLepSign1 = tmpE1->charge();
-        }
-        if (sigLepSign0!=sigLepSign1){
-          m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
-          m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
-          m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
-          // auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
-          // if(tmpPt.size()==2){
-          //   if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
-          //   if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
-            //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
-            //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
-          }
-        }
+      //ugly code to get lep0 type and charge :(
+      xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
+      int sigLepSign0 = 0;
+      tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
+      if(tmpMu0) sigLepSign0 = tmpMu0->charge();
+      else{
+        tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
+        if(tmpE0) sigLepSign0 = tmpE0->charge();
+      }
+      //get lep1 type and charge
+      xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
+      int sigLepSign1 = 0;
+      tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
+      if(tmpMu1) sigLepSign1 = tmpMu1->charge();
+      else{
+        tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
+        if(tmpE1) sigLepSign1 = tmpE1->charge();
+      }
+      if (sigLepSign0!=sigLepSign1){
+        m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
+        m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
+        m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
+        // auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
+        // if(tmpPt.size()==2){
+        //   if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
+        //   if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
+          //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
+          //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
+        // }
+      }
     }
     //fake lep weight
     m_susyEvt->evt.fLwt = 0.0;
@@ -936,7 +936,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Save Z decay chain
     if(CF_isMC && mcTruthMatch.back()=='Z')
     {
-      xAOD::TruthParticle* truthZ=0;
+      const xAOD::TruthParticle* truthZ=0;
+      const xAOD::TruthParticleContainer* tContainer = 0;
       CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
       for(auto particle : *tContainer){
         if(!particle->isZ()) continue;
@@ -1381,17 +1382,17 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     l.truthOrig = res.second;
     l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
 
-    xAOD::TruthParticle *tp = 0;
+    const xAOD::TruthParticle *tp = 0;
     if (mcTruthMatch == "TruthLink" || (mcTruthMatch=="tryAll" && !tp)) {
       //l.truthType = acc_truthType(*el);
       //l.truthOrig = acc_truthOrig(*el);
 
       auto tl = acc_truthLink(*el);
-      if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+      if (tl.isValid()) tp = *tl;
     }
 
     else if (mcTruthMatch == "MCTC" || (mcTruthMatch=="tryAll" && !tp)){
-      tp = const_cast<xAOD::TruthParticle*>(m_truthClassifier->getGenPart());
+      tp = m_truthClassifier->getGenPart();
     }
 
     else if (mcTruthMatch == "reverseTruthLink" || (mcTruthMatch=="tryAll" && !tp)){
@@ -1401,7 +1402,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         if(!(particle->isElectron())) continue;
         auto matchedPart = acc_recoElLink(*particle);
         if(matchedPart.isValid() && const_cast<xAOD::Electron*>(*matchedPart)==el) {
-          tp = const_cast<xAOD::TruthParticle*>(particle); break;
+          tp = particle; break;
         }
       }
     }
@@ -1425,7 +1426,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         if (dR > 0.1) continue;
          
         if (firstTry || dR < p_e.DeltaR(p_tp)){
-          tp = const_cast<xAOD::TruthParticle*>(particle);
+          tp = particle;
           p_tp = p_particle;
           firstTry = false;
         }
@@ -1528,16 +1529,16 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     l.truthType = res.first;
     l.truthOrig = res.second;
 
-    xAOD::TruthParticle *tp = 0;
+    const xAOD::TruthParticle *tp = 0;
     if(mcTruthMatch=="TruthLink" || (mcTruthMatch=="tryAll" && !tp))
     {
       auto tl = acc_truthLink(*mu);
-      if (tl.isValid()) tp = const_cast<xAOD::TruthParticle*>(*tl);
+      if (tl.isValid()) tp = *tl;
     }
 
     // MCTruthClassifier
     else if (mcTruthMatch=="MCTC" || (mcTruthMatch=="tryAll" && !tp)){
-      tp = const_cast<xAOD::TruthParticle*>(m_truthClassifier->getGenPart());
+      tp = m_truthClassifier->getGenPart();
     }
 
     // Reverse truthLink
@@ -1548,7 +1549,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
         if(!(particle->isMuon())) continue;
         auto matchedPart = acc_recoMuLink(*particle);
         if(matchedPart.isValid() && (const_cast<xAOD::Muon*>(*matchedPart))==mu) {
-          tp = const_cast<xAOD::TruthParticle*>(particle); break;
+          tp = particle; break;
         }
       }
     }
@@ -1573,7 +1574,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
         if (dR > 0.1) continue;
          
         if (firstTry || dR < p_m.DeltaR(p_tp)){
-          tp = const_cast<xAOD::TruthParticle*>(particle);
+          tp = particle;
           p_tp = p_particle;
           firstTry = false;
         }
@@ -1623,15 +1624,19 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
   l.truthOrig = 0;
   l.firstEgMotherPdgId = 0;
   xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
-  if(mu) fillLepton(mu, l, index);
+  if(mu) {
+    fillLepton(mu, l, index);
+    if(CF_isMC && mcTruthMatch=="MCTCZ") m_truthClassifier->particleTruthClassifier(mu);
+  }
   else{
     xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
     if(el) fillLepton(el, l, index);
+    if(CF_isMC && mcTruthMatch=="MCTCZ") m_truthClassifier->particleTruthClassifier(el);
   }
 
   if(CF_isMC && mcTruthMatch.back()=='Z')
   {
-    xAOD::TruthParticle* tp=0;
+    const xAOD::TruthParticle* tp=0;
     if(mcTruthMatch=="dRZ")
     {
       TLorentzVector p_tp(0,0,0,0);
@@ -1639,13 +1644,14 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
       bool firstTry = true;
     
       // Find particle with smallest dR < 0.1
+      const xAOD::TruthParticleContainer* tContainer = 0;
       for(auto particle : *tContainer){       
         TLorentzVector p_particle = particle->p4();
         Double_t dR = p_lep.DeltaR(p_particle);
         if (dR > 0.1) continue;
          
         if (firstTry || dR < p_lep.DeltaR(p_tp)){
-          tp = const_cast<xAOD::TruthParticle*>(particle);
+          tp = particle;
           p_tp = p_particle;
           tp = particle;
           firstTry = false;
@@ -1654,12 +1660,11 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
       }
     } else if (mcTruthMatch=="MCTCZ")
     {
-      m_truthClassifier->particleTruthClassifier(p);
       tp = m_truthClassifier->getGenPart();
     }
 
-    if(tp) l.motherI=addTruthPar(tp, m_susyEvt->truths, 0);
-    else l.motherI=-1;
+    if(tp) l.truthI=addTruthPar(tp, m_susyEvt->truths, 0);
+    else l.truthI=-1;
   }
   return EL::StatusCode::SUCCESS;
 }
@@ -1694,7 +1699,7 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
       int id = addTruthPar(m, v, pLevel-1);
       v[nv].motherI = id;
 
-      for(int i=0; i<p->nChildren(); i++) addTruthPar(p->child(i), v, pLevel+1);
+      for(uint i=0; i<p->nChildren(); i++) addTruthPar(p->child(i), v, pLevel+1);
     }
   }
 
