@@ -9,6 +9,7 @@ SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
 
 #Samuel
+#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttbar_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGhiggs_sample_list.txt
 #file=../multiLepSearch/script/MCBGsingletop_sample_list.txt
 #file=../multiLepSearch/script/MCBGttbar_sample_list.txt
 #file=../multiLepSearch/script/MCBGttV_sample_list.txt
