@@ -43,4 +43,4 @@ k=${tag}.MCBG
 
 #file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993822._00001.pool.root.1
 
-# ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf}
+#../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf}
