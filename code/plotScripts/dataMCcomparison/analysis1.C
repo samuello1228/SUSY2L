@@ -5816,10 +5816,10 @@ void analysis1()
     //plot_CR_SS_ee_Zmass.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        /*if(! //Cutflow Attention
-           (RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
+        if(! //Cutflow Attention
+           (//RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass"     )
-           )*/continue;
+           ) continue;
         
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
@@ -5850,9 +5850,9 @@ void analysis1()
             fout<<"}"<<endl;
             
             fout<<"\\Wider[5em]{"<<endl;
-            for(unsigned int RegionIndex=0;RegionIndex<=1;RegionIndex++)
+            for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
             {
-                fout<<"\\includegraphics[width=0.5\\textwidth]{"
+                fout<<"\\includegraphics[width=0.8\\textwidth]{"
                 <<Var[VarIndex].VarName.Data()<<"_"<<RegionInfo[RegionGroup[RegionGroupIndex].lower +RegionIndex].RegionName.Data()<<"}";
                 fout<<endl;
             }
