@@ -882,6 +882,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
+      m_susyEvt->jets[i].m = j->m()*iGeV;
       m_susyEvt->jets[i].MET_dPhi = metV.DeltaPhi(j->p4());
       unsigned int& flag = m_susyEvt->jets[i].jFlag;
       flag = 0;
@@ -891,7 +892,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
       //Central jets
-      if(fabs(j->eta())<2.4 && j->pt()>20e3 && !(flag & JT_BJET))
+      if(fabs(j->eta())<2.8 && j->pt()>20e3 && !(flag & JT_BJET))
       {
         flag |= JT_CJET;
         cjet_Ls.push_back(j);
