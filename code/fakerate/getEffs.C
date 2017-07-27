@@ -45,6 +45,8 @@ using std::endl;
 using std::make_pair;
 using std::pair;
 
+enum STUDY {SS, ThreeL};
+
 // ======= CONFIG VARIABLES ======== //
 const double ptBins[] = {20, 40, 80, 150};
 const int nPtBins = sizeof(ptBins)/sizeof(double)-1;
@@ -63,63 +65,109 @@ const TString inFileWjets="../support/inFileList-Wjets.txt";
 const TString inFileVV="../support/inFileList-VV.txt";
 const TString inFileVgamma="../support/inFileList-Vgamma.txt";
 const TString inFileSingleTop="../support/inFileList-SingleTop.txt";
-const TString inFileMC="../support/inFileList-allMC.txt";
+const TString inFileTTV="../support/inFileList-ttV.txt";
+const TString inFileDY="../support/inFileList-DY.txt";
+// const TString inFileMC="../support/inFileList-allMC.txt";
 
 const bool DEBUG=false;
 const bool VERBOSE=DEBUG || true;
-
-const TString outDir="output/";
 
 const bool measureUnweightedRates = true;
 const bool measureLepComp = true;
 const bool measureSF = true;
 const bool doDataTP = true;
 
+// const STUDY study=ThreeL;
+const STUDY study=SS;
+
+const TString outDir = (study==ThreeL ? "output3L/" : "output2L/");
+
 bool passRatesCR(evt2l* tree){
-	/* RATES MEASUREMENT CONTROL REGION
-
-	- Exactly two baseline leptons
-		- May or may not be signal
-		- No sign requirement
-	- No more than three jets
-	- No b-jets
-	- Relative missing ET < 70?
-	*/
-
 	if (!measureUnweightedRates) return false;
-	// Exactly two leptons
 	bool pass = true;
-	pass *= tree->leps_==2;
-	pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
-	pass *= tree->jets_<=3;
-	for(int i=0; i<tree->jets_; i++) pass *= !(tree->jets_jFlag[i] & JT_BJET);
+	if(study==SS)
+	{
+		/* RATES MEASUREMENT CONTROL REGION
+
+		- Exactly two baseline leptons
+			- May or may not be signal
+			- No sign requirement
+		- No more than three jets
+		- No b-jets
+		- Relative missing ET < 70?
+		*/
+		pass *= tree->leps_==2;
+		pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
+		pass *= tree->jets_<=3;
+		for(int i=0; i<tree->jets_; i++) pass *= !(tree->jets_jFlag[i] & JT_BJET);
+	}
+	else if (study==ThreeL)
+	{
+		/* RATES MEASUREMENT CONTROL REGION
+
+		- (From NTuple requirement) At least two signal
+		- Exactly three baseline leptons
+			- May or may not be signal
+			- SFSS pair + DFOS single
+		*/
+		pass *= tree->leps_==3;
+
+		// Find SFSS pair + DFOS single
+		std::vector<int> idVec={int(tree->leps_ID[0]/1000), int(tree->leps_ID[1]/1000), int(tree->leps_ID[2]/1000)};
+		// Second requirement: 11-13 or 13-11
+		pass *= ( 	(idVec[0]==idVec[1] && abs(idVec[0]+idVec[2])==2) ||
+					(idVec[1]==idVec[2] && abs(idVec[1]+idVec[0])==2) ||
+					(idVec[2]==idVec[0] && abs(idVec[2]+idVec[1])==2)
+				);
+	}
 
 	return pass;
 }
 
 bool passLepCompCR(evt2l* tree)
 {
-	/* LEPTON COMPOSOTION CONTROL REGION
-	- Exactly two leptons
-		- Same sign
-		- Signal
-	- No more than three jets
-	- No b-jets
-	- Relative missing ET < 70?
-
-	Recall f= N(tight)/N(loose), should require signal leptons
-	*/
-
 	if (!measureLepComp) return false;
 	bool pass = true;
-	pass *= tree->leps_==2;
-	pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
-	pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
-	pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
-	pass *= tree->jets_<=3;
+	if(study==SS)
+	{
+		/* LEPTON COMPOSOTION CONTROL REGION
+		- Exactly two leptons
+			- Same sign
+			- Signal
+		- No more than three jets
+		- No b-jets
+		- Relative missing ET < 70?
 
-	// // No b-jets
-	for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
+		Recall f= N(tight)/N(loose), should require signal leptons
+		*/
+		pass *= tree->leps_==2;
+		pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
+		pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
+		pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
+		pass *= tree->jets_<=3;
+
+		// // No b-jets
+		for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
+	} else if (study==ThreeL)
+	{
+		/* LEPTON COMPOSOTION CONTROL REGION
+		- Exactly three baseline leptons
+			- All signal
+			- SFSS pair + DFOS single
+
+		Recall f= N(tight)/N(loose), should require signal leptons
+		*/
+		pass *= tree->leps_==3;
+		for(int i=0; i<3; i++) pass *= (tree->leps_lFlag[i] & IS_SIGNAL);
+
+		// Find SFSS pair + DFOS single
+		std::vector<int> idVec={int(tree->leps_ID[0]/1000), int(tree->leps_ID[1]/1000), int(tree->leps_ID[2]/1000)};
+		// Second requirement: 11-13 or 13-11
+		pass *= ( 	(idVec[0]==idVec[1] && abs(idVec[0]+idVec[2])==2) ||
+					(idVec[1]==idVec[2] && abs(idVec[1]+idVec[0])==2) ||
+					(idVec[2]==idVec[0] && abs(idVec[2]+idVec[1])==2)
+				);
+	}
 
 	return pass;
 }
@@ -167,14 +215,17 @@ enum LEP_PROC
 {
 	TTBAR=0,
 	// BBCC,
+	DY,
+	TTV,
 	ZJETS,
 	WJETS,
 	VV,
 	VGAMMA,
 	SINGLETOP,
+
 	// ALL_MC,
 };
-const int N_PROC=6;
+const int N_PROC=8;
 
 const TString LP_TOSTRING(LEP_PROC p)
 {
@@ -384,13 +435,13 @@ public:
 
 				TString fakesName = (TString) "h" + name + (TString) "_FakeComp_" + ptEtaStr;
 				tmp.hFake = (TH2*) hFakesPrototype2D->Clone(fakesName);
-				tmp.hFake->SetTitle(ptEtaTitle.Prepend(tmp.hFake->GetTitle()));
+				tmp.hFake->SetTitle(tmp.hFake->GetTitle()+ptEtaTitle);
 				tmp.hFake->SetDirectory(dir_lepCompMeasurement_lepComp);
 				tmp.hFake->GetZaxis()->SetRangeUser(0,1);
 
 				TString realsName = (TString) "h" + name + (TString) "_RealComp_" + ptEtaStr;
 				tmp.hReal = (TH1*) hRealsPrototype->Clone(realsName);
-				tmp.hReal->SetTitle(ptEtaTitle.Prepend(tmp.hReal->GetTitle()));
+				tmp.hReal->SetTitle(tmp.hReal->GetTitle()+ptEtaTitle);
 				tmp.hReal->SetDirectory(dir_lepCompMeasurement_lepComp);
 				tmp.hReal->GetYaxis()->SetRangeUser(0,1);
 
@@ -423,12 +474,12 @@ public:
 		{
 			// Real composition 
 			histVector[ptBin][etaBin].hReal->SetFillColor(kAzure+10);
-			histVector[ptBin][etaBin].hReal->Draw("hist bar text");
-			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+			histVector[ptBin][etaBin].hReal->Draw("bar text");
+			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
 
 			// Fake composition 2D
 			histVector[ptBin][etaBin].hFake->Draw("colz text");
-			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
 
 			// Fake composition by process
 			histVector[ptBin][etaBin].hFakeProc = histVector[ptBin][etaBin].hFake->ProjectionX();
@@ -439,7 +490,7 @@ public:
 			histVector[ptBin][etaBin].hFakeProc->GetYaxis()->SetRangeUser(0, 1);
 			histVector[ptBin][etaBin].hFakeProc->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeProc->Draw("bar text");
-			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
+			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
 
 			// Fake composition by source
 			histVector[ptBin][etaBin].hFakeSource = histVector[ptBin][etaBin].hFake->ProjectionY();
@@ -450,7 +501,7 @@ public:
 			histVector[ptBin][etaBin].hFakeSource->GetYaxis()->SetRangeUser(0, 1);
 			histVector[ptBin][etaBin].hFakeSource->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
-			c->Print(((TString)".pdf").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
 		}}
 
 		return true;
@@ -553,19 +604,19 @@ public:
 		TCanvas can;
 
 		Eff->Draw("text colz");
-		can.Print(TString(Eff->GetName())+".pdf");
+		can.Print(TString(Eff->GetName())+".eps");
 
 		// Eff->ProfileX()->Draw();
-		// can.Print(TString(Eff->GetName())+"Pt.pdf");
+		// can.Print(TString(Eff->GetName())+"Pt.eps");
 
 		// Eff->ProfileY()->Draw();
-		// can.Print(TString(Eff->GetName())+"Eta.pdf");
+		// can.Print(TString(Eff->GetName())+"Eta.eps");
 
 		NTight->Draw("text");
-		can.Print(TString(NTight->GetName())+".pdf");
+		can.Print(TString(NTight->GetName())+".eps");
 
 		NLoose->Draw("text");
-		can.Print(TString(NLoose->GetName())+".pdf");
+		can.Print(TString(NLoose->GetName())+".eps");
 
 	}
 
@@ -636,7 +687,7 @@ public:
 	{
 		TCanvas *c = new TCanvas();
 		hRatio->Draw("colz text");
-		c->Print(hRatio->GetName()+(TString)".pdf");
+		c->Print(hRatio->GetName()+(TString)".eps");
 	}
 
 	pair<double, double> GetSF(double pt, double eta)
@@ -660,10 +711,18 @@ public:
 };
 
 LepProp* lp_Mu;
+LepProp* lp_Mu_Tight;
+LepProp* lp_Mu_LNT;
 LepProp* lp_El;
+LepProp* lp_El_Tight;
+LepProp* lp_El_LNT;
 
 TH2* hMu_MCTC;
+TH2* hMu_MCTC_Tight;
+TH2* hMu_MCTC_LNT;
 TH2* hEl_MCTC;
+TH2* hEl_MCTC_Tight;
+TH2* hEl_MCTC_LNT;
 
 Histos* hMu_Real_MCTP;
 Histos* hEl_Real_MCTP;
@@ -789,11 +848,24 @@ bool initialize()
 	// Lepton composition
 	hMu_MCTC = new TH2D("hMu_MCTC", "MCTC Mu;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
 	hEl_MCTC = new TH2D("hEl_MCTC", "MCTC El;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
+	hMu_MCTC_Tight = new TH2D("hMu_MCTC_Tight", "MCTC Mu;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
+	hEl_MCTC_Tight = new TH2D("hEl_MCTC_Tight", "MCTC El;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
+	hMu_MCTC_LNT = new TH2D("hMu_MCTC_LNT", "MCTC Mu;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
+	hEl_MCTC_LNT = new TH2D("hEl_MCTC_LNT", "MCTC El;Type;Origin", PARTICLETYPES, 0, PARTICLETYPES, PARTICLEORIGIN, 0, PARTICLEORIGIN);
 	hMu_MCTC->SetDirectory(dir_lepCompMeasurement_nEvents);
 	hEl_MCTC->SetDirectory(dir_lepCompMeasurement_nEvents);
+	hMu_MCTC_Tight->SetDirectory(dir_lepCompMeasurement_nEvents);
+	hEl_MCTC_Tight->SetDirectory(dir_lepCompMeasurement_nEvents);
+	hMu_MCTC_LNT->SetDirectory(dir_lepCompMeasurement_nEvents);
+	hEl_MCTC_LNT->SetDirectory(dir_lepCompMeasurement_nEvents);
+
 
 	lp_El = new LepProp("El");
 	lp_Mu = new LepProp("Mu");
+	lp_El_Tight = new LepProp("El_Tight");
+	lp_Mu_Tight = new LepProp("Mu_Tight");
+	lp_El_LNT = new LepProp("El_LNT");
+	lp_Mu_LNT = new LepProp("Mu_LNT");
 
 	// Tag-and-probe histograms for MC
 	hMu_Real_MCTP = new Histos("hMu_Real_MCTP"); hMu_Real_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
@@ -852,9 +924,34 @@ int getEffs()
 	hElFake[LIGHT][TTBAR] = new Histos("hEl_Light_TT");
 	hElFake[CONV][TTBAR] = new Histos("hEl_Conv_TT");
 	cout << "Begin loop over ttBar: " << ttEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
+	// loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
 	cout << "ttBar loop finished" << endl << endl;
 
+	// TTV
+	evt2l* ttVEvts = new evt2l(loadData(inFileTTV, true));  tcMC->Add((TChain*) ttVEvts->fChain);
+	hMuReal[0][TTV] = new Histos("hMu_Real_TTV");
+	hElReal[0][TTV] = new Histos("hEl_Real_TTV");
+	hMuFake[HEAVY][TTV] = new Histos("hMu_Heavy_TTV");
+	hElFake[HEAVY][TTV] = new Histos("hEl_Heavy_TTV");
+	hMuFake[LIGHT][TTV] = new Histos("hMu_Light_TTV");
+	hElFake[LIGHT][TTV] = new Histos("hEl_Light_TTV");
+	hElFake[CONV][TTV] = new Histos("hEl_Conv_TTV");
+	cout << "Begin loop over ttV: " << ttVEvts->fChain->GetEntries() << " events" << endl;
+	// loopMC(ttVEvts, hMuReal[0][TTV], hElReal[0][TTV], hMuFake[HEAVY][TTV], hElFake[HEAVY][TTV], hMuFake[LIGHT][TTV], hElFake[LIGHT][TTV], hElFake[CONV][TTV], TTV);
+	cout << "ttV loop finished" << endl << endl;
+
+	// Low mass Zjets
+	evt2l* dyEvts = new evt2l(loadData(inFileDY, true));  tcMC->Add((TChain*) dyEvts->fChain);
+	hMuReal[0][DY] = new Histos("hMu_Real_DY");
+	hElReal[0][DY] = new Histos("hEl_Real_DY");
+	hMuFake[HEAVY][DY] = new Histos("hMu_Heavy_DY");
+	hElFake[HEAVY][DY] = new Histos("hEl_Heavy_DY");
+	hMuFake[LIGHT][DY] = new Histos("hMu_Light_DY");
+	hElFake[LIGHT][DY] = new Histos("hEl_Light_DY");
+	hElFake[CONV][DY] = new Histos("hEl_Conv_DY");
+	cout << "Begin loop over low mass Z: " << dyEvts->fChain->GetEntries() << " events" << endl;
+	// loopMC(dyEvts, hMuReal[0][DY], hElReal[0][DY], hMuFake[HEAVY][DY], hElFake[HEAVY][DY], hMuFake[LIGHT][DY], hElFake[LIGHT][DY], hElFake[CONV][DY], DY);
+	cout << "Low mass Z loop finished" << endl << endl;
 
 	// // Z+jets
 	evt2l* zJetsEvts = new evt2l(loadData(inFileZjets, true));  tcMC->Add((TChain*) zJetsEvts->fChain);
@@ -866,7 +963,7 @@ int getEffs()
 	hElFake[LIGHT][ZJETS] = new Histos("hEl_Light_Zjets");
 	hElFake[CONV][ZJETS] = new Histos("hEl_Conv_Zjets");
 	cout << "Begin loop over Z+jets: " << zJetsEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
+	// loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
 	cout << "Z+jets loop finished" << endl << endl;
 
 	// // W+jets
@@ -879,7 +976,7 @@ int getEffs()
 	hElFake[LIGHT][WJETS] = new Histos("hEl_Light_Wjets");
 	hElFake[CONV][WJETS] = new Histos("hEl_Conv_Wjets");
 	cout << "Begin loop over W+jets: " << wJetsEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
+	// loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
 	cout << "W+jets loop finished" << endl << endl;
 
 	// DIBOSON
@@ -892,7 +989,7 @@ int getEffs()
 	hElFake[LIGHT][VV] = new Histos ("hEl_Light_VV");
 	hElFake[CONV][VV] = new Histos ("hEl_Conv_VV");
 	cout << "Begin loop over VV: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
+	// loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
 	cout << "VV loop finished" << endl << endl;
 
 	// VGAMMA
@@ -905,7 +1002,7 @@ int getEffs()
 	hElFake[LIGHT][VGAMMA] = new Histos("hEl_Light_Vgamma");
 	hElFake[CONV][VGAMMA] = new Histos("hEl_Conv_Vgamma");
 	cout << "Begin loop over Vgamma: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
+	// loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
 	cout << "Vgamma loop finished" << endl << endl;
 
 	// SingleTop
@@ -918,7 +1015,7 @@ int getEffs()
 	hElFake[LIGHT][SINGLETOP] = new Histos("hEl_Light_SingleTop");
 	hElFake[CONV][SINGLETOP] = new Histos("hEl_Conv_SingleTop");
 	cout << "Begin loop over single top: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
+	// loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
 	cout << "Single top loop finished" << endl << endl;
 
 
@@ -1025,7 +1122,7 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 	}
 
 	/** UNWEIGHTED PHOTON CONVERSTION EFFICIENCIES MEASURED BY mumu-e TAG-AND-PROBE IN DATA **/ 
-	else if (false && tree->leps_==3)
+	else if (true && tree->leps_==3)
 	{
 		if (DEBUG) cout << "PhotonConv lep tag-and-probe" << endl;
 
@@ -1076,7 +1173,7 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 		double w = tree->evt_weight*tree->evt_pwt*tree->fChain->GetTree()->GetWeight()*tree->evt_ElSF*tree->evt_MuSF;
 
 		// Measure unweighted efficiencies
-		if(passRatesCR(tree)){ for(int j(0); j<2; j++)
+		if(passRatesCR(tree)){ for(int j(0); j<tree->leps_; j++)
 		{
 			if(tree->leps_pt[j]<20) continue;
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
@@ -1117,7 +1214,7 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 		}}
 
 		// Measure composition fractions
-		if (passLepCompCR(tree)){ for(int j(0); j<2; j++)
+		if (passLepCompCR(tree)){ for(int j(0); j<tree->leps_; j++)
 		{
 			if(tree->leps_pt[j]<20) continue;
 
@@ -1135,13 +1232,43 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			{
 				lp_El->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
 				hEl_MCTC->Fill(type, orig);
+				if (lepIsTight) hEl_MCTC_Tight->Fill(type,orig);
+				else hEl_MCTC_LNT->Fill(type,orig);
 			}
 			else if (recoLepType==MUON)
 			{
 				lp_Mu->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
 				hMu_MCTC->Fill(type, orig);
+				if(lepIsTight) hMu_MCTC_Tight->Fill(type,orig);
+				else hMu_MCTC_LNT->Fill(type,orig);
 			}
 			if (DEBUG) cout << "# Filled lepton composition histograms for lepton " << j << endl;
+		}}
+
+		if (study==SS && passLepCompCR(tree) && (bool(tree->leps_lFlag[0] & IS_SIGNAL) != bool(tree->leps_lFlag[1] & IS_SIGNAL))) {
+		for(int j(0); j<tree->leps_; j++)
+		{
+
+			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
+			LEP_TYPE recoLepType;
+			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
+			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
+			else continue;
+
+			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
+			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
+			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
+
+			if (recoLepType==ELEC)
+			{
+				if (lepIsTight) lp_El_Tight->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				else lp_El_LNT->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+			}
+			else if (recoLepType==MUON)
+			{
+				if (lepIsTight) lp_Mu_Tight->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				else lp_Mu_LNT->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+			}
 		}}
 
 		// Tag and probe for data/MC scale factors
@@ -1161,8 +1288,8 @@ void calcFinalEffs()
 	if(DEBUG) cout << "calcFinalEffs() begins" << endl;
 
 	for(auto h: allHistos) h->calcEff(); 
-    lp_El->Normalize();
-    lp_Mu->Normalize();
+    lp_El->Normalize(); lp_El_Tight->Normalize(); lp_El_LNT->Normalize();
+    lp_Mu->Normalize(); lp_Mu_Tight->Normalize(); lp_Mu_LNT->Normalize();
     if(DEBUG) cout << "Unweighted efficiencies and lepton compositions calculated" << endl;
 
 	hEl_final_fakeRate = new TH2D("hEl_final_fakeRate", "El Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
@@ -1197,14 +1324,14 @@ void calcFinalEffs()
 			auto elLP 	= lp_El->GetWeight(REAL, (LEP_PROC) p, binNum);
 
 			elRealRate += elEff.first*elSF.first*elLP.first;
-			elRealUnc  += elRealRate*elRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
+			elRealUnc  += (elRealRate==0)? 0 : (elRealRate*elRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
 
 			auto muEff 	= hMuReal[0][p]->GetEff(binNum);
 			auto muSF 	= make_pair(1.,0.); // hMu_RealScaleFactors->GetSF(binNum);
 			auto muLP 	= lp_Mu->GetWeight(REAL, (LEP_PROC) p, binNum);
 
 			muRealRate += muEff.first*muSF.first*muLP.first;
-			muRealUnc  += muRealRate*muRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
+			muRealUnc  += (muRealRate==0)? 0 : (muRealRate*muRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
 
 			for(int s=0; s<N_FAKES_SOURCE; s++)
 			{
@@ -1213,7 +1340,7 @@ void calcFinalEffs()
 				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				elFakeRate += elEff.first*elSF.first*elLP.first;
-				elFakeUnc  += elFakeRate*elFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2));
+				elFakeUnc  += (elFakeRate==0)? 0 : (elFakeRate*elFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
 
 				if(((LEP_SOURCE) s)==CONV) continue;
 
@@ -1222,7 +1349,7 @@ void calcFinalEffs()
 				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
 				muFakeRate += muEff.first*muSF.first*muLP.first;
-				muFakeUnc  += muFakeRate*muFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2));
+				muFakeUnc  += (muFakeRate==0)? 0 : (muFakeRate*muFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
 			}
 		}
 
@@ -1240,10 +1367,10 @@ void calcFinalEffs()
 	}}
 
     TCanvas c;
-	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".pdf");
-	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".pdf");
-	hEl_final_realRate->Draw("colz text"); c.Print(TString(hEl_final_realRate->GetName())+".pdf");
-	hMu_final_realRate->Draw("colz text"); c.Print(TString(hMu_final_realRate->GetName())+".pdf");
+	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".eps");
+	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".eps");
+	hEl_final_realRate->Draw("colz text"); c.Print(TString(hEl_final_realRate->GetName())+".eps");
+	hMu_final_realRate->Draw("colz text"); c.Print(TString(hMu_final_realRate->GetName())+".eps");
 }
 
 // // */
@@ -1291,11 +1418,19 @@ bool finalize()
 	if (VERBOSE) cout << "Drawing lepton composition" << endl;
 	lp_El->Normalize(); lp_El->Draw();
 	lp_Mu->Normalize(); lp_Mu->Draw();
+	lp_El_Tight->Normalize(); lp_El_Tight->Draw();
+	lp_Mu_Tight->Normalize(); lp_Mu_Tight->Draw();
+	lp_El_LNT->Normalize(); lp_El_LNT->Draw();
+	lp_Mu_LNT->Normalize(); lp_Mu_LNT->Draw();
 
 	if (VERBOSE) cout << "Draw MCTC " << endl;
 	TCanvas *can = new TCanvas("cMCTC", "cMCTC", 1280,800); can->SetGrid();
-	if (hMu_MCTC) {labelMCTChist(hMu_MCTC); hMu_MCTC->Draw("text"); can->Print("hMu_MCTC.pdf");}
-	if (hEl_MCTC) {labelMCTChist(hEl_MCTC); hEl_MCTC->Draw("text");can->Print("hEl_MCTC.pdf");}
+	if (hMu_MCTC) {labelMCTChist(hMu_MCTC); hMu_MCTC->Draw("text"); can->Print("hMu_MCTC.eps");}
+	if (hEl_MCTC) {labelMCTChist(hEl_MCTC); hEl_MCTC->Draw("text");can->Print("hEl_MCTC.eps");}
+	if (hMu_MCTC_Tight) {labelMCTChist(hMu_MCTC_Tight); hMu_MCTC_Tight->Draw("text"); can->Print("hMu_MCTC_Tight.eps");}
+	if (hEl_MCTC_Tight) {labelMCTChist(hEl_MCTC_Tight); hEl_MCTC_Tight->Draw("text");can->Print("hEl_MCTC_Tight.eps");}
+	if (hMu_MCTC_LNT) {labelMCTChist(hMu_MCTC_LNT); hMu_MCTC_LNT->Draw("text"); can->Print("hMu_MCTC_LNT.eps");}
+	if (hEl_MCTC_LNT) {labelMCTChist(hEl_MCTC_LNT); hEl_MCTC_LNT->Draw("text");can->Print("hEl_MCTC_LNT.eps");}
 	delete can; can=0;
 
 	if (VERBOSE) cout << "Write to file" << endl;
@@ -1323,7 +1458,7 @@ TChain* loadData(TString fileList, bool isMC){
 	   	allFiles.push_back(line);
 	}
 
- 	if (false && isMC) // Weight MC trees
+ 	if (true && isMC) // Weight MC trees
  	{
  		cout << "Weighting MC trees from " << fileList << endl;
  		for(auto it=allFiles.begin(); it!=allFiles.end(); )
