@@ -165,9 +165,13 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(23,">=1BaseLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(24,">=1SigLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(25,">=2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(23,"SS");
+  m_hCutFlow->GetXaxis()->SetBinLabel(24,">=1BaseLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(25,">=1SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(26,">=2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(27,"=2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(28,"=2BaseLep and =2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(29,"SS,w");
   m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
@@ -340,7 +344,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(m_objTool->initialize().isSuccess());
 
   mChargeFlipBkgTool = new ChargeFlipBkgTool("MyQFlipTool");
-  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeFlipRates_old.root"));
+  CHECK(mChargeFlipBkgTool->setProperty("InputRatesFileName" , "$ROOTCOREBIN/data/multiLepSearch/root_files/chargeFlipRates.root"));
   CHECK(mChargeFlipBkgTool->setProperty("InputRatesHistoName", "hFlipProb_data"));
   CHECK(mChargeFlipBkgTool->initialize());
 
@@ -878,6 +882,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
+      m_susyEvt->jets[i].m = j->m()*iGeV;
       m_susyEvt->jets[i].MET_dPhi = metV.DeltaPhi(j->p4());
       unsigned int& flag = m_susyEvt->jets[i].jFlag;
       flag = 0;
@@ -887,7 +892,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
       //Central jets
-      if(fabs(j->eta())<2.4 && j->pt()>20e3 && !(flag & JT_BJET))
+      if(fabs(j->eta())<2.8 && j->pt()>20e3 && !(flag & JT_BJET))
       {
         flag |= JT_CJET;
         cjet_Ls.push_back(j);
@@ -996,6 +1001,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     /// mT2
     auto tl1 = l1->p4();
     auto tl2 = l2->p4();
+    //https://svnweb.cern.ch/trac/atlasphys-susy/browser/Physics/SUSY/Tools/CalcGenericMT2
     m_susyEvt->sig.mT2 =  anaHelper::get_mT2(tl1.M(), tl1.Px(), tl1.Py(), tl2.M(), tl2.Px(), tl2.Py(), metFinal->mpx(), metFinal->mpy(), CF_mT2_m0*GeV, CF_mT2_m0*GeV)*iGeV;
 
     //loop over systematics and vary scale factor for weight based systematics
@@ -1078,8 +1084,7 @@ EL::StatusCode ssEvtSelection :: execute ()
            (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
           m_susyEvt->evt.flag += 3;
 
-        if(nISR==1) m_susyEvt->evt.flag += 6;
-        else if(nISR!=0) m_susyEvt->evt.flag = 0;
+        if(nISR>=1) m_susyEvt->evt.flag += 6;
       }
 
       //Scale factor
@@ -1087,14 +1092,14 @@ EL::StatusCode ssEvtSelection :: execute ()
         if( study == "ss" )
         {
           if(sEvt.flag%3 == 1){ // ee
-            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey, true);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
           }
         }
@@ -1116,6 +1121,18 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
       if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
       if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
+      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep,w", TotalWeight);
+
+      if(totLs == 2 && sig_Ls.size() == 2)
+      {
+        m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
+        if(sEvt.flag%6 == 4 || sEvt.flag%6 == 5 || sEvt.flag%6 == 0)
+        {
+           m_hCutFlow->Fill("SS", 1);
+           m_hCutFlow->Fill("SS,w", TotalWeight);
+        }
+      }
+      
       if(CF_isMC && m_susyEvt->evt.event == 47)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;

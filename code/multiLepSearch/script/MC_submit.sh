@@ -1,41 +1,39 @@
 #!/bin/bash
-tag=v10.2
+tag=v10.5
 dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
-mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/merged_prw_mc15c_Slep0d95.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
-SUSYconf=SUSYTools/SUSYTools_Default.conf
-#SUSYconf=multiLepSearch/sel_conf/SUSYTools_Default_CFT.conf
+mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/Wh_all_merged_PRW.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+#SUSYconf=SUSYTools/SUSYTools_Default.conf
+SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
 #For background MC
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
 
 #Samuel
+#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttbar_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGhiggs_sample_list.txt
 #file=../multiLepSearch/script/MCBGsingletop_sample_list.txt
 #file=../multiLepSearch/script/MCBGttbar_sample_list.txt
 #file=../multiLepSearch/script/MCBGttV_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
+#file=../multiLepSearch/script/MCBGhiggs_sample_list.txt
 
 #Dongliang
 file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-# file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-
 #file=../multiLepSearch/script/MCBGmultitop_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
-
-#not ready
-#file=../multiLepSearch/script/MCBGhiggs_sample_list.txt
 
 k=${tag}.MCBG
 
 #For signal MC
 #file=../multiLepSearch/script/MCSig_sample_list.txt
 #file=../multiLepSearch/script/MCSig_sample_list_new.txt
+#file=../multiLepSearch/script/MCSig_sample_Wh_p2949.txt
 #k=${tag}.MCSig
 
-../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
+../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.392847.MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949/DAOD_SUSY2.10662422._000002.pool.root.1
 

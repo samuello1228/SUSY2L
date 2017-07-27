@@ -5,7 +5,7 @@
 \usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
-\title[]{Siganl/BG comparison}
+\title[]{Update of Signal Optimization}
 \author[]
 {
 Samuel Lo \inst{1}
@@ -36,35 +36,191 @@ University of Michigan
 \begin{document}
 \frame{\titlepage}
 
-\begin{frame}{Outline}
-\tableofcontents
-\end{frame}
-
-\section{Introduction}
-
 \begin{frame}{Introduction}
+\small
+The following constraints are applied to reduce the bias from low statistics:
 \begin{itemize}
-\item Siganl/BG comparison
+\small
+\item At least 10 unweighted events in VV and ttV background.
+\begin{itemize}
+\tiny
+\item New requirement suggested by Jeanette.
+\end{itemize}
+\item If the yield for one group of BG is negative, 0 yield is used. But the statistical error still keep unchanged to calculate the statistical error of total BG.
+\begin{itemize}
+\tiny
+\item Negative value means it is small.
+\end{itemize}
+\item nSig$>$1 and nSig/nSigError $>$ 2 for both (175,0) and (165,35).
+\begin{itemize}
+\tiny
+\item The optimization is still trying to find the largest significance for (175,0) point.
+\item New requirement for (165,35) point is added, so that the SR also works for this point.
+\end{itemize}
+\item For $\pt^{l1}$, $\pt^{l1}$, $\pt^{ll}$, $m_{T2}$, $E_{\text{T}}^{\text{miss,rel}}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$, there is no upper cut.
+\begin{itemize}
+\tiny
+\item In the old result, both lower and upper cut are applied to $\pt^{ll}$,  $m_{T2}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$.
+\end{itemize}
+\item For $|\Delta\eta_{ll}|$ and $m_{lj}$/$m_{ljj}$, there is no lower cut.
+\begin{itemize}
+\tiny
+\item In the old result, both lower and upper cut are applied to $|\Delta\eta_{ll}|$.
+\end{itemize}
 \end{itemize}
 \end{frame}
 
-\section{CR\_SS\_run1}
 \begin{frame}
-\sectionpage
-\end{frame}
-
-\begin{frame}{Selection in run1 SR}
-\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
-\url{https://arxiv.org/pdf/1501.07110.pdf}
-\end{frame}
-
-\input{data/expN_SR_SS_run1.tex}
-\input{data/plot_SR_SS_run1.tex}
-
-\section{Conclusion}
-\begin{frame}{Conclusion}
+\frametitle{significance calculation}
 \begin{itemize}
-\item ?
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Object Definitions}
+\small
+Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
+
+\centering
+\begin{table}
+\small
+\begin{tabularx}{\textwidth}{p{1.5cm} | p{3cm} | p{3cm} | p{3cm}}
+& \textbf{Electron} & \textbf{Muon} & \textbf{Jet}\\
+\hline
+\textbf{Baseline}
+& - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
+& - $p_T>10$ GeV \newline - $|\eta| < 2.7$ \newline - Medium
+& - $p_T>20$ GeV \\
+\hline
+\textbf{Signal}
+& - $p_T > 25$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - TightLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 25$ GeV \newline - $|\eta| < 2.7$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
+\end{tabularx}
+\end{table}
+
+\raggedright
+Selection:
+\begin{itemize}
+%\item Trigger selection
+\item Exactly 2 baseline leptons and exactly 2 signal leptons
+\end{itemize}
+
+\tiny
+Note: \\
+Pileup reweighting is applied. \\
+Scale factor for reconstruction, isolation, ID and trigger is applied.
+\end{frame}
+
+\begin{frame}
+\frametitle{Definition of jets}
+\normalsize
+\begin{itemize}
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.4$, no b-tagged
+\begin{itemize}
+\item This is the run 1 definition.
+\end{itemize}
+\item B-jets: b-tagged
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pre-selection cut}
+\normalsize
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\item $|\eta^{l1}| < 2.4$
+\item $|\eta^{l2}| < 2.4$
+\end{itemize}
+\item SR$e\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\item $|\eta^{l1}| < 2.5$
+\item $|\eta^{l2}| < 2.5$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\item $|\eta^{l1}| < 2.4$
+\item $|\eta^{l2}| < 2.4$
+\end{itemize}
+\item SR$e\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\item $|\eta^{l1}| < 2.5$
+\item $|\eta^{l2}| < 2.5$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Cuts in SR}
+\vspace{5mm}
+\tiny
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& SR$ee$-1 & SR$ee$-2 & SR$\mu\mu$-1 & SR$\mu\mu$-2 & SR$e\mu$-1 & SR$e\mu$-2 \\
+\hline
+Lepton flavours & $ee$ & $ee$ & $\mu\mu$ & $\mu\mu$ & $e\mu$ & $e\mu$ \\
+\hline
+$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\
+\hline
+\input{data/optimization/cut_table_SR_SS_opt_0.tex}
+\end{tabular}
+\end{frame}
+
+\input{data/optimization/opt_SR_SS_opt_0.tex}
+\input{data/plot_SR_SS_opt_0.tex}
+
+\begin{frame}{significance table}
+\includegraphics[width=\textwidth]{data/optimization/dongliang.png}
+\begin{itemize}
+\item The optimized cuts for (175,0) signal point can be used.
+\item The (175,0) and (165,35) points are expected to discover or exclude.
+\item Try another optimization for the (400, 0) point?
+\end{itemize}
+\end{frame}
+
+\section{Discussion}
+\begin{frame}{Discussion}
+\begin{itemize}
+\item Lepton $\pt$ cut 25 GeV is already applied in the pre-selection. Redo the optimization with lower $\pt$ cut in the pre-selection.
+\item Estimate the charge flip BG from data.
+\item Find some validation region to validate the background estimation.
+\item Try another optimization for the (400, 0) point?
+\item \textcolor{red}{Cross check from Dani?}
 \end{itemize}
 \end{frame}
 
@@ -74,6 +230,14 @@ University of Michigan
 Backup
 \end{center}
 \end{frame}
+
+\begin{frame}{Selection in run1 SR}
+\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
+\url{https://arxiv.org/pdf/1501.07110.pdf}
+\end{frame}
+
+\input{data/expN_SR_SS_pre.tex}
+\input{data/plot_SR_SS_pre.tex}
 
 \begin{frame}[fragile]
 \frametitle{Signal sample}
@@ -125,63 +289,6 @@ HLT_mu22_mu8noL1
 \end{verbatim}
 \end{frame}
 
-\begin{frame}{Object Definitions}
-\small
-Tool: AnalysisBase 2.4.31 \\
-
-\centering
-\begin{table}
-\small
-\begin{tabularx}{\textwidth}{p{1.5cm} | p{3cm} | p{3cm} | p{3cm}}
-& \textbf{Electron} & \textbf{Muon} & \textbf{Jet}\\
-\hline
-\textbf{Baseline}
-& - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
-& - $p_T>10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium
-& - $p_T>20$ GeV \\
-\hline
-\textbf{Signal}
-& - $p_T > 10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - MediumLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
-& - $p_T > 10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
-& - $p_T > 20$ GeV \newline - $|\eta|<4.5$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
-\end{tabularx}
-\end{table}
-
-\raggedright
-Selection:
-\begin{itemize}
-%\item Trigger selection
-\item Exactly 2 baseline leptons and exactly 2 signal leptons
-\end{itemize}
-
-\tiny
-Note: \\
-Pileup reweighting is applied. \\
-Scale factor for reconstruction, isolation, ID and trigger is applied.
-\end{frame}xw
-
-\begin{frame}
-\frametitle{Definition of jets}
-\normalsize
-\begin{itemize}
-\item B-jets: b-tagged
-\item Central jets: $|\eta|<2.4$
-\begin{itemize}
-\item Central light jets: no b-tagged, $\pt>30$ GeV
-\end{itemize}
-\item ISR region: at least one central jets.
-\item Non-ISR region: no central jets.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{significance calculation}
-\begin{itemize}
-\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
-\item $\delta$B = 0.3
-\end{itemize}
-\end{frame}
-
 \begin{frame}
 \frametitle{definition of variables}
 \normalsize
@@ -192,4 +299,5 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
+
 \end{document}
