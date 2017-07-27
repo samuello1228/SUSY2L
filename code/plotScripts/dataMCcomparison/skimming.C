@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "obj_def.h"
+#include <TInterpreter.h>
 #include "evt2l.C"
 #include <TH1F.h>
 
@@ -93,8 +94,41 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
     }
-    evt2l *evts = new evt2l(tree1);
     
+    EVT evt;
+    tree1->SetBranchAddress("evt", &evt);
+
+    vector< L_PAR > leps;
+    vector< L_PAR >* vleps = &leps;
+    tree1->SetBranchAddress("leps", &vleps);
+
+    R_PAR l12;
+    tree1->SetBranchAddress("l12", &l12);
+
+    vector< J_PAR > jets;
+    vector< J_PAR >* vjets = &jets;
+    tree1->SetBranchAddress("jets", &vjets);
+
+    vector< TR_PAR > truths;
+    vector< TR_PAR >* vtruths = &truths;
+    tree1->SetBranchAddress("truths", &vtruths);
+
+    SIGNATURE sig;
+    tree1->SetBranchAddress("sig", &sig);
+
+    tree1->GetEntry(1);
+    cout << "weight = " << evt.weight << endl;
+    cout << "the size of the leptons is " << vleps->size() << endl;
+    cout << "the lepton 0 pt= " << vleps->at(0).pt << endl;
+    cout << "l12.m = " << l12.m << endl;
+    cout << "the size of the jets is " << vjets->size() << endl;
+    cout << "the jet 0 pt= " << vjets->at(0).pt << endl;
+    cout << "the size of the truths is " << vtruths->size() << endl;
+    cout << "the truth lepton 0 pt= " << vtruths->at(0).pt << endl;
+    cout << "sig.mT2 = " << sig.mT2 << endl;
+    return;
+
+    evt2l *evts = new evt2l(tree1);
     //channels
     std::vector<TString> channel;
     {
@@ -540,6 +574,10 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
+    gInterpreter->GenerateDictionary("vector<L_PAR>","obj_def.h;vector"); 
+    gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector"); 
+    gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector"); 
+
     TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
