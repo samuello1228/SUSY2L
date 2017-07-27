@@ -11,51 +11,51 @@
 
 Int_t ID1;
 Int_t ID2;
-Double_t pt1;
-Double_t pt2;
-Double_t eta1;
-Double_t eta2;
-Double_t phi1;
-Double_t mll;
-Double_t ptll;
-Double_t MET;
-Double_t METRel;
-Double_t mTtwo;
-Double_t mt1;
-Double_t mt2;
-Double_t mtm;
+float pt1;
+float pt2;
+float eta1;
+float eta2;
+float phi1;
+float mll;
+float ptll;
+float MET;
+float METRel;
+float mTtwo;
+float mt1;
+float mt2;
+float mtm;
 
-Double_t l12_dPhi;
-Double_t l12_MET_dPhi;
-Double_t jets_MET_dPhi;
-Double_t l12_jet0_dPhi;
+float l12_dPhi;
+float l12_MET_dPhi;
+float jets_MET_dPhi;
+float l12_jet0_dPhi;
 
 Int_t nJet;
-Double_t jetpt;
-Double_t jeteta;
-Double_t jetphi;
+float jetpt;
+float jeteta;
+float jetphi;
 Int_t nBJet;
-Double_t bjetpt;
-Double_t bjeteta;
-Double_t bjetphi;
+float bjetpt;
+float bjeteta;
+float bjetphi;
 Int_t nCJet;
-Double_t cjetpt;
-Double_t cjeteta;
-Double_t cjetphi;
+float cjetpt;
+float cjeteta;
+float cjetphi;
 Int_t nFJet;
-Double_t fjetpt;
-Double_t fjeteta;
-Double_t fjetphi;
+float fjetpt;
+float fjeteta;
+float fjetphi;
 
-Double_t weight;
-Double_t qFwt;
-Double_t fLwt;
-Double_t averageMu;
+float weight;
+float qFwt;
+float fLwt;
+float averageMu;
 
-Double_t meff;
-Double_t mlj;
-Double_t R2;
-Double_t mjj;
+float meff;
+float mlj;
+float R2;
+float mjj;
 
 struct nEvent
 {
@@ -180,38 +180,38 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         f2[j]->cd();
         tree2[j] = new TTree(treeName.Data(),treeName.Data());
-        tree2[j]->Branch("pt1",&pt1,"pt1/D");
-        tree2[j]->Branch("pt2",&pt2,"pt2/D");
-        tree2[j]->Branch("eta1",&eta1,"eta1/D");
-        tree2[j]->Branch("eta2",&eta2,"eta2/D");
-        tree2[j]->Branch("phi1",&phi1,"phi1/D");
-        tree2[j]->Branch("mll",&mll,"mll/D");
-        tree2[j]->Branch("ptll",&ptll,"ptll/D");
-        tree2[j]->Branch("MET",&MET,"MET/D");
-        tree2[j]->Branch("METRel",&METRel,"METRel/D");
-        tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/D");
-        tree2[j]->Branch("mt1",&mt1,"mt1/D");
-        tree2[j]->Branch("mt2",&mt2,"mt2/D");
-        tree2[j]->Branch("mtm",&mtm,"mtm/D");
-        tree2[j]->Branch("meff",&meff,"meff/D");
-        tree2[j]->Branch("mlj",&mlj,"mlj/D");
-        tree2[j]->Branch("mjj",&mjj,"mjj/D");
+        tree2[j]->Branch("pt1",&pt1,"pt1/F");
+        tree2[j]->Branch("pt2",&pt2,"pt2/F");
+        tree2[j]->Branch("eta1",&eta1,"eta1/F");
+        tree2[j]->Branch("eta2",&eta2,"eta2/F");
+        tree2[j]->Branch("phi1",&phi1,"phi1/F");
+        tree2[j]->Branch("mll",&mll,"mll/F");
+        tree2[j]->Branch("ptll",&ptll,"ptll/F");
+        tree2[j]->Branch("MET",&MET,"MET/F");
+        tree2[j]->Branch("METRel",&METRel,"METRel/F");
+        tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/F");
+        tree2[j]->Branch("mt1",&mt1,"mt1/F");
+        tree2[j]->Branch("mt2",&mt2,"mt2/F");
+        tree2[j]->Branch("mtm",&mtm,"mtm/F");
+        tree2[j]->Branch("meff",&meff,"meff/F");
+        tree2[j]->Branch("mlj",&mlj,"mlj/F");
+        tree2[j]->Branch("mjj",&mjj,"mjj/F");
 
-        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/D");
-        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/D");
-        tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/D");
-        tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/D");
+        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/F");
+        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/F");
+        tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/F");
+        tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/F");
 
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
-        tree2[j]->Branch("jetpt",&jetpt,"jetpt/D");
-        tree2[j]->Branch("jeteta",&jeteta,"jeteta/D");
+        tree2[j]->Branch("jetpt",&jetpt,"jetpt/F");
+        tree2[j]->Branch("jeteta",&jeteta,"jeteta/F");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
 
-        tree2[j]->Branch("weight",&weight,"weight/D");
-        tree2[j]->Branch("qFwt",&qFwt,"qFwt/D");
-        tree2[j]->Branch("fLwt",&fLwt,"fLwt/D");
-        tree2[j]->Branch("averageMu",&averageMu,"averageMu/D");
+        tree2[j]->Branch("weight",&weight,"weight/F");
+        tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
+        tree2[j]->Branch("fLwt",&fLwt,"fLwt/F");
+        tree2[j]->Branch("averageMu",&averageMu,"averageMu/F");
     }
     
     //histograms
