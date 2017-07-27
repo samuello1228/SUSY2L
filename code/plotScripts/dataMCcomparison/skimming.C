@@ -87,7 +87,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //fileName += ".merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2879.root";
         */
         
-        //fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        //TString fileName = "/Users/samuel/Atlas/ntuple/test.root";
+        //TString fileName = "~/test.root";
         
         cout<<fileName.Data()<<endl;
         tree1->Add(fileName.Data());
