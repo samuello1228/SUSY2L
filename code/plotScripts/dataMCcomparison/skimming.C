@@ -1,9 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+
 #include "obj_def.h"
 #include <TInterpreter.h>
-#include "evt2l.C"
+
+#include <TFile.h>
+#include <TChain.h>
 #include <TH1F.h>
 
 Int_t ID1;
@@ -116,19 +119,20 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     SIGNATURE sig;
     tree1->SetBranchAddress("sig", &sig);
 
-    tree1->GetEntry(1);
+    /*
+    tree1->Show(0);
+    tree1->GetEntry(0);
     cout << "weight = " << evt.weight << endl;
-    cout << "the size of the leptons is " << vleps->size() << endl;
-    cout << "the lepton 0 pt= " << vleps->at(0).pt << endl;
+    cout << "the size of the leptons is " << leps.size() << endl;
+    cout << "the lepton 0 pt= " << leps[0].pt << endl;
     cout << "l12.m = " << l12.m << endl;
-    cout << "the size of the jets is " << vjets->size() << endl;
-    cout << "the jet 0 pt= " << vjets->at(0).pt << endl;
-    cout << "the size of the truths is " << vtruths->size() << endl;
-    cout << "the truth lepton 0 pt= " << vtruths->at(0).pt << endl;
+    cout << "the size of the jets is " << jets.size() << endl;
+    cout << "the jet 0 pt= " << jets[0].pt << endl;
+    cout << "the size of the truths is " << truths.size() << endl;
+    cout << "the truth lepton 0 pt= " << truths[0].pt << endl;
     cout << "sig.mT2 = " << sig.mT2 << endl;
-    return;
+    */
 
-    evt2l *evts = new evt2l(tree1);
     //channels
     std::vector<TString> channel;
     {
@@ -522,7 +526,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     //cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
     nSS.push_back(element);
     //delete
-    delete evts;
     for(unsigned int j=0;j<channel.size();j++)
     {
         delete tree2[j];
