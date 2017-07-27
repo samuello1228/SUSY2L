@@ -266,10 +266,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             cout<<"number of event: " <<j<<endl;
         }
-        evts->GetEntry(j);
+        tree1->GetEntry(j);
         
         //trigger
-        if((evts->sig_trigCode & evts->sig_trigMask)==0)
+        if((sig.trigCode & sig.trigMask)==0)
         {
             //continue;
         }
@@ -278,9 +278,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        fLwt = evts->evt_fLwt;
+        fLwt = evt.fLwt;
         
-        if(!evts->evt_isMC && fLwt!=0)
+        if(!evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -290,9 +290,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else
         {
             //exact 2 signal leptons
-            if(evts->leps_!=2) continue;
-            if(!(evts->leps_lFlag[0] & 1<<1)) continue;
-            if(!(evts->leps_lFlag[1] & 1<<1)) continue;
+            if(leps.size()!=2) continue;
+            if(!(leps[0].lFlag & 1<<1)) continue;
+            if(!(leps[1].lFlag & 1<<1)) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -303,12 +303,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         int sigIndex[2];
         sigIndex[0] = 0;
         sigIndex[1] = 1;
-        ID1 = evts->leps_ID[sigIndex[0]];
-        ID2 = evts->leps_ID[sigIndex[1]];
-        pt1 = evts->leps_pt[sigIndex[0]];
-        pt2 = evts->leps_pt[sigIndex[1]];
-        eta1 = evts->leps_eta[sigIndex[0]];
-        eta2 = evts->leps_eta[sigIndex[1]];
+        ID1 = leps[sigIndex[0]].ID;
+        ID2 = leps[sigIndex[1]].ID;
+        pt1 = leps[sigIndex[0]].pt;
+        pt2 = leps[sigIndex[1]].pt;
+        eta1 = leps[sigIndex[0]].eta;
+        eta2 = leps[sigIndex[1]].eta;
         //pt of leading lepton
         //if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
         //if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
@@ -325,29 +325,29 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
-        phi1 = evts->leps_phi[sigIndex[0]];
-        mll = evts->l12_m;
-        ptll = evts->l12_pt;
-        MET = evts->sig_Met;
-        METRel = evts->sig_MetRel;
-        mTtwo = evts->sig_mT2;
-        mt1 = evts->leps_mT[sigIndex[0]];
-        mt2 = evts->leps_mT[sigIndex[1]];
+        phi1 = leps[sigIndex[0]].phi;
+        mll = l12.m;
+        ptll = l12.pt;
+        MET = sig.Met;
+        METRel = sig.MetRel;
+        mTtwo = sig.mT2;
+        mt1 = leps[sigIndex[0]].mT;
+        mt2 = leps[sigIndex[1]].mT;
         if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
-        meff = evts->sig_HT + evts->sig_Met;
-        mlj = evts->sig_mlj;
-        mjj = evts->sig_mjj;
+        meff = sig.HT + sig.Met;
+        mlj = sig.mlj;
+        mjj = sig.mjj;
         //R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = evts->l12_dPhi;
-        l12_MET_dPhi = evts->l12_MET_dPhi;
-        jets_MET_dPhi = evts->jets_MET_dPhi[0];
-        l12_jet0_dPhi = evts->l12_jet0_dPhi;
-        weight = evts->evt_weight * evts->evt_pwt * evts->evt_ElSF * evts->evt_MuSF * evts->evt_BtagSF * evts->evt_JvtSF;
+        l12_dPhi = l12.dPhi;
+        l12_MET_dPhi = l12.MET_dPhi;
+        jets_MET_dPhi = jets[0].MET_dPhi;
+        l12_jet0_dPhi = l12.jet0_dPhi;
+        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
         
-        qFwt = evts->evt_qFwt;
+        qFwt = evt.qFwt;
         
-        averageMu = evts->evt_averageMu;
+        averageMu = evt.averageMu;
         
         //SF or DF
         int channelIndex = 0;
@@ -383,32 +383,32 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //int leadingBJetIndex = 0;
         //int leadingCJetIndex = 0;
         //int leadingFJetIndex = 0;
-        for(int k=0;k<evts->jets_;k++)
+        for(unsigned int k=0;k<jets.size();k++)
         {
             //signal jets
-            if(!(evts->jets_jFlag[k] & 1<<1)) continue;
+            if(!(jets[k].jFlag & 1<<1)) continue;
             nJet++;
             if(nJet==1) leadingJetIndex = k;
             
             //B-jets
-            //if((evts->jets_jFlag[k] & 1<<5) && evts->jets_pt[k] > 20)
-            if(evts->jets_jFlag[k] & 1<<5)
+            //if((jets[k].jFlag & 1<<5) && jets[k].pt > 20)
+            if(jets[k].jFlag & 1<<5)
             {
                 nBJet++;
                 //if(nBJet==1) leadingBJetIndex = k;
             }
             
-            if(fabs(evts->jets_eta[k]) < 2.4)
+            if(fabs(jets[k].eta) < 2.4)
             {
                 //ISR
-                if(evts->jets_pt[k] > 40) nISR++;
+                if(jets[k].pt > 40) nISR++;
                 
                 
                 //Central jets
-                if(!(evts->jets_jFlag[k] & 1<<5))
+                if(!(jets[k].jFlag & 1<<5))
                 {
                     //no b-tagged
-                    if(evts->jets_pt[k] > 20)
+                    if(jets[k].pt > 20)
                     {
                         //Central light jets
                         nCJet++;
@@ -421,7 +421,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 /*
                 //Forward jets
-                if(evts->jets_pt[k] > 30)
+                if(jets[k].pt > 30)
                 {
                     nFJet++;
                     if(nFJet==1) leadingFJetIndex = k;
@@ -432,9 +432,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(nJet>0)
         {
-            jetpt = evts->jets_pt[leadingJetIndex];
-            jeteta = evts->jets_eta[leadingJetIndex];
-            //jetphi = evts->jets_phi[leadingJetIndex];
+            jetpt = jets[leadingJetIndex].pt;
+            jeteta = jets[leadingJetIndex].eta;
+            //jetphi = jets[leadingJetIndex].phi;
         }
         else
         {
@@ -446,9 +446,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         /* 
         if(nBJet>0)
         {
-            bjetpt = evts->jets_pt[leadingBJetIndex];
-            bjeteta = evts->jets_eta[leadingBJetIndex];
-            bjetphi = evts->jets_phi[leadingBJetIndex];
+            bjetpt = jets[leadingBJetIndex].pt;
+            bjeteta = jets[leadingBJetIndex].eta;
+            bjetphi = jets[leadingBJetIndex].phi;
         }
         else
         {
@@ -459,9 +459,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(nCJet>0)
         {
-            cjetpt = evts->jets_pt[leadingCJetIndex];
-            cjeteta = evts->jets_eta[leadingCJetIndex];
-            cjetphi = evts->jets_phi[leadingCJetIndex];
+            cjetpt = jets[leadingCJetIndex].pt;
+            cjeteta = jets[leadingCJetIndex].eta;
+            cjetphi = jets[leadingCJetIndex].phi;
         }
         else
         {
@@ -472,9 +472,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(nFJet>0)
         {
-            fjetpt = evts->jets_pt[leadingFJetIndex];
-            fjeteta = evts->jets_eta[leadingFJetIndex];
-            fjetphi = evts->jets_phi[leadingFJetIndex];
+            fjetpt = jets[leadingFJetIndex].pt;
+            fjeteta = jets[leadingFJetIndex].eta;
+            fjetphi = jets[leadingFJetIndex].phi;
         }
         else
         {
