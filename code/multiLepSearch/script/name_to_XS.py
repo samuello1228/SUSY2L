@@ -5,6 +5,7 @@ import pyAMI.client
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
+#sigFilesTxt="MCSig_sample_Wh_AOD.txt"
 sigFilesTxt="MCSig_sample_Wh_p2949.txt"
 print "reading", sigFilesTxt
 
@@ -30,7 +31,9 @@ with open(sigFilesTxt) as sigFiles:
       #find evgen.EVNT sample
       prov = AtlasAPI.get_dataset_prov(client, name)
       node = prov['node']
-      evgen = node[10]
+
+      #evgen = node[9]   #AOD
+      evgen = node[10]  #SUSY2
       name = evgen['logicalDatasetName']
       print name
 
