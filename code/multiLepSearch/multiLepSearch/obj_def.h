@@ -21,8 +21,9 @@ struct R_PAR:PAR{
   float m;
   float dPhi;
   float dR;
+  float jet0_dPhi;
 };
-const string R_PAR_s = PAR_s+":m/F:dPhi:dR";
+const string R_PAR_s = PAR_s+":m/F:dPhi:dR:jet0_dPhi";
 
 struct L_PAR:PAR{
   float mT;
@@ -49,9 +50,10 @@ struct MU_Par:L_PAR{
 const string MU_PAR_s = L_PAR_s+":muID/i";
 
 struct J_PAR:PAR{
+  float m;
   unsigned int jFlag ;
 };
-const string J_PAR_s = PAR_s+":jFlag/I";
+const string J_PAR_s = PAR_s+":m/F:jFlag/I";
 
 struct EVT{
   unsigned long int run;
@@ -66,6 +68,7 @@ struct EVT{
   float ElSF;
   float MuSF;
   float BtagSF;
+  float JvtSF;
   float qFwt;
   float qFwt_sys_1up;
   float qFwt_sys_1dn;
@@ -76,7 +79,7 @@ struct EVT{
   float fLwt_u_sys_1dn;
  };
 // const string EVT_s = "run/l:event/l:isMC/i:cut/i;flag/I:actualMu/F:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
-const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
+const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
 
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
@@ -87,8 +90,10 @@ struct SIGNATURE{
   float MetY;
   float mT2;
   float HT;
+  float mjj;
+  float mlj;
 };
-const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F";
+const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
 
 struct TR_PAR:PAR0{
   int pdgId; 
@@ -125,6 +130,7 @@ enum MFLAGS{
 enum JFALGS{
   JT_BJET_LOOSE = 1<<4, //16
   JT_BJET = 1<<5, //32
+  JT_CJET = 1<<11,
 };
 
 typedef std::vector< L_PAR > LEPTONS;

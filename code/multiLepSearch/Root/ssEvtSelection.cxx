@@ -168,14 +168,14 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(16,"nSumW");
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep and trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(23,"==3BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(24,"==3SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(25,"=3BaseLep and =3SigLep and trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(26,"=2BaseLep and =2SigLep and MET>50");
-  m_hCutFlow->GetXaxis()->SetBinLabel(27,"=3BaseLep and =3SigLep and MET>50");
-  m_hCutFlow->GetXaxis()->SetBinLabel(28,"=2BaseLep and =2SigLep and MET>50 and BVeto");
-  m_hCutFlow->GetXaxis()->SetBinLabel(29,"=3BaseLep and =3SigLep and MET>50 and BVeto");
+  m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
+  m_hCutFlow->GetXaxis()->SetBinLabel(23,"SS");
+  m_hCutFlow->GetXaxis()->SetBinLabel(24,">=1BaseLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(25,">=1SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(26,">=2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(27,"=2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(28,"=2BaseLep and =2SigLep,w");
+  m_hCutFlow->GetXaxis()->SetBinLabel(29,"SS,w");
   m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
   m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
@@ -777,6 +777,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
+    if(cutflow)
+    {
+      if(totLs == 0) continue;
+      dilepPair[0] = sel_Ls[0];
+      dilepPair[1] = sel_Ls[0];
+    }
+
     if(!cutflow && study == "ss"){
       //for ss study we put the dilepPair at front, then others sorted by pT at tail
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -790,9 +797,9 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(study == "ss" || study == "fakes")
     {
       if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
-      else if(totLs == 3) {m_hCutFlow->Fill("==3BaseLep", 1);m_hCutFlow->Fill("=3BaseLep", 1);}
+      else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
       if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
-      else if(sig_Ls.size() == 3) {m_hCutFlow->Fill("==3SigLep", 1);m_hCutFlow->Fill("=3SigLep", 1);}
+      else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
 
       if(nBaseEl >= 1) m_hCutFlow->Fill(">=1BaseEl", 1);
       if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
@@ -813,6 +820,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(nBaseMu == 3) m_hCutFlow->Fill("=3BaseMu", 1);
       if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
 
+      if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
       if(totLs == 3 && sig_Ls.size() == 3) m_hCutFlow->Fill("=3BaseLep and =3SigLep", 1);
     }
     /////////////////////////
@@ -823,11 +831,16 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.cut = 0;
 
     //event information
-    //m_susyEvt->evt.run = eventInfo->runNumber();
     m_susyEvt->evt.event = eventInfo->eventNumber();
     //m_susyEvt->evt.lumiBlock = eventInfo->lumiBlock();
     //m_susyEvt->evt.actualMu = eventInfo->actualInteractionsPerCrossing();
-    m_susyEvt->evt.weight = CF_isMC?eventInfo->mcEventWeight():1;
+    
+    double TotalWeight = 1;
+    if(CF_isMC) TotalWeight *= eventInfo->mcEventWeight();
+    if(!CF_isMC) m_susyEvt->evt.weight = 1;
+    else if(fabs(eventInfo->mcEventWeight())<100) m_susyEvt->evt.weight = eventInfo->mcEventWeight();
+    else m_susyEvt->evt.weight = 1;
+    
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
     m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
 
@@ -900,7 +913,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     vector< xAOD::IParticle* > jet_Ls;
     jet_Ls.reserve(10);
     for(auto jet: *jets_copy){
-      if(dec_baseline(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
+      if(cutflow && dec_baseline(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
+      if(!cutflow && dec_signal(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
     }
     sort(jet_Ls.begin(), jet_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
@@ -911,13 +925,15 @@ EL::StatusCode ssEvtSelection :: execute ()
     int nSigJet = 0;
     int nBJet = 0;
     int nISR = 0;
-    int i=0;
-    for(auto j0: jet_Ls){
-      auto j = dynamic_cast<xAOD::Jet*>(j0);
+    vector< xAOD::Jet* > cjet_Ls;
+    cjet_Ls.reserve(10);
+    for(unsigned int i=0;i<jet_Ls.size(); i++){
+      auto j = dynamic_cast<xAOD::Jet*>(jet_Ls[i]);
       
       m_susyEvt->jets[i].pt = j->pt()*iGeV; 
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
+      m_susyEvt->jets[i].m = j->m()*iGeV;
       m_susyEvt->jets[i].MET_dPhi = metV.DeltaPhi(j->p4());
       unsigned int& flag = m_susyEvt->jets[i].jFlag;
       flag = 0;
@@ -926,8 +942,13 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(m_objTool->IsBJet(*j)) {flag |= JT_BJET;nBJet++;}
       if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
-      m_susyEvt->sig.HT += j->pt()*iGeV;
-      i++;
+      //Central jets
+      if(fabs(j->eta())<2.8 && j->pt()>20e3 && !(flag & JT_BJET))
+      {
+        flag |= JT_CJET;
+        cjet_Ls.push_back(j);
+        m_susyEvt->sig.HT += j->pt()*iGeV;
+      }
     }
 
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
@@ -952,6 +973,35 @@ EL::StatusCode ssEvtSelection :: execute ()
     // Info("execute()", "Z decay saved");
 
     // Info("execute()", "Before fillLepton");
+    if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
+    else m_susyEvt->sig.mjj = -1;
+
+    //The two leading leptons
+    xAOD::IParticle* l1 = dilepPair[0];
+    xAOD::IParticle* l2 = dilepPair[1];
+    // cout << l1->pt() << " " << l2->pt() << endl;
+
+    m_susyEvt->sig.mlj = -1;
+    if(cjet_Ls.size()>=1 && cjet_Ls.size()<=3)
+    {
+      TLorentzVector JetSystem;
+      if(cjet_Ls.size()==1)
+      {
+        JetSystem = cjet_Ls[0]->p4();
+      }
+      else if(cjet_Ls.size()==2 || cjet_Ls.size()==3)
+      {
+        JetSystem = cjet_Ls[0]->p4()+cjet_Ls[1]->p4();
+      }
+
+      double dR1 = JetSystem.DeltaR(l1->p4());
+      double dR2 = JetSystem.DeltaR(l2->p4());
+      xAOD::IParticle* lmindR = nullptr;
+      if(dR1<dR2) lmindR = l1;
+      else lmindR = l2;
+      m_susyEvt->sig.mlj = (JetSystem+lmindR->p4()).M() *iGeV;
+    }
+
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size()); 
     // Info("execute()", "There are %d leptons in this event", sel_Ls.size());
@@ -982,73 +1032,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.MetRel = m_susyEvt->sig.Met;
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
 
-
-    unsigned int dilepFlag = 0;
-    //for cutflow
-    for(unsigned int i=0;i<electrons_copy->size(); i++){
-      for(unsigned int j=i+1;j<electrons_copy->size(); j++){
-        if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(electrons_copy->at(j))))
-        {
-          dilepFlag |= 1<<0;
-        }
-      }
-    }
-
-    for(unsigned int i=0;i<muons_copy->size(); i++){
-      for(unsigned int j=i+1;j<muons_copy->size(); j++){
-        if(dec_signal(*(muons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
-        {
-          dilepFlag |= 1<<1;
-        }
-      }
-    }
-
-    for(unsigned int i=0;i<electrons_copy->size(); i++){
-      for(unsigned int j=0;j<muons_copy->size(); j++){
-        if(dec_signal(*(electrons_copy->at(i))) && dec_signal(*(muons_copy->at(j))))
-        {
-          dilepFlag |= 1<<2;
-        }
-      }
-    }
-
-    if(study == "ss")
-    {
-      if(totLs == 2 && sig_Ls.size() == 2)
-      {
-        if(dilepFlag > 0)
-        {
-          m_hCutFlow->Fill("=2BaseLep and =2SigLep and trigger", 1);
-        }
-     
-        if(m_susyEvt->sig.Met > 50)
-        {
-          m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50", 1);
-          if(nBJet == 0)
-          {
-            m_hCutFlow->Fill("=2BaseLep and =2SigLep and MET>50 and BVeto", 1);
-          }
-        }
-      }      
-      else if(totLs == 3 && sig_Ls.size() == 3)
-      {
-        if(dilepFlag > 0)
-        {
-          m_hCutFlow->Fill("=3BaseLep and =3SigLep and trigger", 1);
-        }
-     
-        if(m_susyEvt->sig.Met > 50)
-        {
-          m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50", 1);
-          if(nBJet == 0)
-          {
-            m_hCutFlow->Fill("=3BaseLep and =3SigLep and MET>50 and BVeto", 1);
-          }
-        }
-      }       
-      if(cutflow) continue;
-    }
-
     /*
     /// tau
     xAOD::TauJetContainer* taus_copy(0);
@@ -1074,12 +1057,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       ADD *= 2;
     }
 
-
-    /// two leading leptons
-    xAOD::IParticle* l1 = dilepPair[0];
-    xAOD::IParticle* l2 = dilepPair[1];
-   
-    // cout << l1->pt() << " " << l2->pt() << endl;
+    //l12
     TLorentzVector ll(l1->p4()+l2->p4());
     m_susyEvt->l12.m = ll.M()*iGeV;
     m_susyEvt->l12.pt = ll.Pt()*iGeV; 
@@ -1088,6 +1066,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->l12.dPhi = l1->p4().DeltaPhi(l2->p4()); 
     m_susyEvt->l12.dR = l1->p4().DeltaR(l2->p4()); 
     m_susyEvt->l12.MET_dPhi = metV.DeltaPhi(ll);
+    if(jet_Ls.size()>=1) m_susyEvt->l12.jet0_dPhi = ll.DeltaPhi(jet_Ls[0]->p4());
+    else m_susyEvt->l12.jet0_dPhi = -100;
 
     m_susyEvt->sig.HT += (l1->pt()+l2->pt())*iGeV;
 
@@ -1095,6 +1075,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     /// mT2
     auto tl1 = l1->p4();
     auto tl2 = l2->p4();
+    //https://svnweb.cern.ch/trac/atlasphys-susy/browser/Physics/SUSY/Tools/CalcGenericMT2
     m_susyEvt->sig.mT2 =  anaHelper::get_mT2(tl1.M(), tl1.Px(), tl1.Py(), tl2.M(), tl2.Px(), tl2.Py(), metFinal->mpx(), metFinal->mpy(), CF_mT2_m0*GeV, CF_mT2_m0*GeV)*iGeV;
 
     //loop over systematics and vary scale factor for weight based systematics
@@ -1134,6 +1115,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(CF_isMC){ 
         m_susyEvt->evt.pwt = m_objTool->GetPileupWeight();
         m_susyEvt->evt.averageMu = eventInfo->averageInteractionsPerCrossing();
+        TotalWeight *= m_susyEvt->evt.pwt;
       }else{
         m_susyEvt->evt.pwt = 1;
         m_susyEvt->evt.averageMu = m_objTool->GetCorrectedAverageInteractionsPerCrossing();
@@ -1141,6 +1123,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       //// get trigger info, if passed, and the SF
       auto& sEvt = m_susyEvt->evt;
+      //sEvt.run = eventInfo->runNumber();
       sEvt.run = m_objTool->GetRunNumber();
       auto trigCut = getTriggerConf(sEvt.run);
 
@@ -1177,9 +1160,7 @@ EL::StatusCode ssEvtSelection :: execute ()
              (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
             m_susyEvt->evt.flag += 3;
 
-          // if(nISR==1) m_susyEvt->evt.flag += 6;
-          // else if(nISR!=0) m_susyEvt->evt.flag = 0;
-        }
+        if(nISR>=1) m_susyEvt->evt.flag += 6;
       }
       // else if (study=="fakes")
       // {
@@ -1191,13 +1172,14 @@ EL::StatusCode ssEvtSelection :: execute ()
         if( study == "ss" || study == "fakes")
         {
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey, true);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
           }
         }
@@ -1212,12 +1194,40 @@ EL::StatusCode ssEvtSelection :: execute ()
         //   sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
         // }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
+        sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF;
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
         sEvt.BtagSF = 1;
+        sEvt.JvtSF = 1;
       }
 
+      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
+      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
+      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
+      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep,w", TotalWeight);
+
+      if(totLs == 2 && sig_Ls.size() == 2)
+      {
+        m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
+        if(sEvt.flag%6 == 4 || sEvt.flag%6 == 5 || sEvt.flag%6 == 0)
+        {
+           m_hCutFlow->Fill("SS", 1);
+           m_hCutFlow->Fill("SS,w", TotalWeight);
+        }
+      }
+      
+      if(CF_isMC && m_susyEvt->evt.event == 47)
+      {
+        cout<<"event: "<<m_susyEvt->evt.event<<endl;
+        cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;
+        cout<<"pileup: "<<m_susyEvt->evt.pwt<<endl;
+        cout<<"ele: "<<sEvt.ElSF<<endl;
+        cout<<"mu: "<<sEvt.MuSF<<endl;
+        cout<<"bjet: "<<sEvt.BtagSF<<endl;
+        cout<<"jvt: "<<sEvt.JvtSF<<endl;
+      }
 
       /// fill events
       ATH_MSG_VERBOSE("Fill " << iSyst << " " << jSyst );

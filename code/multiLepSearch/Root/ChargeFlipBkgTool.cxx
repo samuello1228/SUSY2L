@@ -39,8 +39,8 @@ StatusCode ChargeFlipBkgTool::initialize() {
   hFlipProb = (TH2D*) ratesFile->FindObjectAny(m_inputRatesHistoName.c_str());
   if (!hFlipProb) return  StatusCode::FAILURE;
 
-  hFlipProb_sys = (TH2D*) ratesFile->FindObjectAny(m_inputRatesSysHistoName.c_str());
-  if(!hFlipProb_sys) return StatusCode::FAILURE;
+  // hFlipProb_sys = (TH2D*) ratesFile->FindObjectAny(m_inputRatesSysHistoName.c_str());
+  // if(!hFlipProb_sys) return StatusCode::FAILURE;
 
   dPtFile = new TFile(m_inputDPtFileName.c_str(), "READ");
   if (!dPtFile) return StatusCode::FAILURE;
