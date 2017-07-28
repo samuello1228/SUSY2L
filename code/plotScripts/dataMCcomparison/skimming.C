@@ -112,9 +112,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     vector< J_PAR >* vjets = &jets;
     tree1->SetBranchAddress("jets", &vjets);
 
+    /*
     vector< TR_PAR > truths;
     vector< TR_PAR >* vtruths = &truths;
     tree1->SetBranchAddress("truths", &vtruths);
+    */
 
     SIGNATURE sig;
     tree1->SetBranchAddress("sig", &sig);
@@ -128,9 +130,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     cout << "l12.m = " << l12.m << endl;
     cout << "the size of the jets is " << jets.size() << endl;
     cout << "the jet 0 pt= " << jets[0].pt << endl;
-    cout << "the size of the truths is " << truths.size() << endl;
-    cout << "the truth lepton 0 pt= " << truths[0].pt << endl;
+    //cout << "the size of the truths is " << truths.size() << endl;
+    //cout << "the truth lepton 0 pt= " << truths[0].pt << endl;
     cout << "sig.mT2 = " << sig.mT2 << endl;
+    return;
     */
 
     //channels
@@ -275,7 +278,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //trigger
         if((sig.trigCode & sig.trigMask)==0)
         {
-            //continue;
+            continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -345,7 +348,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = l12.dPhi;
         l12_MET_dPhi = l12.MET_dPhi;
-        jets_MET_dPhi = jets[0].MET_dPhi;
+        if(jets.size()>=1) jets_MET_dPhi = jets[0].MET_dPhi;
+        else jets_MET_dPhi = -999;
         l12_jet0_dPhi = l12.jet0_dPhi;
         weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
         
@@ -577,9 +581,11 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
 
 void skimming()
 {
+    gInterpreter->GenerateDictionary("PAR0","obj_def.h"); 
+    gInterpreter->GenerateDictionary("PAR","obj_def.h"); 
     gInterpreter->GenerateDictionary("vector<L_PAR>","obj_def.h;vector"); 
     gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector"); 
-    gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector"); 
+    //gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector"); 
 
     TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
@@ -598,12 +604,13 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
     //Data
-    //if(false)
+    if(false)
     {
         //SamplePath += "data/";
         //tag += "b.Data";
@@ -629,13 +636,13 @@ void skimming()
         //for(unsigned int i=119;i<=120;i++)
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
-            //BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
+            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
             skimming2(SamplePath,tag,BGSampleName[i],nSS);
         }
     }
     
     //Signal
-    if(false)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";

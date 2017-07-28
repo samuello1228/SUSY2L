@@ -47,9 +47,10 @@ struct MU_Par:L_PAR{
 const string MU_PAR_s = L_PAR_s+":muID/i";
 
 struct J_PAR:PAR{
+  float m;
   unsigned int jFlag ;
 };
-const string J_PAR_s = PAR_s+":jFlag/I";
+const string J_PAR_s = PAR_s+":m/F:jFlag/I";
 
 struct EVT{
   unsigned long int run;
