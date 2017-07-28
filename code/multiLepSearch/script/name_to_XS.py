@@ -10,7 +10,7 @@ sigFilesTxt="MCSig_sample_Wh_p2949.txt"
 print "reading", sigFilesTxt
 
 with open(sigFilesTxt) as sigFiles:
-  with open("SigSample.txt", 'w') as outFile:
+  with open("SigSample_ami.txt", 'w') as outFile:
     for aLine in sigFiles:
       #remove and ignore comments in line
       aLine = aLine.split("#")[0]
@@ -18,7 +18,7 @@ with open(sigFilesTxt) as sigFiles:
 
       #read the line
       name = aLine.rstrip()
-      elements = aLine.split(".")
+      elements = name.split(".")
       mass = elements[2].split("_")
 
       mass1 = mass[5].replace("p",".")
@@ -46,5 +46,6 @@ with open(sigFilesTxt) as sigFiles:
 
       #output file
       outStr = elements[1] + " " + elements[2] + " " + mass1 + " " + mass2 + " " + str(float(xSec)*1000) + " " + eff + " " + number
+      #outStr = elements[1] + " " + elements[2] + " " + mass1 + " " + mass2 + " " + str(float(xSec)*1000) + " " + eff
       print outStr, "\n"
       outFile.write(outStr+"\n")
