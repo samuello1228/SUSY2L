@@ -6,7 +6,7 @@ client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
 #sigFilesTxt="MCSig_sample_Wh_AOD.txt"
-sigFilesTxt="MCSig_sample_Wh_p2949.txt"
+sigFilesTxt="MCSig_sample_list.txt"
 print "reading", sigFilesTxt
 
 with open(sigFilesTxt) as sigFiles:
