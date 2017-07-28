@@ -29,8 +29,6 @@ k=${tag}.MCBG
 
 #For signal MC
 #file=../multiLepSearch/script/MCSig_sample_list.txt
-#file=../multiLepSearch/script/MCSig_sample_list_new.txt
-#file=../multiLepSearch/script/MCSig_sample_Wh_p2949.txt
 #k=${tag}.MCSig
 
 ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
