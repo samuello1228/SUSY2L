@@ -209,7 +209,7 @@ elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fak
 
 #     alg.study = options.study
 
-alg.mcTruthMatch = options.mcMatch if (options.study!="fakes") else "MCTC"
+alg.mcTruthMatch = options.mcMatch #if (options.study!="fakes") else "MCTC"
 alg.useChargeIDSelector = options.ChargeID
 
 # alg.CF_nLepCutExactly = 2
