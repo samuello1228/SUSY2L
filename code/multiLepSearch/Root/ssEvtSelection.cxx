@@ -1160,7 +1160,8 @@ EL::StatusCode ssEvtSelection :: execute ()
              (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
             m_susyEvt->evt.flag += 3;
 
-        if(nISR>=1) m_susyEvt->evt.flag += 6;
+          if(nISR>=1) m_susyEvt->evt.flag += 6;
+        }
       }
       // else if (study=="fakes")
       // {
