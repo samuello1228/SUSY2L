@@ -1,10 +1,11 @@
+#source /afs/cern.ch/atlas/software/tools/pyAMI/setup.sh
 import pyAMI.atlas.api as AtlasAPI
 import pyAMI.client
 
 client = pyAMI.client.Client('atlas')
 AtlasAPI.init()
 
-sigFilesTxt="MCSig_sample_list.txt"
+sigFilesTxt="MCSig_sample_Wh_p2949.txt"
 print "reading", sigFilesTxt
 
 with open(sigFilesTxt) as sigFiles:
@@ -18,6 +19,9 @@ with open(sigFilesTxt) as sigFiles:
       name = aLine.rstrip()
       elements = aLine.split(".")
       mass = elements[2].split("_")
+
+      mass1 = mass[5].replace("p",".")
+      mass2 = mass[6].replace("p",".")
 
       #find number of event of SUSY2
       info = AtlasAPI.get_dataset_info(client, name)[0]
@@ -38,6 +42,6 @@ with open(sigFilesTxt) as sigFiles:
       print elements[1], xSec, unit, eff
 
       #output file
-      outStr = elements[1] + " " + elements[2] + " " + mass[4] + " " + mass[5] + " " + str(float(xSec)*1000) + " " + eff + " " + number
+      outStr = elements[1] + " " + elements[2] + " " + mass1 + " " + mass2 + " " + str(float(xSec)*1000) + " " + eff + " " + number
       print outStr, "\n"
       outFile.write(outStr+"\n")
