@@ -641,9 +641,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
-    const bool cutflow = false;
-    //const bool cutflow = true;
-
     vector< IParticle* > dilepPair(2, nullptr);
     if(study == "ss"){
       bool keep = false;
@@ -769,7 +766,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         dilepPair[0] = sel_Ls[0];
         dilepPair[1] = sel_Ls[1];
       }
-      else continue;
+      else if (!cutflow) continue;
 
       m_susyEvt->evt.flag = totLs + sig_Ls.size()*4; 
     }
@@ -1045,7 +1042,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     */
 
-
     //Assign trigCode
     m_susyEvt->sig.trigCode = 0;
     unsigned long int ADD = 1;
@@ -1070,7 +1066,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     else m_susyEvt->l12.jet0_dPhi = -100;
 
     m_susyEvt->sig.HT += (l1->pt()+l2->pt())*iGeV;
-
 
     /// mT2
     auto tl1 = l1->p4();
@@ -1219,7 +1214,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
       }
       
-      if(CF_isMC && m_susyEvt->evt.event == 47)
+      if(CF_isMC && m_susyEvt->evt.event == printEvent)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;
         cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;

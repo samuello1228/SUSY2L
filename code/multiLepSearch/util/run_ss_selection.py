@@ -34,7 +34,9 @@ parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l",
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink", "reverseTruthLink", "tryAll", "MCTCZ", "dRZ"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
 parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
+parser.add_option("--printEvent", type="int", help="Print event?", default=-1)
 parser.add_option("--extraOptions", help="extra options", default=None)
+parser.add_option("--cutflow", help="Cutflow", action='store_true', default=False)
 
 
 (options, args) = parser.parse_args()
@@ -211,6 +213,8 @@ elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fak
 
 alg.mcTruthMatch = options.mcMatch #if (options.study!="fakes") else "MCTC"
 alg.useChargeIDSelector = options.ChargeID
+alg.printEvent = options.printEvent
+alg.cutflow = options.cutflow
 
 # alg.CF_nLepCutExactly = 2
 # alg.CF_nLepCutMin = 2

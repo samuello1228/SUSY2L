@@ -86,6 +86,8 @@ public:
   int CF_vxTrkNMin;
   float CF_vxTrkPtMin;
   float CF_mT2_m0;
+  int printEvent;
+  bool cutflow;
 
   int CF_isMC;
   std::vector< std::string > CF_grlFiles;
