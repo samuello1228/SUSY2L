@@ -403,7 +403,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //if(nBJet==1) leadingBJetIndex = k;
             }
             
-            if(fabs(jets[k].eta) < 2.4)
+            if(fabs(jets[k].eta) < 2.8)
             {
                 //ISR
                 if(jets[k].pt > 40) nISR++;
