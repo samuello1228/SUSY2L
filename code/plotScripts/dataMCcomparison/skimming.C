@@ -382,7 +382,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //jets
-        nJet = 0;
+        nJet = jets.size();
         nBJet = 0;
         nCJet = 0;
         //nFJet = 0;
@@ -394,9 +394,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         for(unsigned int k=0;k<jets.size();k++)
         {
             //signal jets
-            if(!(jets[k].jFlag & 1<<1)) continue;
-            nJet++;
-            if(nJet==1) leadingJetIndex = k;
             
             //B-jets
             //if((jets[k].jFlag & 1<<5) && jets[k].pt > 20)
