@@ -27,7 +27,7 @@ float mtm;
 
 float l12_dPhi;
 float l12_MET_dPhi;
-float jets_MET_dPhi;
+float jet0_MET_dPhi;
 float l12_jet0_dPhi;
 
 Int_t nJet;
@@ -202,7 +202,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
 
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/F");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/F");
-        tree2[j]->Branch("jets_MET_dPhi",&jets_MET_dPhi,"jets_MET_dPhi/F");
+        tree2[j]->Branch("jet0_MET_dPhi",&jet0_MET_dPhi,"jet0_MET_dPhi/F");
         tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/F");
 
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
@@ -348,8 +348,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = l12.dPhi;
         l12_MET_dPhi = l12.MET_dPhi;
-        if(jets.size()>=1) jets_MET_dPhi = jets[0].MET_dPhi;
-        else jets_MET_dPhi = -999;
+        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
+        else jet0_MET_dPhi = -999;
         l12_jet0_dPhi = l12.jet0_dPhi;
         weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
         
