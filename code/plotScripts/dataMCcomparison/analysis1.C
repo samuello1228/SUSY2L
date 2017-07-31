@@ -4370,6 +4370,7 @@ void analysis1()
                 //Add Signal for the same mass splitting
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
+                    /*
                     double AOD = 0;
                     for(unsigned int j=0;j<SigSampleID.size();j++)
                     {
@@ -4382,6 +4383,12 @@ void analysis1()
                     
                     //preliminary normalization for h2SigSum
                     h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                    */
+                    
+                    ///*
+                    h2SigSum[i]->Add(h2Sig[SigMassSplitting[i].ID]);
+                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/SignAOD[SigMassSplitting[i].ID]);
+                    //*/
                 }
                 
                 const bool DoSignificancePlot = !doOptimize &&
@@ -4423,9 +4430,7 @@ void analysis1()
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         //expected number of events
-                        TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                        hTemp.Add(h2SigSum[i]);
-                        SigMassSplitting[i].weighted = hTemp.IntegralAndError(0,-1,SigMassSplitting[i].error);
+                        SigMassSplitting[i].weighted = h2SigSum[i]->IntegralAndError(0,-1,SigMassSplitting[i].error);
                         
                         //Significance
                         SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,total_BG_weighted,total_BG_error2);
@@ -4588,7 +4593,7 @@ void analysis1()
                     }
                     
                     //significance for all mass point
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR")
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
                         PathName = "latex/data/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
@@ -4600,33 +4605,28 @@ void analysis1()
                         int pointN = 0;
                         for(unsigned int j=0;j<SigSampleID.size();j++)
                         {
-                            for(unsigned int k=0;k<SigMassSplitting.size();k++)
+                            //expected number of events
+                            double expN = h2Sig[j]->Integral(0,-1);
+                            expN *= SigXS[j] *sumDataL/SignAOD[j];
+                            
+                            //Significance
+                            double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
+                            
+                            fout<<setprecision(1)<<std::fixed;
+                            fout<<SigMass1[j]<<" "<<SigMass2[j]<<" ";
+                            fout<<setprecision(3)<<std::fixed;
+                            fout<<significance<<endl;
+                            
+                            //2D plot
+                            if(significance>0)
                             {
-                                if(SigMass1[j]-SigMass2[j] == SigMassSplitting[k].MassDiff)
-                                {
-                                    //expected number of events
-                                    double expN = h2SigSum[k]->Integral(0,-1);
-                                    expN *= SigXS[j];
-                                    
-                                    //Significance
-                                    double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
-                                    
-                                    fout<<setprecision(3)<<std::fixed;
-                                    fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
-                                    
-                                    //2D plot
-                                    if(significance>0)
-                                    {
-                                        g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
-                                        pointN++;
-                                    }
-                                }
+                                g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
+                                pointN++;
                             }
                         }
                         fout.close();
                         
                         //if(pointN>=3)
-                        if(RegionInfo[RegionIndex].RegionName == "nonISR_mT_100_inf_ptll_no_cut_MET_150_inf_mumu")
                         {
                             gStyle->SetPalette(1);
                             
@@ -4706,17 +4706,13 @@ void analysis1()
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             //expected number of events
-                            
-                            TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                            hTemp.Add(h2SigSum[i]);
-                            
                             if(Var[VarIndex].CutDirection == 1)
                             {
-                                nSig = hTemp.Integral(bin,-1);
+                                nSig = h2SigSum[i]->Integral(bin,-1);
                             }
                             else if(Var[VarIndex].CutDirection == -1)
                             {
-                                nSig = hTemp.Integral(0,bin);
+                                nSig = h2SigSum[i]->Integral(0,bin);
                             }
                             
                             //Significance
