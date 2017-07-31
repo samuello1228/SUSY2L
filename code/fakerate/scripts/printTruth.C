@@ -6,7 +6,7 @@ const bool DEBUG = false;
 void printTruth()
 {
 	TChain* tc = new TChain("evt2l");
-	tc->Add("/afs/cern.ch/user/g/ggallard/private/fakeLep/mkNTuples/run/v11.5.cf4.MCZeeP/data-myOutput/test.root");
+	tc->Add("/afs/cern.ch/user/g/ggallard/private/fakeLep/mkNTuples/run/v11.5.beta3.ZeeP.dRZ/data-myOutput/test.root");
 	evt2l* t = new evt2l(tc);
 
 	int nEntries = t->fChain->GetEntries();
@@ -31,6 +31,10 @@ void printTruth()
 			<< "    MotherI: ";
 		for(int j=0; j<t->truths_; j++)
 			cout << setw(10) << t->truths_motherI[j] ;
+		cout << '\n'
+			<< "    Barcode: ";
+		for(int j=0; j<t->truths_; j++)
+			cout << setw(10) << t->truths_barcode[j];
 		cout << "\n\n";
 	}
 }
