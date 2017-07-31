@@ -3361,7 +3361,7 @@ void analysis1()
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
             //channelRepresentative for SR
-            unsigned int channelRepresentative;
+            unsigned int channelRepresentative = 0;
             for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
             {
                 if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") channelRepresentative = ChannelIndex;
@@ -5038,7 +5038,7 @@ void analysis1()
                    RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
                 {
                     TString optGroupName = "SR_SS_opt";
-                    unsigned int optRegionGroupIndex;
+                    unsigned int optRegionGroupIndex = 0;
                     for(unsigned int i=0;i<RegionGroup.size();i++)
                     {
                         if(RegionGroup[i].GroupName == optGroupName)
@@ -6045,7 +6045,7 @@ void analysis1()
     for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
     {
         TString optGroupName = "SR_SS_opt";
-        unsigned int optRegionGroupIndex;
+        unsigned int optRegionGroupIndex = 0;
         for(unsigned int i=0;i<RegionGroup.size();i++)
         {
             if(RegionGroup[i].GroupName == optGroupName)
