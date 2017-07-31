@@ -525,7 +525,7 @@ void analysis1()
     
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
     {
-        TString GroupName = "Signal(";
+        TString GroupName = "(";
         GroupName += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
         GroupName += ",";
         GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
@@ -3934,9 +3934,8 @@ void analysis1()
                             cout<<", upperCutRecord2: "<<upperCutRecord2;
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
-                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": (";
-                            cout<<SigMass1[SigMassSplitting[SigIndex].ID]<<", ";
-                            cout<<SigMass2[SigMassSplitting[SigIndex].ID]<<"): "<<endl;
+                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
+                            cout<<SigMassSplitting[SigIndex].IDName.Data()<<": "<<endl;
                             
                             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                             {
@@ -4418,7 +4417,7 @@ void analysis1()
                         //Significance
                         sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
                         
-                        cout<<"Signal ("<<SigMass1[SigMassSplitting[i].ID]<<", "<<SigMass2[SigMassSplitting[i].ID]<<"): "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
+                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
                     cout<<endl;
                 }
@@ -4468,11 +4467,8 @@ void analysis1()
                     
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
-                        fout<<"Signal (";
-                        fout<<SigMass1[SigMassSplitting[i].ID];
-                        fout<<", ";
-                        fout<<SigMass2[SigMassSplitting[i].ID];
-                        fout<<") & $";
+                        fout<<SigMassSplitting[i].IDName.Data();
+                        fout<<" & $";
                         fout<<setprecision(2)<<std::fixed;
                         fout<<sumOfEvent[BGGroup.size()+i+2][0];
                         fout<<"\\pm";
@@ -4872,11 +4868,8 @@ void analysis1()
                         //TString NameTemp = "C1N2#rightarrow WZ";
                         //TString NameTemp = "C1N2#rightarrow slep";
                         TString NameTemp = "";
-                        NameTemp += "(";
-                        NameTemp += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
-                        NameTemp += ", ";
-                        NameTemp += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
-                        NameTemp += ") x";
+                        NameTemp += SigMassSplitting[i].IDName;
+                        NameTemp += " x";
                         NameTemp += TString::Itoa(SigMassSplitting[i].scale,10);
                         leg->AddEntry(h2SigSum[i],NameTemp.Data(),"l");
                     }
@@ -5406,13 +5399,9 @@ void analysis1()
                     hSignificance[i]->Draw("colz");
                     
                     {
-                        unsigned int index = SigMassSplitting[i].ID;
                         TString NameTemp = RegionInfo[RegionIndex].RegionName;
-                        NameTemp += ": (";
-                        NameTemp += SigMass1[index];
-                        NameTemp += ", ";
-                        NameTemp += SigMass2[index];
-                        NameTemp += ")";
+                        NameTemp += ": ";
+                        NameTemp += SigMassSplitting[i].IDName;
                         
                         TLatex lt1;
                         lt1.DrawLatexNDC(0.05,0.05,NameTemp.Data());
@@ -5514,12 +5503,7 @@ void analysis1()
                 
                 for(unsigned int j=0;j<SigMassSplitting.size();j++)
                 {
-                    TString NameTemp = "";
-                    NameTemp += "(";
-                    NameTemp += TString::Itoa(SigMass1[SigMassSplitting[j].ID],10);
-                    NameTemp += ", ";
-                    NameTemp += TString::Itoa(SigMass2[SigMassSplitting[j].ID],10);
-                    NameTemp += ")";
+                    TString NameTemp = SigMassSplitting[j].IDName;
                     leg->AddEntry(h2SRSig[j],NameTemp.Data(),"l");
                 }
             }
@@ -6041,9 +6025,9 @@ void analysis1()
         
         TString latexName = RegionInfo[RegionIndex].RegionName;
         latexName.ReplaceAll("_","\\_");
-        fout<<latexName.Data()<<": (";
-        fout<<SigMass1[SigMassSplitting[SigOptimizingIndex].ID]<<", ";
-        fout<<SigMass2[SigMassSplitting[SigOptimizingIndex].ID]<<"): \\\\"<<endl;
+        fout<<latexName.Data()<<": ";
+        fout<<SigMassSplitting[SigOptimizingIndex].IDName;
+        fout<<": \\\\"<<endl;
 
         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
         {
