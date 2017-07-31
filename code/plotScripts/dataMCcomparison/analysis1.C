@@ -432,8 +432,8 @@ void analysis1()
     
     std::vector<TString> SigSampleID;
     std::vector<double> SigXS; //cross section in pb
-    std::vector<int> SigMass1;
-    std::vector<int> SigMass2;
+    std::vector<double> SigMass1;
+    std::vector<double> SigMass2;
     SigSampleID.reserve(20);
     SigXS.reserve(20);
     SigMass1.reserve(20);
@@ -458,7 +458,7 @@ void analysis1()
             SampleIDTemp += SampleNameTemp;
             SigSampleID.push_back(SampleIDTemp);
             
-            int SigMass;
+            double SigMass;
             fin>>SigMass;
             SigMass1.push_back(SigMass);
             fin>>SigMass;
@@ -526,9 +526,9 @@ void analysis1()
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
     {
         TString GroupName = "(";
-        GroupName += TString::Itoa(SigMass1[SigMassSplitting[i].ID],10);
+        GroupName += TString::Format("%.1f",SigMass1[SigMassSplitting[i].ID]);
         GroupName += ",";
-        GroupName += TString::Itoa(SigMass2[SigMassSplitting[i].ID],10);
+        GroupName += TString::Format("%.1f",SigMass2[SigMassSplitting[i].ID]);
         GroupName += ")";
         SigMassSplitting[i].IDName = GroupName;
     }
