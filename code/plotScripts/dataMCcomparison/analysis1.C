@@ -421,6 +421,9 @@ void analysis1()
         int colour;
         int linestyle;
         int unweighted;
+        double weighted;
+        double error;
+        double significance;
         double scale;
     };
     std::vector<SigInfo> SigMassSplitting;
@@ -4421,12 +4424,12 @@ void analysis1()
                         //expected number of events
                         TH1F hTemp = TH1F("SignalTemp",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hTemp.Add(h2SigSum[i]);
-                        sumOfEvent[BGGroup.size()+i+2][0] = hTemp.IntegralAndError(0,-1,sumOfEvent[BGGroup.size()+i+2][1]);
+                        SigMassSplitting[i].weighted = hTemp.IntegralAndError(0,-1,SigMassSplitting[i].error);
                         
                         //Significance
-                        sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
+                        SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
                         
-                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
+                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<SigMassSplitting[i].weighted<<" +/- "<<SigMassSplitting[i].error<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<SigMassSplitting[i].significance<<endl;
                     }
                     cout<<endl;
                 }
@@ -4479,9 +4482,9 @@ void analysis1()
                         fout<<SigMassSplitting[i].IDName.Data();
                         fout<<" & $";
                         fout<<setprecision(2)<<std::fixed;
-                        fout<<sumOfEvent[BGGroup.size()+i+2][0];
+                        fout<<SigMassSplitting[i].weighted;
                         fout<<"\\pm";
-                        fout<<sumOfEvent[BGGroup.size()+i+2][1];
+                        fout<<SigMassSplitting[i].error;
                         fout<<"$ (";
                         fout<<SigMassSplitting[i].unweighted;
                         fout<<") &";
@@ -4489,7 +4492,7 @@ void analysis1()
                         {
                             fout<<"$";
                             fout<<setprecision(2)<<std::fixed;
-                            fout<<sumOfEvent[BGGroup.size()+i+2][2];
+                            fout<<SigMassSplitting[i].significance;
                             fout<<"$";
                         }
                         fout<<"\\\\"<<endl<<"\\hline"<<endl;
@@ -4556,12 +4559,12 @@ void analysis1()
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
                             fout_SR<<setprecision(1)<<std::fixed;
-                            fout_SR<<std::setw(5)<<sumOfEvent[BGGroup.size()+i+2][0];
+                            fout_SR<<std::setw(5)<<SigMassSplitting[i].weighted;
                             fout_SR<<"+/-";
-                            fout_SR<<std::setw(3)<<sumOfEvent[BGGroup.size()+i+2][1];
+                            fout_SR<<std::setw(3)<<SigMassSplitting[i].error;
                             
                             fout_SR<<setprecision(3)<<std::fixed;
-                            fout_SR<<std::setw(7)<<sumOfEvent[BGGroup.size()+i+2][2];
+                            fout_SR<<std::setw(7)<<SigMassSplitting[i].significance;
                             fout_SR<<std::setw(4)<<SigMassSplitting[i].unweighted;
                         }
                         fout_SR<<endl;
@@ -4578,8 +4581,8 @@ void analysis1()
                         }
                         for(unsigned int j=0;j<SigMassSplitting.size();j++)
                         {
-                            h2SRSig[j]->SetBinContent(RegionIndex2+1,sumOfEvent[BGGroup.size()+j+2][0]);
-                            h2SRSignificance[j]->SetBinContent(RegionIndex2+1,sumOfEvent[BGGroup.size()+j+2][2]);
+                            h2SRSig[j]->SetBinContent(RegionIndex2+1,SigMassSplitting[j].weighted);
+                            h2SRSignificance[j]->SetBinContent(RegionIndex2+1,SigMassSplitting[j].significance);
                         }
                     }
                     
@@ -5101,7 +5104,7 @@ void analysis1()
                     
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
-                        TString NameTemp = TString::Format("Z_{n} = %.2f",sumOfEvent[BGGroup.size()+SigOptimizingIndex+2][2]);
+                        TString NameTemp = TString::Format("Z_{n} = %.2f",SigMassSplitting[SigOptimizingIndex].significance);
                         TLatex lt2;
                         lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
