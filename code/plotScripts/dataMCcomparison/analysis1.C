@@ -383,8 +383,7 @@ void analysis1()
         fin.open("BGSample.txt");
         while(!fin.eof())
         {
-            //TString SampleIDTemp = "mc15_13TeV.";
-            TString SampleIDTemp = ""; //Cutflow Attention
+            TString SampleIDTemp = "mc15_13TeV.";
             TString SampleNameTemp;
             fin>>SampleNameTemp;
             if(fin.eof()) break;
@@ -1621,8 +1620,6 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
             
             element.AdditionalCut.clear();
             
@@ -1663,8 +1660,6 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
             
             element.AdditionalCut.clear();
             
@@ -1745,8 +1740,6 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.4";
-            element.Cut += " && fabs(eta2) < 2.4";
             
             element.AdditionalCut.clear();
             
@@ -1783,8 +1776,6 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            element.Cut += " && fabs(eta1) < 2.5";
-            element.Cut += " && fabs(eta2) < 2.5";
             
             element.AdditionalCut.clear();
             
@@ -1853,8 +1844,7 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            //OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.lower = 25;
+            OptimizingCutElement2.Cut.lower = 20;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -1932,11 +1922,6 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            if(!useDani)
-            {
-                element.Cut += " && fabs(eta1) < 2.4";
-                element.Cut += " && fabs(eta2) < 2.4";
-            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -1954,8 +1939,7 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            //OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.lower = 25;
+            OptimizingCutElement2.Cut.lower = 20;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -2033,11 +2017,6 @@ void analysis1()
             
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            if(!useDani)
-            {
-                element.Cut += " && fabs(eta1) < 2.5";
-                element.Cut += " && fabs(eta2) < 2.5";
-            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2151,8 +2130,7 @@ void analysis1()
             OptimizingCutElement2.min = 25;
             OptimizingCutElement2.max = 250;
             OptimizingCutElement2.nBin = 45;
-            //OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.lower = 25;
+            OptimizingCutElement2.Cut.lower = 20;
             OptimizingCutElement2.Cut.upper = -1;
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -2230,11 +2208,6 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            if(!useDani)
-            {
-                element.Cut += " && fabs(eta1) < 2.4";
-                element.Cut += " && fabs(eta2) < 2.4";
-            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2330,11 +2303,6 @@ void analysis1()
             
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            if(!useDani)
-            {
-                element.Cut += " && fabs(eta1) < 2.5";
-                element.Cut += " && fabs(eta2) < 2.5";
-            }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2466,8 +2434,6 @@ void analysis1()
             {
                 element.Cut = " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
-                element.Cut += " && fabs(eta1) < 2.4";
-                element.Cut += " && fabs(eta2) < 2.4";
             }
             
             element.AdditionalCut.clear();
@@ -2489,8 +2455,6 @@ void analysis1()
             {
                 element.Cut = " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
-                element.Cut += " && fabs(eta1) < 2.5";
-                element.Cut += " && fabs(eta2) < 2.5";
             }
             
             element.AdditionalCut.clear();
@@ -2534,8 +2498,6 @@ void analysis1()
             {
                 element.Cut = " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
-                element.Cut += " && fabs(eta1) < 2.4";
-                element.Cut += " && fabs(eta2) < 2.4";
             }
             
             element.AdditionalCut.clear();
@@ -2557,8 +2519,6 @@ void analysis1()
             {
                 element.Cut = " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
-                element.Cut += " && fabs(eta1) < 2.5";
-                element.Cut += " && fabs(eta2) < 2.5";
             }
             
             element.AdditionalCut.clear();
