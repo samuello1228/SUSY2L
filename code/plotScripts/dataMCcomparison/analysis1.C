@@ -530,7 +530,7 @@ void analysis1()
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleID.size();j++)
         {
-            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j]<<endl;
+            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j].Data()<<endl;
         }
         cout<<endl;
     }
@@ -3556,7 +3556,7 @@ void analysis1()
             if(doOptimize2)
             {
                 for(unsigned int SigIndex=SigOptimizingIndex;SigIndex<=SigOptimizingIndex;SigIndex++)
-                //for(unsigned int SigIndex=0;SigIndex<SigMassSplitting.size();SigIndex++)
+                //for(unsigned int SigIndex=0;SigIndex<RegionInfo[RegionIndex].OptimizingCut.size();SigIndex++)
                 {
                     unsigned int VarIndexRecord2 = 0;
                     int lowerCutRecord2 = 0;
@@ -3588,7 +3588,7 @@ void analysis1()
                             
                             //Fill histograms from trees
                             TH1F* BGGroupRaw[BGGroup.size()];
-                            TH1F* h2Sig[SigSampleID.size()];
+                            TH1F* h2Sig[RegionInfo[RegionIndex].OptimizingCut.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
@@ -3727,7 +3727,7 @@ void analysis1()
                                 }
                                 
                                 //h2Sig
-                                for(unsigned int j=0;j<SigSampleID.size();j++)
+                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
@@ -3742,8 +3742,8 @@ void analysis1()
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig[j]->Scale(SigXS[j]/SignAOD[j] *sumDataL);
+                                    tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
+                                    h2Sig[j]->Scale(SigXS[SigMassSplitting[j].ID] /SignAOD[SigMassSplitting[j].ID] *sumDataL);
                                 }
                             }
                             
@@ -3922,7 +3922,7 @@ void analysis1()
                                 delete BGGroupRaw[j];
                             }
                             
-                            for(unsigned int j=0;j<SigSampleID.size();j++)
+                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
                             {
                                 delete h2Sig[j];
                             }
@@ -4358,7 +4358,7 @@ void analysis1()
                         TString Cut = "weight*(1";
                         Cut += CommonCut;
                         Cut += ")";
-                        double sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        int sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
