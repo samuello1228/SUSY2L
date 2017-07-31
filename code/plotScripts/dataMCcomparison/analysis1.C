@@ -4389,18 +4389,19 @@ void analysis1()
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
                 
-                double sumOfEvent[BGGroup.size()+SigMassSplitting.size()+2][3];
-                //sample,expN/error/significance
-                int totalBGstat = 0;
+                unsigned int dataN;
+                double total_BG_weighted;
+                double total_BG_error2;
+                int total_BG_unweighted = 0;
                 if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
                     //expected number of events for Data
-                    sumOfEvent[BGGroup.size()+1][0] = h2DataSum->Integral(0,-1);
-                    cout<<"Data: "<<sumOfEvent[BGGroup.size()+1][0]<<endl;
+                    dataN = h2DataSum->Integral(0,-1);
+                    cout<<"Data: "<<dataN<<endl;
                     
                     //expected number of events for background
-                    sumOfEvent[BGGroup.size()][0]=0;
-                    sumOfEvent[BGGroup.size()][1]=0;
+                    total_BG_weighted=0;
+                    total_BG_error2=0;
                     
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
@@ -4410,13 +4411,13 @@ void analysis1()
                         
                         if(BGGroup[j].info->weighted > 0)
                         {
-                            sumOfEvent[BGGroup.size()][0] += BGGroup[j].info->weighted;
+                            total_BG_weighted += BGGroup[j].info->weighted;
                         }
-                        sumOfEvent[BGGroup.size()][1] += BGGroup[j].info->error*BGGroup[j].info->error;
+                        total_BG_error2 += BGGroup[j].info->error*BGGroup[j].info->error;
                         
-                        totalBGstat += BGGroup[j].info->unweighted;
+                        total_BG_unweighted += BGGroup[j].info->unweighted;
                     }
-                    cout<<"Total BG: "<<sumOfEvent[BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1])<<" ("<<totalBGstat<<")"<<endl<<endl;
+                    cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                     
                     //expected number of events for signal
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -4427,7 +4428,7 @@ void analysis1()
                         SigMassSplitting[i].weighted = hTemp.IntegralAndError(0,-1,SigMassSplitting[i].error);
                         
                         //Significance
-                        SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
+                        SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,total_BG_weighted,total_BG_error2);
                         
                         cout<<SigMassSplitting[i].IDName.Data()<<": "<<SigMassSplitting[i].weighted<<" +/- "<<SigMassSplitting[i].error<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<SigMassSplitting[i].significance<<endl;
                     }
@@ -4463,17 +4464,17 @@ void analysis1()
                     }
                     
                     fout<<"Total BG & $";
-                    fout<<sumOfEvent[BGGroup.size()][0];
+                    fout<<total_BG_weighted;
                     fout<<"\\pm";
-                    fout<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
+                    fout<<TMath::Sqrt(total_BG_error2);
                     fout<<"$ (";
-                    fout<<totalBGstat;
+                    fout<<total_BG_unweighted;
                     fout<<") & \\\\"<<endl<<"\\hline"<<endl;
                     
                     if(RegionGroup[RegionGroupIndex].showData)
                     {
                         fout<<"Data & $";
-                        fout<<sumOfEvent[BGGroup.size()+1][0];
+                        fout<<dataN;
                         fout<<"$ & \\\\"<<endl<<"\\hline"<<endl;
                     }
                     
@@ -4552,9 +4553,9 @@ void analysis1()
                             }
                         }
                         
-                        fout_SR<<std::setw(8)<<sumOfEvent[BGGroup.size()][0];
+                        fout_SR<<std::setw(8)<<total_BG_weighted;
                         fout_SR<<"+/-";
-                        fout_SR<<std::setw(4)<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1]);
+                        fout_SR<<std::setw(4)<<TMath::Sqrt(total_BG_error2);
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
@@ -4608,7 +4609,7 @@ void analysis1()
                                     expN *= SigXS[j];
                                     
                                     //Significance
-                                    double significance = GetSignificance(expN,sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
+                                    double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
                                     
                                     fout<<setprecision(3)<<std::fixed;
                                     fout<<SigMass1[j]<<" "<<SigMass2[j]<<" "<<significance<<endl;
@@ -4661,7 +4662,7 @@ void analysis1()
                         {
                             if(BGGroup[j].info->GroupName == "fake lepton")
                             {
-                                double factor = ( sumOfEvent[BGGroup.size()+1][0] - sumOfEvent[BGGroup.size()][0] )/ BGGroup[j].info->weighted +1;
+                                double factor = ( dataN - total_BG_weighted )/ BGGroup[j].info->weighted +1;
                                 cout<<RegionInfo[RegionIndex].RegionName.Data()<<": scale factor: "<<factor<<endl;
                             }
                         }
