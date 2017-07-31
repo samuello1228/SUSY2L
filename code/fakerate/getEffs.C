@@ -1406,7 +1406,7 @@ inline LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig,
 inline bool isLeptonFromZ(evt2l* t, int i)
 {
 	LEP_TYPE recoLepType;
-	int pdgId = -1*int(t->leps[i].ID/1000)
+	int pdgId = -1*int(t->leps_ID[i]/1000);
 	switch (abs(pdgId))
 	{
 		case 11: recoLepType = ELEC; break;
@@ -1414,7 +1414,7 @@ inline bool isLeptonFromZ(evt2l* t, int i)
 		default: return false;
 	}
 
-	int truthI = t->leps[i].truthI;
+	int truthI = t->leps_truthI[i];
 	while(truthI>=0)
 	{
 		int motherI = t->truths_motherI[truthI];
