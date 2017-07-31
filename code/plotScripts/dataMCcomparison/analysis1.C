@@ -782,8 +782,8 @@ void analysis1()
         element.CutDirection=0;
         Var.push_back(element);
         
-        element.VarName = "jets_MET_dPhi"; element.VarTitle = "|#Delta#phi_{jet0,MET}|";        element.unit = "";
-        element.VarFormula = "fabs(jets_MET_dPhi)";
+        element.VarName = "jet0_MET_dPhi"; element.VarTitle = "|#Delta#phi_{jet0,MET}|";        element.unit = "";
+        element.VarFormula = "fabs(jet0_MET_dPhi)";
         element.bin=20;         element.xmin=0;                 element.xmax=TMath::Pi();
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$|\\Delta\\phi_{\\text{jet0,MET}}|$";
@@ -3337,7 +3337,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGMCGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(BGMCGroupData[k].GroupName.Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
@@ -3354,7 +3354,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGDataGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(BGMCGroupData[k].GroupName.Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
