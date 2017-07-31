@@ -222,7 +222,7 @@ struct GroupData
     unsigned int lower;
     unsigned int upper;
     int colour;
-    int statCount;
+    int unweighted;
 };
 
 struct Group
@@ -418,7 +418,7 @@ void analysis1()
         TString IDName;
         int colour;
         int linestyle;
-        int statCount;
+        int unweighted;
         double scale;
     };
     std::vector<SigInfo> SigMassSplitting;
@@ -4195,7 +4195,7 @@ void analysis1()
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
-                        BGGroup[j].info->statCount = 0;
+                        BGGroup[j].info->unweighted = 0;
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
                             TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
@@ -4245,7 +4245,7 @@ void analysis1()
                             Cut += CommonCut;
                             Cut += ")";
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
-                            BGGroup[j].info->statCount += bgCount;
+                            BGGroup[j].info->unweighted += bgCount;
                             
                             //if(BGGroup[j].info->GroupName == "VV") cout<<k<<" "<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
                             //if(BGGroup[j].info->GroupName == "VV") tree2BGMC[j][k]->Scan("weight",Cut.Data());
@@ -4273,7 +4273,7 @@ void analysis1()
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
-                        BGGroup[j].info->statCount = 0;
+                        BGGroup[j].info->unweighted = 0;
                         for(unsigned int k=0;k<DataSampleID.size();k++)
                         {
                             h2Data[k]->Scale(0);
@@ -4313,7 +4313,7 @@ void analysis1()
                             {
                                 bgCount = tree2Data[k]->Draw(temp.Data(),Cut.Data());
                             }
-                            BGGroup[j].info->statCount += bgCount;
+                            BGGroup[j].info->unweighted += bgCount;
                             
                             //Add MCData
                             BGGroup[j].h2->Add(h2Data[k]);
@@ -4357,7 +4357,7 @@ void analysis1()
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
-                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].statCount = sigCount;
+                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = sigCount;
                         }
                     }
                 }
@@ -4401,7 +4401,7 @@ void analysis1()
                     {
                         //expected number of events for BG
                         sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->statCount<<")"<<endl;
+                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->unweighted<<")"<<endl;
                         
                         if(sumOfEvent[j][0] > 0)
                         {
@@ -4409,7 +4409,7 @@ void analysis1()
                         }
                         sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
                         
-                        totalBGstat += BGGroup[j].info->statCount;
+                        totalBGstat += BGGroup[j].info->unweighted;
                     }
                     cout<<"Total BG: "<<sumOfEvent[BGGroup.size()][0]<<" +/- "<<TMath::Sqrt(sumOfEvent[BGGroup.size()][1])<<" ("<<totalBGstat<<")"<<endl<<endl;
                     
@@ -4424,7 +4424,7 @@ void analysis1()
                         //Significance
                         sumOfEvent[BGGroup.size()+i+2][2] = GetSignificance(sumOfEvent[BGGroup.size()+i+2][0],sumOfEvent[BGGroup.size()][0],sumOfEvent[BGGroup.size()][1]);
                         
-                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].statCount<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
+                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<sumOfEvent[BGGroup.size()+i+2][0]<<" +/- "<<sumOfEvent[BGGroup.size()+i+2][1]<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<sumOfEvent[BGGroup.size()+i+2][2]<<endl;
                     }
                     cout<<endl;
                 }
@@ -4453,7 +4453,7 @@ void analysis1()
                         fout<<"\\pm";
                         fout<<sumOfEvent[j][1];
                         fout<<"$ (";
-                        fout<<BGGroup[j].info->statCount;
+                        fout<<BGGroup[j].info->unweighted;
                         fout<<") & \\\\"<<endl<<"\\hline"<<endl;
                     }
                     
@@ -4481,7 +4481,7 @@ void analysis1()
                         fout<<"\\pm";
                         fout<<sumOfEvent[BGGroup.size()+i+2][1];
                         fout<<"$ (";
-                        fout<<SigMassSplitting[i].statCount;
+                        fout<<SigMassSplitting[i].unweighted;
                         fout<<") &";
                         if(RegionGroup[RegionGroupIndex].showSignificance)
                         {
@@ -4560,7 +4560,7 @@ void analysis1()
                             
                             fout_SR<<setprecision(3)<<std::fixed;
                             fout_SR<<std::setw(7)<<sumOfEvent[BGGroup.size()+i+2][2];
-                            fout_SR<<std::setw(4)<<SigMassSplitting[i].statCount;
+                            fout_SR<<std::setw(4)<<SigMassSplitting[i].unweighted;
                         }
                         fout_SR<<endl;
                         fout_SR.close();
