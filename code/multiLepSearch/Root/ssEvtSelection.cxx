@@ -1653,13 +1653,16 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
     const xAOD::TruthParticle* tp=0;
     if(mcTruthMatch=="dRZ")
     {
+      // Info("fillLepton(p)", "MCTruthMatch is dRZ");
       TLorentzVector p_tp(0,0,0,0);
       TLorentzVector p_lep = p->p4();
       bool firstTry = true;
     
       // Find particle with smallest dR < 0.1
       const xAOD::TruthParticleContainer* tContainer = 0;
-      for(auto particle : *tContainer){       
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){ 
+        if (particle->p4().Pt()==0) continue;
         TLorentzVector p_particle = particle->p4();
         Double_t dR = p_lep.DeltaR(p_particle);
         if (dR > 0.1) continue;
@@ -1667,7 +1670,6 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
         if (firstTry || dR < p_lep.DeltaR(p_tp)){
           tp = particle;
           p_tp = p_particle;
-          tp = particle;
           firstTry = false;
         }
         else continue;
@@ -1678,6 +1680,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
     }
 
     if(tp!=NULL) {
+      // Info("fillLepton(p)", "Found particle");
       l.truthI=addTruthPar(tp, m_susyEvt->truths, 0);
       m_susyEvt->truths[l.truthI].matchI = index;
     }
