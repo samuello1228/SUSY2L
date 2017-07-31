@@ -436,9 +436,9 @@ void analysis1()
         element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         */
         
-        element.MassDiff = 150;   element.ID = 0;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 130;   element.ID = 1;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 450;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        element.MassDiff = 150;   element.ID = 1;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 130;   element.ID = 3;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 450;   element.ID = 39; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         
     }
     
@@ -4597,11 +4597,13 @@ void analysis1()
                     {
                         PathName = "latex/data/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
+                        PathName += "_";
+                        PathName += TString::Itoa(SigOptimizingIndex,10);
                         PathName += ".txt";
                         fout.open(PathName.Data());
                         
-                        TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,200,700,10,100,500);
-                        TGraph2D* g2 = new TGraph2D();
+                        TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,0,600,10,0,120);
+                        TGraph2D* g_significance = new TGraph2D();
                         int pointN = 0;
                         for(unsigned int j=0;j<SigSampleID.size();j++)
                         {
@@ -4618,9 +4620,9 @@ void analysis1()
                             fout<<significance<<endl;
                             
                             //2D plot
-                            if(significance>0)
+                            //if(significance>0)
                             {
-                                g2->SetPoint(g2->GetN(), SigMass1[j], SigMass2[j], significance);
+                                g_significance->SetPoint(g_significance->GetN(), SigMass1[j], SigMass2[j], significance);
                                 pointN++;
                             }
                         }
@@ -4634,15 +4636,17 @@ void analysis1()
                             c2->cd();
                             c2->SetRightMargin(0.16);
                             h2->Draw();
-                            g2->Draw("colzsame");
+                            g_significance->Draw("colzsame");
                             
                             TLatex lt1;
                             lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
                             lt1.SetTextSize(lt1.GetTextSize()*0.3);
                             
                             TString NameTemp = "plot/";
-                            NameTemp += "SR_";
+                            NameTemp += "significance_";
                             NameTemp += RegionInfo[RegionIndex].RegionName;
+                            NameTemp += "_";
+                            NameTemp += TString::Itoa(SigOptimizingIndex,10);
                             NameTemp += ".eps";
                             c2->Print(NameTemp,"eps");
                             
@@ -4650,7 +4654,7 @@ void analysis1()
                         }
                         
                         delete h2;
-                        delete g2;
+                        delete g_significance;
                     }
                     
                     //calculate scale factor for fake BG
