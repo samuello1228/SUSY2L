@@ -6100,6 +6100,119 @@ void analysis1()
         fin.close();
     }
     
+    //cut table
+    {
+        TString optGroupName = "SR_SS_opt";
+        unsigned int optRegionGroupIndex = 0;
+        for(unsigned int i=0;i<RegionGroup.size();i++)
+        {
+            if(RegionGroup[i].GroupName == optGroupName)
+            {
+                optRegionGroupIndex = i;
+            }
+        }
+        
+        ofstream fout;
+        {
+            TString PathName = "latex/data/optimization/cut_table_";
+            PathName += RegionGroup[optRegionGroupIndex].GroupName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".tex";
+            fout.open(PathName.Data());
+        }
+        
+        ifstream fin[6];
+        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        {
+            const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
+            TString PathName = "latex/data/optimization/";
+            if(useDani) PathName += "cut_txt_Dani/";
+            else PathName += "cut_txt/";
+            PathName += "cut_";
+            PathName += RegionInfo[RegionIndex].RegionName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".txt";
+            fin[SixChannel].open(PathName.Data());
+        }
+        
+        for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
+        {
+            unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+            
+            if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
+            else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
+            else fout<<Var[VarIndex].latexName.Data();
+            
+            fout<<" ";
+            if(Var[VarIndex].unit != "") fout<<Var[VarIndex].unit.Data()<<" ";
+            
+            unsigned int SixChannel = 0;
+            while(true)
+            {
+                TString VarName;
+                double lower;
+                double upper;
+                fin[SixChannel]>>VarName;
+                fin[SixChannel]>>lower;
+                fin[SixChannel]>>upper;
+                
+                fout<<"& ";
+                if(lower == 0)
+                {
+                    if(upper == -1)
+                    {
+                        fout<<"- ";
+                    }
+                    else
+                    {
+                        // x < a
+                        fout<<"$<";
+                        fout<<upper;
+                        fout<<"$ ";
+                    }
+                }
+                else
+                {
+                    if(upper == -1)
+                    {
+                        // x >= a
+                        fout<<"$\\geq ";
+                        fout<<lower;
+                        fout<<"$ ";
+                    }
+                    else
+                    {
+                        // a <= x < b
+                    }
+                }
+                
+                if(SixChannel == 0) SixChannel = 3;
+                else if(SixChannel == 3) SixChannel = 1;
+                else if(SixChannel == 1) SixChannel = 4;
+                else if(SixChannel == 4) SixChannel = 2;
+                else if(SixChannel == 2) SixChannel = 5;
+                else if(SixChannel == 5) break;
+            }
+            
+            fout<<"\\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            
+            if(Var[VarIndex].VarName == "pt2")
+            {
+                fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                fout<<"\\hline"<<endl;
+            }
+        }
+        
+        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        {
+            fin[SixChannel].close();
+        }
+        fout.close();
+    }
+    
     /*
     {
         TString PathName = "latex/data/plot_zpt.tex";
