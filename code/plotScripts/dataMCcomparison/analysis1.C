@@ -413,7 +413,7 @@ void analysis1()
     //For Signal MC
     struct SigInfo
     {
-        int MassDiff;
+        double MassDiff;
         unsigned int ID;
         TString IDName;
         int colour;
@@ -4324,7 +4324,7 @@ void analysis1()
                     for(unsigned int j=0;j<SigMassSplitting.size();j++)
                     {
                         TString NameTemp = "SigSum_";
-                        NameTemp += TString::Itoa(SigMassSplitting[j].MassDiff,10);
+                        NameTemp += TString::Format("%.0f",SigMassSplitting[j].MassDiff);
                         h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
                         h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
@@ -4667,7 +4667,7 @@ void analysis1()
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "Significance_";
-                        NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                        NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
                         hSignificance[i] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
                         hSignificance[i]->SetLineWidth(2);
@@ -5321,7 +5321,7 @@ void analysis1()
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "SigSum_";
-                        NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                        NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
                         h2SigSum[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         unsigned int AOD = 0;
@@ -5356,7 +5356,7 @@ void analysis1()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     TString NameTemp = "Significance_";
-                    NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                    NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
                     hSignificance[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                              Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                     hSignificance[i]->GetXaxis()->SetTitle(axis[0].Data());
@@ -5426,7 +5426,7 @@ void analysis1()
                     NameTemp += "_";
                     NameTemp += RegionInfo[RegionIndex].RegionName;
                     NameTemp += "_";
-                    NameTemp += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                    NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
                     NameTemp += ".eps";
                     c2->Print(NameTemp,"eps");
                     
@@ -5926,7 +5926,7 @@ void analysis1()
             latexName += "_";
             latexName += RegionGroup[RegionGroupIndex].GroupName;
             latexName += "_";
-            latexName += TString::Itoa(SigMassSplitting[i].MassDiff,10);
+            latexName += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
             
             latexName.ReplaceAll("_","\\_");
             
@@ -5943,7 +5943,7 @@ void analysis1()
                 fout<<"significance_ptll_MET_";
                 fout<<RegionInfo[RegionIndex].RegionName;
                 fout<<"_";
-                fout<<TString::Itoa(SigMassSplitting[i].MassDiff,10);
+                fout<<TString::Format("%.0f",SigMassSplitting[i].MassDiff);
                 fout<<"}";
                 
                 if(SixChannel==2) fout<<" \\\\";
