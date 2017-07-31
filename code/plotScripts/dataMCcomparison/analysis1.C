@@ -223,6 +223,8 @@ struct GroupData
     unsigned int upper;
     int colour;
     int unweighted;
+    double weighted;
+    double error;
 };
 
 struct Group
@@ -4400,14 +4402,14 @@ void analysis1()
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         //expected number of events for BG
-                        sumOfEvent[j][0] = BGGroup[j].h2->IntegralAndError(0,-1,sumOfEvent[j][1]);
-                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<sumOfEvent[j][0]<<" +/- "<<sumOfEvent[j][1]<<" ("<<BGGroup[j].info->unweighted<<")"<<endl;
+                        BGGroup[j].info->weighted = BGGroup[j].h2->IntegralAndError(0,-1,BGGroup[j].info->error);
+                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<BGGroup[j].info->weighted<<" +/- "<<BGGroup[j].info->error<<" ("<<BGGroup[j].info->unweighted<<")"<<endl;
                         
-                        if(sumOfEvent[j][0] > 0)
+                        if(BGGroup[j].info->weighted > 0)
                         {
-                            sumOfEvent[BGGroup.size()][0] += sumOfEvent[j][0];
+                            sumOfEvent[BGGroup.size()][0] += BGGroup[j].info->weighted;
                         }
-                        sumOfEvent[BGGroup.size()][1] += sumOfEvent[j][1]*sumOfEvent[j][1];
+                        sumOfEvent[BGGroup.size()][1] += BGGroup[j].info->error*BGGroup[j].info->error;
                         
                         totalBGstat += BGGroup[j].info->unweighted;
                     }
@@ -4449,9 +4451,9 @@ void analysis1()
                     {
                         fout<<BGGroup[j].info->LatexName.Data();
                         fout<<" & $";
-                        fout<<sumOfEvent[j][0];
+                        fout<<BGGroup[j].info->weighted;
                         fout<<"\\pm";
-                        fout<<sumOfEvent[j][1];
+                        fout<<BGGroup[j].info->error;
                         fout<<"$ (";
                         fout<<BGGroup[j].info->unweighted;
                         fout<<") & \\\\"<<endl<<"\\hline"<<endl;
@@ -4534,9 +4536,9 @@ void analysis1()
                                 if(j2==BGGroup.size()) break;
                                 if(SRBGGroup[j1].info->GroupName == BGGroup[j2].info->GroupName)
                                 {
-                                    fout_SR<<std::setw(8)<<sumOfEvent[j2][0];
+                                    fout_SR<<std::setw(8)<<BGGroup[j2].info->weighted;
                                     fout_SR<<"+/-";
-                                    fout_SR<<std::setw(4)<<sumOfEvent[j2][1];
+                                    fout_SR<<std::setw(4)<<BGGroup[j2].info->error;
                                     
                                     j2++;
                                 }
@@ -4572,7 +4574,7 @@ void analysis1()
                         const unsigned int RegionIndex2 = RegionIndex-RegionGroup[RegionGroupIndex].lower;
                         for(unsigned int j=0;j<BGGroup.size();j++)
                         {
-                            SRBGGroup[j].h2->SetBinContent(RegionIndex2+1,sumOfEvent[j][0]);
+                            SRBGGroup[j].h2->SetBinContent(RegionIndex2+1,BGGroup[j].info->weighted);
                         }
                         for(unsigned int j=0;j<SigMassSplitting.size();j++)
                         {
@@ -4656,7 +4658,7 @@ void analysis1()
                         {
                             if(BGGroup[j].info->GroupName == "fake lepton")
                             {
-                                double factor = ( sumOfEvent[BGGroup.size()+1][0] - sumOfEvent[BGGroup.size()][0] )/ sumOfEvent[j][0] +1;
+                                double factor = ( sumOfEvent[BGGroup.size()+1][0] - sumOfEvent[BGGroup.size()][0] )/ BGGroup[j].info->weighted +1;
                                 cout<<RegionInfo[RegionIndex].RegionName.Data()<<": scale factor: "<<factor<<endl;
                             }
                         }
