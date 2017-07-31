@@ -59,8 +59,8 @@ const TString inFileData="../support/inFileList-data.txt";
 
 // TString inFileBBCC="../support/inFileList-.txt";
 const TString inFileTTbar="../support/inFileList-ttbar.txt";
-const TString inFileZjets="../support/inFileList-Zjets.txt";
-// const TString inFileZjets="../support/inFileList-ZPowheg.txt";
+// const TString inFileZjets="../support/inFileList-Zjets.txt";
+const TString inFileZjets="../support/inFileList-ZPowheg.txt";
 const TString inFileWjets="../support/inFileList-Wjets.txt";
 const TString inFileVV="../support/inFileList-VV.txt";
 const TString inFileVgamma="../support/inFileList-Vgamma.txt";
@@ -764,6 +764,7 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l);
 void labelMCTChist(TH2* h);
 void calcFinalEffs();
+bool isLeptonFromZ(evt2l* tree, int i);
 
 // ======== FUNCTION DEFINITIONS ======= //
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -1188,8 +1189,10 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
 
 			// Charge flip. (+lep_ID) * (-pdgId) is no flip
-			// if (source==CONV && recoLepType==ELEC && tree->leps_ID[j]*tree->leps_firstEgMotherPdgId[j]>0)
-			// 	continue;
+			if (source==CONV && recoLepType==ELEC && tree->leps_ID[j]*tree->leps_firstEgMotherPdgId[j]>0)
+				continue;
+			// Use on dR matched samples
+			if (p==ZJETS && source==LIGHT && isLeptonFromZ(tree, j)) source = REAL;
 
 			lepInfo l = {tree->leps_pt[j], tree->leps_eta[j], w, true, lepIsTight};
 
@@ -1375,7 +1378,7 @@ void calcFinalEffs()
 
 // // */
 
-LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l)
+inline LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l)
 {
 	/* cf https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/FakeObjectBgEstimation */
 	using namespace MCTC;
@@ -1398,6 +1401,31 @@ LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TY
 		return CONV;
 
 	 return LIGHT;
+}
+
+inline bool isLeptonFromZ(evt2l* t, int i)
+{
+	LEP_TYPE recoLepType;
+	int pdgId = -1*int(t->leps[i].ID/1000)
+	switch (abs(pdgId))
+	{
+		case 11: recoLepType = ELEC; break;
+		case 13: recoLepType = MUON; break;
+		default: return false;
+	}
+
+	int truthI = t->leps[i].truthI;
+	while(truthI>=0)
+	{
+		int motherI = t->truths_motherI[truthI];
+		if (t->truths_pdgId[motherI]==23) break;
+		truthI = motherI;
+	}
+
+	if(recoLepType==ELEC && abs(t->truths_pdgId[truthI])==11) return true;
+	if(recoLepType==MUON && abs(t->truths_pdgId[truthI])==13) return true;
+
+	return false;
 }
 
 bool finalize()
