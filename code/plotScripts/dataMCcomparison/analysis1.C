@@ -425,9 +425,16 @@ void analysis1()
     {
         SigInfo element;
         
+        /*
         element.MassDiff = 175;   element.ID = 0;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 130;   element.ID = 1;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        */
+        
+        element.MassDiff = 150;   element.ID = 0;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 130;   element.ID = 1;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 450;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        
     }
     
     std::vector<TString> SigSampleID;
