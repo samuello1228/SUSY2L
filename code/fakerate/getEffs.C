@@ -761,10 +761,9 @@ TChain* loadData(TString, bool isMC=false);
 bool finalize();
 bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w=1);
 bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, Histos *hEl_Heavy, Histos *hMu_Light, Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p);
-LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l);
+inline pair<LEP_TYPE, LEP_SOURCE> castSource(evt2l* t, int i, LEP_PROC p);
 void labelMCTChist(TH2* h);
 void calcFinalEffs();
-bool isLeptonFromZ(evt2l* tree, int i);
 
 // ======== FUNCTION DEFINITIONS ======= //
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -1179,20 +1178,15 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			if(tree->leps_pt[j]<20) continue;
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
 
-			LEP_TYPE recoLepType;
-			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
-			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
-			else continue;
-
-			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
-			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
-			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
-
-			// Charge flip. (+lep_ID) * (-pdgId) is no flip
-			if (source==CONV && recoLepType==ELEC && tree->leps_ID[j]*tree->leps_firstEgMotherPdgId[j]>0)
+			pair<LEP_TYPE, LEP_SOURCE> res;
+			try{
+				res = castSource(tree, j, p);
+			} catch (TString errMsg) {
+				if (DEBUG) cout << errMsg << endl;
 				continue;
-			// Use on dR matched samples
-			if (p==ZJETS && source==LIGHT && isLeptonFromZ(tree, j)) source = REAL;
+			}
+			LEP_TYPE  recoLepType= res.first;
+			LEP_SOURCE source = res.second;
 
 			lepInfo l = {tree->leps_pt[j], tree->leps_eta[j], w, true, lepIsTight};
 
@@ -1222,14 +1216,19 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			if(tree->leps_pt[j]<20) continue;
 
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
-			LEP_TYPE recoLepType;
-			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
-			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
-			else continue;
 
-			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
-			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
-			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
+			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[i]);
+			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[i]);
+
+			pair<LEP_TYPE, LEP_SOURCE> res;
+			try{
+				res = castSource(tree, j, p);
+			} catch (TString errMsg) {
+				if (DEBUG) cout << errMsg << endl;
+				continue;
+			}
+			LEP_TYPE  recoLepType= res.first;
+			LEP_SOURCE source = res.second;
 
 			if (recoLepType==ELEC)
 			{
@@ -1253,14 +1252,15 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 		{
 
 			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
-			LEP_TYPE recoLepType;
-			if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 11) recoLepType=ELEC;
-			else if (TMath::Abs(int(tree->leps_ID[j]/1000)) == 13) recoLepType=MUON;
-			else continue;
-
-			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[j]);
-			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[j]);
-			LEP_SOURCE 	   source = castSource(type, orig, recoLepType);
+			pair<LEP_TYPE, LEP_SOURCE> res;
+			try{
+				res = castSource(tree, j, p);
+			} catch (TString errMsg) {
+				if (DEBUG) cout << errMsg << endl;
+				continue;
+			}
+			LEP_TYPE  recoLepType= res.first;
+			LEP_SOURCE source = res.second;
 
 			if (recoLepType==ELEC)
 			{
@@ -1378,54 +1378,73 @@ void calcFinalEffs()
 
 // // */
 
-inline LEP_SOURCE castSource(MCTC::ParticleType type, MCTC::ParticleOrigin orig, LEP_TYPE l)
+inline pair<LEP_TYPE, LEP_SOURCE> castSource(evt2l* t, int i, LEP_PROC p)
 {
 	/* cf https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/FakeObjectBgEstimation */
 	using namespace MCTC;
 
-	if (l==MUON && type==IsoMuon) return REAL;
-	if (l==ELEC && type==IsoElectron) return REAL;
+	LEP_TYPE l; 
+	switch(abs(int(t->leps_ID[i]/1000)))
+	{
+		case 11: l = ELEC; break;
+		case 13: l = MUON; break;
+		default: throw TString("Neither electron nor muon!");
+	}
 
+	ParticleType   type = static_cast<ParticleType>(t->leps_truthType[i]);
+	ParticleOrigin orig = static_cast<ParticleOrigin>(t->leps_truthOrig[i]);
+
+	/* Charge flip first
+		REAL: (IsoElectron || (PhotonCov && firstEgMother== ELEC)) && no charge flip
+		FLIP: (IsoElectron || (PhotonCov && firstEgMother== ELEC)) && charge flip
+	*/
+	if (l==ELEC)
+	{
+		// Standard classification
+		if (type==IsoElectron || (orig==PhotonConv && abs(t->leps_firstEgMotherPdgId[i])==11) ){
+			if(t->leps_ID[i]*t->leps_firstEgMotherPdgId[i] <0) return make_pair(ELEC,REAL);
+			else throw TString("Charge flipped electron");
+		}
+
+		// Failed track matches from Z
+		if(true && p==ZJETS) // Use for dR Powheg Zee samples only! Set to false otherwise.
+		{
+			int truthI = t->leps_truthI[i];
+			int motherI = -1;
+			while(truthI>=0)
+			{
+				motherI = t->truths_motherI[truthI];
+				if (motherI < 0) break;
+				else if (t->truths_pdgId[motherI]==23)
+				{
+					if(abs(t->truths_pdgId[truthI])==11)
+					{
+						if(t->leps_ID[i]*t->truths_pdgId[i] <0) return make_pair(ELEC,REAL);
+						else throw TString("Charge flipped electron from Z");
+					}
+				}
+				else if (t->truths_pdgId[motherI]!=22 || abs(t->truths_pdgId[motherI])!=11) break;
+				truthI = motherI;
+			}
+		}
+	}
+
+	if (l==MUON && type==IsoMuon) return make_pair(MUON,REAL);
 	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
 		|| orig==CharmedBaryon || orig==BottomBaryon || orig==JPsi)
-		return HEAVY;
+		return make_pair(l,HEAVY);
 
 	if (orig==LightMeson || orig==StrangeMeson || orig==LightBaryon || orig==StrangeBaryon 
 		|| orig==PionDecay || orig==KaonDecay || orig==PiZero|| orig==NonDefined || orig==DalitzDec)
-		return LIGHT;
+		return make_pair(l,LIGHT);
 
-	if (l==ELEC && orig==Mu && type==NonIsoElectron) return LIGHT;
+	if (l==ELEC && orig==Mu && type==NonIsoElectron) return make_pair(ELEC,LIGHT);
 
 	if (orig==PhotonConv || orig==BremPhot || orig==PromptPhot || orig==UndrPhot 
 		|| orig==ISRPhot || orig==FSRPhot)
-		return CONV;
+		return make_pair(l,CONV);
 
-	 return LIGHT;
-}
-
-inline bool isLeptonFromZ(evt2l* t, int i)
-{
-	LEP_TYPE recoLepType;
-	int pdgId = -1*int(t->leps_ID[i]/1000);
-	switch (abs(pdgId))
-	{
-		case 11: recoLepType = ELEC; break;
-		case 13: recoLepType = MUON; break;
-		default: return false;
-	}
-
-	int truthI = t->leps_truthI[i];
-	while(truthI>=0)
-	{
-		int motherI = t->truths_motherI[truthI];
-		if (t->truths_pdgId[motherI]==23) break;
-		truthI = motherI;
-	}
-
-	if(recoLepType==ELEC && abs(t->truths_pdgId[truthI])==11) return true;
-	if(recoLepType==MUON && abs(t->truths_pdgId[truthI])==13) return true;
-
-	return false;
+	 return make_pair(l,LIGHT);
 }
 
 bool finalize()
