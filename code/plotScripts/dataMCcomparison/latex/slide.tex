@@ -154,6 +154,14 @@ Backup
 \end{center}
 \end{frame}
 
+\begin{frame}
+\small
+SUSY scenario:\\
+\begin{figure}
+\includegraphics[width=0.6\textwidth]{data/photo/Wh.png}
+\end{figure}
+\end{frame}
+
 \begin{frame}[fragile]
 \frametitle{Signal sample}
 \small
@@ -266,6 +274,41 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{definition of variables}
+\normalsize
+\begin{itemize}
+\item HT: Sum of the $p_T$ of all signal jets and the two leptons.
+\item R2 = MET / (MET + pt1 + pt2)
+\item l12\_dPhi: difference in phi between the two leptons.
+\item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Selection in run1 SR}
+\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
+\url{https://arxiv.org/pdf/1501.07110.pdf}
+\end{frame}
+
+
+\begin{frame}
+\begin{center}
+\huge
+Pre-selection plot
+\end{center}
+\end{frame}
+
 \begin{frame}{Pre-selection cut}
 \normalsize
 \begin{columns}
@@ -316,39 +359,16 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{columns}
 \end{frame}
 
+\input{data/expN_SR_SS_pre.tex}
+\input{data/plot_SR_SS_pre.tex}
 
 \begin{frame}
-\frametitle{significance calculation}
-\begin{itemize}
-\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
-\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
-\begin{itemize}
-\item use the same definition from Dani.
-\end{itemize}
-\end{itemize}
+\begin{center}
+\huge
+N-1 plot
+\end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{definition of variables}
-\normalsize
-\begin{itemize}
-\item HT: Sum of the $p_T$ of all signal jets and the two leptons.
-\item R2 = MET / (MET + pt1 + pt2)
-\item l12\_dPhi: difference in phi between the two leptons.
-\item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
-\end{itemize}
-\end{frame}
+\input{data/plot_SR_SS_opt_0.tex}
 
-\begin{frame}
-\small
-SUSY scenario:\\
-\begin{figure}
-\includegraphics[width=0.6\textwidth]{data/photo/Wh.png}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Selection in run1 SR}
-\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
-\url{https://arxiv.org/pdf/1501.07110.pdf}
-\end{frame}
 \end{document}
