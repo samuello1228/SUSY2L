@@ -5,7 +5,7 @@
 \usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
-\title[]{Data/MC comparison}
+\title[]{SS Analysis}
 \author[]
 {
 Samuel Lo \inst{1}
@@ -38,9 +38,82 @@ University of Michigan
 
 \begin{frame}{Introduction}
 \begin{itemize}
-\item Check the charge flip BG in the pre-selection level.
-\item Use old charge flip rate by Gabriel.
-\item Replace Z+jets and single-top by charge flip BG.
+\item Update on the optimization
+\begin{itemize}
+\item Use Jeanette suggestion: The yields of groups of BG need to be positive.
+\end{itemize}
+\item Check the charge flip background
+\begin{itemize}
+\item Compare data and MC background
+\item Compare data and data-driven background (estimation from data OS events)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+Update on the optimization
+\end{center}
+\end{frame}
+
+\begin{frame}{optimization constraints}
+\small
+The following constraints are applied to reduce the bias from low statistics:
+\begin{itemize}
+\small
+\item The yields of groups of BG need to be positive, except multi-top, V+gamma and Z+jets.
+\begin{itemize}
+\item To have a reasonable/stable modeling of the background shape.
+\item In practice, the HistFitter will include the background only when it has positive yield.
+\end{itemize}
+\item At least 10 unweighted events in VV and ttV background.
+\item If the yield for one group of BG is negative, 0 yield is used. But the statistical error still keep unchanged to calculate the statistical error of total BG.
+\item nSig$>$1 and nSig/nSigError $>$ 2 for both (162.5,12.5) and (175,0).
+\item For $\pt^{l1}$, $\pt^{l1}$, $\pt^{ll}$, $m_{T2}$, $E_{\text{T}}^{\text{miss,rel}}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$, there is no upper cut.
+\item For $|\Delta\eta_{ll}|$ and $m_{lj}$/$m_{ljj}$, there is no lower cut.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cuts in SR}
+\vspace{5mm}
+\tiny
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+& SR$ee$-1 & SR$ee$-2 & SR$\mu\mu$-1 & SR$\mu\mu$-2 & SR$e\mu$-1 & SR$e\mu$-2 \\
+\hline
+Lepton flavours & $ee$ & $ee$ & $\mu\mu$ & $\mu\mu$ & $e\mu$ & $e\mu$ \\
+\hline
+$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\
+\hline
+\input{data/optimization/cut_table_SR_SS_opt_0.tex}
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Yields and significance in SR}
+\includegraphics[width=\textwidth]{SR_SS_opt}
+\end{frame}
+
+\input{data/optimization/nSig_SR_SS_opt_0.tex}
+\input{data/optimization/significance_SR_SS_opt_0.tex}
+
+\begin{frame}{Compare with the old one}
+\begin{itemize}
+\item Combine the significance (only channels with $Z_n>0$ are combined)
+\end{itemize}
+\includegraphics[width=0.5\textwidth]{data/optimization/old_opt}
+\includegraphics[width=0.5\textwidth]{data/optimization/new_opt}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+Check the charge flip background
+\end{center}
+\end{frame}
+
+\begin{frame}{SS\_ee Control Region}
+\begin{itemize}
 \item Define SS\_ee Control Region:
 \begin{itemize}
 \item $|m_{ll}-m_Z| < 10$ GeV
@@ -55,15 +128,22 @@ University of Michigan
 \section{Conclusion}
 \begin{frame}{Conclusion}
 \begin{itemize}
-\item The agreement is not good.
-\item maybe I need to apply trigger requirement.
+\item About the two optimizations, which one is better/prefered?
+\item Charge flip background
+\begin{itemize}
+\item Overestimation in MC
+\item $\pt$ shift in data-driven BG (need to check with Gabriel)
+\end{itemize}
 \end{itemize}
 \end{frame}
 
 \section{Plan}
 \begin{frame}{Plan}
 \begin{itemize}
-\item Use charge flip tagger to estimate charge flip BG.
+\item Optimization with data-driven charge flip background
+\item Try different trigger combination
+\item Try different $\eta$ cut for baseline muons
+\item Try different $\eta$ cut for jets
 \end{itemize}
 \end{frame}
 
@@ -77,12 +157,17 @@ Backup
 \begin{frame}[fragile]
 \frametitle{Signal sample}
 \small
-Sample Name(p2972 tag):
+Sample Name(p2949 tag):
 \tiny
 \begin{verbatim}
-mc15_13TeV.993820.MGPy8EG_A14N13LO_C1N2_Wh_2L_175_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
-mc15_13TeV.993821.MGPy8EG_A14N13LO_C1N2_Wh_2L_165_35.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
-mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972
+mc15_13TeV.
+393822.MGPy8EG_A14N23LO_C1N2_Wh_hall_162p5_12p5_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
+
+mc15_13TeV.
+393823.MGPy8EG_A14N23LO_C1N2_Wh_hall_175p0_0p0_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
+
+mc15_13TeV.
+393895.MGPy8EG_A14N23LO_C1N2_Wh_hall_450p0_0p0_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
 \end{verbatim}
 \end{frame}
 
@@ -136,12 +221,12 @@ Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
 \hline
 \textbf{Baseline}
 & - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
-& - $p_T>10$ GeV \newline - $|\eta| < 2.7$ \newline - Medium
+& - $p_T>10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium
 & - $p_T>20$ GeV \\
 \hline
 \textbf{Signal}
-& - $p_T > 25$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - TightLLH \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
-& - $p_T > 25$ GeV \newline - $|\eta| < 2.7$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - MediumLLH \newline - FixedCutTight \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 20$ GeV \newline - $|\eta| < 2.4$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
 & - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
 \end{tabularx}
 \end{table}
@@ -149,7 +234,7 @@ Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
 \raggedright
 Selection:
 \begin{itemize}
-%\item Trigger selection
+\item Trigger requirement
 \item Exactly 2 baseline leptons and exactly 2 signal leptons
 \end{itemize}
 
@@ -159,27 +244,78 @@ Pileup reweighting is applied. \\
 Scale factor for reconstruction, isolation, ID and trigger is applied.
 \end{frame}
 
-\begin{frame}
-\frametitle{averageMu}
-\begin{figure}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_ee}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_mumu}
-\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_emu} \\
-\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
-\end{figure}
-\end{frame}
+%\begin{frame}
+%\frametitle{averageMu}
+%\begin{figure}
+%\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_ee}
+%\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_mumu}
+%\includegraphics[width=0.33\textwidth]{averageMu_CR_ISR_OS_emu} \\
+%\caption{Average number of interactions per bunch crossing, for ee channel (left), $\mu\mu$ channel (middle) and e$\mu$ channel (right).}
+%\end{figure}
+%\end{frame}
 
 \begin{frame}
 \frametitle{Definition of jets}
 \normalsize
 \begin{itemize}
-\item Central jets: $\pt>20$ GeV, $|\eta|<2.4$, no b-tagged
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.8$, no b-tagged
 \begin{itemize}
-\item This is the run 1 definition.
+\item Use new eta cut.
 \end{itemize}
 \item B-jets: b-tagged
 \end{itemize}
 \end{frame}
+
+\begin{frame}{Pre-selection cut}
+\normalsize
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\end{itemize}
+\item SR$e\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\end{itemize}
+\item SR$e\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\end{columns}
+\end{frame}
+
 
 \begin{frame}
 \frametitle{significance calculation}
