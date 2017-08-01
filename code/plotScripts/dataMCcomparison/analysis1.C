@@ -4391,14 +4391,17 @@ void analysis1()
                     //*/
                 }
                 
+                std::vector<Group> BGGroup2 = BGGroup;
+                std::sort(BGGroup2.begin(),BGGroup2.end(),compare2);
+                
                 const bool DoSignificancePlot = !doOptimize &&
                 Var[VarIndex].CutDirection!=0 && (
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
                 
                 unsigned int dataN;
-                double total_BG_weighted;
-                double total_BG_error2;
+                double total_BG_weighted = 0;
+                double total_BG_error2 = 0 ;
                 int total_BG_unweighted = 0;
                 if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
@@ -4407,9 +4410,6 @@ void analysis1()
                     cout<<"Data: "<<dataN<<endl;
                     
                     //expected number of events for background
-                    total_BG_weighted=0;
-                    total_BG_error2=0;
-                    
                     for(unsigned int j=0;j<BGGroup.size();j++)
                     {
                         //expected number of events for BG
