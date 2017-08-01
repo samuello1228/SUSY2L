@@ -1494,7 +1494,7 @@ bool finalize()
 
 TChain* loadData(TString fileList, bool isMC){
 	//return a TChain linked to the data files
-	// bool DEBUG = true;
+	bool DEBUG = true;
 	TChain* tc = new TChain("evt2l");
 
 	ifstream inF(fileList.Data());
@@ -1571,7 +1571,8 @@ TChain* loadData(TString fileList, bool isMC){
  	for(auto f : allFiles)
  	{
  		if(isMC) {
- 			TString fname= TString(f(0,f.Length()-5));
+ 			TRegexp expr = ".root.?[0-9]?$";
+ 			TString fname= TString(f(0,f.Index(expr)));
  			fname+="_WEIGHTED.root";
  			tc->Add(fname);
  		} else tc->Add(f);

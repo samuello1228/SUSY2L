@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul 17 09:26:26 2017 by ROOT version 6.04/16
+// Tue Aug  1 06:18:16 2017 by ROOT version 6.04/16
 // from TTree evt2l/a angles tree
-// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root
+// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -21,8 +21,8 @@ public :
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
    static const Int_t kMaxleps = 3;
-   static const Int_t kMaxjets = 16;
-   static const Int_t kMaxtruths = 25;
+   static const Int_t kMaxjets = 8;
+   static const Int_t kMaxtruths = 42;
 
    // Declaration of leaf types
    ULong64_t       evt_run;
@@ -36,6 +36,7 @@ public :
    Float_t         evt_ElSF;
    Float_t         evt_MuSF;
    Float_t         evt_BtagSF;
+   Float_t         evt_JvtSF;
    Float_t         evt_qFwt;
    Float_t         evt_qFwt_sys_1up;
    Float_t         evt_qFwt_sys_1dn;
@@ -66,11 +67,13 @@ public :
    Float_t         l12_m;
    Float_t         l12_dPhi;
    Float_t         l12_dR;
+   Float_t         l12_jet0_dPhi;
    Int_t           jets_;
    Float_t         jets_pt[kMaxjets];   //[jets_]
    Float_t         jets_eta[kMaxjets];   //[jets_]
    Float_t         jets_phi[kMaxjets];   //[jets_]
    Float_t         jets_MET_dPhi[kMaxjets];   //[jets_]
+   Float_t         jets_m[kMaxjets];   //[jets_]
    UInt_t          jets_jFlag[kMaxjets];   //[jets_]
    Int_t           truths_;
    Float_t         truths_pt[kMaxtruths];   //[truths_]
@@ -88,6 +91,8 @@ public :
    Float_t         sig_MetY;
    Float_t         sig_mT2;
    Float_t         sig_HT;
+   Float_t         sig_mjj;
+   Float_t         sig_mlj;
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -112,6 +117,7 @@ public :
    TBranch        *b_jets_eta;   //!
    TBranch        *b_jets_phi;   //!
    TBranch        *b_jets_MET_dPhi;   //!
+   TBranch        *b_jets_m;   //!
    TBranch        *b_jets_jFlag;   //!
    TBranch        *b_truths_;   //!
    TBranch        *b_truths_pt;   //!
@@ -142,9 +148,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.2.mc15_13TeV.364114.Sherpa_221_NNPDF30NNLO_Zee_MAXHTPTV0_70_CVetoBVeto_myOutput.root/user.ggallard.11668691._000001.myOutput.root");
+         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
@@ -215,6 +221,7 @@ void evt2l::Init(TTree *tree)
    fChain->SetBranchAddress("jets.eta", jets_eta, &b_jets_eta);
    fChain->SetBranchAddress("jets.phi", jets_phi, &b_jets_phi);
    fChain->SetBranchAddress("jets.MET_dPhi", jets_MET_dPhi, &b_jets_MET_dPhi);
+   fChain->SetBranchAddress("jets.m", jets_m, &b_jets_m);
    fChain->SetBranchAddress("jets.jFlag", jets_jFlag, &b_jets_jFlag);
    fChain->SetBranchAddress("truths", &truths_, &b_truths_);
    fChain->SetBranchAddress("truths.pt", truths_pt, &b_truths_pt);
