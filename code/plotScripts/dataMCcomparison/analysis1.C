@@ -4596,12 +4596,22 @@ void analysis1()
                     //significance for all mass point
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
-                        PathName = "latex/data/significance/";
+                        PathName = "latex/data/optimization/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
                         PathName += "_";
                         PathName += TString::Itoa(SigOptimizingIndex,10);
                         PathName += ".txt";
                         fout.open(PathName.Data());
+                        
+                        fout<<"mC1:mN1:nSig:nSigErr:Zn"<<endl;
+                        fout<<"#Tag: "<<RegionInfo[RegionIndex].RegionName.Data()<<endl;
+                        for(unsigned int j=0;j<BGGroup2.size();j++)
+                        {
+                            //expected number of events for BG
+                            fout<<setprecision(6)<<std::fixed;
+                            fout<<"#"<<BGGroup2[j].info->GroupName.Data()<<": "<<BGGroup2[j].info->weighted<<" +/- "<<BGGroup2[j].info->error<<" ("<<BGGroup2[j].info->unweighted<<")"<<endl;
+                        }
+                        fout<<"#Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                         
                         TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,0,600,10,0,120);
                         TGraph2D* g_nSig = new TGraph2D();
@@ -4610,8 +4620,9 @@ void analysis1()
                         for(unsigned int j=0;j<SigSampleID.size();j++)
                         {
                             //expected number of events
-                            double expN = h2Sig[j]->Integral(0,-1);
-                            expN *= SigXS[j] *sumDataL/SignAOD[j];
+                            h2Sig[j]->Scale(SigXS[j] *sumDataL/SignAOD[j]);
+                            double error;
+                            double expN = h2Sig[j]->IntegralAndError(0,-1,error);
                             
                             //Significance
                             double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
@@ -4619,6 +4630,7 @@ void analysis1()
                             fout<<setprecision(1)<<std::fixed;
                             fout<<SigMass1[j]<<" "<<SigMass2[j]<<" ";
                             fout<<setprecision(3)<<std::fixed;
+                            fout<<expN<<" "<<error<<" ";
                             fout<<significance<<endl;
                             
                             //2D plot
