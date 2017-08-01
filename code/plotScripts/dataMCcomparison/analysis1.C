@@ -4410,19 +4410,19 @@ void analysis1()
                     cout<<"Data: "<<dataN<<endl;
                     
                     //expected number of events for background
-                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    for(unsigned int j=0;j<BGGroup2.size();j++)
                     {
                         //expected number of events for BG
-                        BGGroup[j].info->weighted = BGGroup[j].h2->IntegralAndError(0,-1,BGGroup[j].info->error);
-                        cout<<BGGroup[j].info->GroupName.Data()<<": "<<BGGroup[j].info->weighted<<" +/- "<<BGGroup[j].info->error<<" ("<<BGGroup[j].info->unweighted<<")"<<endl;
+                        BGGroup2[j].info->weighted = BGGroup2[j].h2->IntegralAndError(0,-1,BGGroup2[j].info->error);
+                        cout<<BGGroup2[j].info->GroupName.Data()<<": "<<BGGroup2[j].info->weighted<<" +/- "<<BGGroup2[j].info->error<<" ("<<BGGroup2[j].info->unweighted<<")"<<endl;
                         
-                        if(BGGroup[j].info->weighted > 0)
+                        if(BGGroup2[j].info->weighted > 0)
                         {
-                            total_BG_weighted += BGGroup[j].info->weighted;
+                            total_BG_weighted += BGGroup2[j].info->weighted;
                         }
-                        total_BG_error2 += BGGroup[j].info->error*BGGroup[j].info->error;
+                        total_BG_error2 += BGGroup2[j].info->error*BGGroup2[j].info->error;
                         
-                        total_BG_unweighted += BGGroup[j].info->unweighted;
+                        total_BG_unweighted += BGGroup2[j].info->unweighted;
                     }
                     cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                     
@@ -4456,16 +4456,17 @@ void analysis1()
                     fout.open(PathName.Data());
                     fout<<setprecision(6)<<std::fixed;
                     
-                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    for(unsigned int j=BGGroup2.size()-1;;j--)
                     {
-                        fout<<BGGroup[j].info->LatexName.Data();
+                        fout<<BGGroup2[j].info->LatexName.Data();
                         fout<<" & $";
-                        fout<<BGGroup[j].info->weighted;
+                        fout<<BGGroup2[j].info->weighted;
                         fout<<"\\pm";
-                        fout<<BGGroup[j].info->error;
+                        fout<<BGGroup2[j].info->error;
                         fout<<"$ (";
-                        fout<<BGGroup[j].info->unweighted;
+                        fout<<BGGroup2[j].info->unweighted;
                         fout<<") & \\\\"<<endl<<"\\hline"<<endl;
+                        if(j==0) break;
                     }
                     
                     fout<<"Total BG & $";
@@ -4811,21 +4812,16 @@ void analysis1()
                 
                 //Add BG
                 TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-                std::vector<Group> vBGGroup;
                 for(unsigned int j=0;j<BGGroup.size();j++)
                 {
                     h2BGSum->Add(BGGroup[j].h2);
-                    vBGGroup.push_back(BGGroup[j]);
                 }
-                
-                //sort
-                std::sort(vBGGroup.begin(),vBGGroup.end(),compare2);
                 
                 //stack
                 THStack stack;
-                for(unsigned int j=0;j<vBGGroup.size();j++)
+                for(unsigned int j=0;j<BGGroup2.size();j++)
                 {
-                    stack.Add(vBGGroup[j].h2);
+                    stack.Add(BGGroup2[j].h2);
                 }
                 
                 {
@@ -4898,9 +4894,10 @@ void analysis1()
                     {
                         leg->AddEntry(h2DataSum,"Data","p");
                     }
-                    for(unsigned int j=0;j<BGGroup.size();j++)
+                    for(unsigned int j=BGGroup2.size()-1;;j--)
                     {
-                        leg->AddEntry(BGGroup[j].h2,BGGroup[j].info->LegendName.Data(),"fl");
+                        leg->AddEntry(BGGroup2[j].h2,BGGroup2[j].info->LegendName.Data(),"fl");
+                        if(j==0) break;
                     }
                     
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
