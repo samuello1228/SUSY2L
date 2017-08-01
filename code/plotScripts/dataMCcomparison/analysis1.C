@@ -436,9 +436,9 @@ void analysis1()
         element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         */
         
-        element.MassDiff = 150;   element.ID = 1;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 130;   element.ID = 3;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 450;   element.ID = 39; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        element.MassDiff = 150;   element.ID = 2;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 175;   element.ID = 3;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 450;   element.ID = 73; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         
     }
     
@@ -1828,6 +1828,88 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         
+        
+        {
+            OptimizingCutElement1.clear();
+            
+            OptimizingCutElement2.RelatedVariable = "pt1";
+            OptimizingCutElement2.min = 20;
+            OptimizingCutElement2.max = 250;
+            OptimizingCutElement2.nBin = 46;
+            OptimizingCutElement2.Cut.lower = 20;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "pt2";
+            OptimizingCutElement2.min = 20;
+            OptimizingCutElement2.max = 250;
+            OptimizingCutElement2.nBin = 46;
+            OptimizingCutElement2.Cut.lower = 20;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "ptll";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 300;
+            OptimizingCutElement2.nBin = 30;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "mTtwo";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 150;
+            OptimizingCutElement2.nBin = 30;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "dEta";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 5;
+            OptimizingCutElement2.nBin = 10;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "METRel";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 200;
+            OptimizingCutElement2.nBin = 40;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "meff";
+            OptimizingCutElement2.min = 100;
+            OptimizingCutElement2.max = 600;
+            OptimizingCutElement2.nBin = 50;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "mtm";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 300;
+            OptimizingCutElement2.nBin = 60;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.RelatedVariable = "mlj";
+            OptimizingCutElement2.min = 0;
+            OptimizingCutElement2.max = 300;
+            OptimizingCutElement2.nBin = 60;
+            OptimizingCutElement2.Cut.lower = 0;
+            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            for(unsigned int i=0;i<SigMassSplitting.size();i++)
+            {
+                element.OptimizingCut.push_back(OptimizingCutElement1);
+            }
+        }
+        
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_opt";
@@ -1841,6 +1923,8 @@ void analysis1()
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -1920,6 +2004,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -1936,6 +2021,8 @@ void analysis1()
             element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -2015,6 +2102,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -2031,6 +2119,8 @@ void analysis1()
             element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -2110,6 +2200,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -2127,6 +2218,8 @@ void analysis1()
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -2206,6 +2299,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -2222,6 +2316,8 @@ void analysis1()
             element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -2301,6 +2397,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -2317,6 +2414,8 @@ void analysis1()
             element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
+            
+            /*
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
@@ -2396,6 +2495,7 @@ void analysis1()
             {
                 element.OptimizingCut.push_back(OptimizingCutElement1);
             }
+            */
             
             RegionInfo.push_back(element);
         }
@@ -3799,6 +3899,15 @@ void analysis1()
                                             if(n>0)
                                             {
                                                 nBG += n;
+                                            }
+                                            else
+                                            {
+                                                if(BGGroup[j].info->GroupName != "multitop" &&
+                                                   BGGroup[j].info->GroupName != "Vgamma"   &&
+                                                   BGGroup[j].info->GroupName != "Zjets"   )
+                                                {
+                                                    skip = true;
+                                                }
                                             }
                                             nBGError2 += Error * Error;
                                         }
