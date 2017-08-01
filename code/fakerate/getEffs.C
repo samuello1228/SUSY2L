@@ -925,7 +925,7 @@ int getEffs()
 	hElFake[LIGHT][TTBAR] = new Histos("hEl_Light_TT");
 	hElFake[CONV][TTBAR] = new Histos("hEl_Conv_TT");
 	cout << "Begin loop over ttBar: " << ttEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
+	loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
 	cout << "ttBar loop finished" << endl << endl;
 
 	// TTV
@@ -938,7 +938,7 @@ int getEffs()
 	hElFake[LIGHT][TTV] = new Histos("hEl_Light_TTV");
 	hElFake[CONV][TTV] = new Histos("hEl_Conv_TTV");
 	cout << "Begin loop over ttV: " << ttVEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(ttVEvts, hMuReal[0][TTV], hElReal[0][TTV], hMuFake[HEAVY][TTV], hElFake[HEAVY][TTV], hMuFake[LIGHT][TTV], hElFake[LIGHT][TTV], hElFake[CONV][TTV], TTV);
+	loopMC(ttVEvts, hMuReal[0][TTV], hElReal[0][TTV], hMuFake[HEAVY][TTV], hElFake[HEAVY][TTV], hMuFake[LIGHT][TTV], hElFake[LIGHT][TTV], hElFake[CONV][TTV], TTV);
 	cout << "ttV loop finished" << endl << endl;
 
 	// Low mass Zjets
@@ -951,7 +951,7 @@ int getEffs()
 	hElFake[LIGHT][DY] = new Histos("hEl_Light_DY");
 	hElFake[CONV][DY] = new Histos("hEl_Conv_DY");
 	cout << "Begin loop over low mass Z: " << dyEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(dyEvts, hMuReal[0][DY], hElReal[0][DY], hMuFake[HEAVY][DY], hElFake[HEAVY][DY], hMuFake[LIGHT][DY], hElFake[LIGHT][DY], hElFake[CONV][DY], DY);
+	loopMC(dyEvts, hMuReal[0][DY], hElReal[0][DY], hMuFake[HEAVY][DY], hElFake[HEAVY][DY], hMuFake[LIGHT][DY], hElFake[LIGHT][DY], hElFake[CONV][DY], DY);
 	cout << "Low mass Z loop finished" << endl << endl;
 
 	// // Z+jets
@@ -964,7 +964,7 @@ int getEffs()
 	hElFake[LIGHT][ZJETS] = new Histos("hEl_Light_Zjets");
 	hElFake[CONV][ZJETS] = new Histos("hEl_Conv_Zjets");
 	cout << "Begin loop over Z+jets: " << zJetsEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
+	loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
 	cout << "Z+jets loop finished" << endl << endl;
 
 	// // W+jets
@@ -977,7 +977,7 @@ int getEffs()
 	hElFake[LIGHT][WJETS] = new Histos("hEl_Light_Wjets");
 	hElFake[CONV][WJETS] = new Histos("hEl_Conv_Wjets");
 	cout << "Begin loop over W+jets: " << wJetsEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
+	loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
 	cout << "W+jets loop finished" << endl << endl;
 
 	// DIBOSON
@@ -990,7 +990,7 @@ int getEffs()
 	hElFake[LIGHT][VV] = new Histos ("hEl_Light_VV");
 	hElFake[CONV][VV] = new Histos ("hEl_Conv_VV");
 	cout << "Begin loop over VV: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
+	loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
 	cout << "VV loop finished" << endl << endl;
 
 	// VGAMMA
@@ -1003,7 +1003,7 @@ int getEffs()
 	hElFake[LIGHT][VGAMMA] = new Histos("hEl_Light_Vgamma");
 	hElFake[CONV][VGAMMA] = new Histos("hEl_Conv_Vgamma");
 	cout << "Begin loop over Vgamma: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
+	loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
 	cout << "Vgamma loop finished" << endl << endl;
 
 	// SingleTop
@@ -1016,7 +1016,7 @@ int getEffs()
 	hElFake[LIGHT][SINGLETOP] = new Histos("hEl_Light_SingleTop");
 	hElFake[CONV][SINGLETOP] = new Histos("hEl_Conv_SingleTop");
 	cout << "Begin loop over single top: " << vvEvts->fChain->GetEntries() << " events" << endl;
-	// loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
+	loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
 	cout << "Single top loop finished" << endl << endl;
 
 
@@ -1531,7 +1531,8 @@ TChain* loadData(TString fileList, bool isMC){
 
 	 			TTree *t = (TTree*) f.Get("evt2l");
 
-	 			TString fname= TString(s(0,s.Length()-5));
+	 			TRegexp expr = ".root.?[0-9]?$";
+	 			TString fname= TString(s(0,s.Index(expr)));
 	 			fname+="_WEIGHTED.root";
 
 	 			TFile *newFile = new TFile(fname, "recreate");
