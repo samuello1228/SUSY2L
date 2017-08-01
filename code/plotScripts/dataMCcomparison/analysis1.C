@@ -598,6 +598,7 @@ void analysis1()
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
         element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
+        //element.lower = 103;  element.upper = 106; element.colour = 30; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
         element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
@@ -3421,7 +3422,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=7;RegionGroupIndex<=7;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
