@@ -16,24 +16,41 @@
 #include <TStyle.h>
 #include <TLorentzVector.h>
 #include <TSystem.h>
+#include <TLine.h>
 
 #include "../common/evt2l.C"
 #include "../ChargeFlipTool/ChargeFlipTool.cpp"
 
 // ========= CONFIGURATION =========== //
-TString defaultOut="outputDirYL-PtCorr";
-TString defaultNTupleList="../common/inFileList-DataYL.txt";
-TString defaultMisIdfile="../QID-on/rates_wSys.root";
+// TString defaultOut="../1706-Remeasure-Wh/estimates-data-NoPt";
+// TString defaultOut="../1706-Remeasure-Wh/Powheg/estimates-NoPt-TruthMatched";
+TString defaultOut="../1706-Remeasure-Wh/Sherpa/estimates-Pt";
+
+// TString defaultNTupleList="../common/inFileList-data.txt";
+// TString defaultNTupleList="../common/inFileList-ZeePowheg.txt";
+TString defaultNTupleList="../common/inFileList-ZeeSherpa.txt";
+
+// TString defaultMisIdfile="../1706-Remeasure-Wh/RAWfiles/rates_wSys.root";
+// TString defaultMisIdfile="../1706-Remeasure-Wh/80.000000_100.000000_0.000000_0.000000_DATA.root";
 // TString defaultMisIdfile="../common/chargeMisID_Zee_data_signal_wSys.root";
-//TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
-TString misIDhistname="hFlipProb_MCtruth";
+TString defaultMisIdfile="../1706-Remeasure-Wh/Sherpa/RAWfiles/80.000000_100.000000_0.000000_0.000000_MC.root";
+
+// TString misIDhistname="80.0_100.0_0.0_0.0_DATA_misid";
+// TString misIDhistname="80.0_100.0_20.0_20.0_DATA_misid";
+TString misIDhistname="80.0_100.0_0.0_0.0_MC_misid";
+// TString misIDhistname="hFlipProb_MCtruth";
 // TString misIDhistname="hFlipProb_MCLH";
-// TString misIDhistname="hFlipProb";
-TString defaultdPtfile="../QID-on/ptcorr/dEhistos.root";
+// TString misIDhistname="hFlipProb_data";
+
+// TString defaultdPtfile="../1706-Remeasure-Wh/Powheg/ptcorr/dEhistos.root";
+TString defaultdPtfile="../1706-Remeasure-Wh/Sherpa/pt/dEhistos.root";
+
+
 bool onlySignal=true;
 bool applyPtCorrection=true;
 bool passQID=true;
-bool ZWindowOnly = false;
+bool isMC = true;
+bool ZWindowOnly = !isMC;
 // ========= INFRASTRUCTURE =========== //
 class Histos;
 evt2l* evt2lTree=0;
@@ -95,17 +112,17 @@ class Histos
       // ====  UPPER PLOT ====== //
       // Set range of Y axis()
       // if(SS->GetMinimum()==0) SS->GetYaxis()->SetRangeUser(1, max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
-      SS->GetYaxis()->SetRangeUser(max(1.0,SS->GetMinimum()*0.5), max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
+      ExpSS->GetYaxis()->SetRangeUser(max(1.0,SS->GetMinimum()*0.5), max(SS->GetMaximum(),ExpSS->GetMaximum())*5);
 
       // Set colors
-      SS->SetLineColor(kAzure+1); SS->SetFillColor(kAzure+1); SS->SetMarkerColor(kAzure+1); 
-      ExpSS->SetLineColor(kRed); ExpSS->SetMarkerColor(kRed); 
+      ExpSS->SetLineColor(kAzure+1); ExpSS->SetFillColor(kAzure+1); ExpSS->SetMarkerColor(kAzure+1); 
+      SS->SetLineColor(kBlack); SS->SetMarkerColor(kBlack); SS->SetMarkerStyle(20); 
 
-      SS->Draw("bar");
-      ExpSS->Draw("same e");
+      ExpSS->Draw("bar e");
+      SS->Draw("same");
 
-      l->AddEntry(SS, "Observed SS events", "f");
-      l->AddEntry(ExpSS, "Predicted SS events from OS", "lp");
+      l->AddEntry(SS, "Observed SS events", "lp");
+      l->AddEntry(ExpSS, "Predicted SS events from OS", "f");
       l->Draw("same");
 
       // ====  LOWER PLOT ====== //
@@ -188,7 +205,8 @@ void getSSPrediction(const TString outputDir=defaultOut,
    }
 
    // Initialize histograms here ----------------------------------------
-   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   // Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", ZWindowOnly?20:100, ZWindowOnly?70:60, ZWindowOnly?110:260);
+   Histos hMass("hMass", "invariant mass", "m_{ll}", "Events/2 GeV", 100, 60, 260);
    Histos hLeadingPt("hLeadingPt", "leading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hSubleadingPt("hSubleadingPt", "subleading p_{T}", "p_{T}", "Events/4 GeV", 50, 20, 200);
    Histos hLeadingEta("hLeadingEta", "leading |#eta|", "Leading |#eta|", "", 40, -2.47, 2.47);
@@ -196,7 +214,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
    Histos hLeadingPhi("hLeadingPhi", "leading #phi", "Leading |#phi|", "", 40, -3.15, 3.15);
    Histos hSubleadingPhi("hSubleadingPhi", "subleading #phi", "Subleading |#phi|", "", 40, -3.15, 3.15);
 
-  hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
+   hMass.SetLegendXY(0.7, 0.2, 0.9, 0.35);
 
    long long nEntries = evt2lTree->fChain->GetEntries();
    for(long long i=0; i<nEntries; i++){
@@ -211,10 +229,17 @@ void getSSPrediction(const TString outputDir=defaultOut,
       if(onlySignal && !(((evt2lTree->leps_lFlag[0] & 2)/2) && ((evt2lTree->leps_lFlag[1] & 2)/2))) continue;
 
       // Select Zee events
-      if(ZWindowOnly && fabs(evt2lTree->l12_m - 91)>10) continue;
+      // if(ZWindowOnly && fabs(evt2lTree->l12_m - 91)>10) continue;
 
       // Select events which pass electron ChargeFlipTagger
-      if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
+      // if(passQID && !(evt2lTree->leps_ElChargeID[0] && evt2lTree->leps_ElChargeID[1])) continue;
+
+      // In MC, plot only events with truth-matched electrons 
+      if (isMC &&
+         (evt2lTree->leps_truthI[0] < 0 || evt2lTree->leps_truthI[0] < 0 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11 
+           || abs(evt2lTree->truths_pdgId[evt2lTree->leps_truthI[0]])!=11) )
+         continue;
 
       bool SSevent = ((evt2lTree->leps_ID[0]>0) == (evt2lTree->leps_ID[1]>0));
 
@@ -236,6 +261,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
       p1.SetPtEtaPhiM(pt1, evt2lTree->leps_eta[0], evt2lTree->leps_phi[0], 0.000511);
       p2.SetPtEtaPhiM(pt2, evt2lTree->leps_eta[1], evt2lTree->leps_phi[1], 0.000511);
       double mll = (p1+p2).M();
+      if(ZWindowOnly && fabs(mll - 91)>10) continue;
 
       // Fill histograms here ----------------------------------------
       double chargeFlipWeight=0;
@@ -244,7 +270,7 @@ void getSSPrediction(const TString outputDir=defaultOut,
          chargeFlipWeight = pSS/(1-pSS);
       } else chargeFlipWeight = -1;
 
-      double w = 1;//evt2lTree->evt_weight * evt2lTree->evt_pwt;
+      double w = evt2lTree->evt_weight * evt2lTree->evt_pwt *evt2lTree->evt_ElSF * evt2lTree->evt_MuSF;
 
       hMass.Fill(mll, w, chargeFlipWeight);
       hLeadingPt.Fill(pt1, w, chargeFlipWeight);
@@ -333,7 +359,16 @@ bool initialize(const TString outputDir, const TString ntupleList, const TString
                std::cout << "Option unrecognized. " << std::endl;
                return false;
             }
-         } else {
+         } 
+         else if(key=="mc"){
+            if(value=='y') isMC = true;
+            else if (value=='n') isMC = false;
+            else {
+               std::cout << "Option unrecognized. " << std::endl;
+               return false;
+            }
+         } 
+         else {
             std::cout << "Option unrecognized. " << std::endl;
             return false;
          }

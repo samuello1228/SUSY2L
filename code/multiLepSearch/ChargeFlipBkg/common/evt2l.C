@@ -7,12 +7,12 @@
 void evt2l::Loop()
 {
 //   In a ROOT session, you can do:
-//      Root > .L evt2l.C
-//      Root > evt2l t
-//      Root > t.GetEntry(12); // Fill t data members with entry number 12
-//      Root > t.Show();       // Show values of entry 12
-//      Root > t.Show(16);     // Read and show values of entry 16
-//      Root > t.Loop();       // Loop on all entries
+//      root> .L evt2l.C
+//      root> evt2l t
+//      root> t.GetEntry(12); // Fill t data members with entry number 12
+//      root> t.Show();       // Show values of entry 12
+//      root> t.Show(16);     // Read and show values of entry 16
+//      root> t.Loop();       // Loop on all entries
 //
 
 //     This is the loop skeleton where:

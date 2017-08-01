@@ -2,6 +2,7 @@
 #this file is based heavily on $ROOTSYS/tutorials/TMVAClassification.C
 
 import ROOT
+ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
 from ROOT import TMVA
 
 import os, re
@@ -24,7 +25,7 @@ parser.add_option("--Depth", help="tree depth", type="int", default=2)
 
 (options, args) = parser.parse_args()
 
-ROOT.gROOT.Macro("$ROOTCOREDIR/scripts/load_packages.C")
+
 from ROOT.SUSY import CrossSectionDB
 xsecDB = CrossSectionDB("%s/data/SUSYTools/mc15_13TeV/"%os.environ["ROOTCOREBIN"] )
 
@@ -33,8 +34,11 @@ TMVA.Tools.Instance()
 
 outputFile = ROOT.TFile( options.outFile, "RECREATE" );
 outputTag = options.outFile.split("/")[-1].split(".")[0]
+# factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
+#                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+
 factory = TMVA.Factory( "TMVAClassification_" + outputTag , outputFile,
-                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+                        "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G:AnalysisType=Classification" );
 
 for (aVar, aFormula) in ssUtil.basicBDTVars:
   factory.AddVariable( "%s := %s" % (aVar, aFormula) ,  'F' )
@@ -106,15 +110,15 @@ addTreesToTMVA( options.dataList, isMC=False, isSig=False)
 factory.SetSignalWeightExpression    ( "ElSF*MuSF*BtagSF*weight*pwt" )
 factory.SetBackgroundWeightExpression( "ElSF*MuSF*BtagSF*weight*pwt*(isMC? 1.0 : (qFwt+fLwt))" )
 
-bkgCut = ROOT.TCut( ssUtil.getCut(options.channel) )
-sigCut = ROOT.TCut( ssUtil.getCut(options.channel) )
+bkgCut = ROOT.TCut( ssUtil.getCut(int((options.channel)%100) ) ) # SS events or fake events from data only 
+sigCut = ROOT.TCut( ssUtil.getCut( int(options.channel + (200 if int(options.channel/100)==0 else 0) ) ) ) # Allow OS signal events for training
 
 factory.PrepareTrainingAndTestTree( sigCut, bkgCut,
     "nTrain_Signal=0:nTrain_Background=0:nTest_Background=0:SplitMode=Random:NormMode=EqualNumEvents:!V" )
     #"nTrain_Signal=0:nTrain_Background=2000:SplitMode=Random:NormMode=EqualNumEvents:!V" )
 
 #Here we just use the BDT, see $ROOTSYS/tutorials/tmva/TMVAClassification.C for other available machine learning methods in TMVA
-methodOpt = "!H:!V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=Decorrelate"
+methodOpt = "!H:V:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=20:VarTransform=N"
 methodOpt = "%s:MaxDepth=%d:NTrees=%d:MinNodeSize=%d%%" % (methodOpt, options.Depth, options.NTrees, options.NodeSize)
 factory.BookMethod( TMVA.Types.kBDT, "BDTD", methodOpt )
 

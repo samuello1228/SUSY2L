@@ -21,7 +21,8 @@ Example entry:
 mc: $(PROG) myFiles.txt
     ./$(PROG) myFiles.txt /full/path/to/destination/
 ```
-Check also that the `isMC` falg is properly set in ConvertNTuples
+Check also that the `isMC` flag is properly set in ConvertNTuples. Failure to do so may result in a segmentation fault. 
+
 ### STEP 3: Convert NTuples
 Following the previous example:
 `make mc`

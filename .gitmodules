@@ -4,3 +4,6 @@
 [submodule "code/HistFitter"]
 	path = code/HistFitter
 	url = https://:@gitlab.cern.ch:8443/HistFitter/HistFitter.git
+[submodule "code/xAODTruthAnalysis"]
+	path = code/xAODTruthAnalysis
+	url = git@github.com:dajiaonao/xAODTruthAnalysis.git

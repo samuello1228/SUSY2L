@@ -57,7 +57,7 @@ def runMinuit(numParameters):
   minuit.mnexcm("SET ERR", arglist, 1, internalFlag)
   
   initialValues = np.zeros(numParameters) + 0.01
-  steps = np.zeros(numParameters) + 0.001
+  steps = np.zeros(numParameters) + 0.0001
   
   for i in xrange(numParameters):
     name = "epsilon%s" % i
@@ -88,10 +88,13 @@ import time
 start_time = time.time()
 ##############################
 
-# etas = [0, 0.5, 1, 1.37, 1.52, 1.8, 2.0, 2.47]
-etas = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.37, 1.52, 1.8, 2, 2.2, 2.47]
-pts  = [20, 30, 40, 50, 60, 80, 120, 1000.0]
+etas = [0, 0.5, 1, 1.37, 1.52, 1.8, 2.0, 2.47]
+# etas = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.37, 1.52, 1.8, 2, 2.2, 2.47]
+# pts  = [20, 30, 40, 50, 60, 80, 120, 1000.0]
 
+
+# etas = [0, 0.6, 1.1, 1.5, 1.7, 2.3, 2.5]
+pts  = [25, 60, 90, 130, 150, 1000]
 
 ##############################
 nEta,nPt = len(etas),len(pts)

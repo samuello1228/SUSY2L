@@ -30,7 +30,7 @@ using namespace std;
 
 TString inDir;
 TString outDir;
-bool isMC = true;
+bool isMC = false; // Not set here anymore. Set in main() function()!
 // double PTSCALE = 1.0; // 1000 for GeV to MeV. 
 
 inline void loadbar(unsigned int x, unsigned int n, unsigned int w = 50)
@@ -147,10 +147,10 @@ int getOrigElecI(const susyEvts* mEvts, int i){
 
 bool convert(TString file){
 
-  // TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
-  // TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
-  TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
-  TPRegexp reFile("user.ggallard.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
+  TPRegexp reDir("user.clo.v.*myOutput.root/.{0}");
+  TPRegexp reFile("user.clo.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
+  // TPRegexp reDir("user.ggallard.v.*myOutput.root/.{0}");
+  // TPRegexp reFile("user.ggallard.[0-9]+._[0-9]+.myOutput.root.?[0-9]?$");
   outDir = file(reDir).Data();
   outDir = outDir(0,outDir.First('/'));
   TString outFilename = file(reFile).Data();
@@ -273,7 +273,8 @@ bool convert(TString file){
 
   // === INITIALIZE IN TREE ==== //
   TChain *inChain = new TChain("evt2l");
-  inChain->Add(file);
+  inChain->Add(file); if(inChain->GetEntries()==0) return true;
+  cout << inChain->GetEntries() << endl;
   susyEvts* mEvts = new susyEvts(inChain);
 
   // == FILL TREE
@@ -281,10 +282,45 @@ bool convert(TString file){
   for(long int i=0; i<nEntries; i++){
     loadbar(i+1,nEntries);
     mEvts->GetEntry(i);
-    
+
     // Require exactly two leptons, and the leptons are electrons
-    if(mEvts->leps.size()!=2) continue;
+    if(mEvts->leps.size()!=2) continue; 
     if (int(fabs(mEvts->leps[0].ID/1000))!=11 || int(fabs(mEvts->leps[1].ID/1000))!=11) continue;
+
+    {
+      MCEvtWeight = 0;
+      MCPileupWeight = 0;
+      Zcand_M = 0;
+      trigCode = 0;
+      elCand1_charge = 0;
+      elCand1_pt = 0;
+      elCand1_cl_eta = 0;
+      elCand1_phi = 0;
+      elCand1_E = 0;
+      elCand1_ID = 0;
+      elCand1_qID = 0;
+      elCand2_charge = 0;
+      elCand2_pt = 0;
+      elCand2_cl_eta = 0;
+      elCand2_phi = 0;
+      elCand2_E = 0;
+      elCand2_ID = 0;
+      elCand2_qID = 0;
+      elCand1_flag = 0;
+      elCand2_flag = 0;
+      elCand1_truthPt = 0;
+      elCand2_truthPt = 0;
+      elCand1_truthE = 0;
+      elCand2_truthE = 0;
+      elCand1_origPt = 0;
+      elCand2_origPt = 0;
+      elCand1_origE = 0;
+      elCand2_origE = 0;
+      elCand1_origCharge = 0;
+      elCand2_origCharge = 0;
+      elCand1_dRwOrig = 0;
+      elCand2_dRwOrig = 0;
+    }
 
     MCEvtWeight = mEvts->evt.weight*mEvts->evt.ElSF*mEvts->evt.MuSF;
     MCPileupWeight = mEvts->evt.pwt;
@@ -297,7 +333,7 @@ bool convert(TString file){
     elCand1_phi = mEvts->leps[0].phi;
     elCand1_ID = mEvts->leps[0].ID;
     elCand1_E = pt2E(elCand1_pt, elCand1_cl_eta);
-    elCand1_qID = mEvts->leps[0].ElChargeID;
+    elCand1_qID = true; //mEvts->leps[0].ElChargeID;
     TLorentzVector p1;
     p1.SetPtEtaPhiM(elCand1_pt, elCand1_cl_eta, elCand1_phi, 0.000511);
 
@@ -330,7 +366,7 @@ bool convert(TString file){
     elCand2_phi = mEvts->leps[1].phi;
     elCand2_ID = mEvts->leps[1].ID;
     elCand2_E = pt2E(elCand2_pt, elCand2_cl_eta);
-    elCand2_qID = mEvts->leps[1].ElChargeID;
+    elCand2_qID = true;//mEvts->leps[1].ElChargeID;
 
     TLorentzVector p2;
     p2.SetPtEtaPhiM(elCand2_pt, elCand2_cl_eta, elCand2_phi, 0.000511);
@@ -366,9 +402,9 @@ bool convert(TString file){
 }
 
 int main(int argc, char *argv[]){
-	if (argc!=3){
-		cout << "Wrong number of arguments. Two required. " << endl
-			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/" << endl;
+	if (argc<3 || argc >4){
+		cout << "Wrong number of arguments. Two or Three required. " << endl
+			<< "./ConvertNTuples inFileList.txt /FullPath/outDir/ (MC)" << endl;
 		return -1;
 	}
 
@@ -382,7 +418,14 @@ int main(int argc, char *argv[]){
       return -3;
     }
 	}
-  
+
+  isMC = false;
+  if (argc==4)
+  {
+    TString mcTag(argv[3]); mcTag.ToUpper();
+    isMC = (mcTag=="MC");
+  }
+
   vector<TString> allFiles;
   string file;
   while(getline(inFiles, file)){
