@@ -1691,6 +1691,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsign
 int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLevel){
   /// check if already exist
   if(!p) return -1;
+  if(p->status()!=1 && p->status()!=2 && p->status()!=4) return -1;
   const int bcode = p->barcode();
   int nv = v.size();
   for(int i=0;i<nv;i++){if(v[i].barcode == bcode) {return i;}}
@@ -1704,6 +1705,7 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.pdgId = p->pdgId(); 
   t.matchI = -1;
   t.motherI = -1;
+  t.status = p->status();
 
   /*
   std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;

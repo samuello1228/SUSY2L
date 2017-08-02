@@ -100,9 +100,9 @@ struct TR_PAR:PAR0{
   int barcode;
   int motherI;
   int matchI;
-
+  unsigned char status;
 };
-const string TR_PAR_s = PAR0_s+"pdgId/I:barcode/I:motherI/I:matchI/I";
+const string TR_PAR_s = PAR0_s+"pdgId/I:barcode/I:motherI/I:matchI/I:status/b";
 
 enum FLAGS{
   PASS_GRL = 1<<0,
