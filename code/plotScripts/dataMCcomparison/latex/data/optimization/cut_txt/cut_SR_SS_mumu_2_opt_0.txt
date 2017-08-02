@@ -1,9 +1,9 @@
 pt1 25 -1
 pt2 20 -1
 ptll 20 -1
-mTtwo 55 -1
-dEta 0 -1
-METRel 110 -1
+mTtwo 10 -1
+dEta 0 1
+METRel 35 -1
 meff 240 -1
-mtm 135 -1
-mlj 0 -1
+mtm 110 -1
+mlj 0 160
