@@ -23,6 +23,7 @@ Execution:
 
 #include <vector>
 #include "support/evt2l.C"
+#include "support/susyEvts.cxx"
 #include "support/obj_def.h"
 #include "support/MCTruthClassifierDefs.h"
 #include <TChain.h>
@@ -72,17 +73,20 @@ const TString inFileDY="../support/inFileList-DY.txt";
 const bool DEBUG=false;
 const bool VERBOSE=DEBUG || true;
 
-const bool measureUnweightedRates = true;
-const bool measureLepComp = true;
-const bool measureSF = true;
-const bool doDataTP = true;
+const bool onlyWeightMC = false;
+const bool alreadyWeightedMC = !onlyWeightMC && true;
+
+const bool measureUnweightedRates = !onlyWeightMC && true;
+const bool measureLepComp = !onlyWeightMC && true;
+const bool measureSF = !onlyWeightMC && true;
+const bool doDataTP = !onlyWeightMC && true;
 
 // const STUDY study=ThreeL;
 const STUDY study=SS;
 
 const TString outDir = (study==ThreeL ? "output3L/" : "output2L/");
 
-bool passRatesCR(evt2l* tree){
+bool passRatesCR(susyEvts* tree){
 	if (!measureUnweightedRates) return false;
 	bool pass = true;
 	if(study==SS)
@@ -96,10 +100,10 @@ bool passRatesCR(evt2l* tree){
 		- No b-jets
 		- Relative missing ET < 70?
 		*/
-		pass *= tree->leps_==2;
-		pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
-		pass *= tree->jets_<=3;
-		for(int i=0; i<tree->jets_; i++) pass *= !(tree->jets_jFlag[i] & JT_BJET);
+		pass *= tree->leps.size()==2;
+		pass *= !(abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==121 && fabs(tree->l12.m-91.2)<10);
+		pass *= tree->jets.size()<=3;
+		for(uint i=0; i<tree->jets.size(); i++) pass *= !(tree->jets[i].jFlag & JT_BJET);
 	}
 	else if (study==ThreeL)
 	{
@@ -110,10 +114,10 @@ bool passRatesCR(evt2l* tree){
 			- May or may not be signal
 			- SFSS pair + DFOS single
 		*/
-		pass *= tree->leps_==3;
+		pass *= tree->leps.size()==3;
 
 		// Find SFSS pair + DFOS single
-		std::vector<int> idVec={int(tree->leps_ID[0]/1000), int(tree->leps_ID[1]/1000), int(tree->leps_ID[2]/1000)};
+		std::vector<int> idVec={int(tree->leps[0].ID/1000), int(tree->leps[1].ID/1000), int(tree->leps[2].ID/1000)};
 		// Second requirement: 11-13 or 13-11
 		pass *= ( 	(idVec[0]==idVec[1] && abs(idVec[0]+idVec[2])==2) ||
 					(idVec[1]==idVec[2] && abs(idVec[1]+idVec[0])==2) ||
@@ -124,7 +128,7 @@ bool passRatesCR(evt2l* tree){
 	return pass;
 }
 
-bool passLepCompCR(evt2l* tree)
+bool passLepCompCR(susyEvts* tree)
 {
 	if (!measureLepComp) return false;
 	bool pass = true;
@@ -140,14 +144,14 @@ bool passLepCompCR(evt2l* tree)
 
 		Recall f= N(tight)/N(loose), should require signal leptons
 		*/
-		pass *= tree->leps_==2;
-		pass *= (tree->leps_lFlag[0] & IS_SIGNAL) && (tree->leps_lFlag[1] & IS_SIGNAL);
-		pass *= tree->leps_ID[0]*tree->leps_ID[1]>0;
-		pass *= !(abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121 && fabs(tree->l12_m-91.2)<10);
-		pass *= tree->jets_<=3;
+		pass *= tree->leps.size()==2;
+		pass *= (tree->leps[0].lFlag & IS_SIGNAL) && (tree->leps[1].lFlag & IS_SIGNAL);
+		pass *= tree->leps[0].ID*tree->leps[1].ID>0;
+		pass *= !(abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==121 && fabs(tree->l12.m-91.2)<10);
+		pass *= tree->jets.size()<=3;
 
 		// // No b-jets
-		for(int i(0); i>tree->jets_;i++) pass*= !(tree->jets_jFlag[i] & JT_BJET);
+		for(uint i(0); i>tree->jets.size();i++) pass*= !(tree->jets[i].jFlag & JT_BJET);
 	} else if (study==ThreeL)
 	{
 		/* LEPTON COMPOSOTION CONTROL REGION
@@ -157,11 +161,11 @@ bool passLepCompCR(evt2l* tree)
 
 		Recall f= N(tight)/N(loose), should require signal leptons
 		*/
-		pass *= tree->leps_==3;
-		for(int i=0; i<3; i++) pass *= (tree->leps_lFlag[i] & IS_SIGNAL);
+		pass *= tree->leps.size()==3;
+		for(int i=0; i<3; i++) pass *= (tree->leps[i].lFlag & IS_SIGNAL);
 
 		// Find SFSS pair + DFOS single
-		std::vector<int> idVec={int(tree->leps_ID[0]/1000), int(tree->leps_ID[1]/1000), int(tree->leps_ID[2]/1000)};
+		std::vector<int> idVec={int(tree->leps[0].ID/1000), int(tree->leps[1].ID/1000), int(tree->leps[2].ID/1000)};
 		// Second requirement: 11-13 or 13-11
 		pass *= ( 	(idVec[0]==idVec[1] && abs(idVec[0]+idVec[2])==2) ||
 					(idVec[1]==idVec[2] && abs(idVec[1]+idVec[0])==2) ||
@@ -759,9 +763,9 @@ int getEffs();
 bool initialize();
 TChain* loadData(TString, bool isMC=false);
 bool finalize();
-bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w=1);
-bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, Histos *hEl_Heavy, Histos *hMu_Light, Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p);
-inline pair<LEP_TYPE, LEP_SOURCE> castSource(evt2l* t, int i, LEP_PROC p);
+bool doTP(susyEvts* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w=1);
+bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, Histos *hEl_Heavy, Histos *hMu_Light, Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p);
+inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p);
 void labelMCTChist(TH2* h);
 void calcFinalEffs();
 
@@ -915,7 +919,7 @@ int getEffs()
 	//
 	
 	// TTBAR
-	evt2l* ttEvts = new evt2l(loadData(inFileTTbar, true));  tcMC->Add((TChain*) ttEvts->fChain);
+	susyEvts* ttEvts = new susyEvts(loadData(inFileTTbar, true));  tcMC->Add((TChain*) ttEvts->tree1);
 	hMuReal[0][TTBAR] = new Histos("hMu_Real_TT");
 	hElReal[0][TTBAR] = new Histos("hEl_Real_TT");
 	hMuFake[HEAVY][TTBAR] = new Histos("hMu_Heavy_TT");
@@ -923,12 +927,12 @@ int getEffs()
 	hMuFake[LIGHT][TTBAR] = new Histos("hMu_Light_TT");
 	hElFake[LIGHT][TTBAR] = new Histos("hEl_Light_TT");
 	hElFake[CONV][TTBAR] = new Histos("hEl_Conv_TT");
-	cout << "Begin loop over ttBar: " << ttEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over ttBar: " << ttEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(ttEvts, hMuReal[0][TTBAR], hElReal[0][TTBAR], hMuFake[HEAVY][TTBAR], hElFake[HEAVY][TTBAR], hMuFake[LIGHT][TTBAR], hElFake[LIGHT][TTBAR], hElFake[CONV][TTBAR], TTBAR);
 	cout << "ttBar loop finished" << endl << endl;
 
 	// TTV
-	evt2l* ttVEvts = new evt2l(loadData(inFileTTV, true));  tcMC->Add((TChain*) ttVEvts->fChain);
+	susyEvts* ttVEvts = new susyEvts(loadData(inFileTTV, true));  tcMC->Add((TChain*) ttVEvts->tree1);
 	hMuReal[0][TTV] = new Histos("hMu_Real_TTV");
 	hElReal[0][TTV] = new Histos("hEl_Real_TTV");
 	hMuFake[HEAVY][TTV] = new Histos("hMu_Heavy_TTV");
@@ -936,12 +940,12 @@ int getEffs()
 	hMuFake[LIGHT][TTV] = new Histos("hMu_Light_TTV");
 	hElFake[LIGHT][TTV] = new Histos("hEl_Light_TTV");
 	hElFake[CONV][TTV] = new Histos("hEl_Conv_TTV");
-	cout << "Begin loop over ttV: " << ttVEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over ttV: " << ttVEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(ttVEvts, hMuReal[0][TTV], hElReal[0][TTV], hMuFake[HEAVY][TTV], hElFake[HEAVY][TTV], hMuFake[LIGHT][TTV], hElFake[LIGHT][TTV], hElFake[CONV][TTV], TTV);
 	cout << "ttV loop finished" << endl << endl;
 
 	// Low mass Zjets
-	evt2l* dyEvts = new evt2l(loadData(inFileDY, true));  tcMC->Add((TChain*) dyEvts->fChain);
+	susyEvts* dyEvts = new susyEvts(loadData(inFileDY, true));  tcMC->Add((TChain*) dyEvts->tree1);
 	hMuReal[0][DY] = new Histos("hMu_Real_DY");
 	hElReal[0][DY] = new Histos("hEl_Real_DY");
 	hMuFake[HEAVY][DY] = new Histos("hMu_Heavy_DY");
@@ -949,12 +953,12 @@ int getEffs()
 	hMuFake[LIGHT][DY] = new Histos("hMu_Light_DY");
 	hElFake[LIGHT][DY] = new Histos("hEl_Light_DY");
 	hElFake[CONV][DY] = new Histos("hEl_Conv_DY");
-	cout << "Begin loop over low mass Z: " << dyEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over low mass Z: " << dyEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(dyEvts, hMuReal[0][DY], hElReal[0][DY], hMuFake[HEAVY][DY], hElFake[HEAVY][DY], hMuFake[LIGHT][DY], hElFake[LIGHT][DY], hElFake[CONV][DY], DY);
 	cout << "Low mass Z loop finished" << endl << endl;
 
 	// // Z+jets
-	evt2l* zJetsEvts = new evt2l(loadData(inFileZjets, true));  tcMC->Add((TChain*) zJetsEvts->fChain);
+	susyEvts* zJetsEvts = new susyEvts(loadData(inFileZjets, true));  tcMC->Add((TChain*) zJetsEvts->tree1);
 	hMuReal[0][ZJETS] = new Histos("hMu_Real_Zjets");
 	hElReal[0][ZJETS] = new Histos("hEl_Real_Zjets");
 	hMuFake[HEAVY][ZJETS] = new Histos("hMu_Heavy_Zjets");
@@ -962,12 +966,12 @@ int getEffs()
 	hMuFake[LIGHT][ZJETS] = new Histos("hMu_Light_Zjets");
 	hElFake[LIGHT][ZJETS] = new Histos("hEl_Light_Zjets");
 	hElFake[CONV][ZJETS] = new Histos("hEl_Conv_Zjets");
-	cout << "Begin loop over Z+jets: " << zJetsEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over Z+jets: " << zJetsEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(zJetsEvts, hMuReal[0][ZJETS], hElReal[0][ZJETS], hMuFake[HEAVY][ZJETS], hElFake[HEAVY][ZJETS], hMuFake[LIGHT][ZJETS], hElFake[LIGHT][ZJETS], hElFake[CONV][ZJETS], ZJETS);
 	cout << "Z+jets loop finished" << endl << endl;
 
 	// // W+jets
-	evt2l* wJetsEvts = new evt2l(loadData(inFileWjets, true));  tcMC->Add((TChain*) wJetsEvts->fChain);
+	susyEvts* wJetsEvts = new susyEvts(loadData(inFileWjets, true));  tcMC->Add((TChain*) wJetsEvts->tree1);
 	hMuReal[0][WJETS] = new Histos("hMu_Real_Wjets");
 	hElReal[0][WJETS] = new Histos("hEl_Real_Wjets");
 	hMuFake[HEAVY][WJETS] = new Histos("hMu_Heavy_Wjets");
@@ -975,12 +979,12 @@ int getEffs()
 	hMuFake[LIGHT][WJETS] = new Histos("hMu_Light_Wjets");
 	hElFake[LIGHT][WJETS] = new Histos("hEl_Light_Wjets");
 	hElFake[CONV][WJETS] = new Histos("hEl_Conv_Wjets");
-	cout << "Begin loop over W+jets: " << wJetsEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over W+jets: " << wJetsEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(wJetsEvts, hMuReal[0][WJETS], hElReal[0][WJETS], hMuFake[HEAVY][WJETS], hElFake[HEAVY][WJETS], hMuFake[LIGHT][WJETS], hElFake[LIGHT][WJETS], hElFake[CONV][WJETS], WJETS);
 	cout << "W+jets loop finished" << endl << endl;
 
 	// DIBOSON
-	evt2l* vvEvts = new evt2l(loadData(inFileVV, true));  tcMC->Add((TChain*) vvEvts->fChain);
+	susyEvts* vvEvts = new susyEvts(loadData(inFileVV, true));  tcMC->Add((TChain*) vvEvts->tree1);
 	hMuReal[0][VV] = new Histos ("hMu_Real_VV");
 	hElReal[0][VV] = new Histos ("hEl_Real_VV");
 	hMuFake[HEAVY][VV] = new Histos ("hMu_Heavy_VV");
@@ -988,12 +992,12 @@ int getEffs()
 	hMuFake[LIGHT][VV] = new Histos ("hMu_Light_VV");
 	hElFake[LIGHT][VV] = new Histos ("hEl_Light_VV");
 	hElFake[CONV][VV] = new Histos ("hEl_Conv_VV");
-	cout << "Begin loop over VV: " << vvEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over VV: " << vvEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(vvEvts, hMuReal[0][VV], hElReal[0][VV], hMuFake[HEAVY][VV], hElFake[HEAVY][VV], hMuFake[LIGHT][VV], hElFake[LIGHT][VV], hElFake[CONV][VV], VV);
 	cout << "VV loop finished" << endl << endl;
 
 	// VGAMMA
-	evt2l* vgammaEvts = new evt2l(loadData(inFileVgamma, true));  tcMC->Add((TChain*) vgammaEvts->fChain);
+	susyEvts* vgammaEvts = new susyEvts(loadData(inFileVgamma, true));  tcMC->Add((TChain*) vgammaEvts->tree1);
 	hMuReal[0][VGAMMA] = new Histos("hMu_Real_Vgamma");
 	hElReal[0][VGAMMA] = new Histos("hEl_Real_Vgamma");
 	hMuFake[HEAVY][VGAMMA] = new Histos("hMu_Heavy_Vgamma");
@@ -1001,12 +1005,12 @@ int getEffs()
 	hMuFake[LIGHT][VGAMMA] = new Histos("hMu_Light_Vgamma");
 	hElFake[LIGHT][VGAMMA] = new Histos("hEl_Light_Vgamma");
 	hElFake[CONV][VGAMMA] = new Histos("hEl_Conv_Vgamma");
-	cout << "Begin loop over Vgamma: " << vvEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over Vgamma: " << vvEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
 	cout << "Vgamma loop finished" << endl << endl;
 
 	// SingleTop
-	evt2l* singleTopEvts = new evt2l(loadData(inFileSingleTop, true));  tcMC->Add((TChain*) singleTopEvts->fChain);
+	susyEvts* singleTopEvts = new susyEvts(loadData(inFileSingleTop, true));  tcMC->Add((TChain*) singleTopEvts->tree1);
 	hMuReal[0][SINGLETOP] = new Histos("hMu_Real_SingleTop");
 	hElReal[0][SINGLETOP] = new Histos("hEl_Real_SingleTop");
 	hMuFake[HEAVY][SINGLETOP] = new Histos("hMu_Heavy_SingleTop");
@@ -1014,16 +1018,16 @@ int getEffs()
 	hMuFake[LIGHT][SINGLETOP] = new Histos("hMu_Light_SingleTop");
 	hElFake[LIGHT][SINGLETOP] = new Histos("hEl_Light_SingleTop");
 	hElFake[CONV][SINGLETOP] = new Histos("hEl_Conv_SingleTop");
-	cout << "Begin loop over single top: " << vvEvts->fChain->GetEntries() << " events" << endl;
+	cout << "Begin loop over single top: " << vvEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(singleTopEvts, hMuReal[0][SINGLETOP], hElReal[0][SINGLETOP], hMuFake[HEAVY][SINGLETOP], hElFake[HEAVY][SINGLETOP], hMuFake[LIGHT][SINGLETOP], hElFake[LIGHT][SINGLETOP], hElFake[CONV][SINGLETOP], SINGLETOP);
 	cout << "Single top loop finished" << endl << endl;
 
 
 	// DATA TAG-AND-PROBE
 	if(doDataTP){
-		evt2l* dataEvts = new evt2l(loadData(inFileData));
+		susyEvts* dataEvts = new susyEvts(loadData(inFileData));
 		cout << "Executing tag-and-probe on data" << endl;
-		int nDataEntries = dataEvts->fChain->GetEntries();
+		int nDataEntries = dataEvts->tree1->GetEntries();
 		cout << "Begin loop over data:" << nDataEntries << " events" << endl;
 		for(int i=0; i<nDataEntries; i++)
 		{
@@ -1056,36 +1060,36 @@ int getEffs()
 	return 0;
 }
 
-bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w)
+bool doTP(susyEvts* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Histos* hEl_Heavy, Histos* hEl_Conv, double w)
 {
 	// const bool DEBUG = true;
 
 	if (DEBUG) cout << "Enter doTP()" << endl;
 	// if (tree->sig_trigCode==0) return false;
-	if (tree->leps_==2)
+	if (tree->leps.size()==2)
 	{			
 		// mm and ee
-		bool mumu = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==169;
-		bool elel = TMath::Abs(int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000))==121;
-		bool isOS = (tree->leps_ID[0]*tree->leps_ID[1])<0;
+		bool mumu = TMath::Abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==169;
+		bool elel = TMath::Abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==121;
+		bool isOS = (tree->leps[0].ID*tree->leps[1].ID)<0;
 
 		// "Tight" defined as signal electron
-		bool lep1isTight = (tree->leps_lFlag[0] & IS_SIGNAL);
-		bool lep2isTight = (tree->leps_lFlag[1] & IS_SIGNAL);
+		bool lep1isTight = (tree->leps[0].lFlag & IS_SIGNAL);
+		bool lep2isTight = (tree->leps[1].lFlag & IS_SIGNAL);
 
 		/** UNWEIGHTED REAL EFFICIENCIES MEASURED BY Z_ll TAG-AND-PROBE IN DATA **/
-		if(fabs(tree->l12_m - 91)<10 && isOS) // Select Z mass pair
+		if(fabs(tree->l12.m - 91)<10 && isOS) // Select Z mass pair
 		{
 			if (DEBUG) cout << "Zll\t";
 			// Tag requirement: pT >25, passes signal ("tight") cut, passes trigger, and is trigger matched
-			bool lep1isTag = (tree->leps_pt[0]>25 && lep1isTight && (TMath::Abs(tree->leps_ID[0]) & 1) && (TMath::Abs(tree->leps_ID[0]) & 2));
-			bool lep2isTag = (tree->leps_pt[1]>25 && lep2isTight && (TMath::Abs(tree->leps_ID[1]) & 1) && (TMath::Abs(tree->leps_ID[1]) & 2));
+			bool lep1isTag = (tree->leps[0].pt>25 && lep1isTight && (TMath::Abs(tree->leps[0].ID) & 1) && (TMath::Abs(tree->leps[0].ID) & 2));
+			bool lep2isTag = (tree->leps[1].pt>25 && lep2isTight && (TMath::Abs(tree->leps[1].ID) & 1) && (TMath::Abs(tree->leps[1].ID) & 2));
 
 			if (DEBUG) cout << "Lep 1: " << (lep1isTag?"*":" ") << '\t'
 							<< "Lep 2: " << (lep2isTag?"*":" ") << '\t';
 
-			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], w, lep1isTag, lep1isTight};
-			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], w, lep2isTag, lep2isTight};
+			lepInfo l1info = {tree->leps[0].pt, tree->leps[0].eta, w, lep1isTag, lep1isTight};
+			lepInfo l2info = {tree->leps[1].pt, tree->leps[1].eta, w, lep2isTag, lep2isTight};
 			if (mumu) hMu_Real->Fill(l1info, l2info);
 			else if (elel) hEl_Real->Fill(l1info, l2info);	
 			// if (DEBUG) cout << "Histograms filled" << endl;
@@ -1093,28 +1097,28 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 
 		/* UNWEIGHTED HEAVY EFFICIENCIES MEASURED BY ll TAG-AND-PROBE IN DATA */
 		/** in W/signal suppressed region **/
-		else if (tree->sig_Met<40)
+		else if (tree->sig.Met<40)
 		{
 			// To suppress W background and signal
-			// if (tree->sig_Met>40) continue; TMath::Sqrt(2*leps[0].pt*sig.Met*(1-TMath::Cos(leps[0].MET_dPhi)))<40
+			// if (tree->sig.Met>40) continue; TMath::Sqrt(2*leps[0].pt*sig.Met*(1-TMath::Cos(leps[0].MET_dPhi)))<40
 
 			if (DEBUG) cout << "Heavy lep tag-and-probe" << endl;
 			pair<double, double> mT_lep_MET;
-			mT_lep_MET.first  = TMath::Sqrt(2*tree->leps_pt[0]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[0])));
-			mT_lep_MET.second = TMath::Sqrt(2*tree->leps_pt[1]*tree->sig_Met*(1-TMath::Cos(tree->leps_MET_dPhi[1])));
+			mT_lep_MET.first  = TMath::Sqrt(2*tree->leps[0].pt*tree->sig.Met*(1-TMath::Cos(tree->leps[0].MET_dPhi)));
+			mT_lep_MET.second = TMath::Sqrt(2*tree->leps[1].pt*tree->sig.Met*(1-TMath::Cos(tree->leps[1].MET_dPhi)));
 			if(mT_lep_MET.first>40 || mT_lep_MET.second>40) return false;
 
-			bool lep1isTag = (tree->leps_pt[0]>20 && lep1isTight && TMath::Abs(int(tree->leps_ID[0]/1000))==13 && (TMath::Abs(tree->leps_ID[0]) & 1) && (TMath::Abs(tree->leps_ID[0]) & 2));
-			bool lep2isTag = (tree->leps_pt[1]>20 && lep2isTight && TMath::Abs(int(tree->leps_ID[1]/1000))==13 && (TMath::Abs(tree->leps_ID[1]) & 1) && (TMath::Abs(tree->leps_ID[1]) & 2));
+			bool lep1isTag = (tree->leps[0].pt>20 && lep1isTight && TMath::Abs(int(tree->leps[0].ID/1000))==13 && (TMath::Abs(tree->leps[0].ID) & 1) && (TMath::Abs(tree->leps[0].ID) & 2));
+			bool lep2isTag = (tree->leps[1].pt>20 && lep2isTight && TMath::Abs(int(tree->leps[1].ID/1000))==13 && (TMath::Abs(tree->leps[1].ID) & 1) && (TMath::Abs(tree->leps[1].ID) & 2));
 
 			if (DEBUG) cout << "Lep 1: " << (lep1isTag?"*":" ") << '\t'
 							<< "Lep 2: " << (lep2isTag?"*":" ") << '\t';
 
-			lepInfo l1info = {tree->leps_pt[0], tree->leps_eta[0], w, lep1isTag, lep1isTight};
-			lepInfo l2info = {tree->leps_pt[1], tree->leps_eta[1], w, lep2isTag, lep2isTight};
+			lepInfo l1info = {tree->leps[0].pt, tree->leps[0].eta, w, lep1isTag, lep1isTight};
+			lepInfo l2info = {tree->leps[1].pt, tree->leps[1].eta, w, lep2isTag, lep2isTight};
 
 			// Select mumu with mll cut, or emu
-			if (mumu && tree->l12_m>40) hMu_Heavy->Fill(l1info, l2info);
+			if (mumu && tree->l12.m>40) hMu_Heavy->Fill(l1info, l2info);
 			else hEl_Heavy->Fill(l1info, l2info);
 			if (DEBUG) cout << "Histograms filled" << endl;
 
@@ -1122,27 +1126,27 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 	}
 
 	/** UNWEIGHTED PHOTON CONVERSTION EFFICIENCIES MEASURED BY mumu-e TAG-AND-PROBE IN DATA **/ 
-	else if (true && tree->leps_==3)
+	else if (true && tree->leps.size()==3)
 	{
 		if (DEBUG) cout << "PhotonConv lep tag-and-probe" << endl;
 
 		// Select Z_mumu pair and electron 
-		if ((int(tree->leps_ID[0]/1000)*int(tree->leps_ID[1]/1000) != -169)	|| TMath::Abs(int(tree->leps_ID[2])/1000)!= 11)
+		if ((int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000) != -169)	|| TMath::Abs(int(tree->leps[2].ID)/1000)!= 11)
 			return false;
 
 		// Dimuon trigger match
-		if (!(tree->sig_trigMask & tree->sig_trigCode)) return false;
+		if (!(tree->sig.trigMask & tree->sig.trigCode)) return false;
 
 		TLorentzVector p1, p2, p3;
-		p1.SetPtEtaPhiM(tree->leps_pt[0], tree->leps_eta[0], tree->leps_phi[0], 0.105658);
-		p2.SetPtEtaPhiM(tree->leps_pt[1], tree->leps_eta[1], tree->leps_phi[1], 0.105658);
-		p3.SetPtEtaPhiM(tree->leps_pt[2], tree->leps_eta[2], tree->leps_phi[2], 0.000511);
+		p1.SetPtEtaPhiM(tree->leps[0].pt, tree->leps[0].eta, tree->leps[0].phi, 0.105658);
+		p2.SetPtEtaPhiM(tree->leps[1].pt, tree->leps[1].eta, tree->leps[1].phi, 0.105658);
+		p3.SetPtEtaPhiM(tree->leps[2].pt, tree->leps[2].eta, tree->leps[2].phi, 0.000511);
 
 		if (TMath::Abs((p1+p2+p3).M()-91)>10) return false;
 
-		bool elIsTight = (tree->leps_lFlag[2] & IS_SIGNAL);
+		bool elIsTight = (tree->leps[2].lFlag & IS_SIGNAL);
 
-		lepInfo elInfo = {tree->leps_pt[2], tree->leps_eta[2], w, false, elIsTight};
+		lepInfo elInfo = {tree->leps[2].pt, tree->leps[2].eta, w, false, elIsTight};
 		hEl_Conv->Fill(elInfo);
 		if (DEBUG) cout << "Histograms filled" << endl;
 
@@ -1152,7 +1156,7 @@ bool doTP(evt2l* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy, Hi
 	return true;
 }
 
-bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy,  Histos *hEl_Heavy, Histos *hMu_Light,  Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p)
+bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy,  Histos *hEl_Heavy, Histos *hMu_Light,  Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p)
 {
 	bool DEBUG=false;
 	using namespace MCTC;
@@ -1164,19 +1168,20 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 	if(tree && DEBUG) cout << "tree exists" << endl;
 	if(!tree) return false;
 
-	int nEntries = tree->fChain->GetEntries();
+	int nEntries = tree->tree1->GetEntries();
 	if (DEBUG) cout << "Begin loop MC" << endl;
 	for(int i=0; i<nEntries; i++)
 	{
 		loadbar(i+1, nEntries);
 		tree->GetEntry(i); 
-		double w = tree->evt_weight*tree->evt_pwt*tree->fChain->GetTree()->GetWeight()*tree->evt_ElSF*tree->evt_MuSF;
+		double w = ((TChain*)(tree->tree1))->GetTree()->GetWeight();
+		w *= tree->evt.weight*tree->evt.pwt*tree->evt.ElSF*tree->evt.MuSF;
 
 		// Measure unweighted efficiencies
-		if(passRatesCR(tree)){ for(int j(0); j<tree->leps_; j++)
+		if(passRatesCR(tree)){ for(uint j(0); j<tree->leps.size(); j++)
 		{
-			if(tree->leps_pt[j]<20) continue;
-			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
+			if(tree->leps[j].pt<20) continue;
+			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
 
 			pair<LEP_TYPE, LEP_SOURCE> res;
 			try{
@@ -1188,7 +1193,7 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			LEP_TYPE  recoLepType= res.first;
 			LEP_SOURCE source = res.second;
 
-			lepInfo l = {tree->leps_pt[j], tree->leps_eta[j], w, true, lepIsTight};
+			lepInfo l = {tree->leps[j].pt, tree->leps[j].eta, w, true, lepIsTight};
 
 			if (recoLepType==ELEC){ switch (source)
 			{
@@ -1211,14 +1216,14 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 		}}
 
 		// Measure composition fractions
-		if (passLepCompCR(tree)){ for(int j(0); j<tree->leps_; j++)
+		if (passLepCompCR(tree)){ for(uint j(0); j<tree->leps.size(); j++)
 		{
-			if(tree->leps_pt[j]<20) continue;
+			if(tree->leps[j].pt<20) continue;
 
-			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
+			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
 
-			ParticleType   type = static_cast<ParticleType>(tree->leps_truthType[i]);
-			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps_truthOrig[i]);
+			ParticleType   type = static_cast<ParticleType>(tree->leps[j].truthType);
+			ParticleOrigin orig = static_cast<ParticleOrigin>(tree->leps[j].truthOrig);
 
 			pair<LEP_TYPE, LEP_SOURCE> res;
 			try{
@@ -1232,14 +1237,14 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 
 			if (recoLepType==ELEC)
 			{
-				lp_El->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				lp_El->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
 				hEl_MCTC->Fill(type, orig);
 				if (lepIsTight) hEl_MCTC_Tight->Fill(type,orig);
 				else hEl_MCTC_LNT->Fill(type,orig);
 			}
 			else if (recoLepType==MUON)
 			{
-				lp_Mu->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				lp_Mu->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
 				hMu_MCTC->Fill(type, orig);
 				if(lepIsTight) hMu_MCTC_Tight->Fill(type,orig);
 				else hMu_MCTC_LNT->Fill(type,orig);
@@ -1247,11 +1252,11 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 			if (DEBUG) cout << "# Filled lepton composition histograms for lepton " << j << endl;
 		}}
 
-		if (study==SS && passLepCompCR(tree) && (bool(tree->leps_lFlag[0] & IS_SIGNAL) != bool(tree->leps_lFlag[1] & IS_SIGNAL))) {
-		for(int j(0); j<tree->leps_; j++)
+		if (study==SS && passLepCompCR(tree) && (bool(tree->leps[0].lFlag & IS_SIGNAL) != bool(tree->leps[1].lFlag & IS_SIGNAL))) {
+		for(uint j(0); j<tree->leps.size(); j++)
 		{
 
-			bool lepIsTight = tree->leps_lFlag[j] & IS_SIGNAL;
+			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
 			pair<LEP_TYPE, LEP_SOURCE> res;
 			try{
 				res = castSource(tree, j, p);
@@ -1264,13 +1269,13 @@ bool loopMC(evt2l* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy, 
 
 			if (recoLepType==ELEC)
 			{
-				if (lepIsTight) lp_El_Tight->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
-				else lp_El_LNT->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				if (lepIsTight) lp_El_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+				else lp_El_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
 			}
 			else if (recoLepType==MUON)
 			{
-				if (lepIsTight) lp_Mu_Tight->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
-				else lp_Mu_LNT->Fill(source, p, tree->leps_pt[j], tree->leps_eta[j], w);
+				if (lepIsTight) lp_Mu_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+				else lp_Mu_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
 			}
 		}}
 
@@ -1378,21 +1383,21 @@ void calcFinalEffs()
 
 // // */
 
-inline pair<LEP_TYPE, LEP_SOURCE> castSource(evt2l* t, int i, LEP_PROC p)
+inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 {
 	/* cf https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/FakeObjectBgEstimation */
 	using namespace MCTC;
 
 	LEP_TYPE l; 
-	switch(abs(int(t->leps_ID[i]/1000)))
+	switch(abs(int(t->leps[i].ID/1000)))
 	{
 		case 11: l = ELEC; break;
 		case 13: l = MUON; break;
 		default: throw TString("Neither electron nor muon!");
 	}
 
-	ParticleType   type = static_cast<ParticleType>(t->leps_truthType[i]);
-	ParticleOrigin orig = static_cast<ParticleOrigin>(t->leps_truthOrig[i]);
+	ParticleType   type = static_cast<ParticleType>(t->leps[i].truthType);
+	ParticleOrigin orig = static_cast<ParticleOrigin>(t->leps[i].truthOrig);
 
 	/* Charge flip first
 		REAL: (IsoElectron || (PhotonCov && firstEgMother== ELEC)) && no charge flip
@@ -1401,29 +1406,29 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(evt2l* t, int i, LEP_PROC p)
 	if (l==ELEC)
 	{
 		// Standard classification
-		if (type==IsoElectron || (orig==PhotonConv && abs(t->leps_firstEgMotherPdgId[i])==11) ){
-			if(t->leps_ID[i]*t->leps_firstEgMotherPdgId[i] <0) return make_pair(ELEC,REAL);
+		if (type==IsoElectron || (orig==PhotonConv && abs(t->leps[i].firstEgMotherPdgId)==11) ){
+			if(t->leps[i].ID*t->leps[i].firstEgMotherPdgId <0) return make_pair(ELEC,REAL);
 			else throw TString("Charge flipped electron");
 		}
 
 		// Failed track matches from Z
 		if(true && p==ZJETS) // Use for dR Powheg Zee samples only! Set to false otherwise.
 		{
-			int truthI = t->leps_truthI[i];
+			int truthI = t->leps[i].truthI;
 			int motherI = -1;
 			while(truthI>=0)
 			{
-				motherI = t->truths_motherI[truthI];
+				motherI = t->truths[truthI].motherI;
 				if (motherI < 0) break;
-				else if (t->truths_pdgId[motherI]==23)
+				else if (t->truths[motherI].pdgId==23)
 				{
-					if(abs(t->truths_pdgId[truthI])==11)
+					if(abs(t->truths[truthI].pdgId)==11)
 					{
-						if(t->leps_ID[i]*t->truths_pdgId[i] <0) return make_pair(ELEC,REAL);
+						if(t->leps[i].ID*t->truths[i].pdgId <0) return make_pair(ELEC,REAL);
 						else throw TString("Charge flipped electron from Z");
 					}
 				}
-				else if (t->truths_pdgId[motherI]!=22 || abs(t->truths_pdgId[motherI])!=11) break;
+				else if (t->truths[motherI].pdgId!=22 || abs(t->truths[motherI].pdgId)!=11) break;
 				truthI = motherI;
 			}
 		}
@@ -1505,7 +1510,7 @@ TChain* loadData(TString fileList, bool isMC){
 	   	allFiles.push_back(line);
 	}
 
- 	if (true && isMC) // Weight MC trees
+ 	if (!alreadyWeightedMC && isMC) // Weight MC trees
  	{
  		cout << "Weighting MC trees from " << fileList << endl;
  		for(auto it=allFiles.begin(); it!=allFiles.end(); )
