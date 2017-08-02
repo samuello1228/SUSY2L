@@ -3878,7 +3878,7 @@ void analysis1()
                                     
                                     if((Var[VarIndex].VarName == "dEta" ||
                                         Var[VarIndex].VarName == "mlj" ) &&
-                                        bin1!=0) skip=true;
+                                        bin1!=1) skip = true;
                                     
                                     if(!skip)
                                     {
@@ -3907,6 +3907,7 @@ void analysis1()
                                                    BGGroup[j].info->GroupName != "Vgamma"   &&
                                                    BGGroup[j].info->GroupName != "Zjets"   )
                                                 {
+                                                    //cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
                                                     skip = true;
                                                 }
                                             }
