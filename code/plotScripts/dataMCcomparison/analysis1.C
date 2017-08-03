@@ -3853,6 +3853,8 @@ void analysis1()
                             double nBGRecord1 = -1;
                             double nSigRecord1 = -1;
                             double significanceRecord1 = -999;
+                            bool isPrint = false;
+                            //isPrint = (Var[VarIndex].VarName == "dEta");
                             
                             int bin1 = 1;
                             while(true)
@@ -3880,6 +3882,8 @@ void analysis1()
                                         Var[VarIndex].VarName == "mlj" ) &&
                                         bin1!=1) skip = true;
                                     
+                                    if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
+                                    
                                     if(!skip)
                                     {
                                         for(unsigned int j=0;j<BGGroup.size();j++)
@@ -3890,13 +3894,14 @@ void analysis1()
                                                 double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
                                                 if(nBGRaw<=10)
                                                 {
-                                                    //cout<<"VV or ttV do not have 10 raw events."<<endl;
+                                                    if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
                                                     skip = true;
                                                 }
                                             }
                                             
                                             double Error;
                                             double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
+                                            if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
                                             if(n>0)
                                             {
                                                 nBG += n;
@@ -3907,12 +3912,14 @@ void analysis1()
                                                    BGGroup[j].info->GroupName != "Vgamma"   &&
                                                    BGGroup[j].info->GroupName != "Zjets"   )
                                                 {
-                                                    //cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
+                                                    if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
                                                     skip = true;
                                                 }
                                             }
                                             nBGError2 += Error * Error;
                                         }
+                                        if(isPrint && skip) cout<<endl;
+                                        if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
                                     }
                                     
                                     if(!skip)
@@ -3923,17 +3930,22 @@ void analysis1()
                                         if(nSig1 <=1) skip = true;
                                         else if(nSig1Error == 0) skip = true;
                                         else if(nSig1/nSig1Error<=2) skip = true;
+                                        
+                                        if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
                                     }
                                     
                                     if(!skip)
                                     {
                                         //expected number of events for signal
                                         nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
-                                        //cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<", nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<", nSig: "<<nSig<<", nSigError: "<<nSigError;
+                                        
                                         
                                         if(nSig <= 1) skip = true;
                                         else if(nSigError == 0) skip = true;
                                         else if(nSig/nSigError<=2) skip = true;
+                                        
+                                        if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
+                                        if(isPrint && !skip) cout<<"nSig: "<<nSig<<", nSigError: "<<nSigError<<endl;
                                     }
                                     
                                     //Significance
@@ -3941,7 +3953,7 @@ void analysis1()
                                     if(!skip)
                                     {
                                         significanceTemp = GetSignificance(nSig,nBG,nBGError2);
-                                        //cout<<", significance: "<<significanceTemp<<endl;
+                                        if(isPrint) cout<<"Significance: "<<significanceTemp;
                                         
                                         if(significanceTemp > significanceRecord1)
                                         {
@@ -3950,10 +3962,13 @@ void analysis1()
                                             nBGRecord1 = nBG;
                                             nSigRecord1 = nSig;
                                             significanceRecord1 = significanceTemp;
-                                            //cout<<", accepted";
+                                            if(isPrint) cout<<", accepted."<<endl<<endl;
+                                        }
+                                        else
+                                        {
+                                            if(isPrint) cout<<endl<<endl;
                                         }
                                     }
-                                    //cout<<endl;
                                     
                                     if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
                                     {
@@ -4363,8 +4378,15 @@ void analysis1()
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                             BGGroup[j].info->unweighted += bgCount;
                             
-                            //if(BGGroup[j].info->GroupName == "VV") cout<<k<<" "<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
-                            //if(BGGroup[j].info->GroupName == "VV") tree2BGMC[j][k]->Scan("weight",Cut.Data());
+                            /*
+                            if(BGGroup[j].info->GroupName == "Zjets" && bgCount>0)
+                            {
+                                cout<<BGMCSampleID[BGMCGroupData[0].lower +k]<<endl;
+                                cout<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
+                                tree2BGMC[j][k]->Scan("weight",Cut.Data());
+                            }
+                            */
+                            
                             //normalization for BG
                             hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
                             
