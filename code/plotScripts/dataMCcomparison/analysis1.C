@@ -3422,7 +3422,7 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=7;RegionGroupIndex<=7;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -3660,8 +3660,8 @@ void analysis1()
                 //for(unsigned int SigIndex=0;SigIndex<RegionInfo[RegionIndex].OptimizingCut.size();SigIndex++)
                 {
                     unsigned int VarIndexRecord2 = 0;
-                    int lowerCutRecord2 = 0;
-                    int upperCutRecord2 = 0;
+                    double lowerCutRecord2 = 0;
+                    double upperCutRecord2 = 0;
                     double nBGRecord2 = 0;
                     double nSigRecord2 = 0;
                     double significanceRecord2 = -999;
