@@ -1,9 +1,10 @@
 #!/bin/bash
-tag=v10.5
-dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
+tag=v11.0
+dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/Wh_all_merged_PRW.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 #SUSYconf=SUSYTools/SUSYTools_Default.conf
-SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
+# SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
+SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update_Loose.conf
 
 #For background MC
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
@@ -32,6 +33,10 @@ k=${tag}.MCBG
 #k=${tag}.MCSig
 
 ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
+
+
+# file="mc15_13TeV.*.MGPy8EG_A14N23LO_C1N2_Wh_hall_*_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949"
+# ../multiLepSearch/util/run_ss_selection.py --driver grid --inputDS ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.392847.MGPy8EG_A14N23LO_C1N2_Slep_500_450_0p95_2L5.merge.DAOD_SUSY2.e5668_a766_a821_r7676_p2949/DAOD_SUSY2.10662422._000002.pool.root.1
 
