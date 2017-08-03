@@ -413,7 +413,7 @@ void analysis1()
     cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
     
     //For Signal MC
-    struct SigInfo
+    struct PlotSigInfo
     {
         double MassDiff;
         unsigned int ID;
@@ -426,9 +426,9 @@ void analysis1()
         double significance;
         double scale;
     };
-    std::vector<SigInfo> SigMassSplitting;
+    std::vector<PlotSigInfo> SigMassSplitting;
     {
-        SigInfo element;
+        PlotSigInfo element;
         
         /*
         element.MassDiff = 175;   element.ID = 0;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
@@ -441,6 +441,20 @@ void analysis1()
         element.MassDiff = 450;   element.ID = 73; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         
     }
+    
+    struct SigInfo
+    {
+        TString SampleID;
+        double XS;
+        double Mass1;
+        double Mass2;
+        int unweighted;
+        double weighted;
+        double error;
+        double significance;
+    };
+    
+    std::vector<SigInfo> SigSampleInfo;
     
     std::vector<TString> SigSampleID;
     std::vector<double> SigXS; //cross section in pb
