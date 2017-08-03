@@ -438,7 +438,7 @@ void analysis1()
         
         element.MassDiff = 150;   element.ID = 2;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 175;   element.ID = 3;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 450;   element.ID = 73; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        element.MassDiff = 450;   element.ID = 75; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         
     }
     
