@@ -1054,9 +1054,8 @@ int getEffs()
 	}
 
 	if (measureSF && measureLepComp && measureUnweightedRates) calcFinalEffs();
-	// */
-	finalize();
 
+	finalize();
 	return 0;
 }
 
@@ -1158,7 +1157,7 @@ bool doTP(susyEvts* tree, Histos* hMu_Real, Histos* hEl_Real, Histos* hMu_Heavy,
 
 bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heavy,  Histos *hEl_Heavy, Histos *hMu_Light,  Histos *hEl_Light, Histos *hEl_Conv, LEP_PROC p)
 {
-	bool DEBUG=false;
+	// bool DEBUG=true;
 	using namespace MCTC;
 
 	// if(DEBUG){
@@ -1173,6 +1172,7 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 	for(int i=0; i<nEntries; i++)
 	{
 		loadbar(i+1, nEntries);
+		if(DEBUG) cout << "Entry " << i << " ===================== " << endl;
 		tree->GetEntry(i); 
 		double w = ((TChain*)(tree->tree1))->GetTree()->GetWeight();
 		w *= tree->evt.weight*tree->evt.pwt*tree->evt.ElSF*tree->evt.MuSF;
@@ -1386,7 +1386,10 @@ void calcFinalEffs()
 inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 {
 	/* cf https://twiki.cern.ch/twiki/bin/viewauth/AtlasProtected/FakeObjectBgEstimation */
+	// bool DEBUG=true;
 	using namespace MCTC;
+
+	if (DEBUG) cout << "Cast source for lepton " << i << endl;
 
 	LEP_TYPE l; 
 	switch(abs(int(t->leps[i].ID/1000)))
@@ -1414,16 +1417,21 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 		// Failed track matches from Z
 		if(true && p==ZJETS) // Use for dR Powheg Zee samples only! Set to false otherwise.
 		{
+			if (DEBUG) cout << "Track match failed. Going into this spare section." << endl;
 			int truthI = t->leps[i].truthI;
 			int motherI = -1;
+			if (DEBUG && truthI>=0) cout << "Truth particle found:" << truthI << endl;
 			while(truthI>=0)
 			{
 				motherI = t->truths[truthI].motherI;
-				if (motherI < 0) break;
+				if (DEBUG) cout << "Mother: " << motherI << endl;
+				if (motherI < 0 || motherI > 100) break;
 				else if (t->truths[motherI].pdgId==23)
 				{
+					if (DEBUG) cout << "Z mother found." << endl;
 					if(abs(t->truths[truthI].pdgId)==11)
 					{
+						if (DEBUG) cout << "Original electron from Z found" << endl;
 						if(t->leps[i].ID*t->truths[i].pdgId <0) return make_pair(ELEC,REAL);
 						else throw TString("Charge flipped electron from Z");
 					}
@@ -1433,6 +1441,8 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 			}
 		}
 	}
+
+	if (DEBUG) cout << "Other cases." << endl;
 
 	if (l==MUON && type==IsoMuon) return make_pair(MUON,REAL);
 	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
@@ -1499,7 +1509,7 @@ bool finalize()
 
 TChain* loadData(TString fileList, bool isMC){
 	//return a TChain linked to the data files
-	bool DEBUG = true;
+	// bool DEBUG = true;
 	TChain* tc = new TChain("evt2l");
 
 	ifstream inF(fileList.Data());

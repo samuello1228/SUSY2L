@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Aug  1 06:18:16 2017 by ROOT version 6.04/16
+// Tue Aug  1 11:53:50 2017 by ROOT version 6.04/16
 // from TTree evt2l/a angles tree
-// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root
+// found on file: /eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.MCTC.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11788604._000001.myOutput.root
 //////////////////////////////////////////////////////////
 
 #ifndef evt2l_h
@@ -21,8 +21,8 @@ public :
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
    static const Int_t kMaxleps = 3;
-   static const Int_t kMaxjets = 8;
-   static const Int_t kMaxtruths = 42;
+   static const Int_t kMaxjets = 11;
+   static const Int_t kMaxtruths = 231;
 
    // Declaration of leaf types
    ULong64_t       evt_run;
@@ -148,9 +148,9 @@ evt2l::evt2l(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.MCTC.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11788604._000001.myOutput.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.dR.mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee_myOutput.root/user.ggallard.11789208._000001.myOutput.root");
+         f = new TFile("/eos/atlas/user/g/ggallard/fakes/user.ggallard.v11.5.MCTC.mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad_myOutput.root/user.ggallard.11788604._000001.myOutput.root");
       }
       f->GetObject("evt2l",tree);
 
