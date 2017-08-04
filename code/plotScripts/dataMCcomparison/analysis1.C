@@ -455,6 +455,7 @@ void analysis1()
     {
         TString SampleID;
         double XS;
+        double nwAOD;
         double Mass1;
         double Mass2;
         int unweighted;
@@ -563,7 +564,6 @@ void analysis1()
     }
     
     //Get number of events in AOD
-    std::vector<double> SignAOD;
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
@@ -575,9 +575,8 @@ void analysis1()
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
         TH1F *h1 = (TH1F*) file->Get("hist");
-        double nAOD = h1->GetBinContent(2);
-        cout<<nAOD<<endl;
-        SignAOD.push_back(nAOD);
+        SigSampleInfo[i].nwAOD = h1->GetBinContent(2);
+        cout<<SigSampleInfo[i].nwAOD<<endl;
         
         delete file;
     }
@@ -3880,7 +3879,7 @@ void analysis1()
                                     Cut += ")";
                                     
                                     tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SignAOD[SigMassSplitting[j].ID] *sumDataL);
+                                    h2Sig[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
                                 }
                             }
                             
@@ -4546,7 +4545,7 @@ void analysis1()
                         if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff)
                         {
                             h2SigSum[i]->Add(h2Sig[j]);
-                            AOD += SignAOD[j];
+                            AOD += SigSampleInfo[j].nwAOD;
                         }
                     }
                     
@@ -4556,7 +4555,7 @@ void analysis1()
                     
                     ///*
                     h2SigSum[i]->Add(h2Sig[SigMassSplitting[i].ID]);
-                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/SignAOD[SigMassSplitting[i].ID]);
+                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/SigSampleInfo[SigMassSplitting[i].ID].nwAOD);
                     //*/
                 }
                 
@@ -4789,7 +4788,7 @@ void analysis1()
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
-                            h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SignAOD[j]);
+                            h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SigSampleInfo[j].nwAOD);
                             double error;
                             double expN = h2Sig[j]->IntegralAndError(0,-1,error);
                             
@@ -5555,7 +5554,7 @@ void analysis1()
                             h2SigSum[i]->Add(hTemp);
                             delete hTemp;
                             
-                            AOD += SignAOD[j];
+                            AOD += SigSampleInfo[j].nwAOD;
                         }
                         
                         //normalization for h2SigSum
