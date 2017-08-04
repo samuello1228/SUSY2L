@@ -375,12 +375,19 @@ void analysis1()
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
-    std::vector<TString> BGMCSampleID;
+    struct MCBGInfo
+    {
+        TString SampleID;
+        double XS;
+    };
+    
+    std::vector<MCBGInfo> BGMCSampleInfo;
     std::vector<double> BGMCXS; //cross section in pb
-    BGMCSampleID.reserve(20);
     BGMCXS.reserve(20);
     
     {
+        MCBGInfo element;
+        
         //read BGSample.txt
         ifstream fin;
         fin.open("BGSample.txt");
@@ -396,7 +403,7 @@ void analysis1()
             fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            BGMCSampleID.push_back(SampleIDTemp);
+            element.SampleID = SampleIDTemp;
             
             double BGMCXSTemp;
             double BGMCXSTemp2;
@@ -408,10 +415,11 @@ void analysis1()
             BGMCXS.push_back(BGMCXSTemp2);
             
             fin>>BGMCXSTemp;
+            BGMCSampleInfo.push_back(element);
         }
         fin.close();
     }
-    cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
+    cout<<"Total number of BG files: "<<BGMCSampleInfo.size()<<endl;
     
     //For Signal MC
     struct PlotSigInfo
@@ -984,7 +992,7 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
                                 BGMCGroupXSElement.push_back(BGMCXS[m]);
                             }
                             
@@ -1245,7 +1253,7 @@ void analysis1()
                         for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
                             TChain* tree1 = nullptr;
-                            initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
+                            initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                             
                             TString NameTemp = "tree_rw_";
                             NameTemp += TString::Itoa(k,10);
@@ -1332,7 +1340,7 @@ void analysis1()
                     for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                     {
                         TChain* tree1 = nullptr;
-                        initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
+                        initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                         
                         TString NameTemp = "tree_cfw_";
                         NameTemp += TString::Itoa(k,10);
@@ -3435,7 +3443,7 @@ void analysis1()
         for(unsigned int i = BGMCGroupData[VVGroupIndex].lower;i <= BGMCGroupData[VVGroupIndex].upper;i++)
         {
             SampleData element;
-            element.SampleName = BGMCSampleID[i].Data();
+            element.SampleName = BGMCSampleInfo[i].SampleID.Data();
             element.SampleName.Remove(0,18);
             element.index = i;
             BGVVData.push_back(element);
@@ -3560,7 +3568,7 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
                                 BGMCGroupXSElement.push_back(BGMCXS[m]);
                             }
                             
@@ -4417,7 +4425,7 @@ void analysis1()
                             /*
                             if(BGGroup[j].info->GroupName == "Zjets" && bgCount>0)
                             {
-                                cout<<BGMCSampleID[BGMCGroupData[0].lower +k]<<endl;
+                                cout<<BGMCSampleInfo[BGMCGroupData[0].lower +k].SampleID.Data()<<endl;
                                 cout<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
                                 tree2BGMC[j][k]->Scan("weight",Cut.Data());
                             }
