@@ -1,0 +1,2 @@
+/afs/cern.ch/user/g/ggallard/work/NTuples/mc15_13TeV/DAOD_SUSY2.09951258._000002.pool.root.1
+/afs/cern.ch/user/g/ggallard/work/NTuples/mc15_13TeV/DAOD_SUSY2.09951258._000001.pool.root.1

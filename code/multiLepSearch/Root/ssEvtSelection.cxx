@@ -51,6 +51,10 @@ typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
 //static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
 // static SG::AuxElement::Accessor< float > acc_truthProb("truthMatchProbability"); // only ID track
 static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
+typedef ElementLink< xAOD::ElectronContainer > RecoElLink;
+static SG::AuxElement::Accessor< RecoElLink > acc_recoElLink("recoElectronLink");
+typedef ElementLink< xAOD::MuonContainer > RecoMuLink;
+static SG::AuxElement::Accessor< RecoMuLink > acc_recoMuLink("recoMuonLink");
 //static SG::AuxElement::Accessor<float> dec_z0sinTheta("z0sinTheta");
 //static SG::AuxElement::Accessor<float> dec_d0sig("d0sig");
 
@@ -637,34 +641,31 @@ EL::StatusCode ssEvtSelection :: execute ()
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
-    bool cutflow = false;
-    //cutflow = true;
-
     vector< IParticle* > dilepPair(2, nullptr);
     if(study == "ss"){
       bool keep = false;
 
       //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
       if (sig_Ls.size() == 2) {
-	dilepPair[0] = sig_Ls[0];
-	dilepPair[1] = sig_Ls[1];
+      	dilepPair[0] = sig_Ls[0];
+      	dilepPair[1] = sig_Ls[1];
         keep = true;
         m_susyEvt->evt.flag = 1;
       } 
 
       //this catches 1SigLep1FakeLepSS -.-
       if (sig_Ls.size() == 1) {
-	int sigLepSign = 0;
+      	int sigLepSign = 0;
         xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sig_Ls[0]);
         if(mu) sigLepSign = mu->charge();
         else{
           xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sig_Ls[0]);
           if(el) sigLepSign = el->charge();
         }
-	dilepPair[0] = sig_Ls[0];
+      	dilepPair[0] = sig_Ls[0];
 
-	for (auto p : sel_Ls){
-	  int baseLepSign = -999;
+      	for (auto p : sel_Ls){
+      	  int baseLepSign = -999;
           xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
           if(mu) baseLepSign = mu->charge();
           else{
@@ -672,18 +673,18 @@ EL::StatusCode ssEvtSelection :: execute ()
             if(el) baseLepSign = el->charge();
           }
           if (baseLepSign==sigLepSign){
-	    dilepPair[1] = p;
+      	    dilepPair[1] = p;
             keep = true;
             m_susyEvt->evt.flag = 2;
-	    break;
-	  }
-	}
+      	    break;
+      	  }
+      	}
       }
 
       //this catches 2FakeLepSS
       if (sig_Ls.size() == 0) {
         if (sel_Ls.size() >=2) { 
-	  int baseLep0Sign = 0;
+          int baseLep0Sign = 0;
           xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
           if(mu) baseLep0Sign = mu->charge();
           else{
@@ -691,8 +692,8 @@ EL::StatusCode ssEvtSelection :: execute ()
            if(el) baseLep0Sign = el->charge();
           }
 
-	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
-	    int baseLep1Sign = -999;
+      	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
+      	    int baseLep1Sign = -999;
             xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
             if(mu) baseLep1Sign = mu->charge();
             else{
@@ -700,28 +701,75 @@ EL::StatusCode ssEvtSelection :: execute ()
               if(el) baseLep1Sign = el->charge();
             }
             if (baseLep0Sign==baseLep1Sign){
-	      dilepPair[0] = sel_Ls[0];
-	      dilepPair[1] = sel_Ls[1];
-  	      keep = true;
+      	      dilepPair[0] = sel_Ls[0];
+      	      dilepPair[1] = sel_Ls[1];
+      	      keep = true;
               m_susyEvt->evt.flag = 3;
-	      break;
-	    }
-	  }
+      	      break;
+      	    }
+      	  }
 
-	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
-	    //no one has same sign as the first lep
-	    //=> everyone except the first lep is Same sign among themselves
-	    dilepPair[0] = sel_Ls[1];
-	    dilepPair[1] = sel_Ls[2];
-  	    keep = true;
+      	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
+      	    //no one has same sign as the first lep
+      	    //=> everyone except the first lep is Same sign among themselves
+      	    dilepPair[0] = sel_Ls[1];
+      	    dilepPair[1] = sel_Ls[2];
+      	    keep = true;
             m_susyEvt->evt.flag = 3;
-	  }
-	}
+      	  }
+      	}
       } 
 
       if (!cutflow && !keep) {continue;}
     }
     if(study == "3l" && totLs != 3) continue;
+
+    if(study=="fakes")
+    {
+
+      /* Keep only the events which match either of the conditions listed here.
+       * - Exactly two leptons
+       * - Exactly three leptons, where we have two signal muons and one electrons (sig or base)
+       *
+       * Save the cut information in the evt.flag variable
+       * First two bits store number of leptons, third and fourth bit saves number of signal
+       * e.g. for three leptons with two signal, evt.flag = 1011
+       */
+
+      if (totLs==2 && sig_Ls.size()==2) // Exactly two leptons, both signal
+      {
+        dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sig_Ls[1];
+      }
+      else if (totLs==2 && sig_Ls.size()==1) // Exactly two leptons, 1 signal, 1 baseline
+      {
+        dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sel_Ls[0];
+      }
+      else if (totLs==2 && sig_Ls.size()==0) // Exactly two leptons, both baseline
+      {
+        dilepPair[0] = sel_Ls[0];
+        dilepPair[1] = sel_Ls[1];
+      }
+      else if (totLs==3 && sig_Ls.size()>=2) // Exactly three leptons, at least two signal
+      {
+        dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sig_Ls[1];
+      }
+      else if (totLs==3 && sig_Ls.size()==1) // Exactly three leptons, one signal
+      {
+        dilepPair[0] = sig_Ls[0];
+        dilepPair[1] = sel_Ls[0];
+      }
+      else if (totLs==3 && sig_Ls.size()==0) // Exactly three leptons, no signal
+      {
+        dilepPair[0] = sel_Ls[0];
+        dilepPair[1] = sel_Ls[1];
+      }
+      else if (!cutflow) continue;
+
+      m_susyEvt->evt.flag = totLs + sig_Ls.size()*4; 
+    }
 
     sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -738,12 +786,12 @@ EL::StatusCode ssEvtSelection :: execute ()
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
       for (auto p : sel_Ls){
         if (p==dilepPair[0] || p==dilepPair[1])continue;
-	dilepPair.push_back(p);
+      	dilepPair.push_back(p);
       }
       sel_Ls = dilepPair;
     }
 
-    if(study == "ss")
+    if(study == "ss" || study == "fakes")
     {
       if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
       else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
@@ -799,37 +847,37 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.qFwt = 0.0;
     m_susyEvt->evt.qFwt_sys_1up = 0.0;
     m_susyEvt->evt.qFwt_sys_1dn = 0.0;
-    if ((sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)){
-        //ugly code to get lep0 type and charge :(
-        xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
-        int sigLepSign0 = 0;
-        tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
-        if(tmpMu0) sigLepSign0 = tmpMu0->charge();
-        else{
-          tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
-          if(tmpE0) sigLepSign0 = tmpE0->charge();
-        }
-        //get lep1 type and charge
-        xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
-        int sigLepSign1 = 0;
-        tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
-        if(tmpMu1) sigLepSign1 = tmpMu1->charge();
-        else{
-          tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
-          if(tmpE1) sigLepSign1 = tmpE1->charge();
-        }
-        if (sigLepSign0!=sigLepSign1){
-          m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
-          m_susyEvt->evt.qFwt_sys_1up = 0; // mChargeFlipBkgTool->GetWeight( sel_Ls , 1,-1);
-          m_susyEvt->evt.qFwt_sys_1dn = 0; // mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,-1);
-          auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
-          if(tmpPt.size()==2){
-            if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
-            if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
-            //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
-            //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
-          }
-        }
+    if (((study!="fakes")&&(sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)) || (study=="fakes" && m_susyEvt->evt.flag==10)){
+      //ugly code to get lep0 type and charge :(
+      xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
+      int sigLepSign0 = 0;
+      tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
+      if(tmpMu0) sigLepSign0 = tmpMu0->charge();
+      else{
+        tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
+        if(tmpE0) sigLepSign0 = tmpE0->charge();
+      }
+      //get lep1 type and charge
+      xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
+      int sigLepSign1 = 0;
+      tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
+      if(tmpMu1) sigLepSign1 = tmpMu1->charge();
+      else{
+        tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
+        if(tmpE1) sigLepSign1 = tmpE1->charge();
+      }
+      if (sigLepSign0!=sigLepSign1){
+        m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
+        m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
+        m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
+        // auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
+        // if(tmpPt.size()==2){
+        //   if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
+        //   if (tmpE1) tmpE1->setP4( tmpPt[1]*1000., tmpE1->eta(), tmpE1->phi(), tmpE1->m());
+          //ATH_MSG_ERROR("E0" << tmpPt[0] << " " << sel_Ls[0]->pt());
+          //ATH_MSG_ERROR("E1" << tmpPt[1] << " " << sel_Ls[1]->pt());
+        // }
+      }
     }
     //fake lep weight
     m_susyEvt->evt.fLwt = 0.0;
@@ -837,7 +885,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
     m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
     m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
-    if ((sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
+    if (study!="fakes" && (sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
       m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
       m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
@@ -903,6 +951,25 @@ EL::StatusCode ssEvtSelection :: execute ()
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
     if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
 
+    // Save Z decay chain
+    // Info("execute()", "Save Z decay chain");
+    if(CF_isMC && mcTruthMatch.back()=='Z')
+    {
+      const xAOD::TruthParticle* truthZ=0;
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!particle->isZ()) continue;
+        truthZ = particle;
+        while(truthZ->parent() && truthZ->parent()->isZ()){truthZ = truthZ->parent();}
+        break;
+      }
+
+      addTruthPar(truthZ, m_susyEvt->truths, 1);
+    }
+    // Info("execute()", "Z decay saved");
+
+    // Info("execute()", "Before fillLepton");
     if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
     else m_susyEvt->sig.mjj = -1;
 
@@ -933,7 +1000,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
 
     /// save leptons
-    m_susyEvt->leps.resize(sel_Ls.size());
+    m_susyEvt->leps.resize(sel_Ls.size()); 
+    // Info("execute()", "There are %d leptons in this event", sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       auto& l = m_susyEvt->leps[i];
       fillLepton(sel_Ls[i], l, i);
@@ -948,6 +1016,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       l.jet_dRm = l.jet0_dR;
       for(size_t j=1; j<jet_Ls.size(); j++){auto dRn=jet_Ls[j]->p4().DeltaR(sel_Ls[i]->p4()); if(dRn<l.jet_dRm) l.jet_dRm = dRn;}
     }
+    // Info("execute()", "After fillLepton");
 
     ///MetRel correction factor (See Eq6, 2LSS note: https://cds.cern.ch/record/1747285/files/ATL-COM-PHYS-2014-954.pdf)
     float minMetdPhi = FLT_MAX; //Met's dPhi from nearest obj (e/mu/jet)
@@ -1008,33 +1077,33 @@ EL::StatusCode ssEvtSelection :: execute ()
     for (unsigned int jSyst=0; jSyst<m_systInfoList.size();jSyst++){
       
       if (jSyst>0){
-          if (iSyst!=0) break; //no need to treat weight based sys for non-nominal tree
-          if (!m_systInfoList[jSyst].affectsKinematics){
-	    // apply variation for weight based syst.
-            if (m_objTool) {
-              ret  = m_objTool->applySystematicVariation(m_systInfoList[jSyst].systset);
-              if ( ret != CP::SystematicCode::Ok) {
-                ATH_MSG_ERROR("Cannot configure SUSYObjDefTool for systematic var. " << m_systInfoList[jSyst].systset.name() );
-                continue;
-              } else {
-                ATH_MSG_VERBOSE("SUSYObjDef configured for systematic var. " << m_systInfoList[jSyst].systset.name() );
-              }
+        if (iSyst!=0) break; //no need to treat weight based sys for non-nominal tree
+        if (!m_systInfoList[jSyst].affectsKinematics){
+    	    // apply variation for weight based syst.
+          if (m_objTool) {
+            ret  = m_objTool->applySystematicVariation(m_systInfoList[jSyst].systset);
+            if ( ret != CP::SystematicCode::Ok) {
+              ATH_MSG_ERROR("Cannot configure SUSYObjDefTool for systematic var. " << m_systInfoList[jSyst].systset.name() );
+              continue;
+            } else {
+              ATH_MSG_VERBOSE("SUSYObjDef configured for systematic var. " << m_systInfoList[jSyst].systset.name() );
             }
+          }
 
-            // set the pointer to the correct object
-            m_susyEvt = m_susyEvtList[jSyst];
-	    m_susyEvt->evt  = m_susyEvtList[0]->evt;  // init value to that of the nominal susyEvt
-	    m_susyEvt->leps = m_susyEvtList[0]->leps; // needed by qFwt calculation
-	    //m_susyEvt->l12  = m_susyEvtList[0]->l12;
-	    //m_susyEvt->jets = m_susyEvtList[0]->jets;
-	    //m_susyEvt->truths = m_susyEvtList[0]->truths;
-	    //m_susyEvt->sig = m_susyEvtList[0]->sig;
-            if (jSyst!=0) m_hCutFlow = m_hCutFlowDummy; //to avoid repeated filling of cutflow 
-	  
-          }else{
-	    //skip non-weight syst as they are treated in the iSyst for loop
-            continue;
-	  }
+          // set the pointer to the correct object
+          m_susyEvt = m_susyEvtList[jSyst];
+    	    m_susyEvt->evt  = m_susyEvtList[0]->evt;  // init value to that of the nominal susyEvt
+    	    m_susyEvt->leps = m_susyEvtList[0]->leps; // needed by qFwt calculation
+    	    //m_susyEvt->l12  = m_susyEvtList[0]->l12;
+    	    //m_susyEvt->jets = m_susyEvtList[0]->jets;
+    	    //m_susyEvt->truths = m_susyEvtList[0]->truths;
+    	    //m_susyEvt->sig = m_susyEvtList[0]->sig;
+          if (jSyst!=0) m_hCutFlow = m_hCutFlowDummy; //to avoid repeated filling of cutflow 
+  
+        }else{
+          //skip non-weight syst as they are treated in the iSyst for loop
+          continue;
+    	  }
       }
 
       //pileup weights
@@ -1054,53 +1123,61 @@ EL::StatusCode ssEvtSelection :: execute ()
       auto trigCut = getTriggerConf(sEvt.run);
 
       //12 channel
-      m_susyEvt->evt.flag = 0;
-      if(totLs == 2)
+      if (study=="ss" || study =="fakes")
       {
-        if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-           TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
-          m_susyEvt->evt.flag += 1;
-          m_susyEvt->sig.trigMask = trigCut->ee_mask;
-        }
+        m_susyEvt->evt.flag = 0;
+        if(totLs == 2)
+        {
+          if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
+             TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
+            m_susyEvt->evt.flag += 1;
+            m_susyEvt->sig.trigMask = trigCut->ee_mask;
+          }
 
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 11000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
-          m_susyEvt->evt.flag += 3;
-          m_susyEvt->sig.trigMask = trigCut->em_mask;
-        }
+          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
+                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
+            m_susyEvt->evt.flag += 3;
+            m_susyEvt->sig.trigMask = trigCut->em_mask;
+          }
 
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 11000 ){
-          m_susyEvt->evt.flag += 3;
-          m_susyEvt->sig.trigMask = trigCut->em_mask;
-        }
-        else if(TMath::Abs(m_susyEvt->leps[0].ID) == 13000 &&
-                TMath::Abs(m_susyEvt->leps[1].ID) == 13000 ){
-          m_susyEvt->evt.flag += 2;
-          m_susyEvt->sig.trigMask = trigCut->mm_mask;
-        }
+          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
+                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
+            m_susyEvt->evt.flag += 3;
+            m_susyEvt->sig.trigMask = trigCut->em_mask;
+          }
+          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
+                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
+            m_susyEvt->evt.flag += 2;
+            m_susyEvt->sig.trigMask = trigCut->mm_mask;
+          }
 
-        if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
-           (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
-          m_susyEvt->evt.flag += 3;
+          if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
+             (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
+            m_susyEvt->evt.flag += 3;
 
-        if(nISR>=1) m_susyEvt->evt.flag += 6;
+          if(nISR>=1) m_susyEvt->evt.flag += 6;
+        }
       }
-
+      // else if (study=="fakes")
+      // {
+      //   if(nISR==1) m_susyEvt->evt.flag += 32;
+      //   else if(nISR==0) m_susyEvt->evt.flag += 16;
+      // }
       //Scale factor
       if(CF_isMC){
-        if( study == "ss" )
+        if( study == "ss" || study == "fakes")
         {
+          // Trigger SF turned off as of Aug 3 2017
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_ee_Key, true);
             //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*trigCut->mmTrig[0]*/);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey, true);
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_em_eKey, true);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*m_em_eKey*/);
           }
         }
         else if(study == "3l")
@@ -1108,6 +1185,11 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
+        // else if (study == "fakes")
+        // {
+        //   sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
+        //   sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
+        // }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
         TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF;
@@ -1133,7 +1215,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
       }
       
-      if(CF_isMC && m_susyEvt->evt.event == 47)
+      if(CF_isMC && printEvent>=0 && m_susyEvt->evt.event == (uint) printEvent)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;
         cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;
@@ -1209,6 +1291,61 @@ EL::StatusCode ssEvtSelection :: histFinalize ()
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsigned int index)
 {
   l.ID = 11000;
+
+  // Info("fillLepton(el)", "Before trigger matching");
+  // TRIGGER MATCHING FOR FAKES
+  if (study=="fakes")
+  {
+    if (m_objTool->treatAsYear() == 2015)
+    {
+      if (el->pt()*iGeV > 130)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e120_lhloose")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e120_lhloose")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 70)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH")) l.ID +=2;
+      }
+    }
+    else
+    {
+      if (el->pt()*iGeV > 320)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e300_etcut")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e300_etcut")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 150)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e140_lhloose_nod0")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 70)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
+      }
+      else if (el->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")
+            || m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose")
+            || m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose")
+            ) l.ID +=1;
+          if ((m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH") && m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH"))
+              || (m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e24_lhtight_nod0_ivarloose"))
+              || (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e26_lhtight_nod0_ivarloose"))
+            ) l.ID +=2;      
+      }
+    }
+  }
+  // Info("fillLepton(el)", "After trigger matching");
+
   l.ID *= el->charge();
   //l.author = el->author();
 
@@ -1242,44 +1379,44 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   l.nTRTOutliers =el->trackParticleSummaryIntValue(numberOfTRTOutliers);
   */
 
+  // Info("fillLepton(el)", "Before CF_isMC");
   if(CF_isMC)
   {
-    if (mcTruthMatch == "TruthLink") {
+    std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+    // Info("fillLepton(el)", "About to run particleTruthClassifier()");
+    res = m_truthClassifier->particleTruthClassifier(el);
+    // Info("fillLepton(el)", "After particleTruthClassifier()");
+
+    l.truthType = res.first;
+    l.truthOrig = res.second;
+    l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
+
+    const xAOD::TruthParticle *tp = 0;
+    if (mcTruthMatch == "TruthLink" || (mcTruthMatch=="tryAll" && !tp)) {
       //l.truthType = acc_truthType(*el);
       //l.truthOrig = acc_truthOrig(*el);
 
-      /// save truth match and parents if exist, otherwise save -1.
       auto tl = acc_truthLink(*el);
-      //if(tl.isValid()) l.truthI = tl.isValid()? addTruthPar(*tl, m_susyEvt->truths, -1):-1;
-      
-      if(tl.isValid())
-      {
-        l.truthI = addTruthPar(*tl, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
+      if (tl.isValid()) tp = *tl;
+    }
+
+    else if (mcTruthMatch == "MCTC" || (mcTruthMatch=="tryAll" && !tp)){
+      tp = m_truthClassifier->getGenPart();
+    }
+
+    else if (mcTruthMatch == "reverseTruthLink" || (mcTruthMatch=="tryAll" && !tp)){
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!(particle->isElectron())) continue;
+        auto matchedPart = acc_recoElLink(*particle);
+        if(matchedPart.isValid() && const_cast<xAOD::Electron*>(*matchedPart)==el) {
+          tp = particle; break;
+        }
       }
-      else l.truthI = -1;
-      
-      //auto trk = el->trackParticle();
-      //l.truthProb = trk?acc_truthProb(*trk):-1;
     }
 
-    else if (mcTruthMatch == "MCTC"){
-      //std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
-      //res = m_truthClassifier->particleTruthClassifier(el);
-
-      //l.truthType = res.first;
-      //l.truthOrig = res.second;
-
-      auto truthP = m_truthClassifier->getGenPart();
-      if (truthP) {
-        l.truthI = addTruthPar(truthP, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
-      } else l.truthI = -1;
-    }
-
-    else if (mcTruthMatch == "dR"){
-      xAOD::TruthParticle *tp = 0;
-
+    else if (mcTruthMatch == "dR" || (mcTruthMatch=="tryAll" && !tp)){
       // Set up truth particle container
       const xAOD::TruthParticleContainer* tContainer = 0;
       CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
@@ -1298,19 +1435,23 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
         if (dR > 0.1) continue;
          
         if (firstTry || dR < p_e.DeltaR(p_tp)){
-          tp = const_cast<xAOD::TruthParticle*>(particle);
+          tp = particle;
           p_tp = p_particle;
           firstTry = false;
         }
         else continue;
       }
-      if (tp){
-        l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
-        m_susyEvt->truths[l.truthI].matchI = index;
-      } else l.truthI = -1;
     }
-  }
+    // Info("fillLepton(el)", "After trying to find a match");
 
+    /// save truth match and parents if exist, otherwise save -1.
+    if (tp!=0) {
+      l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
+      m_susyEvt->truths[l.truthI].matchI = index;
+    } else l.truthI = -1;
+    // Info("fillLepton(el)", "truthI = %d", l.truthI);
+
+  }
   fillLeptonCommon(el, l);
   return EL::StatusCode::SUCCESS;
 }
@@ -1318,6 +1459,37 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned int index)
 {
   l.ID = 13000;
+
+  // Setup trigger information
+  if (study=="fakes")
+  {
+    if (m_objTool->treatAsYear() == 2015)
+    {
+      if (mu->pt()*iGeV > 50)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu40")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu40")) l.ID +=2;
+      }
+      else if (mu->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu20_iloose_L1MU15")) l.ID +=2;
+      }
+    }
+    else
+    {
+      if (mu->pt()*iGeV > 60)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
+      }
+      else if (mu->pt()*iGeV > 30)
+      {
+        if (m_objTool->IsTrigPassed("HLT_mu24_ivarmedium")) l.ID +=1;
+        if (m_objTool->IsTrigMatched(mu, "HLT_mu24_ivarmedium")) l.ID +=2;      
+      }
+    }
+  }
   l.ID *= mu->charge();
   //l.author = mu->author();
 
@@ -1361,17 +1533,74 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       l.truthOrig = acc_truthOrig(*trk);
     }
     */
+    // Info("fillLepton(mu)", "Before MCTruthClassifier");
+    std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
+    res = m_truthClassifier->particleTruthClassifier(mu);
+    l.firstEgMotherPdgId = 0;
 
-    /// save truth match and parents if exist, otherwise save -1.
-    auto tl = acc_truthLink(*mu);
-    //l.truthI = tl.isValid()? addTruthPar(*tl, m_susyEvt->truths, -1):-1;
-    //if(l.truthI>=0) m_susyEvt->truths[l.truthI].matchI = index;
+    l.truthType = res.first;
+    l.truthOrig = res.second;
 
-    if(tl.isValid())
+    const xAOD::TruthParticle *tp = 0;
+    if(mcTruthMatch=="TruthLink" || (mcTruthMatch=="tryAll" && !tp))
     {
-      l.truthI = addTruthPar(*tl, m_susyEvt->truths, -1);
+      auto tl = acc_truthLink(*mu);
+      if (tl.isValid()) tp = *tl;
+    }
+
+    // MCTruthClassifier
+    else if (mcTruthMatch=="MCTC" || (mcTruthMatch=="tryAll" && !tp)){
+      tp = m_truthClassifier->getGenPart();
+    }
+
+    // Reverse truthLink
+    else if (mcTruthMatch=="reverseTruthLink" || (mcTruthMatch=="tryAll" && !tp)){
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){
+        if(!(particle->isMuon())) continue;
+        auto matchedPart = acc_recoMuLink(*particle);
+        if(matchedPart.isValid() && (const_cast<xAOD::Muon*>(*matchedPart))==mu) {
+          tp = particle; break;
+        }
+      }
+    }
+
+    // dR
+    else if (mcTruthMatch=="dR" || (mcTruthMatch=="tryAll" && !tp)){
+      // Set up truth particle container
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+   
+      // Momentum vectors
+      TLorentzVector p_tp(0,0,0,0);
+      TLorentzVector p_m = mu->p4();
+      bool firstTry = true;
+   
+      // Find electron with smallest dR < 0.1
+      for(auto particle : *tContainer){
+        if(!(particle->isElectron())) continue;
+   
+        TLorentzVector p_particle = particle->p4();
+        Double_t dR = p_m.DeltaR(p_particle);
+        if (dR > 0.1) continue;
+         
+        if (firstTry || dR < p_m.DeltaR(p_tp)){
+          tp = particle;
+          p_tp = p_particle;
+          firstTry = false;
+        }
+        else continue;
+      }
+    }
+    
+    /// save truth match and parents if exist, otherwise save -1.
+    if (tp!=NULL) {
+      l.truthI = addTruthPar(tp, m_susyEvt->truths, -1);
       m_susyEvt->truths[l.truthI].matchI = index;
-      }else l.truthI = -1;
+    } else l.truthI = -1;
+    // Info("fillLepton(mu)", "l.truthI = %d", l.truthI);
+
   }
   fillLeptonCommon(mu, l);
   return EL::StatusCode::SUCCESS;
@@ -1404,16 +1633,66 @@ void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
 
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::IParticle* p, L_PAR& l, unsigned int index)
 {
+  l.truthType = 0;
+  l.truthOrig = 0;
+  l.firstEgMotherPdgId = 0;
+  // Info("fillLepton(p)", "Casting leptons");
   xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
-  if(mu) fillLepton(mu, l, index);
+  if(mu) {
+    fillLepton(mu, l, index);
+    if(CF_isMC && mcTruthMatch=="MCTCZ") m_truthClassifier->particleTruthClassifier(mu);
+  }
   else{
     xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
     if(el) fillLepton(el, l, index);
+    if(CF_isMC && mcTruthMatch=="MCTCZ") m_truthClassifier->particleTruthClassifier(el);
+  }
+
+  // Info("fillLepton(p)", "Before Z fill");
+  if(CF_isMC && mcTruthMatch.back()=='Z')
+  {
+    const xAOD::TruthParticle* tp=0;
+    if(mcTruthMatch=="dRZ")
+    {
+      // Info("fillLepton(p)", "MCTruthMatch is dRZ");
+      TLorentzVector p_tp(0,0,0,0);
+      TLorentzVector p_lep = p->p4();
+      bool firstTry = true;
+    
+      // Find particle with smallest dR < 0.1
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+      for(auto particle : *tContainer){ 
+        if (particle->p4().Pt()==0) continue;
+        TLorentzVector p_particle = particle->p4();
+        Double_t dR = p_lep.DeltaR(p_particle);
+        if (dR > 0.1) continue;
+         
+        if (firstTry || dR < p_lep.DeltaR(p_tp)){
+          tp = particle;
+          p_tp = p_particle;
+          firstTry = false;
+        }
+        else continue;
+      }
+    } else if (mcTruthMatch=="MCTCZ")
+    {
+      tp = m_truthClassifier->getGenPart();
+    }
+
+    if(tp!=NULL) {
+      // Info("fillLepton(p)", "Found particle");
+      l.truthI=addTruthPar(tp, m_susyEvt->truths, 0);
+      m_susyEvt->truths[l.truthI].matchI = index;
+    }
+    else l.truthI=-1;
   }
   return EL::StatusCode::SUCCESS;
 }
 int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLevel){
   /// check if already exist
+  if(!p) return -1;
+  if(p->status()!=1 && p->status()!=2 && p->status()!=4) return -1;
   const int bcode = p->barcode();
   int nv = v.size();
   for(int i=0;i<nv;i++){if(v[i].barcode == bcode) {return i;}}
@@ -1427,6 +1706,7 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.pdgId = p->pdgId(); 
   t.matchI = -1;
   t.motherI = -1;
+  t.status = p->status();
 
   /*
   std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
@@ -1435,56 +1715,67 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   t.particleOrigin = res.second;
   */
 
-  /// add parents if exist
+  /// add first parent and children if exist
   if(pLevel){
     auto m = p->parent();
     if(m){
       while(m->parent() && m->pdgId() == m->parent()->pdgId()) m=m->parent();
       int id = addTruthPar(m, v, pLevel-1);
       v[nv].motherI = id;
+
+      for(uint i=0; i<p->nChildren(); i++) addTruthPar(p->child(i), v, pLevel+1);
     }
   }
+
   return nv;
 }
 
 void ssEvtSelection::setupTriggers(){
-  /// try di lepton trigger for now
-  /// 2015
-  m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
-  /// 2016: A-D3
-//   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-  m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-  /// 2016: D4-
-  m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-  m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
-  m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
-  m_em_mKey = "HLT_mu14";
+  // if (study=="ss") {
+      /// try di lepton trigger for now
+      /// 2015
+      m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
+      /// 2016: A-D3
+    //   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+      m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+      /// 2016: D4-
+      m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
-//   /// 2016: A
-//   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-// 
-//   /// 2016: B-D3
-//   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-// 
-//   /// 2016: D4-E
-//   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: F
-//   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: G1-G2
-//   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: G3-I3
-//   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-// 
-//   /// 2016: I4-
-//   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+      m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
+      m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
+      m_em_mKey = "HLT_mu14";
+
+    //   /// 2016: A
+    //   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: B-D3
+    //   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: D4-E
+    //   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: F
+    //   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: G1-G2
+    //   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: G3-I3
+    //   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
+    // 
+    //   /// 2016: I4-
+    //   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
 
 
-//   /// 2016: temp
-//   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
+    //   /// 2016: temp
+    //   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
+  // }
+  // else if (study=="fakes")
+  // {
+  //   // Using lowest un-prescaled single-lepton triggers
+  // }
+  
 
   for(auto& t: m_trigSel){
     unsigned long int m1(1);
