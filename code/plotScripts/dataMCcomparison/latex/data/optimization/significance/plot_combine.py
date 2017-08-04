@@ -3,6 +3,7 @@ import os, sys, re
 from ROOT import *
 from rootUtil import useAtlasStyle, waitRootCmd, savehistory, mkupHistSimple, get_default_fig_dir
 from math import sqrt
+import glob
 funlist=[]
 
 sDir = get_default_fig_dir()
@@ -12,6 +13,7 @@ if gROOT.IsBatch(): sDirectly = True
 
 
 def updateDict(d, x):
+    for j in d: d[j] = d[j]*d[j]
     lines = None
     with open(x,'read') as f:
         lines = f.readlines()
@@ -22,23 +24,19 @@ def updateDict(d, x):
             print fs
             continue
         Zn = float(fs[4])
-        if Zn>0: d[(fs[0],fs[1])] = Zn*Zn + d.get((fs[0],fs[1]), 0.)
-    for x in d: d[x] = sqrt(d[x])
+        if Zn<0: Zn = 0.
+        k=(fs[0],fs[1])
 
+        if fs[0]=='400.0' and fs[1]=='25.0':
+            print Zn, d.get(k,-1)
+        d[k] = Zn*Zn + d.get(k,0)
+        if fs[0]=='400.0' and fs[1]=='25.0':
+            print fs[0], fs[1], Zn, d.get(k,0)
+    for j in d: d[j] = sqrt(d[j])
 
-def test():
-    if len(sys.argv)<2:
-        print 'Usage:'
-        print sys.argv[0], 'FILENAMES'
-        print 'ERROR: At least 1 arguments is needed.'
-
-    dir0 = os.getenv('SAMPLEDIR_LAMB')
-    print dir0
-
-    gStyle.SetPadRightMargin(0.16)
-
+def getSig(args, show=True, info=None,savename="test"):
     dictA = {}
-    for x in sys.argv[1:]:
+    for x in args:
         updateDict(dictA, x)
     print dictA
 
@@ -48,44 +46,59 @@ def test():
         g2d.SetPoint(i, float(x[0]),float(x[1]),dictA[x])
         i += 1
 
+    if not show:
+        return g2d
+
+    gStyle.SetPadRightMargin(0.16)
     g2d.Draw('colz')
     h1 = g2d.GetHistogram();
     h1.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
     h1.GetYaxis().SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
     h1.GetZaxis().SetTitle("Z_{n}");
+    h1.GetXaxis().SetRangeUser(0,350)
+    h1.GetZaxis().SetRangeUser(0,4)
 
-    grL = g2d.GetContourList(1);
+    lg = TLegend(0.2, 0.65,0.4,0.85)
+    lg.SetFillStyle(0)
+    lines = {1:2, 2:5, 3:9} # Zn, line Style
 
-    next1 = TIter(grL);
-    while True:
-        obj = next1()
-        if obj == None: break
-        obj.SetLineWidth(2);
-        obj.SetLineStyle(2);
-        obj.Draw("same");
-        obj.SetName("s0");
+    for lx in lines:
+        ltag = str(lx)
+        grL = g2d.GetContourList(lx);
+        next1 = TIter(grL);
+        while True:
+            obj = next1()
+            if obj == None: break
+            obj.SetLineWidth(2);
+            obj.SetLineStyle(lines[lx]);
+            obj.Draw("same");
+            obj.SetName(ltag);
+        xt0 = gPad.GetPrimitive(ltag);
+        lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
+    lg.Draw()
 
-    xt0 = gPad.GetPrimitive("s0");
+    if info:
+        lt = TLatex()
+        lt.DrawLatexNDC(0.2,0.9,info)
+
+    gPad.Update()
+    waitRootCmd(sDir+savename, sDirectly)
+
+    return g2d
+
+def test1():
+    if len(sys.argv)<2:
+        print 'Usage:'
+        print sys.argv[0], 'FILENAMES'
+        print 'ERROR: At least 1 arguments is needed.'
+
+    getSig(sys.argv[1:])
+
+def test():
+    gr1 = getSig(glob.glob("SR*.txt"),True,"Jet |#eta|<2.4","JetEta_2p4")
+    gr2 = getSig(glob.glob("bugFix_Aug04/SR*.txt"),True,"Jet |#eta|<2.8","JetEta_2p8")
 
 
-    grL = g2d.GetContourList(2);
-    next2 = TIter(grL);
-    while True:
-        obj = next2()
-        if obj == None: break
-        obj.SetLineWidth(2);
-        obj.SetLineStyle(9);
-        obj.Draw("same");
-        obj.SetName("s1");
-
-    xt1 = gPad.GetPrimitive("s1");
-
-
-    lt = TLatex()
-#     lt.DrawLatexNDC(0.2,0.9,"New")
-    lt.DrawLatexNDC(0.2,0.9,"Old")
-
-    waitRootCmd()
 funlist.append(test)
 
 if __name__ == '__main__':
