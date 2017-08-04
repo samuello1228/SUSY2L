@@ -464,10 +464,6 @@ void analysis1()
     };
     
     std::vector<SigInfo> SigSampleInfo;
-    
-    std::vector<double> SigXS; //cross section in pb
-    SigXS.reserve(20);
-    
     {
         SigInfo element;
         
@@ -534,7 +530,7 @@ void analysis1()
             */
             
             //cout<<SigXSTemp2<<endl;
-            SigXS.push_back(SigXSTemp2);
+            element.XS = SigXSTemp2;
             SigSampleInfo.push_back(element);
         }
         fin.close();
@@ -546,7 +542,7 @@ void analysis1()
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
         cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleID.Data()<<endl;
         cout<<"MassDiff: "<<SigSampleInfo[SigMassSplitting[i].ID].Mass1 - SigSampleInfo[SigMassSplitting[i].ID].Mass2<<endl;
-        cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
+        cout<<"XS: "<<SigSampleInfo[SigMassSplitting[i].ID].XS<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleInfo.size();j++)
@@ -3884,7 +3880,7 @@ void analysis1()
                                     Cut += ")";
                                     
                                     tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig[j]->Scale(SigXS[SigMassSplitting[j].ID] /SignAOD[SigMassSplitting[j].ID] *sumDataL);
+                                    h2Sig[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SignAOD[SigMassSplitting[j].ID] *sumDataL);
                                 }
                             }
                             
@@ -4555,12 +4551,12 @@ void analysis1()
                     }
                     
                     //preliminary normalization for h2SigSum
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/AOD);
                     */
                     
                     ///*
                     h2SigSum[i]->Add(h2Sig[SigMassSplitting[i].ID]);
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/SignAOD[SigMassSplitting[i].ID]);
+                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/SignAOD[SigMassSplitting[i].ID]);
                     //*/
                 }
                 
@@ -4793,7 +4789,7 @@ void analysis1()
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
-                            h2Sig[j]->Scale(SigXS[j] *sumDataL/SignAOD[j]);
+                            h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SignAOD[j]);
                             double error;
                             double expN = h2Sig[j]->IntegralAndError(0,-1,error);
                             
@@ -5563,7 +5559,7 @@ void analysis1()
                         }
                         
                         //normalization for h2SigSum
-                        h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                        h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/AOD);
                     }
                 }
                 
