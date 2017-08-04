@@ -457,11 +457,9 @@ void analysis1()
     
     std::vector<SigInfo> SigSampleInfo;
     
-    std::vector<TString> SigSampleID;
     std::vector<double> SigXS; //cross section in pb
     std::vector<double> SigMass1;
     std::vector<double> SigMass2;
-    SigSampleID.reserve(20);
     SigXS.reserve(20);
     SigMass1.reserve(20);
     SigMass2.reserve(20);
@@ -487,7 +485,6 @@ void analysis1()
             SampleIDTemp += SampleNameTemp;
             
             element.SampleID = SampleIDTemp;
-            SigSampleID.push_back(SampleIDTemp);
             
             double SigMass;
             fin>>SigMass;
@@ -3668,7 +3665,14 @@ void analysis1()
             }
             
             std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+            {
+                std::vector<TString> SigSampleID;
+                for(unsigned int i=0;i<SigSampleInfo.size();i++)
+                {
+                    SigSampleID.push_back(SigSampleInfo[i].SampleID);
+                }
+                initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+            }
             
             std::vector<TChain*> tree2DataOS;
             if(ChannelInfo[channelRepresentative].isSS_qF)
