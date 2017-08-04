@@ -4,6 +4,6 @@ ptll 30 -1
 mTtwo 0 -1
 dEta 0 4
 METRel 0 -1
-meff 220 -1
-mtm 130 -1
-mlj 0 125
+meff 190 -1
+mtm 120 -1
+mlj 0 95
