@@ -8,6 +8,7 @@
 #include <TFile.h>
 #include <TChain.h>
 #include <TH1F.h>
+#include <TLorentzVector.h>
 
 Int_t ID1;
 Int_t ID2;
@@ -64,6 +65,11 @@ struct nEvent
     double nw;
     double nAOD;
 };
+
+const bool recalculate_mlj = true;
+const float mass_el = 0.000510998;
+const float mass_mu = 0.105658;
+
 void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
 {
     //get the "evt2l"
@@ -344,7 +350,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
         meff = sig.HT + sig.Met;
-        mlj = sig.mlj;
         mjj = sig.mjj;
         //R2 = MET/(MET + pt1 + pt2);
         l12_dPhi = l12.dPhi;
@@ -359,25 +364,33 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         averageMu = evt.averageMu;
         
         //SF or DF
+        TLorentzVector l1;
+        TLorentzVector l2;
         int channelIndex = 0;
         if(int(abs(ID1)/1000) == 11)
         {
+            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_el);
             if(int(abs(ID2)/1000) == 11)
             {
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_el);
             }
             else if(int(abs(ID2)/1000) == 13)
             {
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
                 channelIndex += 2;
             }
         }
         else if(int(abs(ID1)/1000) == 13)
         {
+            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_mu);
             if(int(abs(ID2)/1000) == 11)
             {
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_el);
                 channelIndex += 2;
             }
             else if(int(abs(ID2)/1000) == 13)
             {
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
                 channelIndex += 1;
             }
         }
@@ -385,6 +398,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //jets
         nJet = jets.size();
         nBJet = 0;
+        vector<TLorentzVector> cjet_Ls;
         nCJet = 0;
         nFJet = 0;
         int nISR = 0;
@@ -418,6 +432,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                         //Central light jets
                         nCJet++;
                         //if(nCJet==1) leadingCJetIndex = k;
+                        TLorentzVector cjet;
+                        if(recalculate_mlj) cjet.SetPtEtaPhiM(jets[k].pt,jets[k].eta,jets[k].phi,jets[k].m);
+                        if(recalculate_mlj) cjet_Ls.push_back(cjet);
                     }
                 }
                 
@@ -483,6 +500,33 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             fjetphi = 0;
         }
         */
+
+        if(recalculate_mlj)
+        {
+            mlj = -1;
+            if(cjet_Ls.size()>=1 && cjet_Ls.size()<=3)
+            {
+                TLorentzVector JetSystem;
+                if(cjet_Ls.size()==1)
+                {
+                  JetSystem = cjet_Ls[0];
+                }
+                else if(cjet_Ls.size()==2 || cjet_Ls.size()==3)
+                {
+                  JetSystem = cjet_Ls[0]+cjet_Ls[1];
+                }
+                
+                double dR1 = JetSystem.DeltaR(l1);
+                double dR2 = JetSystem.DeltaR(l2);
+                TLorentzVector lmindR;
+                if(dR1<dR2) lmindR = l1;
+                else lmindR = l2;
+                mlj = (JetSystem+lmindR).M();
+                
+                //if((mlj - sig.mlj)/sig.mlj >1e-6) cout<<(mlj - sig.mlj)/sig.mlj<<endl;
+            }
+        }
+        else mlj = sig.mlj;
 
         //separate the sample into channels
         if(nISR==0) {}
