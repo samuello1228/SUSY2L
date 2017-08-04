@@ -466,11 +466,7 @@ void analysis1()
     std::vector<SigInfo> SigSampleInfo;
     
     std::vector<double> SigXS; //cross section in pb
-    std::vector<double> SigMass1;
-    std::vector<double> SigMass2;
     SigXS.reserve(20);
-    SigMass1.reserve(20);
-    SigMass2.reserve(20);
     
     {
         SigInfo element;
@@ -496,9 +492,9 @@ void analysis1()
             
             double SigMass;
             fin>>SigMass;
-            SigMass1.push_back(SigMass);
+            element.Mass1 = SigMass;
             fin>>SigMass;
-            SigMass2.push_back(SigMass);
+            element.Mass2 = SigMass;
             
             double SigXSTemp2;
             fin>>SigXSTemp2;
@@ -549,13 +545,13 @@ void analysis1()
         cout<<"Mass splitting: "<<SigMassSplitting[i].MassDiff<<endl;
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
         cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleID.Data()<<endl;
-        cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
+        cout<<"MassDiff: "<<SigSampleInfo[SigMassSplitting[i].ID].Mass1 - SigSampleInfo[SigMassSplitting[i].ID].Mass2<<endl;
         cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleInfo.size();j++)
         {
-            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleID.Data()<<endl;
+            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleID.Data()<<endl;
         }
         cout<<endl;
     }
@@ -563,9 +559,9 @@ void analysis1()
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
     {
         TString GroupName = "(";
-        GroupName += TString::Format("%.1f",SigMass1[SigMassSplitting[i].ID]);
+        GroupName += TString::Format("%.1f",SigSampleInfo[SigMassSplitting[i].ID].Mass1);
         GroupName += ",";
-        GroupName += TString::Format("%.1f",SigMass2[SigMassSplitting[i].ID]);
+        GroupName += TString::Format("%.1f",SigSampleInfo[SigMassSplitting[i].ID].Mass2);
         GroupName += ")";
         SigMassSplitting[i].IDName = GroupName;
     }
@@ -4551,7 +4547,7 @@ void analysis1()
                     double AOD = 0;
                     for(unsigned int j=0;j<SigSampleInfo.size();j++)
                     {
-                        if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
+                        if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff)
                         {
                             h2SigSum[i]->Add(h2Sig[j]);
                             AOD += SignAOD[j];
@@ -4805,7 +4801,7 @@ void analysis1()
                             double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
                             
                             fout<<setprecision(1)<<std::fixed;
-                            fout<<SigMass1[j]<<" "<<SigMass2[j]<<" ";
+                            fout<<SigSampleInfo[j].Mass1<<" "<<SigSampleInfo[j].Mass2<<" ";
                             fout<<setprecision(3)<<std::fixed;
                             fout<<expN<<" "<<error<<" ";
                             fout<<significance<<endl;
@@ -4813,8 +4809,8 @@ void analysis1()
                             //2D plot
                             //if(significance>0)
                             {
-                                g_nSig->SetPoint(g_significance->GetN(), SigMass1[j], SigMass2[j], expN);
-                                g_significance->SetPoint(g_significance->GetN(), SigMass1[j], SigMass2[j], significance);
+                                g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, expN);
+                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
                                 pointN++;
                             }
                         }
@@ -5546,7 +5542,7 @@ void analysis1()
                         unsigned int AOD = 0;
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
-                            if(SigMass1[j]-SigMass2[j] != SigMassSplitting[i].MassDiff) continue;
+                            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 != SigMassSplitting[i].MassDiff) continue;
                             TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
