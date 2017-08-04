@@ -1167,16 +1167,17 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(CF_isMC){
         if( study == "ss" || study == "fakes")
         {
+          // Trigger SF turned off as of Aug 3 2017
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, true);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_ee_Key, true);
             //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, trigCut->mmTrig[0]);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*trigCut->mmTrig[0]*/);
           }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey, true);
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_em_eKey, true);
+            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*m_em_eKey*/);
           }
         }
         else if(study == "3l")
@@ -1214,7 +1215,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
       }
       
-      if(CF_isMC && m_susyEvt->evt.event == printEvent)
+      if(CF_isMC && printEvent>=0 && m_susyEvt->evt.event == (uint) printEvent)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;
         cout<<"mcweight: "<<eventInfo->mcEventWeight()<<endl;
