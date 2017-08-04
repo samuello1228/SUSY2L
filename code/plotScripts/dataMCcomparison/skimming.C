@@ -210,6 +210,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("jeteta",&jeteta,"jeteta/F");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
+        tree2[j]->Branch("nFJet",&nFJet,"nFJet/I");
 
         tree2[j]->Branch("weight",&weight,"weight/F");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
@@ -385,7 +386,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         nJet = jets.size();
         nBJet = 0;
         nCJet = 0;
-        //nFJet = 0;
+        nFJet = 0;
         int nISR = 0;
         int leadingJetIndex = 0;
         //int leadingBJetIndex = 0;
@@ -396,7 +397,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             //signal jets
             
             //B-jets
-            //if((jets[k].jFlag & 1<<5) && jets[k].pt > 20)
             if(jets[k].jFlag & 1<<5)
             {
                 nBJet++;
@@ -424,14 +424,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             else
             {
-                /*
                 //Forward jets
-                if(jets[k].pt > 30)
-                {
-                    nFJet++;
-                    if(nFJet==1) leadingFJetIndex = k;
-                }
-                */
+                nFJet++;
+                //if(nFJet==1) leadingFJetIndex = k;
             }
         }
         
