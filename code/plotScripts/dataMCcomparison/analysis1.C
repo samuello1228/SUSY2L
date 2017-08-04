@@ -4523,11 +4523,11 @@ void analysis1()
                         TString Cut = "weight*(1";
                         Cut += CommonCut;
                         Cut += ")";
-                        int sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        SigSampleInfo[j].unweighted = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
-                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = sigCount;
+                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = SigSampleInfo[j].unweighted;
                         }
                     }
                 }
@@ -4786,23 +4786,22 @@ void analysis1()
                         {
                             //expected number of events
                             h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SigSampleInfo[j].nwAOD);
-                            double error;
-                            double expN = h2Sig[j]->IntegralAndError(0,-1,error);
+                            SigSampleInfo[j].weighted = h2Sig[j]->IntegralAndError(0,-1,SigSampleInfo[j].error);
                             
                             //Significance
-                            double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
+                            SigSampleInfo[j].significance = GetSignificance(SigSampleInfo[j].weighted,total_BG_weighted,total_BG_error2);
                             
                             fout<<setprecision(1)<<std::fixed;
                             fout<<SigSampleInfo[j].Mass1<<" "<<SigSampleInfo[j].Mass2<<" ";
                             fout<<setprecision(3)<<std::fixed;
-                            fout<<expN<<" "<<error<<" ";
-                            fout<<significance<<endl;
+                            fout<<SigSampleInfo[j].weighted<<" "<<SigSampleInfo[j].error<<" ";
+                            fout<<SigSampleInfo[j].significance<<endl;
                             
                             //2D plot
                             //if(significance>0)
                             {
-                                g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, expN);
-                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
+                                g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].weighted);
+                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].significance);
                                 pointN++;
                             }
                         }
