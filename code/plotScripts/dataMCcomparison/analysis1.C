@@ -467,6 +467,8 @@ void analysis1()
     SigMass2.reserve(20);
     
     {
+        SigInfo element;
+        
         //read SigSample.txt
         ifstream fin;
         fin.open("SigSample.txt");
@@ -483,6 +485,8 @@ void analysis1()
             fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
+            
+            element.SampleID = SampleIDTemp;
             SigSampleID.push_back(SampleIDTemp);
             
             double SigMass;
@@ -530,6 +534,7 @@ void analysis1()
             
             //cout<<SigXSTemp2<<endl;
             SigXS.push_back(SigXSTemp2);
+            SigSampleInfo.push_back(element);
         }
         fin.close();
     }
@@ -538,14 +543,14 @@ void analysis1()
     {
         cout<<"Mass splitting: "<<SigMassSplitting[i].MassDiff<<endl;
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
-        cout<<"Name: "<<SigSampleID[SigMassSplitting[i].ID].Data()<<endl;
+        cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleID.Data()<<endl;
         cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
         cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
-        for(unsigned int j=0;j<SigSampleID.size();j++)
+        for(unsigned int j=0;j<SigSampleInfo.size();j++)
         {
-            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j].Data()<<endl;
+            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleID.Data()<<endl;
         }
         cout<<endl;
     }
@@ -562,10 +567,10 @@ void analysis1()
     
     //Get number of events in AOD
     std::vector<double> SignAOD;
-    for(unsigned int i=0;i<SigSampleID.size();i++)
+    for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
-        NameTemp += SigSampleID[i];
+        NameTemp += SigSampleInfo[i].SampleID;
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += ChannelInfo[0].ChannelName;
@@ -4165,7 +4170,7 @@ void analysis1()
                 //Fill histograms from trees
                 TH1F* h2DataSum;
                 TH1F* h2SigSum[SigMassSplitting.size()];
-                TH1F* h2Sig[SigSampleID.size()];
+                TH1F* h2Sig[SigSampleInfo.size()];
                 double sumOfEventVV[BGVVData.size()][2];
                 //sample,expN/error
                 
@@ -4504,7 +4509,7 @@ void analysis1()
                     }
                     
                     //h2Sig
-                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    for(unsigned int j=0;j<SigSampleInfo.size();j++)
                     {
                         TString NameTemp = "Sig_";
                         NameTemp += TString::Itoa(j,10);
@@ -4532,7 +4537,7 @@ void analysis1()
                 {
                     /*
                     double AOD = 0;
-                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    for(unsigned int j=0;j<SigSampleInfo.size();j++)
                     {
                         if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
                         {
@@ -4777,7 +4782,7 @@ void analysis1()
                         TGraph2D* g_nSig = new TGraph2D();
                         TGraph2D* g_significance = new TGraph2D();
                         int pointN = 0;
-                        for(unsigned int j=0;j<SigSampleID.size();j++)
+                        for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
                             h2Sig[j]->Scale(SigXS[j] *sumDataL/SignAOD[j]);
@@ -5371,7 +5376,7 @@ void analysis1()
                 delete h2BGSum;
                 
                 //h2Sig
-                for(unsigned int j=0;j<SigSampleID.size();j++)
+                for(unsigned int j=0;j<SigSampleInfo.size();j++)
                 {
                     delete h2Sig[j];
                 }
@@ -5527,7 +5532,7 @@ void analysis1()
                         h2SigSum[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         unsigned int AOD = 0;
-                        for(unsigned int j=0;j<SigSampleID.size();j++)
+                        for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             if(SigMass1[j]-SigMass2[j] != SigMassSplitting[i].MassDiff) continue;
                             TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
@@ -5683,7 +5688,7 @@ void analysis1()
                     delete tree2BGMC[j][k];
                 }
             }
-            for(unsigned int i=0;i<SigSampleID.size();i++)
+            for(unsigned int i=0;i<SigSampleInfo.size();i++)
             {
                 delete tree2Sig[i];
             }
