@@ -378,13 +378,10 @@ void analysis1()
     struct MCBGInfo
     {
         TString SampleID;
-        double XS;
+        double XS; //cross section in pb
     };
     
     std::vector<MCBGInfo> BGMCSampleInfo;
-    std::vector<double> BGMCXS; //cross section in pb
-    BGMCXS.reserve(20);
-    
     {
         MCBGInfo element;
         
@@ -412,7 +409,7 @@ void analysis1()
             BGMCXSTemp2 *= BGMCXSTemp;
             fin>>BGMCXSTemp;
             BGMCXSTemp2 *= BGMCXSTemp;
-            BGMCXS.push_back(BGMCXSTemp2);
+            element.XS = BGMCXSTemp2;
             
             fin>>BGMCXSTemp;
             BGMCSampleInfo.push_back(element);
@@ -454,7 +451,7 @@ void analysis1()
     struct SigInfo
     {
         TString SampleID;
-        double XS;
+        double XS; //cross section in pb
         double nwAOD;
         double Mass1;
         double Mass2;
@@ -984,7 +981,7 @@ void analysis1()
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
                                 BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
-                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
@@ -3560,7 +3557,7 @@ void analysis1()
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
                                 BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
-                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
