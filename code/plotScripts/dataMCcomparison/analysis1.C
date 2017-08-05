@@ -4780,10 +4780,8 @@ void analysis1()
                         }
                         fout<<"#Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                         
-                        TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,0,600,10,0,120);
                         TGraph2D* g_nSig = new TGraph2D();
                         TGraph2D* g_significance = new TGraph2D();
-                        int pointN = 0;
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
@@ -4808,23 +4806,29 @@ void analysis1()
                             {
                                 g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].weighted);
                                 g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
-                                pointN++;
                             }
                         }
                         fout.close();
                         
-                        //if(pointN>=3)
                         {
                             gStyle->SetPalette(1);
+                            
+                            TH2D* h2 = g_nSig->GetHistogram();
+                            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+                            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+                            h2->GetZaxis()->SetTitle("nSig");
+                            
+                            h2->GetXaxis()->SetRangeUser(0,600);
+                            h2->GetYaxis()->SetRangeUser(0,120);
                             
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
                             c2->SetRightMargin(0.16);
                             h2->Draw();
-                            g_nSig->Draw("colzsame");
+                            g_nSig->Draw("colz");
                             
                             TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
+                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
                             lt1.SetTextSize(lt1.GetTextSize()*0.3);
                             
                             TString NameTemp = "plot/";
@@ -4841,14 +4845,23 @@ void analysis1()
                         {
                             gStyle->SetPalette(1);
                             
+                            TH2D* h2 = g_significance->GetHistogram();
+                            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+                            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+                            h2->GetZaxis()->SetTitle("Z_{n}");
+                            
+                            h2->GetXaxis()->SetRangeUser(0,600);
+                            h2->GetYaxis()->SetRangeUser(0,120);
+                            //h2->GetZaxis()->SetRangeUser(0,4);
+                            
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
                             c2->SetRightMargin(0.16);
                             h2->Draw();
-                            g_significance->Draw("colzsame");
+                            g_significance->Draw("colz");
                             
                             TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
+                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
                             lt1.SetTextSize(lt1.GetTextSize()*0.3);
                             
                             TString NameTemp = "plot/";
@@ -4862,7 +4875,6 @@ void analysis1()
                             delete c2;
                         }
                         
-                        delete h2;
                         delete g_nSig;
                         delete g_significance;
                     }
