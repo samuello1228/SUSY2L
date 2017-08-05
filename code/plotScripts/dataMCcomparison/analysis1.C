@@ -2709,8 +2709,6 @@ void analysis1()
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
-        TString PathName_SR = "latex/data/expN/SR.txt";
-        fstream fout_SR;
         std::vector<Group> SRBGGroup;
         std::vector<TH1F*> h2SRSig;
         std::vector<TH1F*> h2SRSignificance;
@@ -2757,22 +2755,6 @@ void analysis1()
                     }
                 }
             }
-            
-            //expN for SR
-            fout_SR.open(PathName_SR.Data(), ios::out);
-            fout_SR<<std::setw(46)<<"The Name of Signal Region";
-            for(unsigned int i=0;i<SRBGGroup.size();i++)
-            {
-                fout_SR<<std::setw(15)<<SRBGGroup[i].info->GroupName.Data();
-            }
-            fout_SR<<std::setw(15)<<"Total BG";
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                fout_SR<<std::setw(22)<<SigMassSplitting[i].IDName.Data();
-            }
-            fout_SR<<endl;
-            fout_SR.close();
             
             //h2SRSig
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
@@ -3950,53 +3932,6 @@ void analysis1()
                             fout<<"$ \\\\"<<endl<<"\\hline"<<endl;
                         }
                         fout.close();
-                    }
-                    
-                    //output SR.txt file
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
-                    {
-                        fout_SR.open(PathName_SR.Data(), ios::out | ios::app);
-                        
-                        fout_SR<<std::setw(46)<<RegionInfo[RegionIndex].RegionName;
-                        
-                        fout_SR<<setprecision(1)<<std::fixed;
-                        {
-                            unsigned int j2 = 0;
-                            for(unsigned int j1=0;j1<SRBGGroup.size();j1++)
-                            {
-                                if(j2==BGGroup.size()) break;
-                                if(SRBGGroup[j1].info->GroupName == BGGroup[j2].info->GroupName)
-                                {
-                                    fout_SR<<std::setw(8)<<BGGroup[j2].info->weighted;
-                                    fout_SR<<"+/-";
-                                    fout_SR<<std::setw(4)<<BGGroup[j2].info->error;
-                                    
-                                    j2++;
-                                }
-                                else
-                                {
-                                    fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
-                                }
-                            }
-                        }
-                        
-                        fout_SR<<std::setw(8)<<total_BG_weighted;
-                        fout_SR<<"+/-";
-                        fout_SR<<std::setw(4)<<TMath::Sqrt(total_BG_error2);
-                        
-                        for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                        {
-                            fout_SR<<setprecision(1)<<std::fixed;
-                            fout_SR<<std::setw(5)<<SigMassSplitting[i].weighted;
-                            fout_SR<<"+/-";
-                            fout_SR<<std::setw(3)<<SigMassSplitting[i].error;
-                            
-                            fout_SR<<setprecision(3)<<std::fixed;
-                            fout_SR<<std::setw(7)<<SigMassSplitting[i].significance;
-                            fout_SR<<std::setw(4)<<SigMassSplitting[i].unweighted;
-                        }
-                        fout_SR<<endl;
-                        fout_SR.close();
                     }
                     
                     //h2SR
