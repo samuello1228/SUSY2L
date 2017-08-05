@@ -97,12 +97,34 @@ $n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\
 \input{data/optimization/nSig_SR_SS_opt_0.tex}
 \input{data/optimization/significance_SR_SS_opt_0.tex}
 
+\begin{frame}{Combined significance}
+\begin{itemize}
+\item Combine the significance (only channels with $Z_n>0$ are combined)
+\end{itemize}
+\includegraphics[width=0.8\textwidth]{combine_significance_0}
+\end{frame}
+
 \begin{frame}{Compare with the old one}
 \begin{itemize}
 \item Combine the significance (only channels with $Z_n>0$ are combined)
 \end{itemize}
-\includegraphics[width=0.5\textwidth]{data/optimization/old_opt}
-\includegraphics[width=0.5\textwidth]{data/optimization/new_opt}
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{data/optimization/combine_significance_0_2p8} \\
+Jet $|\eta|<2.8$
+\end{center}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{data/optimization/combine_significance_0_2p4} \\
+Jet $|\eta|<2.4$, \\ forward jet veto
+\end{center}
+\end{column}
+
+\end{columns}
 \end{frame}
 
 \begin{frame}
