@@ -5870,6 +5870,107 @@ void analysis1()
                 delete h2SRSignificance[j];
             }
         }
+        
+        //combined significance plot
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+        {
+            TGraph2D* g_significance = new TGraph2D();
+            for(unsigned int j=0;j<SigSampleInfo.size();j++)
+            {
+                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, sqrt(SigSampleInfo[j].significance2));
+                //cout<<SigSampleInfo[j].Mass1<<", "<<SigSampleInfo[j].Mass2<<", "<<sqrt(SigSampleInfo[j].significance2)<<endl;
+            }
+            
+            TH2D* h2 = g_significance->GetHistogram();
+            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+            h2->GetZaxis()->SetTitle("Z_{n}");
+            
+            h2->GetXaxis()->SetRangeUser(0,350);
+            h2->GetZaxis()->SetRangeUser(0,4);
+            
+            {
+                gStyle->SetPalette(1);
+                
+                TCanvas* c2 = new TCanvas();
+                c2->cd();
+                c2->SetRightMargin(0.16);
+                g_significance->Draw("colz");
+                
+                {
+                    TList* grL = g_significance->GetContourList(1);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(2);
+                        obj->Draw("same");
+                        obj->SetName("s0");
+                    }
+                }
+                TGraph* xt0 = (TGraph*) gPad->GetPrimitive("s0");
+                
+                {
+                    TList* grL = g_significance->GetContourList(2);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(5);
+                        obj->Draw("same");
+                        obj->SetName("s1");
+                    }
+                }
+                TGraph* xt1 = (TGraph*) gPad->GetPrimitive("s1");
+                
+                {
+                    TList* grL = g_significance->GetContourList(3);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(9);
+                        obj->Draw("same");
+                        obj->SetName("s2");
+                    }
+                }
+                TGraph* xt2 = (TGraph*) gPad->GetPrimitive("s2");
+                
+                TLegend* leg;
+                {
+                    Double_t xl1=0.2, yl1=0.7, xl2=xl1+0.2, yl2=yl1+0.2;
+                    leg = new TLegend(xl1,yl1,xl2,yl2);
+                    leg->SetFillStyle(0);
+                    leg->SetBorderSize(0);
+                    
+                    leg->AddEntry(xt0, "Z_{n}=1", "l");
+                    leg->AddEntry(xt1, "Z_{n}=2", "l");
+                    leg->AddEntry(xt2, "Z_{n}=3", "l");
+                }
+                leg->Draw();
+                
+                TLatex lt1;
+                lt1.DrawLatexNDC(0.2,0.05,"combined");
+                lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                
+                TString NameTemp = "plot/";
+                NameTemp += "combine_significance_";
+                NameTemp += TString::Itoa(SigOptimizingIndex,10);
+                NameTemp += ".eps";
+                c2->Print(NameTemp,"eps");
+                
+                delete leg;
+                delete c2;
+            }
+            
+            delete g_significance;
+        }
     }
     
     //delete fout_plot
