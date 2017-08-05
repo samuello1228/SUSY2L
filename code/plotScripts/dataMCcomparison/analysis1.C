@@ -458,7 +458,7 @@ void analysis1()
         int unweighted;
         double weighted;
         double error;
-        double significance;
+        double significance2;
     };
     
     std::vector<SigInfo> SigSampleInfo;
@@ -576,6 +576,8 @@ void analysis1()
         cout<<SigSampleInfo[i].nwAOD<<endl;
         
         delete file;
+        
+        SigSampleInfo[i].significance2 = 0;
     }
     
     //Group for MC background
@@ -4789,19 +4791,23 @@ void analysis1()
                             SigSampleInfo[j].weighted = h2Sig[j]->IntegralAndError(0,-1,SigSampleInfo[j].error);
                             
                             //Significance
-                            SigSampleInfo[j].significance = GetSignificance(SigSampleInfo[j].weighted,total_BG_weighted,total_BG_error2);
+                            double significance = GetSignificance(SigSampleInfo[j].weighted,total_BG_weighted,total_BG_error2);
+                            if(significance>0)
+                            {
+                                SigSampleInfo[j].significance2 += significance*significance;
+                            }
                             
                             fout<<setprecision(1)<<std::fixed;
                             fout<<SigSampleInfo[j].Mass1<<" "<<SigSampleInfo[j].Mass2<<" ";
                             fout<<setprecision(3)<<std::fixed;
                             fout<<SigSampleInfo[j].weighted<<" "<<SigSampleInfo[j].error<<" ";
-                            fout<<SigSampleInfo[j].significance<<endl;
+                            fout<<significance<<endl;
                             
                             //2D plot
                             //if(significance>0)
                             {
                                 g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].weighted);
-                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].significance);
+                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
                                 pointN++;
                             }
                         }
