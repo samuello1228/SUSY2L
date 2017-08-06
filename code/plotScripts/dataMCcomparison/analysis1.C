@@ -873,7 +873,7 @@ void analysis1()
         TString Cut;
         TString RelatedVariable;
     };
-
+    
     struct OptimizingCutData
     {
         double lower;
@@ -899,7 +899,7 @@ void analysis1()
         std::vector<unsigned int> setOfChannel;
         TString Cut;
         vector<AdditionalCutData> AdditionalCut;
-        vector< vector<OptimizingCutData> > OptimizingCut;
+        vector< vector< vector<OptimizingCutData> > > OptimizingCut;
     };
     
     if(dorw)
@@ -1374,8 +1374,9 @@ void analysis1()
         RegionGroupData GroupElement;
         RegionData element;
         AdditionalCutData AdditionalCutElement;
-        vector<OptimizingCutData> OptimizingCutElement1;
-        OptimizingCutData OptimizingCutElement2;
+        vector< vector<OptimizingCutData> > OptimizingCutElement1;
+        vector<OptimizingCutData> OptimizingCutElement2;
+        OptimizingCutData OptimizingCutElement3;
         
         //CR_OS
         GroupElement.GroupName = "CR_OS";
@@ -1841,78 +1842,97 @@ void analysis1()
         
         
         {
+            element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 20;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 46;
-            OptimizingCutElement2.lower = 20;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 20;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 46;
+            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 20;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 46;
-            OptimizingCutElement2.lower = 20;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 20;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 46;
+            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -1940,76 +1960,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 20;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 55;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 55;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 200;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 90;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 90;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2039,76 +2077,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 20;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 1.5;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 200;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 110;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 110;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 90;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 90;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2138,76 +2194,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 1.5;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 200;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 110;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 110;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 90;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 90;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2238,76 +2312,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 20;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 110;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 110;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 120;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 120;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2337,76 +2429,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 1.5;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 200;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 120;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 120;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2436,76 +2546,94 @@ void analysis1()
             element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.lower = 30;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 30;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 1.5;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.lower = 200;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 110;
-            OptimizingCutElement2.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 110;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.lower = 0;
-            OptimizingCutElement2.upper = 120;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = 120;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
@@ -2547,7 +2675,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2569,7 +2696,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2591,7 +2717,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2614,7 +2739,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2636,7 +2760,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2658,7 +2781,6 @@ void analysis1()
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2941,7 +3063,7 @@ void analysis1()
                             unsigned int VarIndex = 0;
                             for(unsigned int i=0;i<Var.size();i++)
                             {
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].RelatedVariable == Var[i].VarName)
+                                if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == Var[i].VarName)
                                 {
                                     VarIndex = i;
                                 }
@@ -2962,21 +3084,21 @@ void analysis1()
                                 
                                 for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                                 {
-                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable != RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].RelatedVariable)
+                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].RelatedVariable != RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable)
                                     {
-                                        unsigned int VarIndex3 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                        unsigned int VarIndex3 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].RelatedVariable,Var);
                                         
                                         CommonCut += " && ";
                                         CommonCut += Var[VarIndex3].VarFormula;
                                         CommonCut += " >= ";
-                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].lower;
+                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].lower;
                                         
-                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].upper != -1)
+                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].upper != -1)
                                         {
                                             CommonCut += " && ";
                                             CommonCut += Var[VarIndex3].VarFormula;
                                             CommonCut += " < ";
-                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].upper;
+                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].upper;
                                         }
                                     }
                                 }
@@ -2986,17 +3108,17 @@ void analysis1()
                                 //For MC background
                                 for(unsigned int j=0;j<tree2BGMC.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                     BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                                     BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                                     BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
-                                    BGGroupRaw[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    BGGroupRaw[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         {
-                                            TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                             
                                             //fill histograms from trees
                                             TString temp = Var[VarIndex].VarFormula;
@@ -3019,7 +3141,7 @@ void analysis1()
                                             delete hTemp;
                                         }
                                         {
-                                            TH1F* hTemp = new TH1F("BGMCRaw",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            TH1F* hTemp = new TH1F("BGMCRaw",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                             
                                             TString temp = Var[VarIndex].VarFormula;
                                             temp += ">>BGMCRaw";
@@ -3043,14 +3165,14 @@ void analysis1()
                                 //For data-driven background
                                 for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                     BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                                     BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                                     BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
-                                        TH1F* hTemp = new TH1F("BGData",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                        TH1F* hTemp = new TH1F("BGData",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                         
                                         //fill histograms from trees
                                         TString temp = Var[VarIndex].VarFormula;
@@ -3099,7 +3221,7 @@ void analysis1()
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
-                                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].max);
+                                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
                                     
                                     //Fill Signal
                                     TString temp = Var[VarIndex].VarFormula;
@@ -3237,7 +3359,7 @@ void analysis1()
                                         }
                                     }
                                     
-                                    if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
+                                    if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
                                     {
                                         break;
                                     }
@@ -3259,7 +3381,7 @@ void analysis1()
                                     }
                                 }
                                 
-                                if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
+                                if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
                                 {
                                     bin1 = -1;
                                 }
@@ -3273,11 +3395,11 @@ void analysis1()
                                 }
                             }
                             
-                            double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;
+                            double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
                             double lowerCutRecord1 = -1;
                             double upperCutRecord1 = -1;
-                            if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBinRecord1-1) * BinSize;
-                            if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBinRecord1 * BinSize;
+                            if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + (lowerBinRecord1-1) * BinSize;
+                            if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + upperBinRecord1 * BinSize;
                             
                             cout<<Var[VarIndex].VarName.Data()<<": ";
                             cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
@@ -3287,8 +3409,8 @@ void analysis1()
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
-                                if(lowerCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].lower &&
-                                   upperCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].upper )
+                                if(lowerCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].lower &&
+                                   upperCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].upper )
                                 {
                                     cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
                                 }
@@ -3323,18 +3445,18 @@ void analysis1()
                         
                         if(isChanged)
                         {
-                            cout<<"The "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<" cut is applied."<<endl;
+                            cout<<"The "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].RelatedVariable.Data()<<" cut is applied."<<endl;
                             cout<<"lowerCutRecord2: "<<lowerCutRecord2;
                             cout<<", upperCutRecord2: "<<upperCutRecord2;
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].lower = lowerCutRecord2;
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].upper = upperCutRecord2;
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].lower = lowerCutRecord2;
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].upper = upperCutRecord2;
                         }
                         else
                         {
                             cout<<"The cut is the same."<<endl;
-                            cout<<"The last cut is "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<endl;
+                            cout<<"The last cut is "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].RelatedVariable.Data()<<endl;
                             cout<<"lowerCutRecord2: "<<lowerCutRecord2;
                             cout<<", upperCutRecord2: "<<upperCutRecord2;
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
@@ -3344,13 +3466,13 @@ void analysis1()
                             
                             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                             {
-                                unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].RelatedVariable,Var);
                                 
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].lower;
+                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].lower;
                                 cout<<" <= ";
                                 cout<<Var[VarIndex].VarFormula.Data();
                                 cout<<" < ";
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].upper;
+                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].upper;
                                 cout<<endl;
                             }
                             cout<<endl;
@@ -3367,13 +3489,13 @@ void analysis1()
                                 
                                 for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                                 {
-                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].RelatedVariable,Var);
                                     
                                     fout<<Var[VarIndex].VarName;
                                     fout<<" ";
-                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].lower;
+                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].lower;
                                     fout<<" ";
-                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].upper;
+                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].upper;
                                     fout<<endl;
                                 }
                                 
@@ -3457,21 +3579,21 @@ void analysis1()
                     {
                         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
-                            if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable != Var[VarIndex].VarName)
+                            if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable != Var[VarIndex].VarName)
                             {
-                                unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+                                unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable,Var);
                                 
                                 CommonCut += " && ";
                                 CommonCut += Var[VarIndex2].VarFormula;
                                 CommonCut += " >= ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].lower;
+                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].lower;
                                 
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].upper != -1)
+                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].upper != -1)
                                 {
                                     CommonCut += " && ";
                                     CommonCut += Var[VarIndex2].VarFormula;
                                     CommonCut += " < ";
-                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].upper;
+                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].upper;
                                 }
                             }
                         }
@@ -3500,7 +3622,7 @@ void analysis1()
                                 fin>>VarName;
                                 if(VarName != Var[VarIndex].VarName)
                                 {
-                                    unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+                                    unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable,Var);
                                     
                                     CommonCut += " && ";
                                     CommonCut += Var[VarIndex2].VarFormula;
@@ -5639,7 +5761,7 @@ void analysis1()
         
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
         {
-            unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+            unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable,Var);
             
             if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
             else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
