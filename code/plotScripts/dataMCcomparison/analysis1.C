@@ -3099,6 +3099,8 @@ void analysis1()
                         bool isChanged = false;
                         for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
                         {
+                            const unsigned int VarNumber = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();
+                            
                             TH1F* BGGroupRaw1D[BGGroup.size()];
                             TH1F* h2Sig1D[RegionInfo[RegionIndex].OptimizingCut.size()];
                             
@@ -3146,7 +3148,6 @@ void analysis1()
                                     }
                                 }
                                 
-                                const unsigned int VarNumber = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();
                                 //Background
                                 //For MC background
                                 for(unsigned int j=0;j<tree2BGMC.size();j++)
@@ -3385,16 +3386,18 @@ void analysis1()
                             (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
                              RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" );
                             
-                            int lowerBinRecord1 = 1;
-                            int upperBinRecord1 = 1;
+                            int lowerBinRecord1[VarNumber];
+                            int upperBinRecord1[VarNumber];
                             double nBGRecord1 = -1;
                             double nSigRecord1 = -1;
                             double significanceRecord1 = -999;
                             bool isPrint = false;
                             //isPrint = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta");
                             
-                            int bin1 = 1;
-                            int bin2 = -1;
+                            int bin1[VarNumber];
+                            int bin2[VarNumber];
+                            bin1[0] = 1;
+                            bin2[0] = -1;
                             while(true)
                             {
                                 double nBG = 0;
@@ -3403,7 +3406,7 @@ void analysis1()
                                 double nSigError = 0;
                                 bool skip = false;
                                 
-                                if(isPrint) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
+                                if(isPrint) cout<<"bin1: "<<bin1[0]<<", bin2: "<<bin2[0]<<endl;
                                 
                                 if(!skip)
                                 {
@@ -3412,7 +3415,7 @@ void analysis1()
                                         if(BGGroup[j].info->GroupName == "VV" ||
                                            BGGroup[j].info->GroupName == "ttV")
                                         {
-                                            double nBGRaw = BGGroupRaw1D[j]->Integral(bin1,bin2);
+                                            double nBGRaw = BGGroupRaw1D[j]->Integral(bin1[0],bin2[0]);
                                             if(nBGRaw<=10)
                                             {
                                                 if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
@@ -3421,7 +3424,7 @@ void analysis1()
                                         }
                                         
                                         double Error;
-                                        double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
+                                        double n = BGGroup[j].h2->IntegralAndError(bin1[0],bin2[0],Error);
                                         if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
                                         if(n>0)
                                         {
@@ -3446,7 +3449,7 @@ void analysis1()
                                 if(!skip)
                                 {
                                     double nSig1Error = 0;
-                                    double nSig1 = h2Sig1D[1]->IntegralAndError(bin1,bin2,nSig1Error);
+                                    double nSig1 = h2Sig1D[1]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
                                     
                                     if(nSig1 <=1) skip = true;
                                     else if(nSig1Error == 0) skip = true;
@@ -3458,7 +3461,7 @@ void analysis1()
                                 if(!skip)
                                 {
                                     //expected number of events for signal
-                                    nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
+                                    nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1[0],bin2[0],nSigError);
                                     
                                     
                                     if(nSig <= 1) skip = true;
@@ -3478,8 +3481,8 @@ void analysis1()
                                     
                                     if(significanceTemp > significanceRecord1)
                                     {
-                                        lowerBinRecord1 = bin1;
-                                        upperBinRecord1 = bin2;
+                                        lowerBinRecord1[0] = bin1[0];
+                                        upperBinRecord1[0] = bin2[0];
                                         nBGRecord1 = nBG;
                                         nSigRecord1 = nSig;
                                         significanceRecord1 = significanceTemp;
@@ -3491,18 +3494,18 @@ void analysis1()
                                     }
                                 }
                                 
-                                bool isContinue = NextBin(bin1,bin2,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
+                                bool isContinue = NextBin(bin1[0],bin2[0],RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
                                 if(!isContinue) break;
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
                             double lowerCutRecord1 = -1;
                             double upperCutRecord1 = -1;
-                            if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + (lowerBinRecord1-1) * BinSize;
-                            if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + upperBinRecord1 * BinSize;
+                            if(lowerBinRecord1[0]!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + (lowerBinRecord1[0]-1) * BinSize;
+                            if(upperBinRecord1[0]!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + upperBinRecord1[0] * BinSize;
                             
                             cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable.Data()<<": ";
-                            cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
+                            cout<<"lowerBinRecord1: "<<lowerBinRecord1[0]<<", upperBinRecord1: "<<upperBinRecord1[0];
                             cout<<", lowerCutRecord1: "<<lowerCutRecord1;
                             cout<<", upperCutRecord1: "<<upperCutRecord1;
                             cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
