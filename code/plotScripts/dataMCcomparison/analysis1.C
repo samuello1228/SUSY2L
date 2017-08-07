@@ -3059,15 +3059,6 @@ void analysis1()
                         bool isChanged = false;
                         for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
                         {
-                            unsigned int VarIndex = 0;
-                            for(unsigned int i=0;i<Var.size();i++)
-                            {
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == Var[i].VarName)
-                                {
-                                    VarIndex = i;
-                                }
-                            }
-                            
                             TH1F* BGGroupRaw[BGGroup.size()];
                             TH1F* h2Sig[RegionInfo[RegionIndex].OptimizingCut.size()];
                             {
@@ -3097,6 +3088,15 @@ void analysis1()
                                 
                                 //initialize histograms
                                 //Fill histograms from trees
+                                vector<TString> VarFormula;
+                                for(unsigned int i=0;i<Var.size();i++)
+                                {
+                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == Var[i].VarName)
+                                    {
+                                        VarFormula.push_back(Var[i].VarFormula);
+                                    }
+                                }
+                                
                                 //Background
                                 //For MC background
                                 for(unsigned int j=0;j<tree2BGMC.size();j++)
@@ -3114,7 +3114,7 @@ void analysis1()
                                             TH1F* hTemp = new TH1F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                             
                                             //fill histograms from trees
-                                            TString temp = Var[VarIndex].VarFormula;
+                                            TString temp = VarFormula[0];
                                             temp += ">>BGMC";
                                             
                                             //Weight
@@ -3136,7 +3136,7 @@ void analysis1()
                                         {
                                             TH1F* hTemp = new TH1F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                             
-                                            TString temp = Var[VarIndex].VarFormula;
+                                            TString temp = VarFormula[0];
                                             temp += ">>BGMCRaw";
                                             
                                             //Weight
@@ -3168,7 +3168,7 @@ void analysis1()
                                         TH1F* hTemp = new TH1F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                         
                                         //fill histograms from trees
-                                        TString temp = Var[VarIndex].VarFormula;
+                                        TString temp = VarFormula[0];
                                         temp += ">>BGData";
                                         
                                         TString Cut = "1";
@@ -3217,7 +3217,7 @@ void analysis1()
                                     h2Sig[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
                                     
                                     //Fill Signal
-                                    TString temp = Var[VarIndex].VarFormula;
+                                    TString temp = VarFormula[0];
                                     temp += ">>";
                                     temp += NameTemp;
                                     
@@ -3236,7 +3236,7 @@ void analysis1()
                             double nSigRecord1 = -1;
                             double significanceRecord1 = -999;
                             bool isPrint = false;
-                            //isPrint = (Var[VarIndex].VarName == "dEta");
+                            //isPrint = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta");
                             
                             int bin1 = 1;
                             while(true)
@@ -3251,17 +3251,17 @@ void analysis1()
                                     double nSigError = 0;
                                     bool skip = false;
                                     
-                                    if((Var[VarIndex].VarName == "pt1" ||
-                                        Var[VarIndex].VarName == "pt2" ||
-                                        Var[VarIndex].VarName == "ptll" ||
-                                        Var[VarIndex].VarName == "mTtwo" ||
-                                        Var[VarIndex].VarName == "METRel" ||
-                                        Var[VarIndex].VarName == "meff" ||
-                                        Var[VarIndex].VarName == "mtm" ) &&
+                                    if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" ) &&
                                         bin2!=-1) skip = true;
                                     
-                                    if((Var[VarIndex].VarName == "dEta" ||
-                                        Var[VarIndex].VarName == "mlj" ) &&
+                                    if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" ) &&
                                         bin1!=1) skip = true;
                                     
                                     if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
@@ -3394,7 +3394,7 @@ void analysis1()
                             if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + (lowerBinRecord1-1) * BinSize;
                             if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + upperBinRecord1 * BinSize;
                             
-                            cout<<Var[VarIndex].VarName.Data()<<": ";
+                            cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable.Data()<<": ";
                             cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
                             cout<<", lowerCutRecord1: "<<lowerCutRecord1;
                             cout<<", upperCutRecord1: "<<upperCutRecord1;
