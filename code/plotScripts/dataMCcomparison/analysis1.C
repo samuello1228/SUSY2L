@@ -3092,11 +3092,14 @@ void analysis1()
                                 //initialize histograms
                                 //Fill histograms from trees
                                 vector<TString> VarFormula;
-                                for(unsigned int i=0;i<Var.size();i++)
+                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();i++)
                                 {
-                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == Var[i].VarName)
+                                    for(unsigned int j=0;j<Var.size();j++)
                                     {
-                                        VarFormula.push_back(Var[i].VarFormula);
+                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][i].RelatedVariable == Var[j].VarName)
+                                        {
+                                            VarFormula.push_back(Var[j].VarFormula);
+                                        }
                                     }
                                 }
                                 
