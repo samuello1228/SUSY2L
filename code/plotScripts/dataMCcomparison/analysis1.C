@@ -3341,153 +3341,145 @@ void analysis1()
                             //isPrint = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta");
                             
                             int bin1 = 1;
+                            int bin2 = -1;
                             while(true)
                             {
-                                int bin2 = -1;
-                                double significanceRecord0;
-                                while(true)
+                                double nBG = 0;
+                                double nBGError2 = 0;
+                                double nSig = 0;
+                                double nSigError = 0;
+                                bool skip = false;
+                                
+                                if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" ) &&
+                                   bin2!=-1) skip = true;
+                                
+                                if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" ) &&
+                                   bin1!=1) skip = true;
+                                
+                                if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
+                                
+                                if(!skip)
                                 {
-                                    double nBG = 0;
-                                    double nBGError2 = 0;
-                                    double nSig = 0;
-                                    double nSigError = 0;
-                                    bool skip = false;
-                                    
-                                    if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" ) &&
-                                        bin2!=-1) skip = true;
-                                    
-                                    if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
-                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" ) &&
-                                        bin1!=1) skip = true;
-                                    
-                                    if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
-                                    
-                                    if(!skip)
+                                    for(unsigned int j=0;j<BGGroup.size();j++)
                                     {
-                                        for(unsigned int j=0;j<BGGroup.size();j++)
+                                        if(BGGroup[j].info->GroupName == "VV" ||
+                                           BGGroup[j].info->GroupName == "ttV")
                                         {
-                                            if(BGGroup[j].info->GroupName == "VV" ||
-                                               BGGroup[j].info->GroupName == "ttV")
+                                            double nBGRaw = BGGroupRaw1D[j]->Integral(bin1,bin2);
+                                            if(nBGRaw<=10)
                                             {
-                                                double nBGRaw = BGGroupRaw1D[j]->Integral(bin1,bin2);
-                                                if(nBGRaw<=10)
-                                                {
-                                                    if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
-                                                    skip = true;
-                                                }
+                                                if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
+                                                skip = true;
                                             }
-                                            
-                                            double Error;
-                                            double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
-                                            if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
-                                            if(n>0)
-                                            {
-                                                nBG += n;
-                                            }
-                                            else
-                                            {
-                                                if(BGGroup[j].info->GroupName != "multitop" &&
-                                                   BGGroup[j].info->GroupName != "Vgamma"   &&
-                                                   BGGroup[j].info->GroupName != "Zjets"   )
-                                                {
-                                                    if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
-                                                    skip = true;
-                                                }
-                                            }
-                                            nBGError2 += Error * Error;
                                         }
-                                        if(isPrint && skip) cout<<endl;
-                                        if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
-                                    }
-                                    
-                                    if(!skip)
-                                    {
-                                        double nSig1Error = 0;
-                                        double nSig1 = h2Sig1D[1]->IntegralAndError(bin1,bin2,nSig1Error);
                                         
-                                        if(nSig1 <=1) skip = true;
-                                        else if(nSig1Error == 0) skip = true;
-                                        else if(nSig1/nSig1Error<=2) skip = true;
-                                        
-                                        if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
-                                    }
-                                    
-                                    if(!skip)
-                                    {
-                                        //expected number of events for signal
-                                        nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
-                                        
-                                        
-                                        if(nSig <= 1) skip = true;
-                                        else if(nSigError == 0) skip = true;
-                                        else if(nSig/nSigError<=2) skip = true;
-                                        
-                                        if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
-                                        if(isPrint && !skip) cout<<"nSig: "<<nSig<<", nSigError: "<<nSigError<<endl;
-                                    }
-                                    
-                                    //Significance
-                                    double significanceTemp = -999;
-                                    if(!skip)
-                                    {
-                                        significanceTemp = GetSignificance(nSig,nBG,nBGError2);
-                                        if(isPrint) cout<<"Significance: "<<significanceTemp;
-                                        
-                                        if(significanceTemp > significanceRecord1)
+                                        double Error;
+                                        double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
+                                        if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
+                                        if(n>0)
                                         {
-                                            lowerBinRecord1 = bin1;
-                                            upperBinRecord1 = bin2;
-                                            nBGRecord1 = nBG;
-                                            nSigRecord1 = nSig;
-                                            significanceRecord1 = significanceTemp;
-                                            if(isPrint) cout<<", accepted."<<endl<<endl;
+                                            nBG += n;
                                         }
                                         else
                                         {
-                                            if(isPrint) cout<<endl<<endl;
+                                            if(BGGroup[j].info->GroupName != "multitop" &&
+                                               BGGroup[j].info->GroupName != "Vgamma"   &&
+                                               BGGroup[j].info->GroupName != "Zjets"   )
+                                            {
+                                                if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
+                                                skip = true;
+                                            }
                                         }
+                                        nBGError2 += Error * Error;
                                     }
+                                    if(isPrint && skip) cout<<endl;
+                                    if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
+                                }
+                                
+                                if(!skip)
+                                {
+                                    double nSig1Error = 0;
+                                    double nSig1 = h2Sig1D[1]->IntegralAndError(bin1,bin2,nSig1Error);
                                     
-                                    if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
+                                    if(nSig1 <=1) skip = true;
+                                    else if(nSig1Error == 0) skip = true;
+                                    else if(nSig1/nSig1Error<=2) skip = true;
+                                    
+                                    if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
+                                }
+                                
+                                if(!skip)
+                                {
+                                    //expected number of events for signal
+                                    nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
+                                    
+                                    
+                                    if(nSig <= 1) skip = true;
+                                    else if(nSigError == 0) skip = true;
+                                    else if(nSig/nSigError<=2) skip = true;
+                                    
+                                    if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
+                                    if(isPrint && !skip) cout<<"nSig: "<<nSig<<", nSigError: "<<nSigError<<endl;
+                                }
+                                
+                                //Significance
+                                double significanceTemp = -999;
+                                if(!skip)
+                                {
+                                    significanceTemp = GetSignificance(nSig,nBG,nBGError2);
+                                    if(isPrint) cout<<"Significance: "<<significanceTemp;
+                                    
+                                    if(significanceTemp > significanceRecord1)
                                     {
-                                        break;
-                                    }
-                                    else if(bin2==-1)
-                                    {
-                                        if(bin1==-1)
-                                        {
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            significanceRecord0 = significanceTemp;
-                                            bin2 = bin1;
-                                        }
+                                        lowerBinRecord1 = bin1;
+                                        upperBinRecord1 = bin2;
+                                        nBGRecord1 = nBG;
+                                        nSigRecord1 = nSig;
+                                        significanceRecord1 = significanceTemp;
+                                        if(isPrint) cout<<", accepted."<<endl<<endl;
                                     }
                                     else
                                     {
-                                        bin2++;
+                                        if(isPrint) cout<<endl<<endl;
                                     }
                                 }
                                 
-                                if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
+                                if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
                                 {
-                                    bin1 = -1;
+                                    if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
+                                    {
+                                        bin1 = -1;
+                                    }
+                                    else
+                                    {
+                                        bin1++;
+                                    }
+                                    
+                                    bin2 = -1;
                                 }
-                                else if(bin1==-1)
+                                else if(bin2==-1)
                                 {
-                                    break;
+                                    if(bin1==-1)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        bin2 = bin1;
+                                    }
                                 }
                                 else
                                 {
-                                    bin1++;
+                                    bin2++;
                                 }
+                                
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
