@@ -203,7 +203,7 @@ struct VarData
     double ymax;
 };
 
-unsigned int findVarIndex(TString& VarName, std::vector<VarData>& Var)
+unsigned int findVarIndex(TString const& VarName, std::vector<VarData>& Var)
 {
     for(unsigned int i=0;i<Var.size();i++)
     {
@@ -3096,10 +3096,12 @@ void analysis1()
                     
                     while(true)
                     {
+                        const vector< vector<OptimizingCutData> > OptimizingCutInfo = RegionInfo[RegionIndex].OptimizingCut[SigIndex];
+                        
                         bool isChanged = false;
-                        for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
+                        for(unsigned int VarIndex2=0;VarIndex2<OptimizingCutInfo.size();VarIndex2++)
                         {
-                            const unsigned int VarNumber = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();
+                            const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
                             
                             TH1F* BGGroupRaw1D[BGGroup.size()];
                             TH1F* h2Sig1D[RegionInfo[RegionIndex].OptimizingCut.size()];
@@ -3109,25 +3111,25 @@ void analysis1()
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                                 {
                                     if(i != VarIndex2)
                                     {
-                                        for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].size();j++)
+                                        for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
                                         {
-                                            unsigned int VarIndex3 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].RelatedVariable,Var);
+                                            unsigned int VarIndex3 = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
                                             
                                             CommonCut += " && ";
                                             CommonCut += Var[VarIndex3].VarFormula;
                                             CommonCut += " >= ";
-                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].lower;
+                                            CommonCut += OptimizingCutInfo[i][j].lower;
                                             
-                                            if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper != -1)
+                                            if(OptimizingCutInfo[i][j].upper != -1)
                                             {
                                                 CommonCut += " && ";
                                                 CommonCut += Var[VarIndex3].VarFormula;
                                                 CommonCut += " < ";
-                                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper;
+                                                CommonCut += OptimizingCutInfo[i][j].upper;
                                             }
                                         }
                                     }
@@ -3137,11 +3139,11 @@ void analysis1()
                                 //initialize histograms
                                 //Fill histograms from trees
                                 vector<TString> VarFormula;
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();i++)
+                                for(unsigned int i=0;i<VarNumber;i++)
                                 {
                                     for(unsigned int j=0;j<Var.size();j++)
                                     {
-                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][i].RelatedVariable == Var[j].VarName)
+                                        if(OptimizingCutInfo[VarIndex2][i].RelatedVariable == Var[j].VarName)
                                         {
                                             VarFormula.push_back(Var[j].VarFormula);
                                         }
@@ -3154,13 +3156,13 @@ void analysis1()
                                 {
                                     if(VarNumber==1)
                                     {
-                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
-                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
-                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
@@ -3171,12 +3173,12 @@ void analysis1()
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                                hTemp1D = new TH1F("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                                hTemp2D = new TH2F("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -3215,12 +3217,12 @@ void analysis1()
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                                hTemp1D = new TH1F("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                                hTemp2D = new TH2F("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -3258,11 +3260,11 @@ void analysis1()
                                 {
                                     if(VarNumber==1)
                                     {
-                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
@@ -3272,12 +3274,12 @@ void analysis1()
                                         TString temp;
                                         if(VarNumber==1)
                                         {
-                                            hTemp1D = new TH1F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                            hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                             temp = VarFormula[0];
                                         }
                                         else if(VarNumber==2)
                                         {
-                                            hTemp2D = new TH2F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                            hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                             temp = VarFormula[1];
                                             temp += ":";
                                             temp += VarFormula[0];
@@ -3374,17 +3376,17 @@ void analysis1()
                             }
                             
                             const bool OnlyHasLowerCut =
-                            (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" );
+                            (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "pt1" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "pt2" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "ptll" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mTtwo" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "METRel" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "meff" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mtm" );
                             
                             const bool OnlyHasUpperCut =
-                            (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
-                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" );
+                            (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta" ||
+                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mlj" );
                             
                             int lowerBinRecord1[VarNumber];
                             int upperBinRecord1[VarNumber];
@@ -3392,7 +3394,7 @@ void analysis1()
                             double nSigRecord1 = -1;
                             double significanceRecord1 = -999;
                             bool isPrint = false;
-                            //isPrint = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta");
+                            //isPrint = (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta");
                             
                             int bin1[VarNumber];
                             int bin2[VarNumber];
@@ -3494,17 +3496,17 @@ void analysis1()
                                     }
                                 }
                                 
-                                bool isContinue = NextBin(bin1[0],bin2[0],RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
+                                bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
                                 if(!isContinue) break;
                             }
                             
-                            double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
+                            double BinSize = (OptimizingCutInfo[VarIndex2][0].max - OptimizingCutInfo[VarIndex2][0].min)/OptimizingCutInfo[VarIndex2][0].nBin;
                             double lowerCutRecord1 = -1;
                             double upperCutRecord1 = -1;
-                            if(lowerBinRecord1[0]!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + (lowerBinRecord1[0]-1) * BinSize;
-                            if(upperBinRecord1[0]!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min + upperBinRecord1[0] * BinSize;
+                            if(lowerBinRecord1[0]!=-1) lowerCutRecord1 = OptimizingCutInfo[VarIndex2][0].min + (lowerBinRecord1[0]-1) * BinSize;
+                            if(upperBinRecord1[0]!=-1) upperCutRecord1 = OptimizingCutInfo[VarIndex2][0].min + upperBinRecord1[0] * BinSize;
                             
-                            cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable.Data()<<": ";
+                            cout<<OptimizingCutInfo[VarIndex2][0].RelatedVariable.Data()<<": ";
                             cout<<"lowerBinRecord1: "<<lowerBinRecord1[0]<<", upperBinRecord1: "<<upperBinRecord1[0];
                             cout<<", lowerCutRecord1: "<<lowerCutRecord1;
                             cout<<", upperCutRecord1: "<<upperCutRecord1;
@@ -3512,8 +3514,8 @@ void analysis1()
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
-                                if(lowerCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].lower &&
-                                   upperCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].upper )
+                                if(lowerCutRecord1 == OptimizingCutInfo[VarIndex2][0].lower &&
+                                   upperCutRecord1 == OptimizingCutInfo[VarIndex2][0].upper )
                                 {
                                     cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
                                 }
@@ -3548,7 +3550,7 @@ void analysis1()
                         
                         if(isChanged)
                         {
-                            cout<<"The "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].RelatedVariable.Data()<<" cut is applied."<<endl;
+                            cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<" cut is applied."<<endl;
                             cout<<"lowerCutRecord2: "<<lowerCutRecord2;
                             cout<<", upperCutRecord2: "<<upperCutRecord2;
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
@@ -3559,7 +3561,7 @@ void analysis1()
                         else
                         {
                             cout<<"The cut is the same."<<endl;
-                            cout<<"The last cut is "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].RelatedVariable.Data()<<endl;
+                            cout<<"The last cut is "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<endl;
                             cout<<"lowerCutRecord2: "<<lowerCutRecord2;
                             cout<<", upperCutRecord2: "<<upperCutRecord2;
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
@@ -3567,17 +3569,17 @@ void analysis1()
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
                             cout<<SigMassSplitting[SigIndex].IDName.Data()<<": "<<endl;
                             
-                            for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                            for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                             {
-                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].size();j++)
+                                for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
                                 {
-                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].RelatedVariable,Var);
+                                    unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
                                     
-                                    cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].lower;
+                                    cout<<OptimizingCutInfo[i][j].lower;
                                     cout<<" <= ";
                                     cout<<Var[VarIndex].VarFormula.Data();
                                     cout<<" < ";
-                                    cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper;
+                                    cout<<OptimizingCutInfo[i][j].upper;
                                     cout<<endl;
                                 }
                             }
@@ -3593,17 +3595,17 @@ void analysis1()
                                 ofstream fout;
                                 fout.open(PathName.Data());
                                 
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                                 {
-                                    for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].size();j++)
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
                                     {
-                                        unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].RelatedVariable,Var);
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
                                         
                                         fout<<Var[VarIndex].VarName;
                                         fout<<" ";
-                                        fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].lower;
+                                        fout<<OptimizingCutInfo[i][j].lower;
                                         fout<<" ";
-                                        fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper;
+                                        fout<<OptimizingCutInfo[i][j].upper;
                                         fout<<endl;
                                     }
                                 }
