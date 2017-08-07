@@ -207,10 +207,13 @@ const int N_FAKES_SOURCE=3;
 
 const TString LS_TOSTRING(LEP_SOURCE s)
 {
-	if(s==REAL) return "Real";
-	if(s==HEAVY) return "Heavy";
-	if(s==LIGHT) return "Light";
-	if(s==CONV) return "Conv";
+	switch(s){
+		case  REAL: return "Real";
+		case HEAVY: return "Heavy";
+		case LIGHT: return "Light";
+		case  CONV: return "Conv";
+	}
+
 	// if(s==OTHER) return "Other";
 	return "Unknown";
 }
@@ -233,14 +236,18 @@ const int N_PROC=8;
 
 const TString LP_TOSTRING(LEP_PROC p)
 {
-	if(p==TTBAR) return "TTBar";
-	// if(p==BBCC) return "BBCC";
-	if(p==ZJETS) return "Zjets";
-	if(p==WJETS) return "Wjets";
-	if(p==VV) return "VV";
-	if(p==VGAMMA) return "Vgamma";
-	if(p==SINGLETOP) return "SingleTop";
-	return "Unknown";
+	switch (p){
+		case TTBAR: return "TTBar";
+		// case BBCC: return "BBCC";
+		case        DY: return        "DY";
+		case       TTV: return       "ttV";
+		case     ZJETS: return     "Zjets";
+		case     WJETS: return     "Wjets";
+		case        VV: return        "VV";
+		case    VGAMMA: return    "Vgamma";
+		case SINGLETOP: return "SingleTop";
+		default       : return   "Unknown";
+	}
 }
 
 enum DATA_TYPE {
@@ -1409,7 +1416,7 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 	if (l==ELEC)
 	{
 		// Standard classification
-		if (type==IsoElectron || (orig==PhotonConv && abs(t->leps[i].firstEgMotherPdgId)==11) ){
+		if(p!=ZJETS) if (type==IsoElectron || (orig==PhotonConv && abs(t->leps[i].firstEgMotherPdgId)==11) ){
 			if(t->leps[i].ID*t->leps[i].firstEgMotherPdgId <0) return make_pair(ELEC,REAL);
 			else throw TString("Charge flipped electron");
 		}
@@ -1444,7 +1451,33 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 
 	if (DEBUG) cout << "Other cases." << endl;
 
-	if (l==MUON && type==IsoMuon) return make_pair(MUON,REAL);
+	if (l==MUON){
+		if (p!=ZJETS && type==IsoMuon) return make_pair(MUON,REAL);
+		else if (p==ZJETS)
+		{
+			int truthI = t->leps[i].truthI;
+			int motherI = -1;
+			if (DEBUG && truthI>=0) cout << "Truth particle found:" << truthI << endl;
+			while(truthI>=0)
+			{
+				motherI = t->truths[truthI].motherI;
+				if (DEBUG) cout << "Mother: " << motherI << endl;
+				if (motherI < 0 || motherI > 100) break;
+				else if (t->truths[motherI].pdgId==23)
+				{
+					if (DEBUG) cout << "Z mother found." << endl;
+					if(abs(t->truths[truthI].pdgId)==13)
+					{
+						if (DEBUG) cout << "Original muon from Z found" << endl;
+						if(t->leps[i].ID*t->truths[i].pdgId <0) return make_pair(MUON,REAL);
+						else throw TString("Charge flipped muon from Z");
+					}
+				}
+				else if (t->truths[motherI].pdgId!=22 || abs(t->truths[motherI].pdgId)!=13) break;
+				truthI = motherI;
+			}
+		}
+	}
 	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
 		|| orig==CharmedBaryon || orig==BottomBaryon || orig==JPsi)
 		return make_pair(l,HEAVY);
