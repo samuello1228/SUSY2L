@@ -3575,21 +3575,24 @@ void analysis1()
                     {
                         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
-                            if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable != Var[VarIndex].VarName)
+                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();j++)
                             {
-                                unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable,Var);
-                                
-                                CommonCut += " && ";
-                                CommonCut += Var[VarIndex2].VarFormula;
-                                CommonCut += " >= ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].lower;
-                                
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].upper != -1)
+                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable != Var[VarIndex].VarName)
                                 {
+                                    unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
+                                    
                                     CommonCut += " && ";
                                     CommonCut += Var[VarIndex2].VarFormula;
-                                    CommonCut += " < ";
-                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][0].upper;
+                                    CommonCut += " >= ";
+                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].lower;
+                                    
+                                    if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].upper != -1)
+                                    {
+                                        CommonCut += " && ";
+                                        CommonCut += Var[VarIndex2].VarFormula;
+                                        CommonCut += " < ";
+                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].upper;
+                                    }
                                 }
                             }
                         }
