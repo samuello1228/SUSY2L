@@ -3670,13 +3670,21 @@ void analysis1()
                         
                         if(isChanged)
                         {
-                            cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<" cut is applied."<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2[0];
-                            cout<<", upperCutRecord2: "<<upperCutRecord2[0];
-                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            cout<<"The following cut is applied."<<endl;
+                            for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                            {
+                                cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][i].RelatedVariable.Data()<<" cut is applied. ";
+                                cout<<"lowerCutRecord2: "<<lowerCutRecord2[i];
+                                cout<<", upperCutRecord2: "<<upperCutRecord2[i];
+                                cout<<endl;
+                            }
+                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].lower = lowerCutRecord2[0];
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].upper = upperCutRecord2[0];
+                            for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                            {
+                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = lowerCutRecord2[i];
+                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = upperCutRecord2[i];
+                            }
                         }
                         else
                         {
