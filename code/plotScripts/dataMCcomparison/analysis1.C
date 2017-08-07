@@ -3551,16 +3551,26 @@ void analysis1()
                                 }
                                 
                                 //Significance
-                                double significanceTemp = -999;
                                 if(!skip)
                                 {
-                                    significanceTemp = GetSignificance(nSig,nBG,nBGError2);
+                                    double significanceTemp = GetSignificance(nSig,nBG,nBGError2);
                                     if(isPrint) cout<<"Significance: "<<significanceTemp;
                                     
                                     if(significanceTemp > significanceRecord1)
                                     {
-                                        lowerBinRecord1[0] = bin1[0];
-                                        upperBinRecord1[0] = bin2[0];
+                                        if(VarNumber==1)
+                                        {
+                                            lowerBinRecord1[0] = bin1[0];
+                                            upperBinRecord1[0] = bin2[0];
+                                        }
+                                        else if(VarNumber==2)
+                                        {
+                                            lowerBinRecord1[0] = bin1[0];
+                                            upperBinRecord1[0] = bin2[0];
+                                            lowerBinRecord1[1] = bin1[1];
+                                            upperBinRecord1[1] = bin2[1];
+                                        }
+                                        
                                         nBGRecord1 = nBG;
                                         nSigRecord1 = nSig;
                                         significanceRecord1 = significanceTemp;
