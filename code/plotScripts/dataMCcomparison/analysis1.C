@@ -3215,17 +3215,34 @@ void analysis1()
                                 //For data-driven background
                                 for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
-                                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                                    BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
-                                    BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
+                                    if(VarNumber==1)
+                                    {
+                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                    }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
-                                        TH1F* hTemp = new TH1F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                        TH1F* hTemp1D;
+                                        TH2F* hTemp2D;
+                                        TString temp;
+                                        if(VarNumber==1)
+                                        {
+                                            hTemp1D = new TH1F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                            temp = VarFormula[0];
+                                        }
+                                        else if(VarNumber==2)
+                                        {
+                                            hTemp2D = new TH2F("BGData","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                            temp = VarFormula[1];
+                                            temp += ":";
+                                            temp += VarFormula[0];
+                                        }
                                         
                                         //fill histograms from trees
-                                        TString temp = VarFormula[0];
                                         temp += ">>BGData";
                                         
                                         TString Cut = "1";
@@ -3261,8 +3278,16 @@ void analysis1()
                                         }
                                         
                                         //Add MCData
-                                        BGGroup[j].h2->Add(hTemp);
-                                        delete hTemp;
+                                        if(VarNumber==1)
+                                        {
+                                            BGGroup[j].h2->Add(hTemp1D);
+                                            delete hTemp1D;
+                                        }
+                                        else if(VarNumber==2)
+                                        {
+                                            BGGroup[j].h3->Add(hTemp2D);
+                                            delete hTemp2D;
+                                        }
                                     }
                                 }
                                 
