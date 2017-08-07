@@ -3561,8 +3561,28 @@ void analysis1()
                                     }
                                 }
                                 
-                                bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
-                                if(!isContinue) break;
+                                if(VarNumber==1)
+                                {
+                                    bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
+                                    if(!isContinue) break;
+                                }
+                                else if(VarNumber==2)
+                                {
+                                    bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OnlyHasLowerCut[1],OnlyHasUpperCut[1]);
+                                    if(!isContinue)
+                                    {
+                                        isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
+                                        if(isContinue)
+                                        {
+                                            bin1[1] = 1;
+                                            bin2[1] = -1;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                             
                             double BinSize = (OptimizingCutInfo[VarIndex2][0].max - OptimizingCutInfo[VarIndex2][0].min)/OptimizingCutInfo[VarIndex2][0].nBin;
