@@ -3109,8 +3109,8 @@ void analysis1()
                 //for(unsigned int SigIndex=0;SigIndex<RegionInfo[RegionIndex].OptimizingCut.size();SigIndex++)
                 {
                     unsigned int VarIndexRecord2 = 0;
-                    double lowerCutRecord2 = 0;
-                    double upperCutRecord2 = 0;
+                    vector<double> lowerCutRecord2;
+                    vector<double> upperCutRecord2;
                     double nBGRecord2 = 0;
                     double nSigRecord2 = 0;
                     double significanceRecord2 = -999;
@@ -3624,8 +3624,13 @@ void analysis1()
                                     cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
                                     
                                     VarIndexRecord2 = VarIndex2;
-                                    lowerCutRecord2 = lowerCutRecord1[0];
-                                    upperCutRecord2 = upperCutRecord1[0];
+                                    lowerCutRecord2.clear();
+                                    upperCutRecord2.clear();
+                                    for(unsigned int i=0;i<VarNumber;i++)
+                                    {
+                                        lowerCutRecord2.push_back(lowerCutRecord1[i]);
+                                        upperCutRecord2.push_back(upperCutRecord1[i]);
+                                    }
                                     nBGRecord2 = nBGRecord1;
                                     nSigRecord2 = nSigRecord1;
                                     significanceRecord2 = significanceRecord1;
@@ -3651,19 +3656,19 @@ void analysis1()
                         if(isChanged)
                         {
                             cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<" cut is applied."<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
-                            cout<<", upperCutRecord2: "<<upperCutRecord2;
+                            cout<<"lowerCutRecord2: "<<lowerCutRecord2[0];
+                            cout<<", upperCutRecord2: "<<upperCutRecord2[0];
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].lower = lowerCutRecord2;
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].upper = upperCutRecord2;
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].lower = lowerCutRecord2[0];
+                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][0].upper = upperCutRecord2[0];
                         }
                         else
                         {
                             cout<<"The cut is the same."<<endl;
                             cout<<"The last cut is "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
-                            cout<<", upperCutRecord2: "<<upperCutRecord2;
+                            cout<<"lowerCutRecord2: "<<lowerCutRecord2[0];
+                            cout<<", upperCutRecord2: "<<upperCutRecord2[0];
                             cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
