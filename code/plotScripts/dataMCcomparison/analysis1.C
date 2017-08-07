@@ -3689,10 +3689,7 @@ void analysis1()
                         else
                         {
                             cout<<"The cut is the same."<<endl;
-                            cout<<"The last cut is "<<OptimizingCutInfo[VarIndexRecord2][0].RelatedVariable.Data()<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2[0];
-                            cout<<", upperCutRecord2: "<<upperCutRecord2[0];
-                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
                             cout<<SigMassSplitting[SigIndex].IDName.Data()<<": "<<endl;
