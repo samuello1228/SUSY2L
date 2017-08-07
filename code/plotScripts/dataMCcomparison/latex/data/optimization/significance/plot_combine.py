@@ -95,9 +95,82 @@ def test1():
     getSig(sys.argv[1:])
 
 def test():
-    gr1 = getSig(glob.glob("SR*.txt"),True,"Jet |#eta|<2.4","JetEta_2p4")
-    gr2 = getSig(glob.glob("bugFix_Aug04/SR*.txt"),True,"Jet |#eta|<2.8","JetEta_2p8")
+#     gr1 = getSig(glob.glob("SR*.txt"),True,"Jet |#eta|<2.4","JetEta_2p4")
+#     gr2 = getSig(glob.glob("bugFix_Aug04/SR*.txt"),True,"Jet |#eta|<2.8","JetEta_2p8")
 
+    show = False
+    gr1 = getSig(glob.glob("SR*.txt"),show,"Jet |#eta|<2.4","JetEta_2p4")
+    gr2 = getSig(glob.glob("bugFix_Aug04/SR*.txt"),show,"Jet |#eta|<2.8","JetEta_2p8")
+
+#     c1 = TCanvas()
+#     c1.Divide(2)
+#     c1.cd(1)
+#     gr1.Draw('colz')
+#     c1.cd(2)
+#     gr2.Draw('colz')
+#     waitRootCmd()
+
+
+
+#     gStyle.SetPadRightMargin(0.16)
+    gr1.Draw()
+    h1 = gr1.GetHistogram();
+    gr2.Draw()
+    h1 = gr2.GetHistogram();
+    h1.Draw("axis")
+    h1.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+    h1.GetYaxis().SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+    h1.GetZaxis().SetTitle("Z_{n}");
+    h1.GetXaxis().SetRangeUser(0,350)
+    h1.GetZaxis().SetRangeUser(0,4)
+
+    fun1 = TF1("linex","x-125.5", 0, 350);
+    fun1.SetLineColor(kGray)
+    fun1.SetLineWidth(2)
+    fun1.SetLineStyle(8)
+    fun1.Draw("same");
+#     waitRootCmd()
+
+    lg = TLegend(0.2, 0.65,0.4,0.85)
+    lg.SetFillStyle(0)
+    lines = {1:2, 2:5, 3:9} # Zn, line Style
+
+    lg.AddEntry(None, "|#eta|<2.8","")
+    for lx in lines:
+        ltag = "s1_"+str(lx)
+        grL = gr1.GetContourList(lx);
+        next1 = TIter(grL);
+        while True:
+            obj = next1()
+            if obj == None: break
+            obj.SetLineWidth(2);
+            obj.SetLineStyle(lines[lx]);
+            obj.Draw("same");
+            obj.SetName(ltag);
+        xt0 = gPad.GetPrimitive(ltag);
+        lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
+
+    lg.AddEntry(None, "------","")
+    lg.AddEntry(None, "|#eta|<2.4","")
+    for lx in lines:
+        ltag = "s2_"+str(lx)
+        grL = gr2.GetContourList(lx);
+        next1 = TIter(grL);
+        while True:
+            obj = next1()
+            if obj == None: break
+            obj.SetLineColor(2);
+            obj.SetLineWidth(2);
+            obj.SetLineStyle(lines[lx]);
+            obj.Draw("same");
+            obj.SetName(ltag);
+        xt0 = gPad.GetPrimitive(ltag);
+        if xt0==None: continue
+        lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
+
+    lg.Draw()
+    gPad.Update()
+    waitRootCmd()
 
 funlist.append(test)
 
