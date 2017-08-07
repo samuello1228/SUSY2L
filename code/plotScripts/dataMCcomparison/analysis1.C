@@ -3332,6 +3332,19 @@ void analysis1()
                                 }
                             }
                             
+                            const bool OnlyHasLowerCut =
+                            (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" );
+                            
+                            const bool OnlyHasUpperCut =
+                            (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
+                             RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" );
+                            
                             int lowerBinRecord1 = 1;
                             int upperBinRecord1 = 1;
                             double nBGRecord1 = -1;
@@ -3350,20 +3363,7 @@ void analysis1()
                                 double nSigError = 0;
                                 bool skip = false;
                                 
-                                if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt1" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "pt2" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "ptll" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mTtwo" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "METRel" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "meff" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mtm" ) &&
-                                   bin2!=-1) skip = true;
-                                
-                                if((RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "dEta" ||
-                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].RelatedVariable == "mlj" ) &&
-                                   bin1!=1) skip = true;
-                                
-                                if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
+                                if(isPrint) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
                                 
                                 if(!skip)
                                 {
@@ -3451,11 +3451,17 @@ void analysis1()
                                     }
                                 }
                                 
-                                if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
+                                if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin || OnlyHasLowerCut)
                                 {
+                                    if(OnlyHasUpperCut) break;
+                                    
                                     if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
                                     {
                                         bin1 = -1;
+                                    }
+                                    else if(bin1 == -1) //For OnlyHasLowerCut
+                                    {
+                                        break;
                                     }
                                     else
                                     {
@@ -3479,7 +3485,6 @@ void analysis1()
                                 {
                                     bin2++;
                                 }
-                                
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
