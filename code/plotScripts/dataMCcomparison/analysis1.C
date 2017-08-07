@@ -5439,6 +5439,7 @@ void analysis1()
             h2->GetXaxis()->SetRangeUser(0,350);
             h2->GetZaxis()->SetRangeUser(0,4);
             
+            gStyle->SetNumberContours(255);
             {
                 gStyle->SetPalette(1);
                 
