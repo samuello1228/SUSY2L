@@ -3608,8 +3608,14 @@ void analysis1()
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
-                                if(lowerCutRecord1[0] == OptimizingCutInfo[VarIndex2][0].lower &&
-                                   upperCutRecord1[0] == OptimizingCutInfo[VarIndex2][0].upper )
+                                bool isSameCut = true;
+                                for(unsigned int i=0;i<VarNumber;i++)
+                                {
+                                    if(lowerCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].lower) isSameCut = false;
+                                    if(upperCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].upper) isSameCut = false;
+                                }
+                                
+                                if(isSameCut)
                                 {
                                     cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
                                 }
