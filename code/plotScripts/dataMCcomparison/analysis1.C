@@ -3106,24 +3106,42 @@ void analysis1()
                                     }
                                 }
                                 
+                                const unsigned int VarNumber = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].size();
                                 //Background
                                 //For MC background
                                 for(unsigned int j=0;j<tree2BGMC.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
-                                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                                    BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
-                                    BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
-                                    
-                                    BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                    if(VarNumber==1)
+                                    {
+                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                    }
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         {
-                                            TH1F* hTemp = new TH1F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGMC","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
                                             
                                             //fill histograms from trees
-                                            TString temp = VarFormula[0];
                                             temp += ">>BGMC";
                                             
                                             //Weight
@@ -3137,15 +3155,37 @@ void analysis1()
                                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                             
                                             //normalization for BG
-                                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
-                                            
-                                            BGGroup[j].h2->Add(hTemp);
-                                            delete hTemp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
+                                                BGGroup[j].h2->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
+                                                BGGroup[j].h3->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                         {
-                                            TH1F* hTemp = new TH1F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGMCRaw","",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
                                             
-                                            TString temp = VarFormula[0];
+                                            //fill histograms from trees
                                             temp += ">>BGMCRaw";
                                             
                                             //Weight
@@ -3158,8 +3198,16 @@ void analysis1()
                                             
                                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                             
-                                            BGGroupRaw1D[j]->Add(hTemp);
-                                            delete hTemp;
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroupRaw1D[j]->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroupRaw2D[j]->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                     }
                                 }
