@@ -1908,26 +1908,6 @@ void analysis1()
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             OptimizingCutElement2.clear();
-            OptimizingCutElement3.RelatedVariable = "ptll";
-            OptimizingCutElement3.min = 0;
-            OptimizingCutElement3.max = 300;
-            OptimizingCutElement3.nBin = 30;
-            OptimizingCutElement3.lower = 0;
-            OptimizingCutElement3.upper = -1;
-            OptimizingCutElement2.push_back(OptimizingCutElement3);
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.clear();
-            OptimizingCutElement3.RelatedVariable = "mTtwo";
-            OptimizingCutElement3.min = 0;
-            OptimizingCutElement3.max = 150;
-            OptimizingCutElement3.nBin = 30;
-            OptimizingCutElement3.lower = 0;
-            OptimizingCutElement3.upper = -1;
-            OptimizingCutElement2.push_back(OptimizingCutElement3);
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.clear();
             OptimizingCutElement3.RelatedVariable = "dEta";
             OptimizingCutElement3.min = 0;
             OptimizingCutElement3.max = 5;
@@ -1972,6 +1952,26 @@ void analysis1()
             OptimizingCutElement3.min = 0;
             OptimizingCutElement3.max = 300;
             OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
+            OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
             OptimizingCutElement3.lower = 0;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
