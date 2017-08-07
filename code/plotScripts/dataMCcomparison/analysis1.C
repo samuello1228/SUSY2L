@@ -922,6 +922,8 @@ void analysis1()
         double max;
         int nBin;
         TString RelatedVariable;
+        bool OnlyHasLowerCut;
+        bool OnlyHasUpperCut;
     };
     
     struct RegionGroupData
@@ -1974,6 +1976,25 @@ void analysis1()
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            for(unsigned int i=0;i<OptimizingCutElement1.size();i++)
+            {
+                for(unsigned int j=0;j<OptimizingCutElement1[i].size();j++)
+                {
+                    OptimizingCutElement1[i][j].OnlyHasLowerCut =
+                    (OptimizingCutElement1[i][j].RelatedVariable == "pt1" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "pt2" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "ptll" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mTtwo" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "METRel" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "meff" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mtm" );
+                    
+                    OptimizingCutElement1[i][j].OnlyHasUpperCut =
+                    (OptimizingCutElement1[i][j].RelatedVariable == "dEta" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mlj" );
+                }
+            }
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
@@ -3375,18 +3396,20 @@ void analysis1()
                                 }
                             }
                             
-                            const bool OnlyHasLowerCut =
-                            (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "pt1" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "pt2" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "ptll" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mTtwo" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "METRel" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "meff" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mtm" );
-                            
-                            const bool OnlyHasUpperCut =
-                            (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta" ||
-                             OptimizingCutInfo[VarIndex2][0].RelatedVariable == "mlj" );
+                            bool OnlyHasLowerCut[VarNumber];
+                            bool OnlyHasUpperCut[VarNumber];
+                            if(VarNumber==1)
+                            {
+                                OnlyHasLowerCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut;
+                                OnlyHasUpperCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut;
+                            }
+                            else if(VarNumber==2)
+                            {
+                                OnlyHasLowerCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut;
+                                OnlyHasUpperCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut;
+                                OnlyHasLowerCut[1] = OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut;
+                                OnlyHasUpperCut[1] = OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut;
+                            }
                             
                             int lowerBinRecord1[VarNumber];
                             int upperBinRecord1[VarNumber];
@@ -3398,8 +3421,19 @@ void analysis1()
                             
                             int bin1[VarNumber];
                             int bin2[VarNumber];
-                            bin1[0] = 1;
-                            bin2[0] = -1;
+                            if(VarNumber==1)
+                            {
+                                bin1[0] = 1;
+                                bin2[0] = -1;
+                            }
+                            else if(VarNumber==2)
+                            {
+                                bin1[0] = 1;
+                                bin2[0] = -1;
+                                bin1[1] = 1;
+                                bin2[1] = -1;
+                            }
+                            
                             while(true)
                             {
                                 double nBG = 0;
@@ -3408,7 +3442,17 @@ void analysis1()
                                 double nSigError = 0;
                                 bool skip = false;
                                 
-                                if(isPrint) cout<<"bin1: "<<bin1[0]<<", bin2: "<<bin2[0]<<endl;
+                                if(isPrint)
+                                {
+                                    if(VarNumber==1)
+                                    {
+                                        cout<<"bin1[0]: "<<bin1[0]<<", bin2[0]: "<<bin2[0]<<endl;
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        cout<<"bin1[0]: "<<bin1[0]<<", bin2[0]: "<<bin2[0]<<", bin1[1]: "<<bin1[1]<<", bin2[1]: "<<bin2[1]<<endl;
+                                    }
+                                }
                                 
                                 if(!skip)
                                 {
@@ -3496,7 +3540,7 @@ void analysis1()
                                     }
                                 }
                                 
-                                bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
+                                bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
                                 if(!isContinue) break;
                             }
                             
