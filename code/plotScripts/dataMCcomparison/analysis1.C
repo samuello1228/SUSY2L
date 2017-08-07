@@ -3461,7 +3461,16 @@ void analysis1()
                                         if(BGGroup[j].info->GroupName == "VV" ||
                                            BGGroup[j].info->GroupName == "ttV")
                                         {
-                                            double nBGRaw = BGGroupRaw1D[j]->Integral(bin1[0],bin2[0]);
+                                            double nBGRaw;
+                                            if(VarNumber==1)
+                                            {
+                                                nBGRaw = BGGroupRaw1D[j]->Integral(bin1[0],bin2[0]);
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                nBGRaw = BGGroupRaw2D[j]->Integral(bin1[0],bin2[0],bin1[1],bin2[1]);
+                                            }
+                                            
                                             if(nBGRaw<=10)
                                             {
                                                 if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
@@ -3470,7 +3479,16 @@ void analysis1()
                                         }
                                         
                                         double Error;
-                                        double n = BGGroup[j].h2->IntegralAndError(bin1[0],bin2[0],Error);
+                                        double n;
+                                        if(VarNumber==1)
+                                        {
+                                            n = BGGroup[j].h2->IntegralAndError(bin1[0],bin2[0],Error);
+                                        }
+                                        else if(VarNumber==2)
+                                        {
+                                            n = BGGroup[j].h3->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],Error);
+                                        }
+                                        
                                         if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
                                         if(n>0)
                                         {
