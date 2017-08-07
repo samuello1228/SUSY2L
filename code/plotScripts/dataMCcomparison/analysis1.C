@@ -3585,22 +3585,31 @@ void analysis1()
                                 }
                             }
                             
-                            double BinSize = (OptimizingCutInfo[VarIndex2][0].max - OptimizingCutInfo[VarIndex2][0].min)/OptimizingCutInfo[VarIndex2][0].nBin;
-                            double lowerCutRecord1 = -1;
-                            double upperCutRecord1 = -1;
-                            if(lowerBinRecord1[0]!=-1) lowerCutRecord1 = OptimizingCutInfo[VarIndex2][0].min + (lowerBinRecord1[0]-1) * BinSize;
-                            if(upperBinRecord1[0]!=-1) upperCutRecord1 = OptimizingCutInfo[VarIndex2][0].min + upperBinRecord1[0] * BinSize;
-                            
-                            cout<<OptimizingCutInfo[VarIndex2][0].RelatedVariable.Data()<<": ";
-                            cout<<"lowerBinRecord1: "<<lowerBinRecord1[0]<<", upperBinRecord1: "<<upperBinRecord1[0];
-                            cout<<", lowerCutRecord1: "<<lowerCutRecord1;
-                            cout<<", upperCutRecord1: "<<upperCutRecord1;
-                            cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
+                            double lowerCutRecord1[VarNumber];
+                            double upperCutRecord1[VarNumber];
+                            for(unsigned int i=0;i<VarNumber;i++)
+                            {
+                                double BinSize = (OptimizingCutInfo[VarIndex2][i].max - OptimizingCutInfo[VarIndex2][i].min)/OptimizingCutInfo[VarIndex2][i].nBin;
+                                
+                                if(lowerBinRecord1[i]!=-1) lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
+                                else lowerCutRecord1[i] = -1;
+                                
+                                if(upperBinRecord1[i]!=-1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
+                                else upperCutRecord1[i] = -1;
+                                
+                                cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<": ";
+                                cout<<"lowerBinRecord1: "<<lowerBinRecord1[i];
+                                cout<<", upperBinRecord1: "<<upperBinRecord1[i];
+                                cout<<", lowerCutRecord1: "<<lowerCutRecord1[i];
+                                cout<<", upperCutRecord1: "<<upperCutRecord1[i];
+                                cout<<endl;
+                            }
+                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
-                                if(lowerCutRecord1 == OptimizingCutInfo[VarIndex2][0].lower &&
-                                   upperCutRecord1 == OptimizingCutInfo[VarIndex2][0].upper )
+                                if(lowerCutRecord1[0] == OptimizingCutInfo[VarIndex2][0].lower &&
+                                   upperCutRecord1[0] == OptimizingCutInfo[VarIndex2][0].upper )
                                 {
                                     cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
                                 }
@@ -3609,8 +3618,8 @@ void analysis1()
                                     cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
                                     
                                     VarIndexRecord2 = VarIndex2;
-                                    lowerCutRecord2 = lowerCutRecord1;
-                                    upperCutRecord2 = upperCutRecord1;
+                                    lowerCutRecord2 = lowerCutRecord1[0];
+                                    upperCutRecord2 = upperCutRecord1[0];
                                     nBGRecord2 = nBGRecord1;
                                     nSigRecord2 = nSigRecord1;
                                     significanceRecord2 = significanceRecord1;
