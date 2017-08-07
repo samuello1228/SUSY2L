@@ -3398,17 +3398,10 @@ void analysis1()
                             
                             bool OnlyHasLowerCut[VarNumber];
                             bool OnlyHasUpperCut[VarNumber];
-                            if(VarNumber==1)
+                            for(unsigned int i=0;i<VarNumber;i++)
                             {
-                                OnlyHasLowerCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut;
-                                OnlyHasUpperCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut;
-                            }
-                            else if(VarNumber==2)
-                            {
-                                OnlyHasLowerCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut;
-                                OnlyHasUpperCut[0] = OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut;
-                                OnlyHasLowerCut[1] = OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut;
-                                OnlyHasUpperCut[1] = OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut;
+                                OnlyHasLowerCut[i] = OptimizingCutInfo[VarIndex2][i].OnlyHasLowerCut;
+                                OnlyHasUpperCut[i] = OptimizingCutInfo[VarIndex2][i].OnlyHasUpperCut;
                             }
                             
                             int lowerBinRecord1[VarNumber];
@@ -3421,17 +3414,10 @@ void analysis1()
                             
                             int bin1[VarNumber];
                             int bin2[VarNumber];
-                            if(VarNumber==1)
+                            for(unsigned int i=0;i<VarNumber;i++)
                             {
-                                bin1[0] = 1;
-                                bin2[0] = -1;
-                            }
-                            else if(VarNumber==2)
-                            {
-                                bin1[0] = 1;
-                                bin2[0] = -1;
-                                bin1[1] = 1;
-                                bin2[1] = -1;
+                                bin1[i] = 1;
+                                bin2[i] = -1;
                             }
                             
                             while(true)
@@ -3558,17 +3544,10 @@ void analysis1()
                                     
                                     if(significanceTemp > significanceRecord1)
                                     {
-                                        if(VarNumber==1)
+                                        for(unsigned int i=0;i<VarNumber;i++)
                                         {
-                                            lowerBinRecord1[0] = bin1[0];
-                                            upperBinRecord1[0] = bin2[0];
-                                        }
-                                        else if(VarNumber==2)
-                                        {
-                                            lowerBinRecord1[0] = bin1[0];
-                                            upperBinRecord1[0] = bin2[0];
-                                            lowerBinRecord1[1] = bin1[1];
-                                            upperBinRecord1[1] = bin2[1];
+                                            lowerBinRecord1[i] = bin1[i];
+                                            upperBinRecord1[i] = bin2[i];
                                         }
                                         
                                         nBGRecord1 = nBG;
