@@ -1,6 +1,6 @@
 #!/bin/bash
-tag=v11.5.1.Sam1
-dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root
+tag=v11.5.1.cf12
+dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/Wh_all_merged_PRW.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
