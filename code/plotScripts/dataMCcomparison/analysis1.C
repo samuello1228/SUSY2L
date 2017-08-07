@@ -240,6 +240,46 @@ bool compare2(Group Group1,Group Group2)
     return Group1.h2->GetSumOfWeights() < Group2.h2->GetSumOfWeights();
 }
 
+bool NextBin(int& bin1, int& bin2, int const nBin, bool const OnlyHasLowerCut, bool const OnlyHasUpperCut)
+{
+    if(bin2==nBin || OnlyHasLowerCut)
+    {
+        if(OnlyHasUpperCut) return false;
+        
+        if(bin1 == nBin)
+        {
+            bin1 = -1;
+        }
+        else if(bin1 == -1) //For OnlyHasLowerCut
+        {
+            return false;
+        }
+        else
+        {
+            bin1++;
+        }
+        
+        bin2 = -1;
+    }
+    else if(bin2==-1)
+    {
+        if(bin1==-1)
+        {
+            return false;
+        }
+        else
+        {
+            bin2 = bin1;
+        }
+    }
+    else
+    {
+        bin2++;
+    }
+    
+    return true;
+}
+
 // definition of shared parameter
 // mumu channel
 int iparM[3] = { 0, // pol(2)
@@ -3451,40 +3491,8 @@ void analysis1()
                                     }
                                 }
                                 
-                                if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin || OnlyHasLowerCut)
-                                {
-                                    if(OnlyHasUpperCut) break;
-                                    
-                                    if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin)
-                                    {
-                                        bin1 = -1;
-                                    }
-                                    else if(bin1 == -1) //For OnlyHasLowerCut
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        bin1++;
-                                    }
-                                    
-                                    bin2 = -1;
-                                }
-                                else if(bin2==-1)
-                                {
-                                    if(bin1==-1)
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        bin2 = bin1;
-                                    }
-                                }
-                                else
-                                {
-                                    bin2++;
-                                }
+                                bool isContinue = NextBin(bin1,bin2,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,OnlyHasLowerCut,OnlyHasUpperCut);
+                                if(!isContinue) break;
                             }
                             
                             double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin;
