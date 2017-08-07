@@ -3512,8 +3512,16 @@ void analysis1()
                                 
                                 if(!skip)
                                 {
-                                    double nSig1Error = 0;
-                                    double nSig1 = h2Sig1D[1]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
+                                    double nSig1Error;
+                                    double nSig1;
+                                    if(VarNumber==1)
+                                    {
+                                        nSig1 = h2Sig1D[1]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        nSig1 = h2Sig2D[1]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSig1Error);
+                                    }
                                     
                                     if(nSig1 <=1) skip = true;
                                     else if(nSig1Error == 0) skip = true;
@@ -3525,8 +3533,14 @@ void analysis1()
                                 if(!skip)
                                 {
                                     //expected number of events for signal
-                                    nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1[0],bin2[0],nSigError);
-                                    
+                                    if(VarNumber==1)
+                                    {
+                                        nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1[0],bin2[0],nSigError);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        nSig = h2Sig2D[SigIndex]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError);
+                                    }
                                     
                                     if(nSig <= 1) skip = true;
                                     else if(nSigError == 0) skip = true;
