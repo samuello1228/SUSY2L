@@ -3462,14 +3462,17 @@ void analysis1()
                             
                             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
                             {
-                                unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].RelatedVariable,Var);
-                                
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].lower;
-                                cout<<" <= ";
-                                cout<<Var[VarIndex].VarFormula.Data();
-                                cout<<" < ";
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][0].upper;
-                                cout<<endl;
+                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].size();j++)
+                                {
+                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].RelatedVariable,Var);
+                                    
+                                    cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].lower;
+                                    cout<<" <= ";
+                                    cout<<Var[VarIndex].VarFormula.Data();
+                                    cout<<" < ";
+                                    cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper;
+                                    cout<<endl;
+                                }
                             }
                             cout<<endl;
                             
@@ -3575,7 +3578,7 @@ void analysis1()
                     {
                         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
-                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();j++)
+                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
                             {
                                 if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable != Var[VarIndex].VarName)
                                 {
