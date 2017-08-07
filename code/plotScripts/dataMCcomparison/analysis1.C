@@ -3059,8 +3059,11 @@ void analysis1()
                         bool isChanged = false;
                         for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
                         {
-                            TH1F* BGGroupRaw[BGGroup.size()];
-                            TH1F* h2Sig[RegionInfo[RegionIndex].OptimizingCut.size()];
+                            TH1F* BGGroupRaw1D[BGGroup.size()];
+                            TH1F* h2Sig1D[RegionInfo[RegionIndex].OptimizingCut.size()];
+                            
+                            TH2F* BGGroupRaw2D[BGGroup.size()];
+                            TH2F* h2Sig2D[RegionInfo[RegionIndex].OptimizingCut.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
@@ -3112,7 +3115,7 @@ void analysis1()
                                     BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                                     BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                                     
-                                    BGGroupRaw[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
+                                    BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2][0].max);
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
@@ -3155,7 +3158,7 @@ void analysis1()
                                             
                                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                             
-                                            BGGroupRaw[j]->Add(hTemp);
+                                            BGGroupRaw1D[j]->Add(hTemp);
                                             delete hTemp;
                                         }
                                     }
@@ -3220,7 +3223,7 @@ void analysis1()
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
-                                    h2Sig[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
+                                    h2Sig1D[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
                                     
                                     //Fill Signal
                                     TString temp = VarFormula[0];
@@ -3232,7 +3235,7 @@ void analysis1()
                                     Cut += ")";
                                     
                                     tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                    h2Sig1D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
                                 }
                             }
                             
@@ -3279,7 +3282,7 @@ void analysis1()
                                             if(BGGroup[j].info->GroupName == "VV" ||
                                                BGGroup[j].info->GroupName == "ttV")
                                             {
-                                                double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
+                                                double nBGRaw = BGGroupRaw1D[j]->Integral(bin1,bin2);
                                                 if(nBGRaw<=10)
                                                 {
                                                     if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
@@ -3313,7 +3316,7 @@ void analysis1()
                                     if(!skip)
                                     {
                                         double nSig1Error = 0;
-                                        double nSig1 = h2Sig[1]->IntegralAndError(bin1,bin2,nSig1Error);
+                                        double nSig1 = h2Sig1D[1]->IntegralAndError(bin1,bin2,nSig1Error);
                                         
                                         if(nSig1 <=1) skip = true;
                                         else if(nSig1Error == 0) skip = true;
@@ -3325,7 +3328,7 @@ void analysis1()
                                     if(!skip)
                                     {
                                         //expected number of events for signal
-                                        nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
+                                        nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
                                         
                                         
                                         if(nSig <= 1) skip = true;
@@ -3433,12 +3436,12 @@ void analysis1()
                             for(unsigned int j=0;j<BGGroup.size();j++)
                             {
                                 delete BGGroup[j].h2;
-                                delete BGGroupRaw[j];
+                                delete BGGroupRaw1D[j];
                             }
                             
                             for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
                             {
-                                delete h2Sig[j];
+                                delete h2Sig1D[j];
                             }
                         }
                         
