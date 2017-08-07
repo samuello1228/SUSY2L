@@ -4560,75 +4560,78 @@ void analysis1()
                     
                     for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].OptimizingCut[SigOptimizingIndex].size();i++)
                     {
-                        TString VarName;
-                        double lower;
-                        double upper;
-                        fin>>VarName;
-                        if(VarName == Var[VarIndex].VarName)
+                        for(unsigned int j=0;j<RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].OptimizingCut[SigOptimizingIndex][i].size();j++)
                         {
-                            fin>>lower;
-                            fin>>upper;
-                            
-                            TString NameTemp;
-                            TLine l;
-                            TLine* l1 = nullptr;
-                            TLine* l2 = nullptr;
-                            if(lower == 0)
+                            TString VarName;
+                            double lower;
+                            double upper;
+                            fin>>VarName;
+                            if(VarName == Var[VarIndex].VarName)
                             {
-                                if(upper == -1)
+                                fin>>lower;
+                                fin>>upper;
+                                
+                                TString NameTemp;
+                                TLine l;
+                                TLine* l1 = nullptr;
+                                TLine* l2 = nullptr;
+                                if(lower == 0)
                                 {
+                                    if(upper == -1)
+                                    {
+                                    }
+                                    else
+                                    {
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " < ";
+                                        NameTemp += upper;
+                                        
+                                        l1 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                    }
                                 }
                                 else
                                 {
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " < ";
-                                    NameTemp += upper;
-                                    
-                                    l1 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
+                                    if(upper == -1)
+                                    {
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " >= ";
+                                        NameTemp += lower;
+                                        
+                                        l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                    }
+                                    else
+                                    {
+                                        NameTemp += lower;
+                                        NameTemp += " <= ";
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " < ";
+                                        NameTemp += upper;
+                                        
+                                        l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                        
+                                        l2 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                        l2->SetLineStyle(9);
+                                        l2->SetLineWidth(2);
+                                    }
                                 }
+                                
+                                TLatex lt2;
+                                lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
+                                lt2.SetTextSize(lt2.GetTextSize());
+                                
+                                break;
                             }
                             else
                             {
-                                if(upper == -1)
-                                {
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " >= ";
-                                    NameTemp += lower;
-                                    
-                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
-                                }
-                                else
-                                {
-                                    NameTemp += lower;
-                                    NameTemp += " <= ";
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " < ";
-                                    NameTemp += upper;
-                                    
-                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
-                                    
-                                    l2 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
-                                    l2->SetLineStyle(9);
-                                    l2->SetLineWidth(2);
-                                }
+                                fin>>lower;
+                                fin>>upper;
                             }
-                            
-                            TLatex lt2;
-                            lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
-                            lt2.SetTextSize(lt2.GetTextSize());
-                            
-                            break;
-                        }
-                        else
-                        {
-                            fin>>lower;
-                            fin>>upper;
                         }
                     }
                     
@@ -5676,52 +5679,55 @@ void analysis1()
 
         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
         {
-            TString VarName;
-            double lower;
-            double upper;
-            fin>>VarName;
-            fin>>lower;
-            fin>>upper;
-            
-            unsigned int VarIndex = findVarIndex(VarName,Var);
-            
-            if(lower == 0)
+            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
             {
-                if(upper == -1)
+                TString VarName;
+                double lower;
+                double upper;
+                fin>>VarName;
+                fin>>lower;
+                fin>>upper;
+                
+                unsigned int VarIndex = findVarIndex(VarName,Var);
+                
+                if(lower == 0)
                 {
+                    if(upper == -1)
+                    {
+                    }
+                    else
+                    {
+                        // x < a
+                        fout<<Var[VarIndex].latexName.Data();
+                        fout<<" $<";
+                        fout<<upper;
+                        fout<<"$";
+                        fout<<" \\\\"<<endl;
+                    }
                 }
                 else
                 {
-                    // x < a
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $<";
-                    fout<<upper;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
-                }
-            }
-            else
-            {
-                if(upper == -1)
-                {
-                    // x >= a
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $\\geq ";
-                    fout<<lower;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
-                }
-                else
-                {
-                    // a <= x < b
-                    fout<<"$";
-                    fout<<lower;
-                    fout<<" \\leq$ ";
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $<";
-                    fout<<upper;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
+                    if(upper == -1)
+                    {
+                        // x >= a
+                        fout<<Var[VarIndex].latexName.Data();
+                        fout<<" $\\geq ";
+                        fout<<lower;
+                        fout<<"$";
+                        fout<<" \\\\"<<endl;
+                    }
+                    else
+                    {
+                        // a <= x < b
+                        fout<<"$";
+                        fout<<lower;
+                        fout<<" \\leq$ ";
+                        fout<<Var[VarIndex].latexName.Data();
+                        fout<<" $<";
+                        fout<<upper;
+                        fout<<"$";
+                        fout<<" \\\\"<<endl;
+                    }
                 }
             }
         }
@@ -5768,70 +5774,73 @@ void analysis1()
         
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
         {
-            unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i][0].RelatedVariable,Var);
-            
-            if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
-            else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
-            else fout<<Var[VarIndex].latexName.Data();
-            
-            fout<<" ";
-            if(Var[VarIndex].unit != "") fout<<Var[VarIndex].unit.Data()<<" ";
-            
-            unsigned int SixChannel = 0;
-            while(true)
+            for(unsigned int j=0;j<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i].size();j++)
             {
-                TString VarName;
-                double lower;
-                double upper;
-                fin[SixChannel]>>VarName;
-                fin[SixChannel]>>lower;
-                fin[SixChannel]>>upper;
+                unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
                 
-                fout<<"& ";
-                if(lower == 0)
+                if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
+                else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
+                else fout<<Var[VarIndex].latexName.Data();
+                
+                fout<<" ";
+                if(Var[VarIndex].unit != "") fout<<Var[VarIndex].unit.Data()<<" ";
+                
+                unsigned int SixChannel = 0;
+                while(true)
                 {
-                    if(upper == -1)
+                    TString VarName;
+                    double lower;
+                    double upper;
+                    fin[SixChannel]>>VarName;
+                    fin[SixChannel]>>lower;
+                    fin[SixChannel]>>upper;
+                    
+                    fout<<"& ";
+                    if(lower == 0)
                     {
-                        fout<<"- ";
+                        if(upper == -1)
+                        {
+                            fout<<"- ";
+                        }
+                        else
+                        {
+                            // x < a
+                            fout<<"$<";
+                            fout<<upper;
+                            fout<<"$ ";
+                        }
                     }
                     else
                     {
-                        // x < a
-                        fout<<"$<";
-                        fout<<upper;
-                        fout<<"$ ";
+                        if(upper == -1)
+                        {
+                            // x >= a
+                            fout<<"$\\geq ";
+                            fout<<lower;
+                            fout<<"$ ";
+                        }
+                        else
+                        {
+                            // a <= x < b
+                        }
                     }
-                }
-                else
-                {
-                    if(upper == -1)
-                    {
-                        // x >= a
-                        fout<<"$\\geq ";
-                        fout<<lower;
-                        fout<<"$ ";
-                    }
-                    else
-                    {
-                        // a <= x < b
-                    }
+                    
+                    if(SixChannel == 0) SixChannel = 3;
+                    else if(SixChannel == 3) SixChannel = 1;
+                    else if(SixChannel == 1) SixChannel = 4;
+                    else if(SixChannel == 4) SixChannel = 2;
+                    else if(SixChannel == 2) SixChannel = 5;
+                    else if(SixChannel == 5) break;
                 }
                 
-                if(SixChannel == 0) SixChannel = 3;
-                else if(SixChannel == 3) SixChannel = 1;
-                else if(SixChannel == 1) SixChannel = 4;
-                else if(SixChannel == 4) SixChannel = 2;
-                else if(SixChannel == 2) SixChannel = 5;
-                else if(SixChannel == 5) break;
-            }
-            
-            fout<<"\\\\"<<endl;
-            fout<<"\\hline"<<endl;
-            
-            if(Var[VarIndex].VarName == "pt2")
-            {
-                fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                fout<<"\\\\"<<endl;
                 fout<<"\\hline"<<endl;
+                
+                if(Var[VarIndex].VarName == "pt2")
+                {
+                    fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                    fout<<"\\hline"<<endl;
+                }
             }
         }
         
