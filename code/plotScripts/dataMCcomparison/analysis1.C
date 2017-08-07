@@ -3296,10 +3296,22 @@ void analysis1()
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
-                                    h2Sig1D[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
+                                    
+                                    TString temp;
+                                    if(VarNumber==1)
+                                    {
+                                        h2Sig1D[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
+                                        temp = VarFormula[0];
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        h2Sig2D[j] = new TH2F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].max);
+                                        temp = VarFormula[1];
+                                        temp += ":";
+                                        temp += VarFormula[0];
+                                    }
                                     
                                     //Fill Signal
-                                    TString temp = VarFormula[0];
                                     temp += ">>";
                                     temp += NameTemp;
                                     
@@ -3308,7 +3320,15 @@ void analysis1()
                                     Cut += ")";
                                     
                                     tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig1D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                    
+                                    if(VarNumber==1)
+                                    {
+                                        h2Sig1D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        h2Sig2D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                    }
                                 }
                             }
                             
