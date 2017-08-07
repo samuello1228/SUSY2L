@@ -3643,13 +3643,28 @@ void analysis1()
                             //delete
                             for(unsigned int j=0;j<BGGroup.size();j++)
                             {
-                                delete BGGroup[j].h2;
-                                delete BGGroupRaw1D[j];
+                                if(VarNumber==1)
+                                {
+                                    delete BGGroup[j].h2;
+                                    delete BGGroupRaw1D[j];
+                                }
+                                else if(VarNumber==2)
+                                {
+                                    delete BGGroup[j].h3;
+                                    delete BGGroupRaw2D[j];
+                                }
                             }
                             
                             for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
                             {
-                                delete h2Sig1D[j];
+                                if(VarNumber==1)
+                                {
+                                    delete h2Sig1D[j];
+                                }
+                                else if(VarNumber==2)
+                                {
+                                    delete h2Sig2D[j];
+                                }
                             }
                         }
                         
