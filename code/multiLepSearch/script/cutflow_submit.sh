@@ -1,12 +1,16 @@
 #!/bin/bash
-tag=v11.5.1.cf12
-dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+tag=v11.5.1.cf13
+grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
+
+# dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/Wh_all_merged_PRW.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+mcPRW=dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
 # Use Samuel's or my framework?
 st=fakes
-st=ss
+# st=ss
 
 if true; then
     ###########
@@ -35,7 +39,7 @@ if true; then
     echo "### Executing cutflow for data sample ############################"
     k=${tag}.data
     file=/eos/atlas/user/g/ggallard/xAOD_forTesting/data16_13TeV/DAOD_SUSY2.10314997._000013.pool.root.1
-    ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 0 --study ${st} --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf} --cutflow | tee data.log  
+    ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 0 --study ${st} --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf} --cutflow --grl ${grl} | tee data.log  
 
 
 else 
