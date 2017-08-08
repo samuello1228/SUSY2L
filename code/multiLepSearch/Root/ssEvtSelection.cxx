@@ -35,6 +35,13 @@
 #include <TH1D.h>
 #include <TFile.h>
 
+// For TrigGlobalEfficiencyCorrectionTool
+#include "MuonEfficiencyCorrections/MuonTriggerScaleFactors.h"
+#include "ElectronEfficiencyCorrection/AsgElectronEfficiencyCorrectionTool.h"
+#include "ElectronEfficiencyCorrection/IAsgElectronEfficiencyCorrectionTool.h"
+#include "TrigGlobalEfficiencyCorrection/TrigGlobalEfficiencyCorrectionTool.h"
+#include "TriggerAnalysisInterfaces/ITrigGlobalEfficiencyCorrectionTool.h"
+
 using namespace xAOD;
 using namespace std;
 
