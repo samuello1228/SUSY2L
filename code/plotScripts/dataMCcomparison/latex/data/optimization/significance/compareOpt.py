@@ -18,13 +18,14 @@ class OptResults:
     infoP = re.compile('#(.*): (.*) \+/- (.*) \(.*')
     nPoint = 10.
 
-    def __init__(self, txtfile=None, tag='test'):
+    def __init__(self, txtfile=None, tag='test', ref=None):
         self.tag = tag
         self.hNBkg = None 
         self.gNsig = TGraphErrors()
         self.gZnSig = TGraph()
         self.gTBkg = None
         self.min1 = 0.
+        self.ref = ref
         if txtfile is not None:
             self.load(txtfile)
 
@@ -46,8 +47,10 @@ class OptResults:
                 if head == 'Total BG':
                     nTotalBkg = float(m.group(2))
                     self.gTBkg = TGraphErrors()
-                    self.gTBkg.SetPoint(0, nP, float(m.group(2)))
+                    self.gTBkg.SetPoint(0, 0, float(m.group(2)))
                     self.gTBkg.SetPointError(0, nP, float(m.group(3)))
+                    self.gTBkg.SetPoint(1, self.nPoint, float(m.group(2)))
+                    self.gTBkg.SetPointError(1, nP, float(m.group(3)))
                 else:
                     bkgList.append((head, float(m.group(2)), float(m.group(3))))
                 continue
@@ -65,7 +68,19 @@ class OptResults:
         nBkgC = len(bkgList)
         self.hNBkg = TH1F(self.tag+"hBkg","hBkg",nBkgC, 0., self.nPoint)
         ibin = 1
-        for x in bkgList:
+
+        keys = range(len(bkgList))
+        if self.ref:
+            x1 = self.ref.hNBkg.GetXaxis()
+            ## Get the tag list in current list
+            ltemp = [x[0] for x in bkgList]
+            print ltemp
+            print [x1.GetBinLabel(i+1) for i in keys]
+
+            ## find their indices in the refernece
+            keys = [ltemp.index(x1.GetBinLabel(i+1)) for i in keys]
+        for ix in keys:
+            x = bkgList[ix]
             self.hNBkg.SetBinContent(ibin, x[1])
             self.hNBkg.SetBinError(ibin, x[2])
             self.hNBkg.GetXaxis().SetBinLabel(ibin, x[0])
@@ -73,50 +88,90 @@ class OptResults:
 
             if self.min1 > x[1]-x[2]: self.min1 = x[1]-x[2]
 
+
+class ComparerX:
+    def __init__(self, tag='test'):
+        self.tag = tag
+        self.rx1 = None
+        self.rx2 = None
+        self.channels = ['ee_1','ee_2','emu_1','emu_2','mumu_1','mumu_2']
+        self.dir0 = '/home/dzhang/links/eosOther/cloShared/save/'
+        self.sDir = sDir
+        self.sTag = sTag
+        self.autoSave = sDirectly
+
+    def compareChans(self, chans = ['ee_1','ee_2','emu_1','emu_2','mumu_1','mumu_2']):
+        for chan in chans:
+            self.showCompare(chan)
+    def showCompare(self,chan):
+        r1 = OptResults(self.dir0+self.rx1[0]+'/significance/SR_SS_'+chan+'_opt_0.txt','r1_')
+        r2 = OptResults(self.dir0+self.rx2[0]+'/significance/SR_SS_'+chan+'_opt_0.txt', 'r2_', r1)
+        lg1 = self.rx1[1]
+        lg2 = self.rx2[1]
+
+        hfirst = r1.hNBkg
+        hfirst.Draw("hist")
+
+        r1.gTBkg.SetFillStyle(3004)
+        r1.gTBkg.SetFillColor(kGray)
+        r1.gTBkg.Draw("F2")
+        r1.gTBkg.Draw("L")
+        r2.gTBkg.Draw("F2")
+        r2.gTBkg.Draw("L")
+        r2.gTBkg.SetFillStyle(3005)
+        r2.gTBkg.SetFillColor(46)
+        r2.gTBkg.SetLineColor(2)
+    #     r2.gTBkg.SetMarkerColor(2)
+    #     r2.gTBkg.SetMarkerStyle(26)
+
+        r1.gNsig.Draw("Psame")
+        r2.gNsig.Draw("Psame")
+        r2.gNsig.SetLineColor(2)
+        r2.gNsig.SetMarkerColor(2)
+        r2.gNsig.SetMarkerStyle(26)
+
+        r1.gZnSig.Draw("Psame")
+        r2.gZnSig.Draw("Psame")
+        r1.gZnSig.SetMarkerColor(kGray)
+        r2.gZnSig.SetMarkerColor(kGray)
+        r2.gZnSig.SetMarkerStyle(26)
+
+        fun1 = TF1("fun1", "0", 0, 100)
+        fun1.SetLineStyle(2)
+    #     fun1.SetLineColor(kGray)
+        fun1.Draw("same")
+
+        r1.hNBkg.Draw("histsame")
+        r1.hNBkg.Draw("Esame")
+        r2.hNBkg.Draw("Esame")
+        r2.hNBkg.SetLineColor(2)
+        r2.hNBkg.SetMarkerColor(2)
+        r2.hNBkg.SetMarkerStyle(26)
+
+
+        max1 = max(r1.gNsig.GetHistogram().GetMaximum(), r2.gNsig.GetHistogram().GetMaximum())
+        min1 = min(r1.min1, r2.min1)
+        dm = 0.02*(max1-min1)
+        hfirst.GetYaxis().SetRangeUser(min1-dm,max1+dm)
+        hfirst.GetYaxis().SetTitle("Events")
+        
+
+        lg = TLegend(0.7,0.8,0.9,0.93)
+        lg.SetHeader(chan)
+        lg.SetFillStyle(0)
+        lg.AddEntry(r1.hNBkg,lg1,'lp')
+        lg.AddEntry(r2.hNBkg,lg2,'lp')
+        lg.Draw()
+
+        gPad.Update()
+        waitRootCmd(self.sDir+self.sTag+chan,self.autoSave)
+
 def test():
-    dir0 = '/home/dzhang/links/eosOther/cloShared/save/'
-    print dir0
+    cx1 = ComparerX('tes1')
+    cx1.rx1 = ('2.4_2D','2.4-2D')
+    cx1.rx2 = ('2.8_2D','2.8-2D')
+    cx1.compareChans()
 
-    r1 = OptResults(dir0+'2.8_2D/significance/SR_SS_ee_1_opt_0.txt','r1_')
-    r2 = OptResults(dir0+'2.4_2D/significance/SR_SS_ee_1_opt_0.txt', 'r2_')
-    lg1 = "2.8_2D"
-    lg2 = "2.4_2D"
-
-    hfirst = r1.hNBkg
-    r1.hNBkg.Draw("hist")
-    r2.hNBkg.Draw("Esame")
-    r2.hNBkg.SetLineColor(2)
-    r2.hNBkg.SetMarkerColor(2)
-    r2.hNBkg.SetMarkerStyle(26)
-
-
-    r1.gNsig.Draw("Psame")
-    r2.gNsig.Draw("Psame")
-    r2.gNsig.SetLineColor(2)
-    r2.gNsig.SetMarkerColor(2)
-    r2.gNsig.SetMarkerStyle(26)
-
-    r1.gTBkg.Draw("L")
-    r2.gTBkg.Draw("Lsame")
-    r2.gTBkg.SetLineColor(2)
-    r2.gTBkg.SetMarkerColor(2)
-    r2.gTBkg.SetMarkerStyle(26)
-
-
-    max1 = max(r1.gNsig.GetHistogram().GetMaximum(), r2.gNsig.GetHistogram().GetMaximum())
-    min1 = min(r1.min1, r2.min1)
-    dm = 0.02*(max1-min1)
-    hfirst.GetYaxis().SetRangeUser(min1-dm,max1+dm)
-    
-
-    lg = TLegend(0.7,0.8,0.9,0.93)
-    lg.SetFillStyle(0)
-    lg.AddEntry(r1.hNBkg,lg1,'lp')
-    lg.AddEntry(r2.hNBkg,lg2,'lp')
-    lg.Draw()
-
-    gPad.Update()
-    waitRootCmd()
 funlist.append(test)
 
 if __name__ == '__main__':
