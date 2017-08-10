@@ -1,9 +1,10 @@
 #!/bin/bash
-tag=v10.5
-grl=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
-dataPRW=GoodRunsLists/data16_13TeV/20170215/physics_25ns_20.7.lumicalc.OflLumi-13TeV-008.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
+tag=v11.0
+grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 #SUSYconf=SUSYTools/SUSYTools_Default.conf
-SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
+# SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
+SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update_Loose.conf
 
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root
 
