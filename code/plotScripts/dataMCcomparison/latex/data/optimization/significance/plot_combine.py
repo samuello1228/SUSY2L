@@ -135,7 +135,7 @@ def test():
     lg.SetFillStyle(0)
     lines = {1:2, 2:5, 3:9} # Zn, line Style
 
-    lg.AddEntry(None, "|#eta|<2.8","")
+    lg.AddEntry(None, "|#eta|<2.4","")
     for lx in lines:
         ltag = "s1_"+str(lx)
         grL = gr1.GetContourList(lx);
@@ -150,8 +150,8 @@ def test():
         xt0 = gPad.GetPrimitive(ltag);
         lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
 
-    lg.AddEntry(None, "------","")
-    lg.AddEntry(None, "|#eta|<2.4","")
+    lg.AddEntry(None, "~~~~~~~","")
+    lg.AddEntry(None, "|#eta|<2.8","")
     for lx in lines:
         ltag = "s2_"+str(lx)
         grL = gr2.GetContourList(lx);
