@@ -1,6 +1,6 @@
 pt1 40 -1
-pt2 25 -1
-dEta 0 2
+pt2 20 -1
+dEta 0 1.5
 METRel 0 -1
 meff 200 -1
 mtm 130 -1
