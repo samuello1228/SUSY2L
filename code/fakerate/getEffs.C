@@ -49,7 +49,7 @@ using std::pair;
 enum STUDY {SS, ThreeL};
 
 // ======= CONFIG VARIABLES ======== //
-const double ptBins[] = {20, 40, 80, 150};
+const double ptBins[] = {25, 40, 80, 150};
 const int nPtBins = sizeof(ptBins)/sizeof(double)-1;
 const double etaBins[] = {0, 1.37, 2.5};
 const int nEtaBins = sizeof(etaBins)/sizeof(double)-1;
@@ -273,118 +273,29 @@ class LepProp;
 
 class LepProp
 {
+public:
+	struct lpHistos
+	{
+		TH2* hFake;
+		TH1* hReal;
+		TH1* hFakeProc;
+		TH1* hFakeSource;
+
+		TH2* hFakeNorm;
+		TH1* hRealNorm;
+		TH1* hFakeProcNorm;
+		TH1* hFakeSourceNorm;
+	};
 private:
 	bool DEBUG=false;
 	bool normalized=false;
-	typedef std::vector<double> binsOfEta;
-	typedef std::vector<binsOfEta> binsOfPt;
-	typedef std::vector<binsOfPt> binsOfProc;
-	typedef std::vector<binsOfProc> binsOfSource;
-
-	binsOfSource fakes; 
-	binsOfSource fakeSumW2; 
-	binsOfSource nFakeEntries;
-
-	binsOfSource reals; 
-	binsOfSource realSumW2; 
-	binsOfSource nRealEntries;
-
 	TString name;
-
-	bool AddSourceToVec(binsOfSource &v)
-	{
-		binsOfProc procRow;
-		procRow.reserve(N_PROC);
-		for(int nProc=0; nProc<N_PROC; nProc++) // Add all processes
-		{
-			binsOfPt ptRow;
-			ptRow.reserve(nPtBins);
-			for(int ptBin=0; ptBin < nPtBins; ptBin++) // Add pt bins
-			{
-				binsOfEta etaRow(nEtaBins, 0.0); // Reserve bins of eta
-				ptRow.push_back(etaRow);
-			}
-			procRow.push_back(ptRow);
-		}
-		v.push_back(procRow);
-		return true;
-	}
-
-	bool NormalizeVec(binsOfSource &v, binsOfSource &vSumW2)
-	{
-		for(int ptBin=0; ptBin<nPtBins; ptBin++){
-		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
-		{
-			double sumW = 0;
-			for(uint s=0; s<v.size(); s++){ for(int p=0; p<N_PROC; p++)
-				{sumW +=v[s][p][ptBin][etaBin];}}
-
-			for(uint s=0; s<v.size(); s++){ for(int p=0; p<N_PROC; p++)
-				{v[s][p][ptBin][etaBin] /= sumW; vSumW2[s][p][ptBin][etaBin] /= (sumW*sumW);}}
-		}}
-		
-		return true;
-	}
+	std::vector< std::vector<lpHistos> > histVector;
 
 public:
 	LepProp():LepProp("test"){};
 	LepProp(TString name){
 		this->name = name;
-		AddSourceToVec(reals);
-		for(int i=0; i<N_FAKES_SOURCE; i++) AddSourceToVec(fakes);
-
-		// Initialize sumW vectors
-		realSumW2=reals;
-		fakeSumW2=fakes;
-
-		// Initialize counters for uncertainties
-		nRealEntries = reals;
-		nFakeEntries = fakes;
-
-		if (DEBUG){
-			cout << "LepProp " << name << "initialized." << endl;
-			cout << "The reals vector has size " << reals.size() << endl;
-			cout << "The fakes vector has size " << fakes.size() << endl;
-		}
-	}
-	~LepProp(){}
-
-	bool Fill(LEP_SOURCE s, LEP_PROC p, double pt, double eta, double w)
-	{
-		if (DEBUG) cout << "### Enter " << name << "::Fill()" << endl;
-		int ptBin = GetPtBin(pt)-1; int etaBin = GetEtaBin(eta)-1;
-		if (DEBUG) cout << "### Pt/Eta Bin acquired" << endl;
-		if(ptBin<0 || etaBin<0) return false;
-
-		if(s==REAL) {
-			if (DEBUG) cout << "### Filling real for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
-			reals[0][p][ptBin][etaBin] +=w;
-			realSumW2[0][p][ptBin][etaBin] += w*w;
-			nRealEntries[0][p][ptBin][etaBin] += 1;
-		}
-		else {
-			if (DEBUG) cout << "### Filling fakes for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
-			fakes[s][p][ptBin][etaBin]+=w;
-			fakeSumW2[s][p][ptBin][etaBin] += w*w;
-			nFakeEntries[s][p][ptBin][etaBin] += 1;
-		}
-		if (DEBUG) cout << "### LepProp filled. Return now." << endl;
-
-		return true;
-	}
-
-	bool Normalize()
-	{
-		if(normalized) return true;
-		NormalizeVec(reals, realSumW2);
-		NormalizeVec(fakes, fakeSumW2);
-		return true;
-	};
-
-	bool Draw()
-	{
-
-		Normalize(); // Normalize histograms first
 
 		// PROTOTYPE HISTOGRAMS
 		TH2D* hFakesPrototype2D = new TH2D("hFakesPrototype2D", "Fake lepton composition fractions;Process;Source", N_PROC, 0, N_PROC, N_FAKES_SOURCE, 0, N_FAKES_SOURCE);
@@ -392,6 +303,8 @@ public:
 
 		hFakesPrototype2D->SetDirectory(0);
 		hRealsPrototype->SetDirectory(0);
+		hFakesPrototype2D->GetZaxis()->SetRangeUser(0,1);
+		hRealsPrototype->GetYaxis()->SetRangeUser(0,1);
 
 		// Label bins
 		for(int p=0; p<N_PROC; p++)
@@ -404,19 +317,7 @@ public:
 			hFakesPrototype2D->GetYaxis()->SetBinLabel(s+1, LS_TOSTRING((LEP_SOURCE) s));
 		}
 
-
-		// INTIALIZE HISTOGRAMS
-		struct lpHistos
-		{
-			TH2* hFake;
-			TH1* hReal;
-			TH1* hFakeProc;
-			TH1* hFakeSource;
-		};
-
-		std::vector< std::vector<lpHistos> > histVector;
 		histVector.reserve(nPtBins);
-
 		for(int ptBin=0; ptBin<nPtBins; ptBin++)
 		{
 			std::vector<lpHistos> v;
@@ -447,72 +348,137 @@ public:
 				TString fakesName = (TString) "h" + name + (TString) "_FakeComp_" + ptEtaStr;
 				tmp.hFake = (TH2*) hFakesPrototype2D->Clone(fakesName);
 				tmp.hFake->SetTitle(tmp.hFake->GetTitle()+ptEtaTitle);
-				tmp.hFake->SetDirectory(dir_lepCompMeasurement_lepComp);
-				tmp.hFake->GetZaxis()->SetRangeUser(0,1);
+				tmp.hFake->SetDirectory(dir_lepCompMeasurement_nEvents);
 
 				TString realsName = (TString) "h" + name + (TString) "_RealComp_" + ptEtaStr;
 				tmp.hReal = (TH1*) hRealsPrototype->Clone(realsName);
 				tmp.hReal->SetTitle(tmp.hReal->GetTitle()+ptEtaTitle);
-				tmp.hReal->SetDirectory(dir_lepCompMeasurement_lepComp);
-				tmp.hReal->GetYaxis()->SetRangeUser(0,1);
+				tmp.hReal->SetDirectory(dir_lepCompMeasurement_nEvents);
+
+				tmp.hFakeNorm = 0;
+				tmp.hRealNorm = 0;
+				tmp.hFakeProcNorm = 0;
+				tmp.hFakeSourceNorm = 0;
 
 				v.push_back(tmp);
 			}
 			histVector.push_back(v);
 		}
 
-		// FILL HISTOGRAMS
-		for(int p=0; p<N_PROC; p++){
-		for(int ptBin=0; ptBin<nPtBins; ptBin++){
-		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
-		{
-			histVector[ptBin][etaBin].hReal->Fill(p, reals[0][p][ptBin][etaBin]);
-			double statUnc = TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]);
-			histVector[ptBin][etaBin].hReal->SetBinError(p+1, statUnc);
+		delete hFakesPrototype2D; hFakesPrototype2D = 0; 
+		delete hRealsPrototype; hRealsPrototype = 0; 
 
-			for(int s=0;s<N_FAKES_SOURCE; s++)
-			{
-				histVector[ptBin][etaBin].hFake->Fill(p, s, fakes[s][p][ptBin][etaBin]);
-				double statUnc = TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]);
-				histVector[ptBin][etaBin].hFake->SetBinError(p+1, s+1, statUnc);
-			}
-		}}}
+		if (DEBUG){
+			cout << "LepProp " << name << "initialized." << endl;
+		}
+	}
+	~LepProp(){}
+
+	bool Fill(LEP_SOURCE s, LEP_PROC p, double pt, double eta, double w)
+	{
+		if (DEBUG) cout << "### Enter " << name << "::Fill()" << endl;
+		int ptBin = GetPtBin(pt)-1; int etaBin = GetEtaBin(eta)-1;
+		if (DEBUG) cout << "### Pt/Eta Bin acquired" << endl;
+		if(ptBin<0 || etaBin<0) return false;
+
+		if(s==REAL) {
+			if (DEBUG) cout << "### Filling real for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
+			histVector[ptBin][etaBin].hReal->Fill(p, w);
+		}
+		else {
+			if (DEBUG) cout << "### Filling fakes for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
+			histVector[ptBin][etaBin].hFake->Fill(s, p, w);
+		}
+		if (DEBUG) cout << "### LepProp filled. Return now." << endl;
+
+		return true;
+	}
+
+	bool Normalize()
+	{
+		if(normalized) return true;
+		// Normalize and set styles
+		for(int ptBin=0; ptBin<nPtBins; ptBin++){
+		for(int etaBin=0; etaBin<nEtaBins; etaBin++){
+			// STYLES AND INITIALIZE PROJECTIONS
+			histVector[ptBin][etaBin].hReal->SetFillColor(kAzure+10);
+
+			histVector[ptBin][etaBin].hFakeProc = histVector[ptBin][etaBin].hFake->ProjectionX();
+			histVector[ptBin][etaBin].hFakeProc->SetDirectory(dir_lepCompMeasurement_nEvents);
+			histVector[ptBin][etaBin].hFakeProc->SetName(((TString)"_byProcess").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			histVector[ptBin][etaBin].hFakeProc->SetTitle(((TString)" by process").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
+			histVector[ptBin][etaBin].hFakeProc->SetFillColor(kAzure+10);
+			histVector[ptBin][etaBin].hFakeProc->GetXaxis()->SetRangeUser(0, N_PROC);
+
+			histVector[ptBin][etaBin].hFakeSource = histVector[ptBin][etaBin].hFake->ProjectionY();
+			histVector[ptBin][etaBin].hFakeSource->SetDirectory(dir_lepCompMeasurement_nEvents);
+			histVector[ptBin][etaBin].hFakeSource->SetName(((TString)"_bySource").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			histVector[ptBin][etaBin].hFakeSource->SetTitle(((TString)" by source").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
+			histVector[ptBin][etaBin].hFakeSource->SetFillColor(kAzure+10);
+			histVector[ptBin][etaBin].hFakeSource->GetXaxis()->SetRangeUser(0, N_FAKES_SOURCE);
+
+			// NORMALIZE
+			histVector[ptBin][etaBin].hRealNorm = histVector[ptBin][etaBin].hRealNorm->DrawNormalized();
+			histVector[ptBin][etaBin].hRealNorm->SetName(histVector[ptBin][etaBin].hReal->GetName()+TString("_norm"));
+			histVector[ptBin][etaBin].hRealNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+
+			histVector[ptBin][etaBin].hFakeNorm = (TH2*) histVector[ptBin][etaBin].hFakeNorm->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeNorm->SetName(histVector[ptBin][etaBin].hFake->GetName()+TString("_norm"));
+			histVector[ptBin][etaBin].hFakeNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hFakeNorm->GetZaxis()->SetRangeUser(0,1);
+
+			histVector[ptBin][etaBin].hFakeProcNorm = histVector[ptBin][etaBin].hFakeProc->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeProcNorm->SetName(histVector[ptBin][etaBin].hFakeProc->GetName()+TString("_norm"));
+			histVector[ptBin][etaBin].hFakeProcNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hFakeProcNorm->GetYaxis()->SetRangeUser(0, 1);
+
+			histVector[ptBin][etaBin].hFakeSourceNorm = histVector[ptBin][etaBin].hFakeSource->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeSourceNorm->SetName(histVector[ptBin][etaBin].hFakeSource->GetName()+TString("_norm"));
+			histVector[ptBin][etaBin].hFakeSourceNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hFakeSourceNorm->GetYaxis()->SetRangeUser(0, 1);
+		}}
+		normalized=true;
+		return true;
+	}
+
+	bool Draw()
+	{
+
+		Normalize(); // Normalize histograms first
 
 		// OUTPUT HISTOGRAMS
 		TCanvas *c = new TCanvas();
 		for(int ptBin=0; ptBin<nPtBins; ptBin++){
-		for(int etaBin=0; etaBin<nEtaBins; etaBin++)
-		{
+		for(int etaBin=0; etaBin<nEtaBins; etaBin++){
+
 			// Real composition 
-			histVector[ptBin][etaBin].hReal->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hReal->Draw("bar text");
 			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
 
+			histVector[ptBin][etaBin].hRealNorm->Draw("bar text");
+			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+
 			// Fake composition 2D
-			histVector[ptBin][etaBin].hFake->Draw("colz text");
+			c->SetGrid();
+			histVector[ptBin][etaBin].hFake->Draw("text");
 			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
 
+			histVector[ptBin][etaBin].hFakeNorm->Draw("colz text");
+			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			c->SetGrid(0,0);
+
 			// Fake composition by process
-			histVector[ptBin][etaBin].hFakeProc = histVector[ptBin][etaBin].hFake->ProjectionX();
-			histVector[ptBin][etaBin].hFakeProc->SetDirectory(dir_lepCompMeasurement_lepComp);
-			histVector[ptBin][etaBin].hFakeProc->SetName(((TString)"_byProcess").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
-			histVector[ptBin][etaBin].hFakeProc->SetTitle(((TString)" by process").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
-			histVector[ptBin][etaBin].hFakeProc->GetXaxis()->SetRangeUser(0, N_PROC);
-			histVector[ptBin][etaBin].hFakeProc->GetYaxis()->SetRangeUser(0, 1);
-			histVector[ptBin][etaBin].hFakeProc->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeProc->Draw("bar text");
 			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
+			histVector[ptBin][etaBin].hFakeProcNorm->Draw("bar text");
+			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
 
 			// Fake composition by source
-			histVector[ptBin][etaBin].hFakeSource = histVector[ptBin][etaBin].hFake->ProjectionY();
-			histVector[ptBin][etaBin].hFakeSource->SetDirectory(dir_lepCompMeasurement_lepComp);
-			histVector[ptBin][etaBin].hFakeSource->SetName(((TString)"_bySource").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
-			histVector[ptBin][etaBin].hFakeSource->SetTitle(((TString)" by source").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
-			histVector[ptBin][etaBin].hFakeSource->GetXaxis()->SetRangeUser(0, N_FAKES_SOURCE);
-			histVector[ptBin][etaBin].hFakeSource->GetYaxis()->SetRangeUser(0, 1);
-			histVector[ptBin][etaBin].hFakeSource->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
 			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+			histVector[ptBin][etaBin].hFakeSourceNorm->Draw("bar text");
+			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+
 		}}
 
 		return true;
@@ -527,14 +493,14 @@ public:
 	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, pair<int, int> binNum)
 	{
 		int ptBin = binNum.first-1; int etaBin = binNum.second-1; // -1 to be consistent with the binning scheme of TH1
-		if(ptBin<0 || etaBin<0) return make_pair(0,0);
-		if(s==REAL) return make_pair(reals[0][p][ptBin][etaBin], TMath::Sqrt(realSumW2[0][p][ptBin][etaBin]));
-		else return make_pair(fakes[s][p][ptBin][etaBin], TMath::Sqrt(fakeSumW2[s][p][ptBin][etaBin]));
+		if(ptBin<=0 || etaBin<=0) return make_pair(0,0);
+		if(s==REAL) return make_pair(histVector[ptBin][etaBin].hReal->GetBinContent(p), histVector[ptBin][etaBin].hFake->GetBinError(p));
+		else return make_pair(histVector[ptBin][etaBin].hReal->GetBinContent(p,s), histVector[ptBin][etaBin].hFake->GetBinError(p,s));
 	}
 
 	static int GetPtBin(double pt)
 	{
-		if (pt<ptBins[0]) return -1; // Underflow
+		if (pt<ptBins[0]) return 0; // Underflow
 		for(int i=0; i<nPtBins; i++) if (pt<ptBins[i+1]) return i+1;
 		return nPtBins; // Overflow, place in largest ptBin.
 	}
@@ -542,7 +508,7 @@ public:
 	static int GetEtaBin(double eta)
 	{
 		eta = TMath::Abs(eta);
-		if (eta<etaBins[0]) return -1; // Underflow, not really possible for eta
+		if (eta<etaBins[0]) return 0; // Underflow, not really possible for eta
 		for(int i=0; i<nEtaBins; i++) if (eta<etaBins[i+1]) return i+1;
 		return nEtaBins; // Overflow, place in largest etaBin.
 	}
