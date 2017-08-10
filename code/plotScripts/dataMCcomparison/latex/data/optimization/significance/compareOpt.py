@@ -112,7 +112,7 @@ class ComparerX:
         hfirst = r1.hNBkg
         hfirst.Draw("hist")
 
-        r1.gTBkg.SetFillStyle(3004)
+#         r1.gTBkg.SetFillStyle(3004)
         r1.gTBkg.SetFillColor(kGray)
         r1.gTBkg.Draw("F2")
         r1.gTBkg.Draw("L")
@@ -133,7 +133,7 @@ class ComparerX:
         r1.gZnSig.Draw("Psame")
         r2.gZnSig.Draw("Psame")
         r1.gZnSig.SetMarkerColor(kGray)
-        r2.gZnSig.SetMarkerColor(kGray)
+        r2.gZnSig.SetMarkerColor(kGray+2)
         r2.gZnSig.SetMarkerStyle(26)
 
         fun1 = TF1("fun1", "0", 0, 100)
