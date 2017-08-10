@@ -1413,6 +1413,7 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 		REAL: (IsoElectron || (PhotonCov && firstEgMother== ELEC)) && no charge flip
 		FLIP: (IsoElectron || (PhotonCov && firstEgMother== ELEC)) && charge flip
 	*/
+	/*
 	if (l==ELEC)
 	{
 		// Standard classification
@@ -1449,7 +1450,7 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 		}
 	}
 
-	if (DEBUG) cout << "Other cases." << endl;
+	// if (DEBUG) cout << "Other cases." << endl;
 
 	if (l==MUON){
 		if (p!=ZJETS && type==IsoMuon) return make_pair(MUON,REAL);
@@ -1478,6 +1479,15 @@ inline pair<LEP_TYPE, LEP_SOURCE> castSource(susyEvts* t, int i, LEP_PROC p)
 			}
 		}
 	}
+	*/
+
+	if (l==MUON && type==IsoMuon) return make_pair(MUON, REAL);
+	if (l==ELEC && (type==IsoElectron||(orig==PhotonConv && abs(t->leps[i].firstEgMotherPdgId)==11)))
+	{
+		if (t->leps[i].firstEgMotherPdgId * t->leps[i].ID < 0) return make_pair(ELEC, REAL);
+		else throw TString("Charge flipped electron from Z");
+	}
+
 	if (orig==CharmedMeson || orig==BottomMeson || orig==CCbarMeson || orig==BBbarMeson 
 		|| orig==CharmedBaryon || orig==BottomBaryon || orig==JPsi)
 		return make_pair(l,HEAVY);
