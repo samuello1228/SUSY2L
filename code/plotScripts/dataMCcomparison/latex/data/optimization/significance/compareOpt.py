@@ -194,6 +194,7 @@ def test():
     cx1 = ComparerX('tes1')
     cx1.rx1 = ('2.8_1D','2.8-1D')
     cx1.rx2 = ('2.8_1D_loose','Loose')
+    cx1.sTag = "muEta2p7_"
     cx1.compareChans()
 
 funlist.append(test)
