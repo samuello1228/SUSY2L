@@ -28,6 +28,23 @@ class OptResults:
         self.ref = ref
         if txtfile is not None:
             self.load(txtfile)
+    def getZnDiff(self, ref=None):
+        if ref is None: ref = self.ref
+        if self.gZnSig.GetN() != ref.gZnSig.GetN(): return None
+        gU = TGraph()
+        gD = TGraph()
+        for i in range(self.gZnSig.GetN()):
+            xi,yi,zi = Double(0),Double(0),Double(0)
+            ref.gZnSig.GetPoint(i, xi, yi)
+            self.gZnSig.GetPoint(i, xi, zi)
+            if zi>yi:
+                gU.SetPoint(gU.GetN(), xi, zi)
+            else:
+                gD.SetPoint(gD.GetN(), xi, zi)
+        gU.SetMarkerStyle(26)
+        gD.SetMarkerStyle(32)
+        return gU, gD
+
 
     def load(self, txtfile):
         nP = self.nPoint*0.5
@@ -88,6 +105,8 @@ class OptResults:
 
             if self.min1 > x[1]-x[2]: self.min1 = x[1]-x[2]
 
+     
+
 
 class ComparerX:
     def __init__(self, tag='test'):
@@ -112,7 +131,7 @@ class ComparerX:
         hfirst = r1.hNBkg
         hfirst.Draw("hist")
 
-        r1.gTBkg.SetFillStyle(3004)
+#         r1.gTBkg.SetFillStyle(3004)
         r1.gTBkg.SetFillColor(kGray)
         r1.gTBkg.Draw("F2")
         r1.gTBkg.Draw("L")
@@ -131,10 +150,15 @@ class ComparerX:
         r2.gNsig.SetMarkerStyle(26)
 
         r1.gZnSig.Draw("Psame")
-        r2.gZnSig.Draw("Psame")
+#         r2.gZnSig.Draw("Psame")
         r1.gZnSig.SetMarkerColor(kGray)
-        r2.gZnSig.SetMarkerColor(kGray)
-        r2.gZnSig.SetMarkerStyle(26)
+#         r2.gZnSig.SetMarkerColor(kGray+2)
+#         r2.gZnSig.SetMarkerStyle(26)
+        gU,gD = r2.getZnDiff()
+        gU.SetMarkerColor(kGray+2)
+        gD.SetMarkerColor(kGray+2)
+        gU.Draw("Psame")
+        gD.Draw("Psame")
 
         fun1 = TF1("fun1", "0", 0, 100)
         fun1.SetLineStyle(2)

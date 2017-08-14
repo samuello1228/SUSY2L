@@ -175,20 +175,38 @@ elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fak
     #https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/DerivationFramework/DerivationFrameworkSUSY/trunk/share/SUSY2.py
     #https://twiki.cern.ch/twiki/bin/viewauth/Atlas/LowestUnprescaled
     
-    electronTrig = ["HLT_e24_lhmedium_L1EM20VH","HLT_e24_lhtight_nod0_ivarloose","HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e60_medium","HLT_e140_lhloose_nod0","HLT_e300_etcut"]
-    for i in electronTrig: alg.CF_trigNames.push_back(i)
 
-    dielectronTrig = ["HLT_2e12_lhloose_L12EM10VH","HLT_2e15_lhvloose_nod0_L12EM13VH","HLT_2e17_lhvloose_nod0"]
-    for i in dielectronTrig: alg.CF_trigNames.push_back(i)
+    # 2015 Triggers
+    electronTrig = ["HLT_e24_lhmedium_L1EM20VH","HLT_e60_lhmedium","HLT_e120_lhloose"]
+    for i in electronTrig: alg.CF_trigNames_2015.push_back(i)
 
-    muonTrig = ["HLT_mu20_iloose_L1MU15","HLT_mu24_iloose","HLT_mu24_ivarloose","HLT_mu24_imedium","HLT_mu24_ivarmedium","HLT_mu26_imedium","HLT_mu26_ivarmedium","HLT_mu40","HLT_mu50"]
-    for i in muonTrig: alg.CF_trigNames.push_back(i)
+    dielectronTrig = ["HLT_2e12_lhloose_L12EM10VH"]
+    for i in dielectronTrig: alg.CF_trigNames_2015.push_back(i)
 
-    dimuonTrig = ["HLT_2mu10","HLT_mu18_mu8noL1","HLT_mu18_2mu4noL1","HLT_2mu10_nomucomb","HLT_2mu14","HLT_2mu14_nomucomb","HLT_mu20_mu8noL1","HLT_mu22_mu8noL1"]
-    for i in dimuonTrig: alg.CF_trigNames.push_back(i)
+    muonTrig = ["HLT_mu20_iloose_L1MU15","HLT_mu40"]
+    for i in muonTrig: alg.CF_trigNames_2015.push_back(i)
 
-    elemuonTrig = ["HLT_e17_lhloose_mu14","HLT_e24_lhmedium_L1EM20VHI_mu8noL1","HLT_e7_lhmedium_mu24","HLT_e17_lhloose_nod0_mu14","HLT_e24_lhmedium_nod0_L1EM20VHI_mu8noL1","HLT_e26_lhmedium_nod0_L1EM22VHI_mu8noL1","HLT_e7_lhmedium_nod0_mu24"]
-    for i in elemuonTrig: alg.CF_trigNames.push_back(i)
+    dimuonTrig = ["HLT_mu18_mu8noL1"]
+    for i in dimuonTrig: alg.CF_trigNames_2015.push_back(i)
+
+    elemuonTrig = ["HLT_e17_lhloose_mu14","HLT_e7_lhmedium_mu24"]
+    for i in elemuonTrig: alg.CF_trigNames_2015.push_back(i)
+
+    ## 2016 Triggers
+    electronTrig = ["HLT_e26_lhtight_nod0_ivarloose","HLT_e60_lhmedium_nod0","HLT_e140_lhloose_nod0"]
+    for i in electronTrig: alg.CF_trigNames_2016.push_back(i)
+
+    dielectronTrig = ["HLT_2e17_lhvloose_nod0"]
+    for i in dielectronTrig: alg.CF_trigNames_2016.push_back(i)
+
+    muonTrig = ["HLT_mu26_imedium","HLT_mu50"]
+    for i in muonTrig: alg.CF_trigNames_2016.push_back(i)
+
+    dimuonTrig = ["HLT_mu22_mu8noL1"]
+    for i in dimuonTrig: alg.CF_trigNames_2016.push_back(i)
+
+    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e7_lhmedium_nod0_mu24"]
+    for i in elemuonTrig: alg.CF_trigNames_2016.push_back(i)
  
     alg.study = options.study
 
