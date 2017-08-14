@@ -28,6 +28,18 @@
 // MCTruthClassifier
 #include "MCTruthClassifier/MCTruthClassifier.h"
 
+// For TrigGlobalEfficiencyCorrectionTool
+#include "MuonEfficiencyCorrections/MuonTriggerScaleFactors.h"
+#include "ElectronEfficiencyCorrection/AsgElectronEfficiencyCorrectionTool.h"
+#include "ElectronEfficiencyCorrection/IAsgElectronEfficiencyCorrectionTool.h"
+#include "TrigGlobalEfficiencyCorrection/TrigGlobalEfficiencyCorrectionTool.h"
+#include "TriggerAnalysisInterfaces/ITrigGlobalEfficiencyCorrectionTool.h"
+
+namespace CP{
+  class MuonTriggerScaleFactors;
+  class IMuonTriggerScaleFactors;
+}
+
 class GoodRunsListSelectionTool;
 class TH1;
 
@@ -92,7 +104,8 @@ public:
   int CF_isMC;
   std::vector< std::string > CF_grlFiles;
   std::string CF_ConfigFile;
-  std::vector< std::string > CF_trigNames;
+  std::vector< std::string > CF_trigNames_2015;
+  std::vector< std::string > CF_trigNames_2016;
 
   /// PRW files
   std::vector< std::string > CF_PRW_confFiles;
@@ -127,6 +140,11 @@ public:
     static SG::AuxElement::Accessor<float> charge("charge");
     return charge(*p1)*charge(*p2)>0;
   }
+
+  // New trigger tool
+  bool InitializeTriggerTools(std::string var="");
+
+  // Old trigger tools
   void setupTriggers();
   TRIGCONF* getTriggerConf(uint32_t run);
 
@@ -174,6 +192,21 @@ public:
   std::string m_em_eKey;
   std::string m_em_mKey;
   std::string m_ee_Key;
+
+  // For TrigGlobalEfficiencyTool
+  TrigGlobalEfficiencyCorrectionTool* TriggerSFTool;     //!
+
+  std::map<std::string,std::string> LegsPerTool; //!
+  ToolHandleArray<CP::IMuonTriggerScaleFactors> muonTools;  //! 
+  ToolHandleArray<IAsgElectronEfficiencyCorrectionTool> electronSFTools;  //!
+  ToolHandleArray<IAsgElectronEfficiencyCorrectionTool> electronEffTools; //!  
+
+  std::vector< std::string > triggerInfo; //!
+  std::vector< std::string > triggerList2015; //!
+  std::vector< std::string > triggerList2016; //!
+  std::vector< const xAOD::Electron* > trigPassedElec; //!
+  std::vector< const xAOD::Muon* > trigPassedMuon; //!
+
 
  private:
   // this is needed to distribute the algorithm to the workers

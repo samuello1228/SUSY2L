@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v11.5.1.Sam2
+tag=v11.5.1.Sam14
 grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 
@@ -9,8 +9,14 @@ mcPRW=dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
 # Use Samuel's or my framework?
-# st=fakes
+st=fakes
 st=ss
+
+if [ -d ${tag} ]; then
+    echo "Previous directories/files with tag "${tag}" found."
+    echo "Now rm'ing them"
+    rm -r ${tag}.*
+fi
 
 if true; then
     ###########

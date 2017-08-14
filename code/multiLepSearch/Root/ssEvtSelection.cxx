@@ -35,13 +35,6 @@
 #include <TH1D.h>
 #include <TFile.h>
 
-// For TrigGlobalEfficiencyCorrectionTool
-#include "MuonEfficiencyCorrections/MuonTriggerScaleFactors.h"
-#include "ElectronEfficiencyCorrection/AsgElectronEfficiencyCorrectionTool.h"
-#include "ElectronEfficiencyCorrection/IAsgElectronEfficiencyCorrectionTool.h"
-#include "TrigGlobalEfficiencyCorrection/TrigGlobalEfficiencyCorrectionTool.h"
-#include "TriggerAnalysisInterfaces/ITrigGlobalEfficiencyCorrectionTool.h"
-
 using namespace xAOD;
 using namespace std;
 
@@ -165,14 +158,15 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(6,"dSumW2");
   m_hCutFlow->GetXaxis()->SetBinLabel(7,"All");
   m_hCutFlow->GetXaxis()->SetBinLabel(8,"GRL");
-  m_hCutFlow->GetXaxis()->SetBinLabel(9,"LArErr");
-  m_hCutFlow->GetXaxis()->SetBinLabel(10,"TileErr");
-  m_hCutFlow->GetXaxis()->SetBinLabel(11,"CoreFlag");
-  m_hCutFlow->GetXaxis()->SetBinLabel(12,"PV");
-  m_hCutFlow->GetXaxis()->SetBinLabel(13,"BadMuon");
-  m_hCutFlow->GetXaxis()->SetBinLabel(14,"cosMuon");
-  m_hCutFlow->GetXaxis()->SetBinLabel(15,"BadJet");
-  m_hCutFlow->GetXaxis()->SetBinLabel(16,"nSumW");
+  m_hCutFlow->GetXaxis()->SetBinLabel(9,"Trigger");
+  m_hCutFlow->GetXaxis()->SetBinLabel(10,"LArErr");
+  m_hCutFlow->GetXaxis()->SetBinLabel(11,"TileErr");
+  m_hCutFlow->GetXaxis()->SetBinLabel(12,"CoreFlag");
+  m_hCutFlow->GetXaxis()->SetBinLabel(13,"PV");
+  m_hCutFlow->GetXaxis()->SetBinLabel(14,"BadMuon");
+  m_hCutFlow->GetXaxis()->SetBinLabel(15,"cosMuon");
+  m_hCutFlow->GetXaxis()->SetBinLabel(16,"BadJet");
+  m_hCutFlow->GetXaxis()->SetBinLabel(17,"nSumW");
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
   m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
@@ -210,10 +204,14 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlowDummy = new TH1D( *(TH1D*)m_hCutFlow );
   m_hCutFlowDummy->SetDirectory(0); //prevent saving this hist, set it not belonging to current opend file/dir
 
-  m_hTrigs = new TH1D("hTrigs", "n pass trigger", CF_trigNames.size(), 0, CF_trigNames.size());
-  for(unsigned int i=0; i<CF_trigNames.size(); i++){
-    m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames[i].c_str());
-    std::cout<<CF_trigNames[i].c_str()<<std::endl;
+  m_hTrigs = new TH1D("hTrigs", "n pass trigger", CF_trigNames_2015.size()+CF_trigNames_2016.size(), 0, CF_trigNames_2015.size()+CF_trigNames_2016.size());
+  for(unsigned int i=0; i<CF_trigNames_2015.size(); i++){
+    m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames_2015[i].c_str());
+    std::cout<<CF_trigNames_2015[i].c_str()<<std::endl;
+  }
+  for(unsigned int i=0; i<CF_trigNames_2015.size(); i++){
+    m_hTrigs->GetXaxis()->SetBinLabel(i+1+CF_trigNames_2015.size(),CF_trigNames_2016[i].c_str());
+    std::cout<<CF_trigNames_2016[i].c_str()<<std::endl;
   }
   m_hTrigs->SetDirectory(outputFile);
   return EL::StatusCode::SUCCESS;
@@ -450,6 +448,21 @@ EL::StatusCode ssEvtSelection :: initialize ()
 
 
   return EL::StatusCode::SUCCESS;
+
+  //Initialization of the Trigger SF Tool
+  Info("initialize()", "Initializing Tool: \t %s", "TrigGlobalEfficiencyCorrectionTool");
+  if( !this->InitializeTriggerTools() ){
+    Error("initialize()", "Cannot initialize trigger SF Tools. Exiting." ); return EL::StatusCode::FAILURE; }
+  TriggerSFTool = new TrigGlobalEfficiencyCorrectionTool("TrigGlobalEfficiencyCorrectionTool");
+  ANA_CHECK( TriggerSFTool->setProperty("ElectronEfficiencyTools",electronEffTools) );
+  ANA_CHECK( TriggerSFTool->setProperty("ElectronScaleFactorTools",electronSFTools) );
+  ANA_CHECK( TriggerSFTool->setProperty("MuonTools",muonTools) );
+  ANA_CHECK( TriggerSFTool->setProperty("ListOfLegsPerTool",LegsPerTool) );
+  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose || mu20_iloose_L1MU15_OR_mu40 || 2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
+  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0 || mu26_imedium_OR_mu50 || 2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
+  ANA_CHECK( TriggerSFTool->initialize() );
+
+
 }
 
 
@@ -509,6 +522,17 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_hCutFlow->Fill("GRL", 1);
     }else return sc;
 
+    CHECK(m_objTool->ApplyPRWTool());
+    bool passTrig=false;
+    if (m_objTool->treatAsYear()==2015) for(auto trig : CF_trigNames_2015){
+        if(m_objTool->IsTrigPassed(trig)) {passTrig=true; break;}
+    }
+    else if (m_objTool->treatAsYear()==2016) for(auto trig : CF_trigNames_2016){
+        if(m_objTool->IsTrigPassed(trig)) {passTrig=true; break;}
+    }
+    if (passTrig) m_hCutFlow->Fill("Trigger", 1);
+    else return sc;
+
     /// LArError, tileError, CoreFlags
     if(eventInfo->errorState(xAOD::EventInfo::LAr)!=xAOD::EventInfo::Error){
       m_hCutFlow->Fill("LArErr", 1);
@@ -549,8 +573,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     if(nPV<1) return sc;
     m_hCutFlow->Fill("PV", 1);
-
-    CHECK(m_objTool->ApplyPRWTool());
 
     // Get the Electrons from the event
     xAOD::ElectronContainer* electrons_copy(0);
@@ -976,7 +998,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     // Info("execute()", "Z decay saved");
 
-    // Info("execute()", "Before fillLepton");
     if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
     else m_susyEvt->sig.mjj = -1;
 
@@ -1007,8 +1028,9 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
 
     /// save leptons
-    m_susyEvt->leps.resize(sel_Ls.size()); 
-    // Info("execute()", "There are %d leptons in this event", sel_Ls.size());
+    m_susyEvt->leps.resize(sel_Ls.size());
+    trigPassedElec.clear(); trigPassedMuon.clear(); 
+    // Info("execute()", "There are %lu leptons in this event", sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       auto& l = m_susyEvt->leps[i];
       fillLepton(sel_Ls[i], l, i);
@@ -1051,13 +1073,29 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     //Assign trigCode
     m_susyEvt->sig.trigCode = 0;
-    unsigned long int ADD = 1;
-    for(unsigned int i=0; i<CF_trigNames.size(); i++){
-      if(m_objTool->IsTrigPassed(CF_trigNames[i])){
-        m_susyEvt->sig.trigCode += ADD;
-        m_hTrigs->Fill(CF_trigNames[i].c_str(), 1);
+    unsigned long int ADD;
+    // There are 8 triggers for each year. 
+    // Use the first byte to store 2015
+    // Use the second byte to store 2016
+    if (m_objTool->treatAsYear()==2015){ 
+      ADD = 1; 
+      for(auto trig : CF_trigNames_2015){
+        if(m_objTool->IsTrigPassed(trig)){
+          m_susyEvt->sig.trigCode += ADD;
+          m_hTrigs->Fill(trig.c_str(), 1);
+        }
+        ADD *= 2;
       }
-      ADD *= 2;
+    }
+    else if (m_objTool->treatAsYear()==2016){ 
+      ADD = 1 << CF_trigNames_2015.size(); 
+      for(auto trig : CF_trigNames_2015){
+        if(m_objTool->IsTrigPassed(trig)){
+          m_susyEvt->sig.trigCode += ADD;
+          m_hTrigs->Fill(trig.c_str(), 1);
+        }
+        ADD *= 2;
+      }
     }
 
     //l12
@@ -1172,9 +1210,10 @@ EL::StatusCode ssEvtSelection :: execute ()
       // }
       //Scale factor
       if(CF_isMC){
+        // Info("execute()", "Calculate scale factors");
         if( study == "ss" || study == "fakes")
         {
-          // Trigger SF turned off as of Aug 3 2017
+          // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
           if(sEvt.flag%3 == 1){ // ee
             sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_ee_Key, true);
             //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
@@ -1199,7 +1238,14 @@ EL::StatusCode ssEvtSelection :: execute ()
         // }
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
-        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF;
+        // Info("execute()", "About to calculate trigger scale factors");
+        // if (TriggerSFTool) Info("execute()", "TriggerSFTool initialized");
+        // else Info("execute()", "TriggerSFTool not initialized");
+        double trigSF=0;
+        // CHECK (TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF));
+        sEvt.trigSF = trigSF;
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF; //*sEvt.trigSF;
+        // Info("execute()", "Sca le factors done");
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
@@ -1300,58 +1346,34 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   l.ID = 11000;
 
   // Info("fillLepton(el)", "Before trigger matching");
-  // TRIGGER MATCHING FOR FAKES
+  // Save single lepton trigger matching info for fakes
   if (study=="fakes")
   {
-    if (m_objTool->treatAsYear() == 2015)
-    {
-      if (el->pt()*iGeV > 130)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e120_lhloose")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e120_lhloose")) l.ID +=2;
-      }
-      else if (el->pt()*iGeV > 70)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
-      }
-      else if (el->pt()*iGeV > 30)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH")) l.ID +=2;
-      }
-    }
-    else
-    {
-      if (el->pt()*iGeV > 320)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e300_etcut")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e300_etcut")) l.ID +=2;
-      }
-      else if (el->pt()*iGeV > 150)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e140_lhloose_nod0")) l.ID +=2;
-      }
-      else if (el->pt()*iGeV > 70)
-      {
-        if (m_objTool->IsTrigPassed("HLT_e60_lhmedium")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium")) l.ID +=2;
-      }
-      else if (el->pt()*iGeV > 30)
+    if (m_objTool->treatAsYear() == 2015) // 2015 data
       {
         if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH")
-            || m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose")
-            || m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose")
-            ) l.ID +=1;
-          if ((m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH") && m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH"))
-              || (m_objTool->IsTrigPassed("HLT_e24_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e24_lhtight_nod0_ivarloose"))
-              || (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose") && m_objTool->IsTrigMatched(el, "HLT_e26_lhtight_nod0_ivarloose"))
-            ) l.ID +=2;      
+          || m_objTool->IsTrigPassed("HLT_e60_lhmedium") 
+          || m_objTool->IsTrigPassed("HLT_e120_lhloose") ) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e24_lhmedium_L1EM20VH")
+          || m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium") 
+          || m_objTool->IsTrigMatched(el, "HLT_e120_lhloose") ) l.ID +=2;
       }
-    }
+      else // 2016 data
+      {
+        if (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose")
+          || m_objTool->IsTrigPassed("HLT_e60_lhmedium_nod0") 
+          || m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0") ) l.ID +=1;
+        if (m_objTool->IsTrigMatched(el, "HLT_e26_lhtight_nod0_ivarloose")
+          || m_objTool->IsTrigMatched(el, "HLT_e60_lhmedium_nod0") 
+          || m_objTool->IsTrigMatched(el, "HLT_e140_lhloose_nod0") ) l.ID +=2;
+      }
   }
   // Info("fillLepton(el)", "After trigger matching");
+
+  if (m_objTool->treatAsYear()==2015) for(auto trig : CF_trigNames_2015) if (m_objTool->IsTrigPassed(trig))
+    { trigPassedElec.push_back(el); break; }
+  else if (m_objTool->treatAsYear()==2016) for(auto trig : CF_trigNames_2016) if (m_objTool->IsTrigPassed(trig))
+    { trigPassedElec.push_back(el); break; }
 
   l.ID *= el->charge();
   //l.author = el->author();
@@ -1467,36 +1489,30 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
 {
   l.ID = 13000;
 
-  // Setup trigger information
+  // Save trigger information for fakes study
   if (study=="fakes")
   {
     if (m_objTool->treatAsYear() == 2015)
     {
-      if (mu->pt()*iGeV > 50)
-      {
-        if (m_objTool->IsTrigPassed("HLT_mu40")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(mu, "HLT_mu40")) l.ID +=2;
-      }
-      else if (mu->pt()*iGeV > 30)
-      {
-        if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(mu, "HLT_mu20_iloose_L1MU15")) l.ID +=2;
-      }
+      if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15")
+        || m_objTool->IsTrigPassed("HLT_mu40")) l.ID +=1;
+      if (m_objTool->IsTrigMatched(mu, "HLT_mu20_iloose_L1MU15")
+        || m_objTool->IsTrigMatched(mu, "HLT_mu40")) l.ID +=2;
     }
     else
     {
-      if (mu->pt()*iGeV > 60)
-      {
-        if (m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
-      }
-      else if (mu->pt()*iGeV > 30)
-      {
-        if (m_objTool->IsTrigPassed("HLT_mu24_ivarmedium")) l.ID +=1;
-        if (m_objTool->IsTrigMatched(mu, "HLT_mu24_ivarmedium")) l.ID +=2;      
-      }
+      if (m_objTool->IsTrigPassed("HLT_mu25_imedium")
+        || m_objTool->IsTrigPassed("HLT_mu50")) l.ID +=1;
+      if (m_objTool->IsTrigMatched(mu, "HLT_mu25_imedium")
+        || m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
     }
   }
+  
+  if (m_objTool->treatAsYear()==2015) for(auto trig : CF_trigNames_2015) if (m_objTool->IsTrigPassed(trig))
+    { trigPassedMuon.push_back(mu); break; }
+  else if (m_objTool->treatAsYear()==2016) for(auto trig : CF_trigNames_2016) if (m_objTool->IsTrigPassed(trig))
+    { trigPassedMuon.push_back(mu); break; }
+
   l.ID *= mu->charge();
   //l.author = mu->author();
 
@@ -1737,6 +1753,129 @@ int ssEvtSelection::addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int pLe
   return nv;
 }
 
+bool ssEvtSelection :: InitializeTriggerTools(std::string var){
+
+  const char* APP_NAME = "InitializeTriggerTools()";
+  LegsPerTool.clear();
+  Info( APP_NAME, "Starting to initialize single lepton efficiency tools for GlobalEfficiencyCorrectionTool[%s]", var.c_str() );
+
+  electronEffTools.clear();
+  electronEffTools.clear();
+  electronSFTools.clear();
+  electronSFTools.clear();
+  muonTools.clear();
+  muonTools.clear();
+
+  //Trigger efficiency tool for single lepton trigger
+  AsgElectronEfficiencyCorrectionTool* elEffTool1 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-1"+var);
+  elEffTool1->msg().setLevel( MSG::FATAL );
+  elEffTool1->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elEffTool1->setProperty("TriggerKey","Eff_SINGLE_E_2015_e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose_2016_e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0").ignore();
+  elEffTool1->setProperty("IdKey","Medium").ignore();
+  elEffTool1->setProperty("IsoKey","FixedCutTight").ignore();
+  elEffTool1->setProperty("CorrelationModel","TOTAL").ignore();
+  elEffTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elEffTool1->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-1"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-1");}
+  LegsPerTool["ElTrigEff-1"+var] = "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose,e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0";
+
+  //Trigger SF tool for single lepton trigger
+  AsgElectronEfficiencyCorrectionTool* elSFTool1 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-1"+var);
+  elSFTool1->msg().setLevel( MSG::FATAL );
+  elSFTool1->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elSFTool1->setProperty("TriggerKey","SINGLE_E_2015_e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose_2016_e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0").ignore();
+  elSFTool1->setProperty("IdKey","Medium").ignore();
+  elSFTool1->setProperty("IsoKey","FixedCutTight").ignore();
+  elSFTool1->setProperty("CorrelationModel","TOTAL").ignore();
+  elSFTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elSFTool1->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-1"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-1");}
+  LegsPerTool["ElTrigSF-1"+var] = LegsPerTool["ElTrigEff-1"+var];
+
+  //Trigger efficiency tool for dielectron trigger
+  AsgElectronEfficiencyCorrectionTool* elEffTool2 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-2"+var);
+  elEffTool2->msg().setLevel( MSG::FATAL );
+  elEffTool2->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elEffTool2->setProperty("TriggerKey","Eff_DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0").ignore();
+  elEffTool2->setProperty("IdKey","Medium").ignore();
+  elEffTool2->setProperty("IsoKey","FixedCutTight").ignore();
+  elEffTool2->setProperty("CorrelationModel","TOTAL").ignore();
+  elEffTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elEffTool2->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-2"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-2");}
+  LegsPerTool["ElTrigEff-2"+var] = "e12_lhloose_L1EM10VH,e17_lhvloose_nod0";
+
+  //Trigger SF tool for dilelectron trigger
+  AsgElectronEfficiencyCorrectionTool* elSFTool2 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-2"+var);
+  elSFTool2->msg().setLevel( MSG::FATAL );
+  elSFTool2->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elSFTool2->setProperty("TriggerKey","DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0").ignore();
+  elSFTool2->setProperty("IdKey","Medium").ignore();
+  elSFTool2->setProperty("IsoKey","FixedCutTight").ignore();
+  elSFTool2->setProperty("CorrelationModel","TOTAL").ignore();
+  elSFTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elSFTool2->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-2"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-2");}
+  LegsPerTool["ElTrigSF-2"+var] = LegsPerTool["ElTrigEff-2"+var];
+
+  //Trigger efficiency tool for dilepton trigger
+  AsgElectronEfficiencyCorrectionTool* elEffTool3 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-3"+var);
+  elEffTool3->msg().setLevel( MSG::FATAL );
+  elEffTool3->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elEffTool3->setProperty("TriggerKey","Eff_MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0").ignore();
+  elEffTool3->setProperty("IdKey","Medium").ignore();
+  elEffTool3->setProperty("IsoKey","FixedCutTight").ignore();
+  elEffTool3->setProperty("CorrelationModel","TOTAL").ignore();
+  elEffTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elEffTool3->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-3"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-3");}
+  LegsPerTool["ElTrigEff-3"+var] = "e17_lhloose,e17_lhloose_nod0";
+
+  //Trigger SF tool for dilepton trigger
+  AsgElectronEfficiencyCorrectionTool* elSFTool3 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-3"+var);
+  elSFTool3->msg().setLevel( MSG::FATAL );
+  elSFTool3->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elSFTool3->setProperty("TriggerKey","MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0").ignore();
+  elSFTool3->setProperty("IdKey","Medium").ignore();
+  elSFTool3->setProperty("IsoKey","FixedCutTight").ignore();
+  elSFTool3->setProperty("CorrelationModel","TOTAL").ignore();
+  elSFTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elSFTool3->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-3"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-3");}
+  LegsPerTool["ElTrigSF-3"+var] = LegsPerTool["ElTrigEff-3"+var];
+
+  // Trigger Efficiency tool for muon (2015)
+  CP::MuonTriggerScaleFactors* toolMuons1 =  new CP::MuonTriggerScaleFactors("MuonTrigEff-2015"+var);
+  toolMuons1->msg().setLevel( MSG::FATAL );
+  toolMuons1->setProperty("CalibrationRelease", "170209_Moriond").ignore();
+  toolMuons1->setProperty("MuonQuality", "Tight").ignore();
+  toolMuons1->setProperty("Isolation", "GradientLoose").ignore();
+  toolMuons1->setProperty("Year", "2015").ignore();
+  if(toolMuons1->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize MuonTriggerScaleFactorsTool"); return false;}
+  else{ Info(APP_NAME, "Initialized MuonTriggerScaleFactorsTool for 2015");}
+
+  // Trigger Efficiency tool for muon (2016)
+  CP::MuonTriggerScaleFactors* toolMuons2 =  new CP::MuonTriggerScaleFactors("MuonTrigEff-2016"+var);
+  toolMuons2->msg().setLevel( MSG::FATAL );
+  toolMuons2->setProperty("CalibrationRelease", "170209_Moriond").ignore();
+  toolMuons2->setProperty("MuonQuality", "Tight").ignore();
+  toolMuons2->setProperty("Isolation", "GradientLoose").ignore();
+  toolMuons2->setProperty("Year", "2016").ignore();
+  if(toolMuons2->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize MuonTriggerScaleFactorsTool"); return false;}
+
+  electronEffTools.push_back(elEffTool1);
+  electronEffTools.push_back(elEffTool2);
+  electronEffTools.push_back(elEffTool3);
+  electronSFTools.push_back(elSFTool1);
+  electronSFTools.push_back(elSFTool2);
+  electronSFTools.push_back(elSFTool3);
+  muonTools.push_back(toolMuons1);
+  muonTools.push_back(toolMuons2);
+
+  Info( APP_NAME, "Initialized single lepton efficiency tools for GlobalEfficiencyCorrectionTool[%s]", var.c_str() );
+  return true;
+}
+
 void ssEvtSelection::setupTriggers(){
 
   // if (study=="ss") {
@@ -1786,7 +1925,13 @@ void ssEvtSelection::setupTriggers(){
 
   for(auto& t: m_trigSel){
     unsigned long int m1(1);
-    for(auto& x: CF_trigNames){
+    for(auto& x: CF_trigNames_2015){
+      if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
+      if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
+      if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
+      m1 *= 2;
+    }
+    for(auto& x: CF_trigNames_2016){
       if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
       if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
       if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
