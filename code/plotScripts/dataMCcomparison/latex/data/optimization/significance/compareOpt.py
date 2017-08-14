@@ -168,8 +168,8 @@ class ComparerX:
 
 def test():
     cx1 = ComparerX('tes1')
-    cx1.rx1 = ('2.4_2D','2.4-2D')
-    cx1.rx2 = ('2.8_2D','2.8-2D')
+    cx1.rx1 = ('2.8_1D','2.8-1D')
+    cx1.rx2 = ('2.8_1D_loose','Loose')
     cx1.compareChans()
 
 funlist.append(test)
