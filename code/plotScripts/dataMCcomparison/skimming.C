@@ -66,7 +66,7 @@ struct nEvent
     double nAOD;
 };
 
-const bool recalculate_mlj = true;
+const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
@@ -87,7 +87,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString fileName = SamplePath;
         fileName += "all/user.*.";
         fileName += SampleName;
-        fileName += ".*.myOutput.root";
+        fileName += ".*.myOutput.root*";
         //*/
         
         /*
@@ -417,7 +417,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 //if(nBJet==1) leadingBJetIndex = k;
             }
             
-            if(fabs(jets[k].eta) < 2.4)
+            if(fabs(jets[k].eta) < 2.8)
             {
                 //ISR
                 if(jets[k].pt > 40) nISR++;
@@ -641,7 +641,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
     
     std::vector<nEvent> nSS;
     
