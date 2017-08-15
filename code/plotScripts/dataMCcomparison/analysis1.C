@@ -44,7 +44,7 @@ const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
-const bool FJetVeto = true;
+const bool FJetVeto = 0;
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -4308,7 +4308,8 @@ void analysis1()
                     }
                     
                     //significance for all mass point
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+                       RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
                     {
                         PathName = "latex/data/optimization/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
@@ -4357,6 +4358,7 @@ void analysis1()
                         }
                         fout.close();
                         
+                        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                         {
                             gStyle->SetPalette(1);
                             
@@ -4389,6 +4391,7 @@ void analysis1()
                             delete c2;
                         }
                         
+                        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                         {
                             gStyle->SetPalette(1);
                             
