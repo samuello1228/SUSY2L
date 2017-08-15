@@ -243,15 +243,15 @@ bool compare2(Group Group1,Group Group2)
 
 bool NextBin(int& bin1, int& bin2, int const nBin, bool const OnlyHasLowerCut, bool const OnlyHasUpperCut)
 {
-    if(bin2==nBin || OnlyHasLowerCut)
+    if(bin2 == nBin || OnlyHasLowerCut)
     {
         if(OnlyHasUpperCut) return false;
         
         if(bin1 == nBin)
         {
-            bin1 = -1;
+            bin1 = nBin+1;
         }
-        else if(bin1 == -1) //For OnlyHasLowerCut
+        else if(bin1 == nBin+1) //For OnlyHasLowerCut
         {
             return false;
         }
@@ -260,11 +260,11 @@ bool NextBin(int& bin1, int& bin2, int const nBin, bool const OnlyHasLowerCut, b
             bin1++;
         }
         
-        bin2 = -1;
+        bin2 = nBin+1;
     }
-    else if(bin2==-1)
+    else if(bin2 == nBin+1)
     {
-        if(bin1==-1)
+        if(bin1 == nBin+1)
         {
             return false;
         }
@@ -3430,7 +3430,7 @@ void analysis1()
                             for(unsigned int i=0;i<VarNumber;i++)
                             {
                                 bin1[i] = 1;
-                                bin2[i] = -1;
+                                bin2[i] = OptimizingCutInfo[VarIndex2][i].nBin+1;
                             }
                             
                             while(true)
@@ -3604,10 +3604,9 @@ void analysis1()
                             {
                                 double BinSize = (OptimizingCutInfo[VarIndex2][i].max - OptimizingCutInfo[VarIndex2][i].min)/OptimizingCutInfo[VarIndex2][i].nBin;
                                 
-                                if(lowerBinRecord1[i]!=-1) lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
-                                else lowerCutRecord1[i] = -1;
+                                lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
                                 
-                                if(upperBinRecord1[i]!=-1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
+                                if(upperBinRecord1[i] != OptimizingCutInfo[VarIndex2][i].nBin+1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
                                 else upperCutRecord1[i] = -1;
                                 
                                 cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<": ";

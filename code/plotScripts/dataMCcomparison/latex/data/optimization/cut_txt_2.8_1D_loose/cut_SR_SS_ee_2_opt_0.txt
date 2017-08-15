@@ -1,5 +1,5 @@
 pt1 20 -1
-pt2 -1 -1
+pt2 20 -1
 dEta 0 2.5
 METRel 75 -1
 meff 200 -1
