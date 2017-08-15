@@ -117,14 +117,15 @@ class ComparerX:
         self.dir0 = '/home/dzhang/links/eosOther/cloShared/save/'
         self.sDir = sDir
         self.sTag = sTag
+        self.opt = 'opt'
         self.autoSave = sDirectly
 
     def compareChans(self, chans = ['ee_1','ee_2','emu_1','emu_2','mumu_1','mumu_2']):
         for chan in chans:
             self.showCompare(chan)
     def showCompare(self,chan):
-        r1 = OptResults(self.dir0+self.rx1[0]+'/significance/SR_SS_'+chan+'_opt_0.txt','r1_')
-        r2 = OptResults(self.dir0+self.rx2[0]+'/significance/SR_SS_'+chan+'_opt_0.txt', 'r2_', r1)
+        r1 = OptResults(self.dir0+self.rx1[0]+'/SR_SS_'+chan+'_'+self.opt+'_0.txt','r1_')
+        r2 = OptResults(self.dir0+self.rx2[0]+'/SR_SS_'+chan+'_'+self.opt+'_0.txt','r2_', r1)
         lg1 = self.rx1[1]
         lg2 = self.rx2[1]
 
@@ -192,9 +193,17 @@ class ComparerX:
 
 def test():
     cx1 = ComparerX('tes1')
-    cx1.rx1 = ('2.8_1D','2.8-1D')
-    cx1.rx2 = ('2.8_1D_loose','Loose')
-    cx1.sTag = "muEta2p7_"
+#     cx1.rx1 = ('2.8_1D/significance','2.8-1D')
+#     cx1.rx2 = ('2.8_1D_loose/significance','Loose')
+#     cx1.sTag = "muEta2p7_"
+
+    ### git version
+    cx1.dir0 = './'
+    cx1.rx1 = ('significance_2.8_1D','2.8-1D')
+    cx1.rx2 = ('significance_2.8_1D_loose','loose')
+    cx1.opt = 'pre'
+    cx1.sTag = "muEta2p7Pre_"
+
     cx1.compareChans()
 
 funlist.append(test)
