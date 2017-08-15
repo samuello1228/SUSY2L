@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 const bool FJetVeto = 0; //For jet eta cut 2.4
-const bool ptcut = 1; //For loose
+const bool ptcut = 0; //For loose
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -5551,7 +5551,7 @@ void analysis1()
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         if(!
-           (RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
+           (/* RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
@@ -5561,7 +5561,7 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" */ false)
            ) continue;
         
         TString PathName = "latex/data/expN_";
@@ -5714,8 +5714,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||*/
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||*/
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
