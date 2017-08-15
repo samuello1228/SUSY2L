@@ -45,6 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 const bool FJetVeto = 0;
+const bool ptcut = 0;
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -2013,6 +2014,7 @@ void analysis1()
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
@@ -2131,6 +2133,7 @@ void analysis1()
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             
@@ -2248,6 +2251,7 @@ void analysis1()
             element.Cut = " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             
@@ -2365,6 +2369,7 @@ void analysis1()
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
@@ -2483,6 +2488,7 @@ void analysis1()
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             
@@ -2600,6 +2606,7 @@ void analysis1()
             element.Cut = " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             
@@ -2731,6 +2738,7 @@ void analysis1()
                 element.Cut = " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
                 element.Cut += " && fabs(mll - 91.2) > 10";
             }
             
@@ -2753,6 +2761,7 @@ void analysis1()
                 element.Cut = " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
@@ -2774,6 +2783,7 @@ void analysis1()
                 element.Cut = " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
@@ -2795,6 +2805,7 @@ void analysis1()
                 element.Cut = " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
                 element.Cut += " && fabs(mll - 91.2) > 10";
             }
             
@@ -2817,6 +2828,7 @@ void analysis1()
                 element.Cut = " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
@@ -2838,6 +2850,7 @@ void analysis1()
                 element.Cut = " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
