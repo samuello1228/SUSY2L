@@ -44,8 +44,8 @@ const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
-const bool FJetVeto = 0;
-const bool ptcut = 0;
+const bool FJetVeto = 0; //For jet eta cut 2.4
+const bool ptcut = 1; //For loose
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -5684,7 +5684,7 @@ void analysis1()
             fout<<Var[VarIndex].latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
             {
                 fout<<"\\includegraphics[width=0.8\\textwidth]{"
@@ -5713,8 +5713,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||*/
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||*/
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
@@ -5741,13 +5741,14 @@ void analysis1()
             TString latexName = RegionGroup[RegionGroupIndex].GroupName;
             latexName.ReplaceAll("_","\\_");
             
-            fout<<"\\begin{frame}{For ";
-            fout<<latexName.Data();
-            fout<<" \\\\ ";
+            fout<<"\\begin{frame}{";
+            //fout<<"For ";
+            //fout<<latexName.Data();
+            //fout<<" \\\\ ";
             fout<<Var[VarIndex].latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
@@ -5816,7 +5817,7 @@ void analysis1()
             fout<<latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
@@ -6119,7 +6120,7 @@ void analysis1()
                 if(lepton==1) fout<<"mumu channel";
                 fout<<")}"<<endl;
                 
-                fout<<"\\Wider[5em]{"<<endl;
+                fout<<"\\Wider{"<<endl;
                 for(unsigned int ISR=0;ISR<=6;ISR+=6)
                 {
                     fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_nozpt/"
