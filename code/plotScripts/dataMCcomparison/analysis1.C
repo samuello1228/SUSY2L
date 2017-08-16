@@ -4136,6 +4136,8 @@ void analysis1()
                         {
                             if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = SigSampleInfo[j].unweighted;
                         }
+                        
+                        h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SigSampleInfo[j].nwAOD);
                     }
                 }
                 
@@ -4159,7 +4161,6 @@ void analysis1()
                     
                     ///*
                     h2SigSum[i]->Add(h2Sig[SigMassSplitting[i].ID]);
-                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/SigSampleInfo[SigMassSplitting[i].ID].nwAOD);
                     //*/
                 }
                 
@@ -4343,7 +4344,6 @@ void analysis1()
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
-                            h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SigSampleInfo[j].nwAOD);
                             SigSampleInfo[j].weighted = h2Sig[j]->IntegralAndError(0,-1,SigSampleInfo[j].error);
                             
                             //Significance
