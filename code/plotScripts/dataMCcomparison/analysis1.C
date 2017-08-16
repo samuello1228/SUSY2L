@@ -2887,6 +2887,12 @@ void analysis1()
         }
     }
     
+    std::vector<unsigned int> OptimizingSignal;
+    for(unsigned int i=0;i<10;i++)
+    {
+        OptimizingSignal.push_back(i);
+    }
+    
     //plot graph
     unsigned int countVariable = 0;
     for(unsigned int i=0;i<Var.size();i++)
@@ -3138,10 +3144,10 @@ void analysis1()
                             const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
                             
                             TH1F* BGGroupRaw1D[BGGroup.size()];
-                            TH1F* h2Sig1D[RegionInfo[RegionIndex].OptimizingCut.size()];
+                            TH1F* h2Sig1D[OptimizingSignal.size()];
                             
                             TH2F* BGGroupRaw2D[BGGroup.size()];
-                            TH2F* h2Sig2D[RegionInfo[RegionIndex].OptimizingCut.size()];
+                            TH2F* h2Sig2D[OptimizingSignal.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
@@ -3369,7 +3375,7 @@ void analysis1()
                                 }
                                 
                                 //h2Sig
-                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
+                                for(unsigned int j=0;j<OptimizingSignal.size();j++)
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
@@ -3377,12 +3383,12 @@ void analysis1()
                                     TString temp;
                                     if(VarNumber==1)
                                     {
-                                        h2Sig1D[j] = new TH1F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max);
+                                        h2Sig1D[j] = new TH1F(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                         temp = VarFormula[0];
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        h2Sig2D[j] = new TH2F(NameTemp.Data(),"",RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][0].max,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2][1].max);
+                                        h2Sig2D[j] = new TH2F(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                         temp = VarFormula[1];
                                         temp += ":";
                                         temp += VarFormula[0];
@@ -3396,15 +3402,15 @@ void analysis1()
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
+                                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
                                     
                                     if(VarNumber==1)
                                     {
-                                        h2Sig1D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                        h2Sig1D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        h2Sig2D[j]->Scale(SigSampleInfo[SigMassSplitting[j].ID].XS /SigSampleInfo[SigMassSplitting[j].ID].nwAOD *sumDataL);
+                                        h2Sig2D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
                                     }
                                 }
                             }
@@ -3515,11 +3521,11 @@ void analysis1()
                                     double nSig1;
                                     if(VarNumber==1)
                                     {
-                                        nSig1 = h2Sig1D[1]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
+                                        nSig1 = h2Sig1D[3]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        nSig1 = h2Sig2D[1]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSig1Error);
+                                        nSig1 = h2Sig2D[3]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSig1Error);
                                     }
                                     
                                     if(nSig1 <=1) skip = true;
@@ -3534,11 +3540,11 @@ void analysis1()
                                     //expected number of events for signal
                                     if(VarNumber==1)
                                     {
-                                        nSig = h2Sig1D[SigIndex]->IntegralAndError(bin1[0],bin2[0],nSigError);
+                                        nSig = h2Sig1D[2]->IntegralAndError(bin1[0],bin2[0],nSigError);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        nSig = h2Sig2D[SigIndex]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError);
+                                        nSig = h2Sig2D[2]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError);
                                     }
                                     
                                     if(nSig <= 1) skip = true;
@@ -3667,7 +3673,7 @@ void analysis1()
                                 }
                             }
                             
-                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
+                            for(unsigned int j=0;j<OptimizingSignal.size();j++)
                             {
                                 if(VarNumber==1)
                                 {
@@ -3703,8 +3709,7 @@ void analysis1()
                             cout<<"The cut is the same."<<endl;
                             cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
-                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
-                            cout<<SigMassSplitting[SigIndex].IDName.Data()<<": "<<endl;
+                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
                             
                             for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                             {
