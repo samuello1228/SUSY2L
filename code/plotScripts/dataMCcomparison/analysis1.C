@@ -3131,7 +3131,7 @@ void analysis1()
                     vector<double> lowerCutRecord2;
                     vector<double> upperCutRecord2;
                     double nBGRecord2 = 0;
-                    double nSigRecord2 = 0;
+                    double nSigRecord2[OptimizingSignal.size()];
                     double significanceRecord2 = -999;
                     
                     while(true)
@@ -3426,7 +3426,7 @@ void analysis1()
                             int lowerBinRecord1[VarNumber];
                             int upperBinRecord1[VarNumber];
                             double nBGRecord1 = -1;
-                            double nSigRecord1 = -1;
+                            double nSigRecord1[OptimizingSignal.size()];
                             double significanceRecord1 = -999;
                             bool isPrint = false;
                             //isPrint = (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta");
@@ -3443,8 +3443,8 @@ void analysis1()
                             {
                                 double nBG = 0;
                                 double nBGError2 = 0;
-                                double nSig = 0;
-                                double nSigError = 0;
+                                double nSig[OptimizingSignal.size()];
+                                double nSigError[OptimizingSignal.size()];
                                 bool skip = false;
                                 
                                 if(isPrint)
@@ -3517,20 +3517,18 @@ void analysis1()
                                 
                                 if(!skip)
                                 {
-                                    double nSig1Error;
-                                    double nSig1;
                                     if(VarNumber==1)
                                     {
-                                        nSig1 = h2Sig1D[3]->IntegralAndError(bin1[0],bin2[0],nSig1Error);
+                                        nSig[3] = h2Sig1D[3]->IntegralAndError(bin1[0],bin2[0],nSigError[3]);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        nSig1 = h2Sig2D[3]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSig1Error);
+                                        nSig[3] = h2Sig2D[3]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[3]);
                                     }
                                     
-                                    if(nSig1 <=1) skip = true;
-                                    else if(nSig1Error == 0) skip = true;
-                                    else if(nSig1/nSig1Error<=2) skip = true;
+                                    if(nSig[3] <=1) skip = true;
+                                    else if(nSigError[3] == 0) skip = true;
+                                    else if(nSig[3]/nSigError[3]<=2) skip = true;
                                     
                                     if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
                                 }
@@ -3540,25 +3538,25 @@ void analysis1()
                                     //expected number of events for signal
                                     if(VarNumber==1)
                                     {
-                                        nSig = h2Sig1D[2]->IntegralAndError(bin1[0],bin2[0],nSigError);
+                                        nSig[2] = h2Sig1D[2]->IntegralAndError(bin1[0],bin2[0],nSigError[2]);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        nSig = h2Sig2D[2]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError);
+                                        nSig[2] = h2Sig2D[2]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[2]);
                                     }
                                     
-                                    if(nSig <= 1) skip = true;
-                                    else if(nSigError == 0) skip = true;
-                                    else if(nSig/nSigError<=2) skip = true;
+                                    if(nSig[2] <= 1) skip = true;
+                                    else if(nSigError[2] == 0) skip = true;
+                                    else if(nSig[2]/nSigError[2]<=2) skip = true;
                                     
                                     if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
-                                    if(isPrint && !skip) cout<<"nSig: "<<nSig<<", nSigError: "<<nSigError<<endl;
+                                    if(isPrint && !skip) cout<<"nSig: "<<nSig[2]<<", nSigError: "<<nSigError[2]<<endl;
                                 }
                                 
                                 //Significance
                                 if(!skip)
                                 {
-                                    double significanceTemp = GetSignificance(nSig,nBG,nBGError2);
+                                    double significanceTemp = GetSignificance(nSig[2],nBG,nBGError2);
                                     if(isPrint) cout<<"Significance: "<<significanceTemp;
                                     
                                     if(significanceTemp > significanceRecord1)
@@ -3570,7 +3568,10 @@ void analysis1()
                                         }
                                         
                                         nBGRecord1 = nBG;
-                                        nSigRecord1 = nSig;
+                                        for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                        {
+                                            nSigRecord1[i] = nSig[i];
+                                        }
                                         significanceRecord1 = significanceTemp;
                                         if(isPrint) cout<<", accepted."<<endl<<endl;
                                     }
@@ -3622,7 +3623,7 @@ void analysis1()
                                 cout<<", upperCutRecord1: "<<upperCutRecord1[i];
                                 cout<<endl;
                             }
-                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
+                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1[2]<<", significanceRecord1: "<<significanceRecord1<<endl;
                             
                             if(significanceRecord1 > significanceRecord2)
                             {
@@ -3650,7 +3651,10 @@ void analysis1()
                                         upperCutRecord2.push_back(upperCutRecord1[i]);
                                     }
                                     nBGRecord2 = nBGRecord1;
-                                    nSigRecord2 = nSigRecord1;
+                                    for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                    {
+                                        nSigRecord2[i] = nSigRecord1[i];
+                                    }
                                     significanceRecord2 = significanceRecord1;
                                     
                                     isChanged = true;
@@ -3696,7 +3700,7 @@ void analysis1()
                                 cout<<", upperCutRecord2: "<<upperCutRecord2[i];
                                 cout<<endl;
                             }
-                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
                             for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
                             {
@@ -3707,7 +3711,7 @@ void analysis1()
                         else
                         {
                             cout<<"The cut is the same."<<endl;
-                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                             
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
                             
