@@ -179,6 +179,7 @@ class ComparerX:
         dm = 0.02*(max1-min1)
         hfirst.GetYaxis().SetRangeUser(min1-dm,max1+dm)
         hfirst.GetYaxis().SetTitle("Events")
+        hfirst.Draw('axis same')
         
 
         lg = TLegend(0.7,0.8,0.9,0.93)
@@ -199,10 +200,10 @@ def test():
 
     ### git version
     cx1.dir0 = './'
-    cx1.rx1 = ('significance_2.8_1D','2.8-1D')
-    cx1.rx2 = ('significance_2.8_1D_loose','loose')
-    cx1.opt = 'pre'
-    cx1.sTag = "muEta2p7Pre_"
+    cx1.rx1 = ('significance_2.8_1D_avg','BaselineAvg')
+    cx1.rx2 = ('significance_2.8_1D_loose_avg','looseAvg')
+    cx1.opt = 'opt'
+    cx1.sTag = "muEta2p7Opt_"
 
     cx1.compareChans()
 

@@ -46,6 +46,7 @@ def getSig(args, show=True, info=None,savename="test"):
         g2d.SetPoint(i, float(x[0]),float(x[1]),dictA[x])
         i += 1
 
+    if info: g2d.SetTitle(info)
     if not show:
         return g2d
 
@@ -116,19 +117,14 @@ def getSig(args, show=True, info=None,savename="test"):
 
 def compare2():
     show = False
-    gr1 = getSig(glob.glob("SR*.txt"),show,"Jet |#eta|<2.4","JetEta_2p4")
-    gr2 = getSig(glob.glob("bugFix_Aug04/SR*.txt"),show,"Jet |#eta|<2.8","JetEta_2p8")
+#     gr1 = getSig(glob.glob("significance_2.8_1D/SR*.txt"),show,"Baseline","Baseline")
+    gr1 = getSig(glob.glob("significance_2.8_1D_avg/SR*.txt"),show,"BaselineAvg","BaselineAvg")
+    gr2 = getSig(glob.glob("significance_2.8_1D_loose_avg/SR*.txt"),show,"LooseAvg","LooseAvg")
+    showCompare(gr1,gr2)
 
-    gr1.Draw()
-    h1 = gr1.GetHistogram();
-    gr2.Draw()
-    h1 = gr2.GetHistogram();
+def showCompare(gr1, gr2):
+    h1 = TH2F('h1',"h1;m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV];m_{#tilde{#chi}^{0}_{1}} [GeV]",100,125,350,100,0,120)
     h1.Draw("axis")
-    h1.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
-    h1.GetYaxis().SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
-    h1.GetZaxis().SetTitle("Z_{n}");
-    h1.GetXaxis().SetRangeUser(0,350)
-    h1.GetZaxis().SetRangeUser(0,4)
 
     fun1 = TF1("linex","x-125.5", 0, 350);
     fun1.SetLineColor(kGray)
@@ -136,11 +132,11 @@ def compare2():
     fun1.SetLineStyle(8)
     fun1.Draw("same");
 
-    lg = TLegend(0.2, 0.65,0.4,0.85)
+    lg = TLegend(0.2, 0.5,0.4,0.93)
     lg.SetFillStyle(0)
     lines = {1:2, 2:5, 3:9} # Zn, line Style
 
-    lg.AddEntry(None, "|#eta|<2.4","")
+    lg.AddEntry(None, gr1.GetTitle(),"")
     for lx in lines:
         ltag = "s1_"+str(lx)
         grL = gr1.GetContourList(lx);
@@ -156,7 +152,7 @@ def compare2():
         lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
 
     lg.AddEntry(None, "~~~~~~~","")
-    lg.AddEntry(None, "|#eta|<2.8","")
+    lg.AddEntry(None, gr2.GetTitle(),"")
     for lx in lines:
         ltag = "s2_"+str(lx)
         grL = gr2.GetContourList(lx);
@@ -172,6 +168,18 @@ def compare2():
         xt0 = gPad.GetPrimitive(ltag);
         if xt0==None: continue
         lg.AddEntry(xt0, 'Z_{n}='+str(lx), 'l')
+
+    ## run 1 limit: http://www.hepdata.net/record/ins1341609?version=1&table=Table31
+    fRun1 = TFile('HEPData-ins1341609-v1.root','read')
+    grRun1 = fRun1.Get('Table 31/Graph1D_y1')
+    grRun1.SetFillColor(3)
+    grRun1.Draw("Fsame")
+    grRun1E = fRun1.Get('Table 30/Graph1D_y1')
+    grRun1E.SetFillColor(4)
+    grRun1E.SetFillStyle(3004)
+    grRun1E.Draw("Fsame")
+#     lg.AddEntry(grRun1E, 'Run1 expected', 'l')
+#     lg.AddEntry(grRun1, 'Run1 limit', 'l')
 
     lg.Draw()
     gPad.Update()
@@ -196,4 +204,5 @@ funlist.append(test)
 if __name__ == '__main__':
     savehistory('.')
     useAtlasStyle()
-    for fun in funlist: print fun()
+#     for fun in funlist: print fun()
+    compare2()
