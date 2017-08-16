@@ -4341,6 +4341,8 @@ void analysis1()
                         
                         TGraph2D* g_nSig = new TGraph2D();
                         TGraph2D* g_significance = new TGraph2D();
+                        
+                        double averageSignificance = 0;
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             //expected number of events
@@ -4351,6 +4353,11 @@ void analysis1()
                             if(significance>0)
                             {
                                 SigSampleInfo[j].significance2 += significance*significance;
+                            }
+                            
+                            if(j<OptimizingSignal.size())
+                            {
+                                averageSignificance += significance;
                             }
                             
                             fout<<setprecision(1)<<std::fixed;
@@ -4366,6 +4373,11 @@ void analysis1()
                                 g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
                             }
                         }
+                        
+                        averageSignificance /= OptimizingSignal.size();
+                        cout<<"average significance: "<<averageSignificance<<endl;
+                        fout<<"#average significance: "<<averageSignificance<<endl;
+                        
                         fout.close();
                         
                         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
