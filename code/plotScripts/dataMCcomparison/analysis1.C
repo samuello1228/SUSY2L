@@ -3515,48 +3515,37 @@ void analysis1()
                                     if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
                                 }
                                 
-                                if(!skip)
-                                {
-                                    if(VarNumber==1)
-                                    {
-                                        nSig[3] = h2Sig1D[3]->IntegralAndError(bin1[0],bin2[0],nSigError[3]);
-                                    }
-                                    else if(VarNumber==2)
-                                    {
-                                        nSig[3] = h2Sig2D[3]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[3]);
-                                    }
-                                    
-                                    if(nSig[3] <=1) skip = true;
-                                    else if(nSigError[3] == 0) skip = true;
-                                    else if(nSig[3]/nSigError[3]<=2) skip = true;
-                                    
-                                    if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
-                                }
-                                
-                                if(!skip)
+                                for(unsigned int i=0;i<OptimizingSignal.size();i++)
                                 {
                                     //expected number of events for signal
                                     if(VarNumber==1)
                                     {
-                                        nSig[2] = h2Sig1D[2]->IntegralAndError(bin1[0],bin2[0],nSigError[2]);
+                                        nSig[i] = h2Sig1D[i]->IntegralAndError(bin1[0],bin2[0],nSigError[i]);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        nSig[2] = h2Sig2D[2]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[2]);
+                                        nSig[i] = h2Sig2D[i]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[i]);
                                     }
                                     
-                                    if(nSig[2] <= 1) skip = true;
-                                    else if(nSigError[2] == 0) skip = true;
-                                    else if(nSig[2]/nSigError[2]<=2) skip = true;
+                                    if(nSig[i] <= 1) skip = true;
+                                    else if(nSigError[i] == 0) skip = true;
+                                    else if(nSig[i]/nSigError[i]<=2) skip = true;
                                     
-                                    if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
-                                    if(isPrint && !skip) cout<<"nSig: "<<nSig[2]<<", nSigError: "<<nSigError[2]<<endl;
+                                    if(isPrint && skip) cout<<"Signal "<<i<<" has low statistics."<<endl<<endl;
+                                    if(isPrint && !skip) cout<<"nSig["<<i<<"]: "<<nSig[i]<<", nSigError["<<i<<"]: "<<nSigError[i]<<endl;
+                                    
+                                    if(skip) break;
                                 }
                                 
                                 //Significance
                                 if(!skip)
                                 {
-                                    double significanceTemp = GetSignificance(nSig[2],nBG,nBGError2);
+                                    double significanceTemp = 0;
+                                    for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                    {
+                                        significanceTemp += GetSignificance(nSig[i],nBG,nBGError2);
+                                    }
+                                    significanceTemp /= OptimizingSignal.size();
                                     if(isPrint) cout<<"Significance: "<<significanceTemp;
                                     
                                     if(significanceTemp > significanceRecord1)
