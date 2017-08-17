@@ -44,6 +44,9 @@ const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
+
+TString setupTag = "2p8_1D_pt25_s2";
+
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose
 
@@ -4460,9 +4463,17 @@ void analysis1()
                             h2->Draw();
                             g_nSig->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "nSig_";
@@ -4494,9 +4505,17 @@ void analysis1()
                             h2->Draw();
                             g_significance->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "significance_";
@@ -4965,6 +4984,12 @@ void analysis1()
                         lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.2,0.63,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
@@ -5490,6 +5515,12 @@ void analysis1()
             }
             leg->Draw();
             
+            {
+                TLatex lt1;
+                lt1.DrawLatexNDC(0.2,0.13,setupTag.Data());
+                lt1.SetTextSize(lt1.GetTextSize());
+            }
+            
             c2->cd();
             pad2->Draw();
             pad2->cd();
@@ -5603,9 +5634,17 @@ void analysis1()
                 }
                 leg->Draw();
                 
-                TLatex lt1;
-                lt1.DrawLatexNDC(0.2,0.05,"combined");
-                lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.05,0.05,"combined");
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
                 
                 TString NameTemp = "plot/";
                 NameTemp += "combine_significance_";
