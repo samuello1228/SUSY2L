@@ -3301,75 +3301,134 @@ void analysis1()
                                     if(VarNumber==1)
                                     {
                                         BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
                                         BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
-                                        TH1F* hTemp1D;
-                                        TH2F* hTemp2D;
-                                        TString temp;
-                                        if(VarNumber==1)
                                         {
-                                            hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
-                                            temp = VarFormula[0];
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGData";
+                                            
+                                            TString Cut = "1";
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += "*qFwt";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += "*fLwt";
+                                            }
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroup[j].h2->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroup[j].h3->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
-                                        else if(VarNumber==2)
                                         {
-                                            hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
-                                            temp = VarFormula[1];
-                                            temp += ":";
-                                            temp += VarFormula[0];
-                                        }
-                                        
-                                        //fill histograms from trees
-                                        temp += ">>BGData";
-                                        
-                                        TString Cut = "1";
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            Cut += "*qFwt";
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            Cut += "*fLwt";
-                                        }
-                                        
-                                        Cut += "*(1";
-                                        Cut += CommonCut;
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            Cut += " && fLwt==0";
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            Cut += " && fLwt!=0";
-                                        }
-                                        
-                                        Cut += ")";
-                                        
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        
-                                        //Add MCData
-                                        if(VarNumber==1)
-                                        {
-                                            BGGroup[j].h2->Add(hTemp1D);
-                                            delete hTemp1D;
-                                        }
-                                        else if(VarNumber==2)
-                                        {
-                                            BGGroup[j].h3->Add(hTemp2D);
-                                            delete hTemp2D;
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGDataRaw";
+                                            
+                                            TString Cut = "1";
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroupRaw1D[j]->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroupRaw2D[j]->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                     }
                                 }
