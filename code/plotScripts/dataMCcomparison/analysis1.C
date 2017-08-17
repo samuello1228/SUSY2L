@@ -3461,15 +3461,15 @@ void analysis1()
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                                    tree2Sig[OptimizingSignal[j]]->Draw(temp.Data(),Cut.Data());
                                     
                                     if(VarNumber==1)
                                     {
-                                        h2Sig1D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
+                                        h2Sig1D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        h2Sig2D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
+                                        h2Sig2D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
                                     }
                                 }
                             }
@@ -4414,9 +4414,12 @@ void analysis1()
                                 SigSampleInfo[j].significance2 += significance*significance;
                             }
                             
-                            if(j<OptimizingSignal.size())
+                            for(unsigned int k=0;k<OptimizingSignal.size();k++)
                             {
-                                averageSignificance += significance;
+                                if(j == OptimizingSignal[k])
+                                {
+                                    averageSignificance += significance;
+                                }
                             }
                             
                             fout<<setprecision(1)<<std::fixed;
