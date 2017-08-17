@@ -2891,9 +2891,19 @@ void analysis1()
     }
     
     std::vector<unsigned int> OptimizingSignal;
+    /*
     for(unsigned int i=0;i<10;i++)
     {
         OptimizingSignal.push_back(i);
+    }
+    */
+    for(unsigned int i=0;i<SigSampleInfo.size();i++)
+    {
+        if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
+        {
+            cout<<SigSampleInfo[i].SampleID.Data()<<endl;
+            OptimizingSignal.push_back(i);
+        }
     }
     
     //plot graph
