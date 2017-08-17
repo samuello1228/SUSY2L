@@ -4972,7 +4972,7 @@ void analysis1()
                                 }
                                 
                                 TLatex lt2;
-                                lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
+                                lt2.DrawLatexNDC(0.2,0.63, NameTemp.Data());
                                 lt2.SetTextSize(lt2.GetTextSize());
                                 
                                 break;
@@ -4998,7 +4998,7 @@ void analysis1()
                 
                 {
                     TLatex lt1;
-                    lt1.DrawLatexNDC(0.2,0.63,setupTag.Data());
+                    lt1.DrawLatexNDC(0.2,0.73,setupTag.Data());
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
