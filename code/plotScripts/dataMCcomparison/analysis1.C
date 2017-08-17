@@ -5373,8 +5373,12 @@ void analysis1()
                 }
             }
             
+            std::vector<Group> SRBGGroup2 = SRBGGroup;
+            std::sort(SRBGGroup2.begin(),SRBGGroup2.end(),compare2);
+            
             //stack
             THStack stackSR;
+            /*
             stackSR.Add(SRBGGroup[5].h2); //multi top
             stackSR.Add(SRBGGroup[3].h2); //single top
             stackSR.Add(SRBGGroup[0].h2); //Z+jets
@@ -5385,6 +5389,12 @@ void analysis1()
             stackSR.Add(SRBGGroup[7].h2); //Vgamma
             stackSR.Add(SRBGGroup[2].h2); //ttbar
             stackSR.Add(SRBGGroup[6].h2); //VV
+            */
+            
+            for(unsigned int i=0;i<SRBGGroup2.size();i++)
+            {
+                stackSR.Add(SRBGGroup2[i].h2);
+            }
             
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
