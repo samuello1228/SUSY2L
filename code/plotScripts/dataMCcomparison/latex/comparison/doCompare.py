@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import re, os
 from ROOT import *
-from subprocess import call
+from subprocess import call, Popen
 ### get the files
 dirAP = re.compile('.*FigDirA{(.*)} *$')
 # dirAP = re.compile('^\\def\\FigDirA\{(.*)\}$')
 dirBP = re.compile('.*FigDirB{(.*)} *$')
-outNameP = re.compile('%outName:(.*)$')
+outNameP = re.compile('%outName: *(.*) *$')
 
 sDirectly = False
 if gROOT.IsBatch(): sDirectly = True
@@ -41,7 +41,7 @@ def getComparePlots(A1, A2):
     cx1.rx2 = ('significance_'+A2,A2)
     cx1.opt = 'opt'
     
-#     cx1.compareChans()
+    cx1.compareChans()
     cx1.compare2X()
 
 def main():

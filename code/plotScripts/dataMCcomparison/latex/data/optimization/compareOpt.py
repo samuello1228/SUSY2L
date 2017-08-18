@@ -311,7 +311,7 @@ class ComparerX:
         fun1 = TF1("linex","x-125.5", 0, 350);
         fun1.SetLineColor(kGray)
         fun1.SetLineWidth(2)
-        fun1.SetLineStyle(8)
+        fun1.SetLineStyle(5)
         fun1.Draw("same");
 
         lg = TLegend(0.2, 0.65,0.4,0.85)
@@ -422,7 +422,7 @@ class ComparerX:
         ## run 1 limit: http://www.hepdata.net/record/ins1341609?version=1&table=Table31
         fRun1 = TFile('HEPData-ins1341609-v1.root','read')
         grRun1 = fRun1.Get('Table 31/Graph1D_y1')
-        grRun1.SetFillColor(3)
+        grRun1.SetFillColor(5)
         grRun1.Draw("Fsame")
         grRun1E = fRun1.Get('Table 30/Graph1D_y1')
         grRun1E.SetFillColor(4)
@@ -515,9 +515,9 @@ def setPel():
    const Int_t  nC = 49;
    static Int_t  colors[nC];
    static Bool_t initialized = kFALSE;
-   Double_t Red[3]    = { 1.00, 1.00, 0.00};
-   Double_t Green[3]  = { 0.00, 1.00, 0.00};
-   Double_t Blue[3]   = { 0.00, 1.00, 1.00};
+   Double_t Red[3]    = { 0.00, 1.00, 0.00};
+   Double_t Green[3]  = { 0.00, 1.00, 1.00};
+   Double_t Blue[3]   = { 1.00, 1.00, 0.00};
    Double_t Length[3] = { 0.00, 0.50, 1.00 };
    Int_t FI = TColor::CreateGradientColorTable(3,Length,Red,Green,Blue,nC);
    for (int i=0; i<nC; i++) colors[i] = FI+i;
