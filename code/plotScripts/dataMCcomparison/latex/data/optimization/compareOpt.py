@@ -357,8 +357,24 @@ class ComparerX:
 
 
     def showCompareZn(self, gr1, gr2):
-        h1 = TH2F('h1',"h1;m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV];m_{#tilde{#chi}^{0}_{1}} [GeV]",100,125,350,100,0,120)
-        h1.Draw("axis")
+        h1 = TH2F('h1',"h1;m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV];m_{#tilde{#chi}^{0}_{1}} [GeV];#DeltaZ_{n}",50,125,350,50,0,120)
+#         h1.Draw("axis")
+
+        gPad.SetRightMargin(0.16)
+        setPel()
+        pL = [-100,-2,-1,-0.6]
+        xL = -1*pL[-1]
+        nX = 49-2*len(pL)
+        setp = 2.*xL/nX
+        levels = array('d',pL+[-xL+(i+1)*setp for i in range(nX-1)]+[-x for x in reversed(pL)])
+        grDiff = self.getZnDiff2D(gr2, gr1)
+        grDiff.SetHistogram(h1)
+        grDiff.GetHistogram().SetContour(len(levels), levels);
+#         grDiff.Draw('PCOLZ')
+
+#         h1.Draw("axis")
+        grDiff.GetHistogram().Draw('colz')
+#         waitRootCmd()
 
         fun1 = TF1("linex","x-125.5", 0, 350);
         fun1.SetLineColor(kGray)
@@ -419,20 +435,21 @@ class ComparerX:
         gPad.Update()
         waitRootCmd(self.sDir+self.sTag+'ZnDiff', self.autoSave)
 
-        
-        gPad.SetRightMargin(0.16)
-        setPel()
-        pL = [-100,-2,-1,-0.5]
-        xL = -1*pL[-1]
-        nX = 50-2*len(pL)
-        setp = 2.*xL/nX
-        levels = array('d',pL+[-xL+(i+1)*setp for i in range(nX)]+[-x for x in reversed(pL)])
+      
+        ### set up the 
+#         gPad.SetRightMargin(0.16)
+#         setPel()
+#         pL = [-100,-2,-1,-0.5]
+#         xL = -1*pL[-1]
+#         nX = 50-2*len(pL)
+#         setp = 2.*xL/nX
+#         levels = array('d',pL+[-xL+(i+1)*setp for i in range(nX)]+[-x for x in reversed(pL)])
 #         levels = array('d',[-100, -1, 0, 1 ,100])
 #         print levels
 
 #         h1.Draw("axis")
-        grDiff = self.getZnDiff2D(gr2, gr1)
-        grDiff.GetHistogram().SetContour(len(levels), levels);
+#         grDiff = self.getZnDiff2D(gr2, gr1)
+#         grDiff.GetHistogram().SetContour(len(levels), levels);
         grDiff.Draw('colz')
         fun1.Draw("same");
         self.lt.DrawLatexNDC(0.2,0.9,"Z_{n} difference")
@@ -494,15 +511,17 @@ def test():
     cx1.compareChans()
 
 def setPel():
-   pad1 = '''static Int_t  colors[50];
+   pad1 = '''
+   const Int_t  nC = 49;
+   static Int_t  colors[nC];
    static Bool_t initialized = kFALSE;
    Double_t Red[3]    = { 1.00, 1.00, 0.00};
    Double_t Green[3]  = { 0.00, 1.00, 0.00};
    Double_t Blue[3]   = { 0.00, 1.00, 1.00};
    Double_t Length[3] = { 0.00, 0.50, 1.00 };
-   Int_t FI = TColor::CreateGradientColorTable(3,Length,Red,Green,Blue,50);
-   for (int i=0; i<50; i++) colors[i] = FI+i;
-   gStyle->SetPalette(50,colors);'''
+   Int_t FI = TColor::CreateGradientColorTable(3,Length,Red,Green,Blue,nC);
+   for (int i=0; i<nC; i++) colors[i] = FI+i;
+   gStyle->SetPalette(nC,colors);'''
    gROOT.ProcessLine(pad1)
 
 

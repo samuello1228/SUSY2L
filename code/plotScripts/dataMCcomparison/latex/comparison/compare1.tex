@@ -5,6 +5,7 @@
 \usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
+\newif\ifFigS
 
 \newcommand\Wider[2][2em]{%
 \makebox[\linewidth][c]{%
@@ -46,8 +47,9 @@ University of Michigan
   \end{itemize}
 \end{frame}
 \input{sumPlots}
+\ifFigS
 \input{Nplots}
 \input{PrePlots}
-
+\fi
 
 \end{document}

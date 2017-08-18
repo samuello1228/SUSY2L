@@ -41,7 +41,7 @@ def getComparePlots(A1, A2):
     cx1.rx2 = ('significance_'+A2,A2)
     cx1.opt = 'opt'
     
-    cx1.compareChans()
+#     cx1.compareChans()
     cx1.compare2X()
 
 def main():
@@ -52,6 +52,7 @@ def main():
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option('-P', "--producePlots", help="if produce the plots", action='store_true', default=False)
+    parser.add_option('-b', "--batch", help="if produce the plots", action='store_true', default=False)
     parser.add_option("--oCmd", help='opening command', default='okular')
     parser.add_option('-N', "--noOpen", help="don't open pdf file when it's compiled", action='store_true', default=False)
     (options, args) = parser.parse_args()
