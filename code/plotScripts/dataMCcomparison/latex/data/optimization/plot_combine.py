@@ -111,7 +111,8 @@ def getSig(args, show=True, info=None,savename="test"):
         lt.DrawLatexNDC(0.2,0.9,info)
 
     gPad.Update()
-    waitRootCmd(sDir+savename, sDirectly)
+    sname = savename if savename.find('/')!=-1 else sDir+savename
+    waitRootCmd(sname, sDirectly)
 
     return g2d
 
@@ -119,10 +120,18 @@ def compare2():
     show = False
 #     gr1 = getSig(glob.glob("significance_2.8_1D/SR*.txt"),show,"Baseline","Baseline")
     gr1 = getSig(glob.glob("significance_2.8_1D_avg/SR*.txt"),show,"BaselineAvg","BaselineAvg")
-    gr2 = getSig(glob.glob("significance_2.8_1D_loose_avg/SR*.txt"),show,"LooseAvg","LooseAvg")
+#     gr2 = getSig(glob.glob("significance_2.8_1D_loose_avg/SR*.txt"),show,"LooseAvg","LooseAvg")
+    gr2 = getSig(glob.glob("significance_2.8_1D_pt25_avg/SR*.txt"),show,"pt25Avg","pt25Avg")
     showCompare(gr1,gr2)
 
-def showCompare(gr1, gr2):
+def compare2X(x1, x2, fname, show=False):
+    print "significance_"+x1+"/SR*.txt"
+    print "significance_"+x2+"/SR*.txt"
+    gr1 = getSig(glob.glob("significance_"+x1+"/SR*.txt"),show,x1,x1)
+    gr2 = getSig(glob.glob("significance_"+x2+"/SR*.txt"),show,x2,x2)
+    showCompare(gr1,gr2, fname, show)
+
+def showCompare(gr1, gr2, fname=None, autoSave=False):
     h1 = TH2F('h1',"h1;m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV];m_{#tilde{#chi}^{0}_{1}} [GeV]",100,125,350,100,0,120)
     h1.Draw("axis")
 
@@ -183,7 +192,10 @@ def showCompare(gr1, gr2):
 
     lg.Draw()
     gPad.Update()
-    waitRootCmd()
+    if fname:
+        waitRootCmd(fname, autoSave)
+    else:
+        waitRootCmd()
 
 
 def test1():
