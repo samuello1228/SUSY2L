@@ -44,6 +44,9 @@ const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
+
+TString setupTag = "2p8_1D_pt25_s2";
+
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose
 
@@ -2888,9 +2891,19 @@ void analysis1()
     }
     
     std::vector<unsigned int> OptimizingSignal;
+    /*
     for(unsigned int i=0;i<10;i++)
     {
         OptimizingSignal.push_back(i);
+    }
+    */
+    for(unsigned int i=0;i<SigSampleInfo.size();i++)
+    {
+        if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
+        {
+            cout<<SigSampleInfo[i].SampleID.Data()<<endl;
+            OptimizingSignal.push_back(i);
+        }
     }
     
     //plot graph
@@ -3301,75 +3314,134 @@ void analysis1()
                                     if(VarNumber==1)
                                     {
                                         BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
                                         BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
-                                        TH1F* hTemp1D;
-                                        TH2F* hTemp2D;
-                                        TString temp;
-                                        if(VarNumber==1)
                                         {
-                                            hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
-                                            temp = VarFormula[0];
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGData";
+                                            
+                                            TString Cut = "1";
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += "*qFwt";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += "*fLwt";
+                                            }
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroup[j].h2->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroup[j].h3->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
-                                        else if(VarNumber==2)
                                         {
-                                            hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
-                                            temp = VarFormula[1];
-                                            temp += ":";
-                                            temp += VarFormula[0];
-                                        }
-                                        
-                                        //fill histograms from trees
-                                        temp += ">>BGData";
-                                        
-                                        TString Cut = "1";
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            Cut += "*qFwt";
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            Cut += "*fLwt";
-                                        }
-                                        
-                                        Cut += "*(1";
-                                        Cut += CommonCut;
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            Cut += " && fLwt==0";
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            Cut += " && fLwt!=0";
-                                        }
-                                        
-                                        Cut += ")";
-                                        
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        
-                                        //Add MCData
-                                        if(VarNumber==1)
-                                        {
-                                            BGGroup[j].h2->Add(hTemp1D);
-                                            delete hTemp1D;
-                                        }
-                                        else if(VarNumber==2)
-                                        {
-                                            BGGroup[j].h3->Add(hTemp2D);
-                                            delete hTemp2D;
+                                            TH1F* hTemp1D;
+                                            TH2F* hTemp2D;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGDataRaw";
+                                            
+                                            TString Cut = "1";
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroupRaw1D[j]->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroupRaw2D[j]->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                     }
                                 }
@@ -3402,15 +3474,15 @@ void analysis1()
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                                    tree2Sig[OptimizingSignal[j]]->Draw(temp.Data(),Cut.Data());
                                     
                                     if(VarNumber==1)
                                     {
-                                        h2Sig1D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
+                                        h2Sig1D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        h2Sig2D[j]->Scale(SigSampleInfo[j].XS /SigSampleInfo[j].nwAOD *sumDataL);
+                                        h2Sig2D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
                                     }
                                 }
                             }
@@ -4355,9 +4427,12 @@ void analysis1()
                                 SigSampleInfo[j].significance2 += significance*significance;
                             }
                             
-                            if(j<OptimizingSignal.size())
+                            for(unsigned int k=0;k<OptimizingSignal.size();k++)
                             {
-                                averageSignificance += significance;
+                                if(j == OptimizingSignal[k])
+                                {
+                                    averageSignificance += significance;
+                                }
                             }
                             
                             fout<<setprecision(1)<<std::fixed;
@@ -4398,9 +4473,17 @@ void analysis1()
                             h2->Draw();
                             g_nSig->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "nSig_";
@@ -4432,9 +4515,17 @@ void analysis1()
                             h2->Draw();
                             g_significance->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.05,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "significance_";
@@ -4881,7 +4972,7 @@ void analysis1()
                                 }
                                 
                                 TLatex lt2;
-                                lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
+                                lt2.DrawLatexNDC(0.2,0.63, NameTemp.Data());
                                 lt2.SetTextSize(lt2.GetTextSize());
                                 
                                 break;
@@ -4903,6 +4994,12 @@ void analysis1()
                         lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.2,0.73,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
@@ -5314,8 +5411,12 @@ void analysis1()
                 }
             }
             
+            std::vector<Group> SRBGGroup2 = SRBGGroup;
+            std::sort(SRBGGroup2.begin(),SRBGGroup2.end(),compare2);
+            
             //stack
             THStack stackSR;
+            /*
             stackSR.Add(SRBGGroup[5].h2); //multi top
             stackSR.Add(SRBGGroup[3].h2); //single top
             stackSR.Add(SRBGGroup[0].h2); //Z+jets
@@ -5326,6 +5427,12 @@ void analysis1()
             stackSR.Add(SRBGGroup[7].h2); //Vgamma
             stackSR.Add(SRBGGroup[2].h2); //ttbar
             stackSR.Add(SRBGGroup[6].h2); //VV
+            */
+            
+            for(unsigned int i=0;i<SRBGGroup2.size();i++)
+            {
+                stackSR.Add(SRBGGroup2[i].h2);
+            }
             
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
@@ -5417,6 +5524,12 @@ void analysis1()
                 h2SRSig[j]->Draw("histsame");
             }
             leg->Draw();
+            
+            {
+                TLatex lt1;
+                lt1.DrawLatexNDC(0.2,0.13,setupTag.Data());
+                lt1.SetTextSize(lt1.GetTextSize());
+            }
             
             c2->cd();
             pad2->Draw();
@@ -5531,9 +5644,17 @@ void analysis1()
                 }
                 leg->Draw();
                 
-                TLatex lt1;
-                lt1.DrawLatexNDC(0.2,0.05,"combined");
-                lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.05,0.05,"combined");
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
                 
                 TString NameTemp = "plot/";
                 NameTemp += "combine_significance_";
