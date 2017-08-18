@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_pt25_s2";
+TString setupTag = "2p8_run1";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose
@@ -1642,7 +1642,7 @@ void analysis1()
         
         //ee_1
         {
-            element.RegionName = "SR_SS_ee_1";
+            element.RegionName = "SR_SS_ee_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -1682,7 +1682,7 @@ void analysis1()
         
         //mumu_1
         {
-            element.RegionName = "SR_SS_mumu_1";
+            element.RegionName = "SR_SS_mumu_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -1722,7 +1722,7 @@ void analysis1()
         
         //emu_1
         {
-            element.RegionName = "SR_SS_emu_1";
+            element.RegionName = "SR_SS_emu_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -1762,7 +1762,7 @@ void analysis1()
         
         //ee_2
         {
-            element.RegionName = "SR_SS_ee_2";
+            element.RegionName = "SR_SS_ee_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -1802,7 +1802,7 @@ void analysis1()
         
         //mumu_2
         {
-            element.RegionName = "SR_SS_mumu_2";
+            element.RegionName = "SR_SS_mumu_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -1838,7 +1838,7 @@ void analysis1()
         
         //emu_2
         {
-            element.RegionName = "SR_SS_emu_2";
+            element.RegionName = "SR_SS_emu_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -4391,7 +4391,8 @@ void analysis1()
                     }
                     
                     //significance for all mass point
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+                       RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
                        RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
                     {
                         PathName = "latex/data/optimization/significance/";
