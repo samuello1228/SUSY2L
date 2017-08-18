@@ -7,6 +7,7 @@ import os, sys, re
 import glob
 from ROOT import *
 from math import sqrt
+from array import array
 from rootUtil import useAtlasStyle, waitRootCmd, savehistory, mkupHistSimple, get_default_fig_dir
 funlist=[]
 
@@ -185,6 +186,7 @@ class ComparerX:
         self.sDir = sDir
         self.sTag = sTag
         self.opt = 'opt'
+        self.lt = TLatex()
         self.autoSave = sDirectly
 
     def compareChans(self, chans = ['ee_1','ee_2','emu_1','emu_2','mumu_1','mumu_2']):
@@ -259,10 +261,10 @@ class ComparerX:
         gPad.Update()
         waitRootCmd(self.sDir+self.sTag+chan,self.autoSave)
 
-    def getZnDiff2D(self, gr1,gr2):
-        grDiff2D = gr1.Clone("grDiff2D")
+    def getZnDiff2D(self, gr,ref):
+        grDiff2D = gr.Clone("grDiff2D")
         xiS,yiS,ziS = grDiff2D.GetX(),grDiff2D.GetY(),grDiff2D.GetZ()
-        xjS,yjS,zjS = gr2.GetX(),gr2.GetY(),gr2.GetZ()
+        xjS,yjS,zjS = ref.GetX(),ref.GetY(),ref.GetZ()
         for i in range(len(xiS)):
             if abs(xiS[i]-xjS[i])>0.001 or abs(xjS[i]-xjS[i])>0.001:
                 print "the two graph does not match"
@@ -346,8 +348,7 @@ class ComparerX:
 
         lg.Draw()
         if info:
-            lt = TLatex()
-            lt.DrawLatexNDC(0.2,0.9,info)
+            self.lt.DrawLatexNDC(0.2,0.9,info)
 
         gPad.Update()
         waitRootCmd(self.sDir+self.sTag+savename, self.autoSave)
@@ -418,23 +419,38 @@ class ComparerX:
         gPad.Update()
         waitRootCmd(self.sDir+self.sTag+'ZnDiff', self.autoSave)
 
-        h1.Draw("axis")
+        
+        gPad.SetRightMargin(0.16)
+        setPel()
+        pL = [-100,-2,-1,-0.5]
+        xL = -1*pL[-1]
+        nX = 50-2*len(pL)
+        setp = 2.*xL/nX
+        levels = array('d',pL+[-xL+(i+1)*setp for i in range(nX)]+[-x for x in reversed(pL)])
+#         levels = array('d',[-100, -1, 0, 1 ,100])
+#         print levels
+
+#         h1.Draw("axis")
         grDiff = self.getZnDiff2D(gr2, gr1)
+        grDiff.GetHistogram().SetContour(len(levels), levels);
         grDiff.Draw('colz')
         fun1.Draw("same");
+        self.lt.DrawLatexNDC(0.2,0.9,"Z_{n} difference")
         gPad.Update()
         waitRootCmd(self.sDir+self.sTag+'ZnDiff2D', self.autoSave)
 
     def compare2X(self):
+        print self.sDir
         show = True
         x1 = self.rx1[0].lstrip('significance_')
         x2 = self.rx2[0].lstrip('significance_')
         print "significance_"+x1+"/SR*.txt"
-        gr1 = self.getSig(glob.glob("significance_"+x1+"/SR*.txt"), show, x1,x1.replace("2.8", "2p8"))
-        gr2 = self.getSig(glob.glob("significance_"+x2+"/SR*.txt"), show, x2,x2.replace("2.8", "2p8"))
-        
-#         self.getZnDiff2D(gr2, gr1)
-        self.showCompareZn(gr1,gr2)
+        dir1 = '../data/optimization/'
+        print x1, x2 
+        gr1 = self.getSig(glob.glob(dir1+"significance_"+x1+"/SR*.txt"), show, x1,'plots_'+x1)
+        gr2 = self.getSig(glob.glob(dir1+"significance_"+x2+"/SR*.txt"), show, x2,'plots_'+x2)
+
+        self.showCompareZn(gr1,gr2) ## gr1 is the reference
 
 
 def test1():
@@ -477,11 +493,24 @@ def test():
 
     cx1.compareChans()
 
+def setPel():
+   pad1 = '''static Int_t  colors[50];
+   static Bool_t initialized = kFALSE;
+   Double_t Red[3]    = { 1.00, 1.00, 0.00};
+   Double_t Green[3]  = { 0.00, 1.00, 0.00};
+   Double_t Blue[3]   = { 0.00, 1.00, 1.00};
+   Double_t Length[3] = { 0.00, 0.50, 1.00 };
+   Int_t FI = TColor::CreateGradientColorTable(3,Length,Red,Green,Blue,50);
+   for (int i=0; i<50; i++) colors[i] = FI+i;
+   gStyle->SetPalette(50,colors);'''
+   gROOT.ProcessLine(pad1)
+
 
 funlist.append(test)
 
 if __name__ == '__main__':
     savehistory('.')
     useAtlasStyle()
+#     setPel()
     test1()
 #     for fun in funlist: print fun()
