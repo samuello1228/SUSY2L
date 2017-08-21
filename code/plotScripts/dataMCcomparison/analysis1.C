@@ -4308,7 +4308,7 @@ void analysis1()
                         }
                         
                         //combined significance
-                        if(SigSampleInfo[i].significance>0)
+                        if(VarIndex==countVariable && SigSampleInfo[i].significance>0)
                         {
                             SigSampleInfo[i].significance2 += SigSampleInfo[i].significance * SigSampleInfo[i].significance;
                         }
