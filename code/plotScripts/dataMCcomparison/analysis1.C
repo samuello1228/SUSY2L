@@ -502,7 +502,8 @@ void analysis1()
         int unweighted;
         double weighted;
         double error;
-        double significance2;
+        double significance;
+        double significance2; //for combined significance
     };
     
     std::vector<SigInfo> SigSampleInfo;
@@ -2981,6 +2982,12 @@ void analysis1()
             }
         }
         
+        //For combined significance
+        for(unsigned int i=0;i<SigSampleInfo.size();i++)
+        {
+            SigSampleInfo[i].significance2 = 0;
+        }
+        
         //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
         for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
         {
@@ -4247,6 +4254,7 @@ void analysis1()
                 double total_BG_weighted = 0;
                 double total_BG_error2 = 0 ;
                 int total_BG_unweighted = 0;
+                double averageSignificance = 0;
                 if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
                     //expected number of events for Data
@@ -4271,17 +4279,43 @@ void analysis1()
                     cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                     
                     //expected number of events for signal
-                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    for(unsigned int i=0;i<SigSampleInfo.size();i++)
                     {
                         //expected number of events
-                        SigMassSplitting[i].weighted = h2SigSum[i]->IntegralAndError(0,-1,SigMassSplitting[i].error);
+                        SigSampleInfo[i].weighted = h2Sig[i]->IntegralAndError(0,-1,SigSampleInfo[i].error);
                         
                         //Significance
-                        SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,total_BG_weighted,total_BG_error2);
+                        SigSampleInfo[i].significance = GetSignificance(SigSampleInfo[i].weighted,total_BG_weighted,total_BG_error2);
                         
-                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<SigMassSplitting[i].weighted<<" +/- "<<SigMassSplitting[i].error<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<SigMassSplitting[i].significance<<endl;
+                        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                        {
+                            if(i == SigMassSplitting[j].ID)
+                            {
+                                SigMassSplitting[j].weighted = SigSampleInfo[i].weighted;
+                                SigMassSplitting[j].error = SigSampleInfo[i].error;
+                                SigMassSplitting[j].significance = SigSampleInfo[i].significance;
+                                
+                                cout<<SigMassSplitting[j].IDName.Data()<<": "<<SigMassSplitting[j].weighted<<" +/- "<<SigMassSplitting[j].error<<" ("<<SigMassSplitting[j].unweighted<<")"<<", Significance: "<<SigMassSplitting[j].significance<<endl;
+                            }
+                        }
+                        
+                        for(unsigned int j=0;j<OptimizingSignal.size();j++)
+                        {
+                            if(i == OptimizingSignal[j])
+                            {
+                                averageSignificance += SigSampleInfo[i].significance;
+                            }
+                        }
+                        
+                        //combined significance
+                        if(SigSampleInfo[i].significance>0)
+                        {
+                            SigSampleInfo[i].significance2 += SigSampleInfo[i].significance * SigSampleInfo[i].significance;
+                        }
                     }
                     cout<<endl;
+                    
+                    averageSignificance /= OptimizingSignal.size();
                 }
                 
                 if(VarIndex==countVariable)
@@ -4415,42 +4449,22 @@ void analysis1()
                         TGraph2D* g_nSig = new TGraph2D();
                         TGraph2D* g_significance = new TGraph2D();
                         
-                        double averageSignificance = 0;
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
-                            //expected number of events
-                            SigSampleInfo[j].weighted = h2Sig[j]->IntegralAndError(0,-1,SigSampleInfo[j].error);
-                            
-                            //Significance
-                            double significance = GetSignificance(SigSampleInfo[j].weighted,total_BG_weighted,total_BG_error2);
-                            if(significance>0)
-                            {
-                                SigSampleInfo[j].significance2 += significance*significance;
-                            }
-                            
-                            for(unsigned int k=0;k<OptimizingSignal.size();k++)
-                            {
-                                if(j == OptimizingSignal[k])
-                                {
-                                    averageSignificance += significance;
-                                }
-                            }
-                            
                             fout<<setprecision(1)<<std::fixed;
                             fout<<SigSampleInfo[j].Mass1<<" "<<SigSampleInfo[j].Mass2<<" ";
                             fout<<setprecision(3)<<std::fixed;
                             fout<<SigSampleInfo[j].weighted<<" "<<SigSampleInfo[j].error<<" ";
-                            fout<<significance<<endl;
+                            fout<<SigSampleInfo[j].significance<<endl;
                             
                             //2D plot
-                            //if(significance>0)
+                            //if(SigSampleInfo[j].significance>0)
                             {
                                 g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].weighted);
-                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, significance);
+                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].significance);
                             }
                         }
                         
-                        averageSignificance /= OptimizingSignal.size();
                         cout<<"average significance: "<<averageSignificance<<endl;
                         fout<<"#average significance: "<<averageSignificance<<endl;
                         
@@ -4990,7 +5004,7 @@ void analysis1()
                     
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
-                        TString NameTemp = TString::Format("Z_{n} = %.2f",SigMassSplitting[SigOptimizingIndex].significance);
+                        TString NameTemp = TString::Format("Z_{n} = %.2f",averageSignificance);
                         TLatex lt2;
                         lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
