@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_run1";
+TString setupTag = "2p8_1D_v2";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose
@@ -2892,12 +2892,13 @@ void analysis1()
     }
     
     std::vector<unsigned int> OptimizingSignal;
-    /*
+    ///*
     for(unsigned int i=0;i<10;i++)
     {
         OptimizingSignal.push_back(i);
     }
-    */
+    //*/
+    /*
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
         if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
@@ -2906,6 +2907,7 @@ void analysis1()
             OptimizingSignal.push_back(i);
         }
     }
+    */
     
     //plot graph
     unsigned int countVariable = 0;
@@ -3159,6 +3161,8 @@ void analysis1()
                         const vector< vector<OptimizingCutData> > OptimizingCutInfo = RegionInfo[RegionIndex].OptimizingCut[SigIndex];
                         
                         bool isChanged = false;
+                        double significance_Nminus1[OptimizingCutInfo.size()];
+                        
                         for(unsigned int VarIndex2=0;VarIndex2<OptimizingCutInfo.size();VarIndex2++)
                         {
                             const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
@@ -3518,6 +3522,7 @@ void analysis1()
                                 bin2[i] = OptimizingCutInfo[VarIndex2][i].nBin+1;
                             }
                             
+                            bool firstTime = true;
                             while(true)
                             {
                                 double nBG = 0;
@@ -3626,6 +3631,12 @@ void analysis1()
                                     }
                                     significanceTemp /= OptimizingSignal.size();
                                     if(isPrint) cout<<"Significance: "<<significanceTemp;
+                                    
+                                    if(firstTime)
+                                    {
+                                        significance_Nminus1[VarIndex2] = significanceTemp;
+                                        firstTime = false;
+                                    }
                                     
                                     if(significanceTemp > significanceRecord1)
                                     {
@@ -3799,6 +3810,48 @@ void analysis1()
                             }
                             cout<<endl;
                             
+                            cout<<"Final check:"<<endl;
+                            for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
+                            {
+                                for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                {
+                                    cout<<OptimizingCutInfo[i][j].RelatedVariable.Data()<<" ";
+                                }
+                                cout<<": "<<significance_Nminus1[i];
+                                
+                                if(significanceRecord2 - significance_Nminus1[i] < 0.1)
+                                {
+                                    cout<<", reject this cut."<<endl;
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    {
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].lower = OptimizingCutInfo[i][j].min;
+                                        RegionInfo[RegionIndex].OptimizingCut[SigIndex][i][j].upper = -1;
+                                    }
+                                }
+                                else
+                                {
+                                    cout<<", accept this cut."<<endl;
+                                }
+                            }
+                            cout<<endl;
+                            
+                            const vector< vector<OptimizingCutData> > OptimizingCutInfo2 = RegionInfo[RegionIndex].OptimizingCut[SigIndex];
+                            for(unsigned int i=0;i<OptimizingCutInfo2.size();i++)
+                            {
+                                for(unsigned int j=0;j<OptimizingCutInfo2[i].size();j++)
+                                {
+                                    unsigned int VarIndex = findVarIndex(OptimizingCutInfo2[i][j].RelatedVariable,Var);
+                                    
+                                    cout<<OptimizingCutInfo2[i][j].lower;
+                                    cout<<" <= ";
+                                    cout<<Var[VarIndex].VarFormula.Data();
+                                    cout<<" < ";
+                                    cout<<OptimizingCutInfo2[i][j].upper;
+                                    cout<<endl;
+                                }
+                            }
+                            cout<<endl;
+                            
                             {
                                 TString PathName = "latex/data/optimization/cut_txt/cut_";
                                 PathName += RegionInfo[RegionIndex].RegionName;
@@ -3809,17 +3862,17 @@ void analysis1()
                                 ofstream fout;
                                 fout.open(PathName.Data());
                                 
-                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
+                                for(unsigned int i=0;i<OptimizingCutInfo2.size();i++)
                                 {
-                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    for(unsigned int j=0;j<OptimizingCutInfo2[i].size();j++)
                                     {
-                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo2[i][j].RelatedVariable,Var);
                                         
                                         fout<<Var[VarIndex].VarName;
                                         fout<<" ";
-                                        fout<<OptimizingCutInfo[i][j].lower;
+                                        fout<<OptimizingCutInfo2[i][j].lower;
                                         fout<<" ";
-                                        fout<<OptimizingCutInfo[i][j].upper;
+                                        fout<<OptimizingCutInfo2[i][j].upper;
                                         fout<<endl;
                                     }
                                 }
