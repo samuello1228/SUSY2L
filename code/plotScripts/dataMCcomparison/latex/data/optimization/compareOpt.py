@@ -15,6 +15,8 @@ sDir = get_default_fig_dir()
 sTag = 'test_'
 sDirectly = False
 if gROOT.IsBatch(): sDirectly = True
+isDebug = False
+
 
 def updateDict(d, x):
     for j in d: d[j] = d[j]*d[j]
@@ -31,11 +33,13 @@ def updateDict(d, x):
         if Zn<0: Zn = 0.
         k=(fs[0],fs[1])
 
-        if fs[0]=='400.0' and fs[1]=='25.0':
-            print Zn, d.get(k,-1)
+        if isDebug:
+            if fs[0]=='400.0' and fs[1]=='25.0':
+                print Zn, d.get(k,-1)
         d[k] = Zn*Zn + d.get(k,0)
-        if fs[0]=='400.0' and fs[1]=='25.0':
-            print fs[0], fs[1], Zn, d.get(k,0)
+        if isDebug:
+            if fs[0]=='400.0' and fs[1]=='25.0':
+                print fs[0], fs[1], Zn, d.get(k,0)
     for j in d: d[j] = sqrt(d[j])
 
 
@@ -279,7 +283,7 @@ class ComparerX:
         dictA = {}
         for x in args:
             updateDict(dictA, x)
-        print dictA
+#         print dictA
 
         g2d = TGraph2D()
         i = 0
@@ -293,7 +297,11 @@ class ComparerX:
 
     #     g2d.SetPoint(g2d.GetN(), 125, 0,0)
 
-        gStyle.SetPadRightMargin(0.16)
+#         gStyle.SetPadRightMargin(0.16)
+        if gPad:
+            gPad.SetRightMargin(0.16)
+        else:
+            gStyle.SetPadRightMargin(0.16)
 
         g2d.Draw('colz')
         h1 = g2d.GetHistogram();
