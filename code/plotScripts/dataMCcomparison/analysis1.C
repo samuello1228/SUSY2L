@@ -1937,7 +1937,7 @@ void analysis1()
             OptimizingCutElement3.min = 100;
             OptimizingCutElement3.max = 600;
             OptimizingCutElement3.nBin = 50;
-            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.lower = 100;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
@@ -3502,14 +3502,6 @@ void analysis1()
                                 }
                             }
                             
-                            bool OnlyHasLowerCut[VarNumber];
-                            bool OnlyHasUpperCut[VarNumber];
-                            for(unsigned int i=0;i<VarNumber;i++)
-                            {
-                                OnlyHasLowerCut[i] = OptimizingCutInfo[VarIndex2][i].OnlyHasLowerCut;
-                                OnlyHasUpperCut[i] = OptimizingCutInfo[VarIndex2][i].OnlyHasUpperCut;
-                            }
-                            
                             int lowerBinRecord1[VarNumber];
                             int upperBinRecord1[VarNumber];
                             double nBGRecord1 = -1;
@@ -3666,15 +3658,15 @@ void analysis1()
                                 
                                 if(VarNumber==1)
                                 {
-                                    bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
+                                    bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
                                     if(!isContinue) break;
                                 }
                                 else if(VarNumber==2)
                                 {
-                                    bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OnlyHasLowerCut[1],OnlyHasUpperCut[1]);
+                                    bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut);
                                     if(!isContinue)
                                     {
-                                        isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OnlyHasLowerCut[0],OnlyHasUpperCut[0]);
+                                        isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
                                         if(isContinue)
                                         {
                                             bin1[1] = 1;
