@@ -3149,16 +3149,20 @@ void analysis1()
                 for(unsigned int SigIndex=SigOptimizingIndex;SigIndex<=SigOptimizingIndex;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<RegionInfo[RegionIndex].OptimizingCut.size();SigIndex++)
                 {
-                    unsigned int VarIndexRecord2 = 0;
-                    vector<double> lowerCutRecord2;
-                    vector<double> upperCutRecord2;
-                    double nBGRecord2 = 0;
-                    double nSigRecord2[OptimizingSignal.size()];
-                    double significanceRecord2 = -999;
+                    double nBGRecord3 = 0;
+                    double nSigRecord3[OptimizingSignal.size()];
+                    double significanceRecord3 = -999;
                     
                     while(true)
                     {
                         const vector< vector<OptimizingCutData> > OptimizingCutInfo = RegionInfo[RegionIndex].OptimizingCut[SigIndex];
+                        
+                        unsigned int VarIndexRecord2 = 0;
+                        vector<double> lowerCutRecord2;
+                        vector<double> upperCutRecord2;
+                        double nBGRecord2 = 0;
+                        double nSigRecord2[OptimizingSignal.size()];
+                        double significanceRecord2 = significanceRecord3;
                         
                         bool isChanged = false;
                         double significance_Nminus1[OptimizingCutInfo.size()];
@@ -3786,11 +3790,18 @@ void analysis1()
                                 RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = lowerCutRecord2[i];
                                 RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = upperCutRecord2[i];
                             }
+                            
+                            nBGRecord3 = nBGRecord2;
+                            for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                            {
+                                nSigRecord3[i] = nSigRecord2[i];
+                            }
+                            significanceRecord3 = significanceRecord2;
                         }
                         else
                         {
                             cout<<"The cut is the same."<<endl;
-                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                            cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
                             
                             cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
                             
@@ -3819,7 +3830,7 @@ void analysis1()
                                 }
                                 cout<<": "<<significance_Nminus1[i];
                                 
-                                if(significanceRecord2 - significance_Nminus1[i] < 0.1)
+                                if(significanceRecord3 - significance_Nminus1[i] < 0.1)
                                 {
                                     cout<<", reject this cut."<<endl;
                                     for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
