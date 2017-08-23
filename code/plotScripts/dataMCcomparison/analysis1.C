@@ -3650,26 +3650,26 @@ void analysis1()
                                     
                                     if(isOptimizing)
                                     {
-                                    if(significanceTemp > significanceRecord1)
-                                    {
-                                        for(unsigned int i=0;i<VarNumber;i++)
+                                        if(significanceTemp > significanceRecord1)
                                         {
-                                            lowerBinRecord1[i] = bin1[i];
-                                            upperBinRecord1[i] = bin2[i];
+                                            for(unsigned int i=0;i<VarNumber;i++)
+                                            {
+                                                lowerBinRecord1[i] = bin1[i];
+                                                upperBinRecord1[i] = bin2[i];
+                                            }
+                                            
+                                            nBGRecord1 = nBG;
+                                            for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                            {
+                                                nSigRecord1[i] = nSig[i];
+                                            }
+                                            significanceRecord1 = significanceTemp;
+                                            if(isPrint) cout<<", accepted."<<endl<<endl;
                                         }
-                                        
-                                        nBGRecord1 = nBG;
-                                        for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                        else
                                         {
-                                            nSigRecord1[i] = nSig[i];
+                                            if(isPrint) cout<<endl<<endl;
                                         }
-                                        significanceRecord1 = significanceTemp;
-                                        if(isPrint) cout<<", accepted."<<endl<<endl;
-                                    }
-                                    else
-                                    {
-                                        if(isPrint) cout<<endl<<endl;
-                                    }
                                     }
                                     
                                     if(isRemovingCut)
@@ -3696,28 +3696,28 @@ void analysis1()
                                 
                                 if(isOptimizing)
                                 {
-                                if(VarNumber==1)
-                                {
-                                    bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
-                                    if(!isContinue) break;
-                                }
-                                else if(VarNumber==2)
-                                {
-                                    bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut);
-                                    if(!isContinue)
+                                    if(VarNumber==1)
                                     {
-                                        isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
-                                        if(isContinue)
+                                        bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
+                                        if(!isContinue) break;
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut);
+                                        if(!isContinue)
                                         {
-                                            bin1[1] = 1;
-                                            bin2[1] = -1;
-                                        }
-                                        else
-                                        {
-                                            break;
+                                            isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
+                                            if(isContinue)
+                                            {
+                                                bin1[1] = 1;
+                                                bin2[1] = -1;
+                                            }
+                                            else
+                                            {
+                                                break;
+                                            }
                                         }
                                     }
-                                }
                                 }
                                 
                                 if(isRemovingCut)
@@ -3730,22 +3730,22 @@ void analysis1()
                             double upperCutRecord1[VarNumber];
                             if(isOptimizing)
                             {
-                            for(unsigned int i=0;i<VarNumber;i++)
-                            {
-                                double BinSize = (OptimizingCutInfo[VarIndex2][i].max - OptimizingCutInfo[VarIndex2][i].min)/OptimizingCutInfo[VarIndex2][i].nBin;
-                                
-                                lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
-                                
-                                if(upperBinRecord1[i] != OptimizingCutInfo[VarIndex2][i].nBin+1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
-                                else upperCutRecord1[i] = -1;
-                                
-                                cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<": ";
-                                cout<<"lowerBinRecord1: "<<lowerBinRecord1[i];
-                                cout<<", upperBinRecord1: "<<upperBinRecord1[i];
-                                cout<<", lowerCutRecord1: "<<lowerCutRecord1[i];
-                                cout<<", upperCutRecord1: "<<upperCutRecord1[i];
-                                cout<<endl;
-                            }
+                                for(unsigned int i=0;i<VarNumber;i++)
+                                {
+                                    double BinSize = (OptimizingCutInfo[VarIndex2][i].max - OptimizingCutInfo[VarIndex2][i].min)/OptimizingCutInfo[VarIndex2][i].nBin;
+                                    
+                                    lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
+                                    
+                                    if(upperBinRecord1[i] != OptimizingCutInfo[VarIndex2][i].nBin+1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
+                                    else upperCutRecord1[i] = -1;
+                                    
+                                    cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<": ";
+                                    cout<<"lowerBinRecord1: "<<lowerBinRecord1[i];
+                                    cout<<", upperBinRecord1: "<<upperBinRecord1[i];
+                                    cout<<", lowerCutRecord1: "<<lowerCutRecord1[i];
+                                    cout<<", upperCutRecord1: "<<upperCutRecord1[i];
+                                    cout<<endl;
+                                }
                             }
                             if(isRemovingCut)
                             {
@@ -3758,41 +3758,41 @@ void analysis1()
                             
                             if(isOptimizing)
                             {
-                            if(significanceRecord1 > significanceRecord2)
-                            {
-                                bool isSameCut = true;
-                                for(unsigned int i=0;i<VarNumber;i++)
+                                if(significanceRecord1 > significanceRecord2)
                                 {
-                                    if(lowerCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].lower) isSameCut = false;
-                                    if(upperCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].upper) isSameCut = false;
-                                }
-                                
-                                if(isSameCut)
-                                {
-                                    cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
-                                }
-                                else
-                                {
-                                    cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
-                                    
-                                    VarIndexRecord2 = VarIndex2;
-                                    lowerCutRecord2.clear();
-                                    upperCutRecord2.clear();
+                                    bool isSameCut = true;
                                     for(unsigned int i=0;i<VarNumber;i++)
                                     {
-                                        lowerCutRecord2.push_back(lowerCutRecord1[i]);
-                                        upperCutRecord2.push_back(upperCutRecord1[i]);
+                                        if(lowerCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].lower) isSameCut = false;
+                                        if(upperCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].upper) isSameCut = false;
                                     }
-                                    nBGRecord2 = nBGRecord1;
-                                    for(unsigned int i=0;i<OptimizingSignal.size();i++)
-                                    {
-                                        nSigRecord2[i] = nSigRecord1[i];
-                                    }
-                                    significanceRecord2 = significanceRecord1;
                                     
-                                    isChanged = true;
+                                    if(isSameCut)
+                                    {
+                                        cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
+                                    }
+                                    else
+                                    {
+                                        cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
+                                        
+                                        VarIndexRecord2 = VarIndex2;
+                                        lowerCutRecord2.clear();
+                                        upperCutRecord2.clear();
+                                        for(unsigned int i=0;i<VarNumber;i++)
+                                        {
+                                            lowerCutRecord2.push_back(lowerCutRecord1[i]);
+                                            upperCutRecord2.push_back(upperCutRecord1[i]);
+                                        }
+                                        nBGRecord2 = nBGRecord1;
+                                        for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                        {
+                                            nSigRecord2[i] = nSigRecord1[i];
+                                        }
+                                        significanceRecord2 = significanceRecord1;
+                                        
+                                        isChanged = true;
+                                    }
                                 }
-                            }
                             }
                             
                             if(isRemovingCut)
@@ -3845,59 +3845,59 @@ void analysis1()
                         
                         if(isOptimizing)
                         {
-                        if(isChanged)
-                        {
-                            cout<<"The following cut is applied."<<endl;
-                            for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                            if(isChanged)
                             {
-                                cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][i].RelatedVariable.Data()<<" cut is applied. ";
-                                cout<<"lowerCutRecord2: "<<lowerCutRecord2[i];
-                                cout<<", upperCutRecord2: "<<upperCutRecord2[i];
-                                cout<<endl;
-                            }
-                            cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
-                            
-                            for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
-                            {
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = lowerCutRecord2[i];
-                                RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = upperCutRecord2[i];
-                            }
-                            
-                            nBGRecord3 = nBGRecord2;
-                            for(unsigned int i=0;i<OptimizingSignal.size();i++)
-                            {
-                                nSigRecord3[i] = nSigRecord2[i];
-                            }
-                            significanceRecord3 = significanceRecord2;
-                        }
-                        else
-                        {
-                            cout<<"The cut is the same."<<endl;
-                            cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
-                            
-                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
-                            
-                            for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
-                            {
-                                for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                cout<<"The following cut is applied."<<endl;
+                                for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
                                 {
-                                    unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
-                                    
-                                    cout<<OptimizingCutInfo[i][j].lower;
-                                    cout<<" <= ";
-                                    cout<<Var[VarIndex].VarFormula.Data();
-                                    cout<<" < ";
-                                    cout<<OptimizingCutInfo[i][j].upper;
+                                    cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][i].RelatedVariable.Data()<<" cut is applied. ";
+                                    cout<<"lowerCutRecord2: "<<lowerCutRecord2[i];
+                                    cout<<", upperCutRecord2: "<<upperCutRecord2[i];
                                     cout<<endl;
                                 }
+                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                                
+                                for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                                {
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = lowerCutRecord2[i];
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = upperCutRecord2[i];
+                                }
+                                
+                                nBGRecord3 = nBGRecord2;
+                                for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                {
+                                    nSigRecord3[i] = nSigRecord2[i];
+                                }
+                                significanceRecord3 = significanceRecord2;
                             }
-                            cout<<endl;
-                            
-                            cout<<"Start to remove cuts."<<endl<<endl;
-                            isOptimizing = false;
-                            isRemovingCut = true;
-                            significanceRecord4 = significanceRecord3;
-                        }
+                            else
+                            {
+                                cout<<"The cut is the same."<<endl;
+                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
+                                
+                                cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
+                                
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
+                                {
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    {
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                        
+                                        cout<<OptimizingCutInfo[i][j].lower;
+                                        cout<<" <= ";
+                                        cout<<Var[VarIndex].VarFormula.Data();
+                                        cout<<" < ";
+                                        cout<<OptimizingCutInfo[i][j].upper;
+                                        cout<<endl;
+                                    }
+                                }
+                                cout<<endl;
+                                
+                                cout<<"Start to remove cuts."<<endl<<endl;
+                                isOptimizing = false;
+                                isRemovingCut = true;
+                                significanceRecord4 = significanceRecord3;
+                            }
                         }
                         else if(isRemovingCut)
                         {
