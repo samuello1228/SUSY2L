@@ -45,10 +45,10 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_pt25_meff200_dEta1p5_v4";
+TString setupTag = "2p8_1D_loose_v4";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
-const bool ptcut = 0; //For loose
+const bool ptcut = 0; //For loose (muon |eta|<2.7)
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -3603,6 +3603,7 @@ void analysis1()
                                         {
                                             if(BGGroup[j].info->GroupName != "multitop" &&
                                                BGGroup[j].info->GroupName != "Vgamma"   &&
+                                               BGGroup[j].info->GroupName != "Wjets"    &&
                                                BGGroup[j].info->GroupName != "Zjets"   )
                                             {
                                                 if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
@@ -3691,7 +3692,7 @@ void analysis1()
                                 else if(isRemovingCut)
                                 {
                                     cout<<"Error2"<<endl;
-                                    return;
+                                    //return;
                                 }
                                 
                                 if(isOptimizing)
@@ -3797,7 +3798,7 @@ void analysis1()
                             
                             if(isRemovingCut)
                             {
-                                if((significanceRecord4 - significanceRecord1) < 0.05 && significanceRecord1 > significanceRecord2)
+                                if(significanceRecord1 != -999 && (significanceRecord4 - significanceRecord1) < 0.05 && significanceRecord1 > significanceRecord2)
                                 {
                                     cout<<"Higher significance is found. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
                                     
