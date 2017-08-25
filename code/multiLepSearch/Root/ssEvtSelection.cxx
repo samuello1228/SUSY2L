@@ -341,7 +341,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
   //m_objTool->msg().setLevel( MSG::ERROR );
   //m_objTool->msg().setLevel( MSG::WARNING );
-//   m_objTool->msg().setLevel( MSG::VERBOSE );
+  // m_objTool->msg().setLevel( MSG::VERBOSE );
 
   for(auto x: CF_PRW_confFiles){Info("CF_PRW_confFiles", "%s", x.c_str());}
 
@@ -447,7 +447,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   setupTriggers();
 
 
-  return EL::StatusCode::SUCCESS;
+
 
   //Initialization of the Trigger SF Tool
   Info("initialize()", "Initializing Tool: \t %s", "TrigGlobalEfficiencyCorrectionTool");
@@ -460,8 +460,13 @@ EL::StatusCode ssEvtSelection :: initialize ()
   ANA_CHECK( TriggerSFTool->setProperty("ListOfLegsPerTool",LegsPerTool) );
   ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose || mu20_iloose_L1MU15_OR_mu40 || 2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
   ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0 || mu26_imedium_OR_mu50 || 2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
-  ANA_CHECK( TriggerSFTool->initialize() );
+  
+  // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
+  // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
 
+  ANA_CHECK( TriggerSFTool->initialize() );
+  TriggerSFTool->msg().setLevel( MSG::VERBOSE );
+  return EL::StatusCode::SUCCESS;
 
 }
 
@@ -1241,11 +1246,58 @@ EL::StatusCode ssEvtSelection :: execute ()
         // Info("execute()", "About to calculate trigger scale factors");
         // if (TriggerSFTool) Info("execute()", "TriggerSFTool initialized");
         // else Info("execute()", "TriggerSFTool not initialized");
-        double trigSF=0;
-        // CHECK (TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF));
-        sEvt.trigSF = trigSF;
+        double trigSF=1;
+        // auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF);
+        // sEvt.trigSF = (trigRet==CP::CorrectionCode::OutOfValidityRange? 0 : trigSF);
+
+        if (m_objTool->treatAsYear()==2015)
+        {
+          if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH") || m_objTool->IsTrigPassed("HLT_e60_lhmedium") || m_objTool->IsTrigPassed("HLT_e120_lhloose")) {
+            cout << "Treat event as year 2015 which passed a single electron trigger" << endl;
+            double tSF = 1.; 
+            cout << "Trig SFs: ";
+            for (uint i=0; i<trigPassedElec.size(); i++) {
+              electronSFTools[0]->getEfficiencyScaleFactor(*(trigPassedElec[i]), tSF);
+              cout << i << ": " << tSF << '\t';
+            } cout << endl;
+          }//cout << endl << endl;
+
+        } 
+        if (m_objTool->treatAsYear()==2016)
+        {
+          if (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose") || m_objTool->IsTrigPassed("HLT_e60_lhmedium_nod0") || m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0")) {
+            cout << "Treat event as year 2016 which passed a single electron trigger" << endl;
+            double tSF = 1.; 
+            cout << "Trig SFs: ";
+            for (uint i=0; i<trigPassedElec.size(); i++) {
+              electronSFTools[0]->getEfficiencyScaleFactor(*(trigPassedElec[i]), tSF);
+              cout << i << ": " << tSF << '\t';
+            } cout << endl;
+          }//cout << endl << endl;
+
+        }
+
+        if (m_objTool->treatAsYear()==2015)
+        {
+          if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15") || m_objTool->IsTrigPassed("HLT_mu40")) {
+            cout << "Treat event as year 2015 which passed a single muon trigger" << endl;
+            double tSF = 1.; 
+            muonTools[0]->getTriggerScaleFactor(*muons_copy, tSF, "HLT_mu20_iloose_L1MU15_OR_HLT_mu40");
+            cout << "Trig SF: " << tSF << endl;
+          }//cout << endl << endl;
+
+        } 
+        if (m_objTool->treatAsYear()==2016)
+        {
+          if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15") || m_objTool->IsTrigPassed("HLT_mu40")) {
+            cout << "Treat event as year 2015 which passed a single muon trigger" << endl;
+            double tSF = 1.; 
+            muonTools[1]->getTriggerScaleFactor(*muons_copy, tSF, "HLT_mu20_iloose_L1MU15_OR_HLT_mu40");
+            cout << "Trig SF: " << tSF << endl;
+          }//cout << endl << endl;
+        }
         TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF; //*sEvt.trigSF;
-        // Info("execute()", "Sca le factors done");
+        // Info("execute()", "Scale factors done");
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;

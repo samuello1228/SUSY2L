@@ -1,5 +1,7 @@
 #!/bin/bash
-tag=v11.5.1.Sam14
+rc compile
+
+tag=v11.5.1.cf15
 grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
 dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 
@@ -10,7 +12,7 @@ SUSYconf=multiLepSearch/sel_conf/SUSYTools_Wh_update.conf
 
 # Use Samuel's or my framework?
 st=fakes
-st=ss
+# st=ss
 
 if [ -d ${tag} ]; then
     echo "Previous directories/files with tag "${tag}" found."
@@ -18,7 +20,7 @@ if [ -d ${tag} ]; then
     rm -r ${tag}.*
 fi
 
-if true; then
+if false; then
     ###########
     # Cutflow #
     ###########
@@ -47,13 +49,24 @@ if true; then
     file=/eos/atlas/user/g/ggallard/xAOD_forTesting/data16_13TeV/DAOD_SUSY2.10314997._000013.pool.root.1
     ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 0 --study ${st} --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf} --cutflow --grl ${grl} | tee data.log  
 
+    # echo "### Executing cutflow for Zee sample ############################"
+    # k=${tag}.Zee
+    # file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2949/DAOD_SUSY2.11608161._000011.pool.root.1
+    # ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ${st} --mcMatch dR --doSys 0 --ChargeID 1 --conf ${SUSYconf} --printEvent 47 --cutflow | tee Zmm.log 
+
     ./printCutflow.py ${tag} > ${tag}.log
 
 else 
     ###################
     # Feature testing #
     ###################
-    k=${tag}.ZeeP.dRZ
-    file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2949/DAOD_SUSY2.11608161._000011.pool.root.1
-    ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ${st} --mcMatch dRZ --doSys 0 --ChargeID 1 --conf ${SUSYconf} 
+    
+    echo "### Executing test for signal sample ############################"
+    k=${tag}.Sig
+    file=/eos/atlas/user/d/dzhang/Samples/Wh/mc15_13TeV.993822.MGPy8EG_A14N13LO_C1N2_Wh_2L_400_0.merge.DAOD_SUSY2.e5678_a766_a821_r7676_p2949_p2972_pUM999999/merge.DAOD_SUSY2.993822._00001.pool.root.1
+    ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ${st} --mcMatch MCTC --doSys 0 --ChargeID 1 --conf ${SUSYconf} --printEvent 10566 --cutflow -n 200| tee Sig.log
+
+    # k=${tag}.ZeeP.dRZ
+    # file=/eos/atlas/user/g/ggallard/xAOD_forTesting/mc15_13TeV.361106.PowhegPythia8EvtGen_AZNLOCTEQ6L1_Zee.merge.DAOD_SUSY2.e3601_s2576_s2132_r7725_r7676_p2949/DAOD_SUSY2.11608161._000011.pool.root.1
+    # ../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${tag} -o ${k} -w -a 1 --study ${st} --mcMatch dRZ --doSys 0 --ChargeID 1 --conf ${SUSYconf} 
 fi
