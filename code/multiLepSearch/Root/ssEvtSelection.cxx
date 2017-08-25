@@ -1247,8 +1247,8 @@ EL::StatusCode ssEvtSelection :: execute ()
         // if (TriggerSFTool) Info("execute()", "TriggerSFTool initialized");
         // else Info("execute()", "TriggerSFTool not initialized");
         double trigSF=1;
-        // auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF);
-        // sEvt.trigSF = (trigRet==CP::CorrectionCode::OutOfValidityRange? 0 : trigSF);
+        auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF);
+        sEvt.trigSF = (trigRet==CP::CorrectionCode::OutOfValidityRange? 0 : trigSF);
 
         if (m_objTool->treatAsYear()==2015)
         {
