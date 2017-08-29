@@ -341,7 +341,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   m_objTool = new ST::SUSYObjDef_xAOD("SUSYObjDef_xAOD");
   //m_objTool->msg().setLevel( MSG::ERROR );
   //m_objTool->msg().setLevel( MSG::WARNING );
-//   m_objTool->msg().setLevel( MSG::VERBOSE );
+  // m_objTool->msg().setLevel( MSG::VERBOSE );
 
   for(auto x: CF_PRW_confFiles){Info("CF_PRW_confFiles", "%s", x.c_str());}
 
@@ -447,7 +447,7 @@ EL::StatusCode ssEvtSelection :: initialize ()
   setupTriggers();
 
 
-  return EL::StatusCode::SUCCESS;
+
 
   //Initialization of the Trigger SF Tool
   Info("initialize()", "Initializing Tool: \t %s", "TrigGlobalEfficiencyCorrectionTool");
@@ -460,8 +460,13 @@ EL::StatusCode ssEvtSelection :: initialize ()
   ANA_CHECK( TriggerSFTool->setProperty("ListOfLegsPerTool",LegsPerTool) );
   ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose || mu20_iloose_L1MU15_OR_mu40 || 2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
   ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0 || mu26_imedium_OR_mu50 || 2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
-  ANA_CHECK( TriggerSFTool->initialize() );
+  
+  // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
+  // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
 
+  ANA_CHECK( TriggerSFTool->initialize() );
+  TriggerSFTool->msg().setLevel( MSG::VERBOSE );
+  return EL::StatusCode::SUCCESS;
 
 }
 
@@ -1029,7 +1034,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
-    trigPassedElec.clear(); trigPassedMuon.clear(); 
+    trigElec.clear(); trigMuon.clear(); 
     // Info("execute()", "There are %lu leptons in this event", sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       auto& l = m_susyEvt->leps[i];
@@ -1203,11 +1208,7 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(nISR>=1) m_susyEvt->evt.flag += 6;
         }
       }
-      // else if (study=="fakes")
-      // {
-      //   if(nISR==1) m_susyEvt->evt.flag += 32;
-      //   else if(nISR==0) m_susyEvt->evt.flag += 16;
-      // }
+
       //Scale factor
       if(CF_isMC){
         // Info("execute()", "Calculate scale factors");
@@ -1215,8 +1216,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         {
           // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_ee_Key, true);
-            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false /*trigSF*/, true, m_ee_Key, true);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
@@ -1231,21 +1231,34 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
-        // else if (study == "fakes")
-        // {
-        //   sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
-        //   sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
-        // }
+
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
-        // Info("execute()", "About to calculate trigger scale factors");
-        // if (TriggerSFTool) Info("execute()", "TriggerSFTool initialized");
-        // else Info("execute()", "TriggerSFTool not initialized");
-        double trigSF=0;
-        // CHECK (TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigPassedElec, trigPassedMuon, trigSF));
+
+        double trigSF=1;
+        auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigElec, trigMuon, trigSF);
         sEvt.trigSF = trigSF;
-        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF; //*sEvt.trigSF;
-        // Info("execute()", "Sca le factors done");
+
+        // DEBUG MESSAGES. COMMENT OUT TO READ
+        // if (trigRet==CP::CorrectionCode::OutOfValidityRange){
+        //   cout << "Event " << m_eventCounter << ": Year " << m_objTool->treatAsYear() << ", trigSF = " << sEvt.trigSF << endl;
+        //   cout << sel_Ls.size() << " selected leptons" << endl;
+        //   for (uint i=0; i<sel_Ls.size(); i++)
+        //   {
+        //     cout << "Lepton " << i;
+        //     xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[i]);
+        //     xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[i]);
+        //     if(mu) cout << " muon" ;
+        //     else if (el) cout << " electron";
+        //     else cout << " unknown flavor";
+
+        //     cout << endl << "PT: " << sel_Ls[i]->pt() << "\t" << "ETA: " << sel_Ls[i]->eta() << endl;      
+        //   }
+        //   cout << endl;
+        // }
+        
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF*sEvt.trigSF;
+
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
@@ -1370,10 +1383,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   }
   // Info("fillLepton(el)", "After trigger matching");
 
-  if (m_objTool->treatAsYear()==2015) for(auto trig : CF_trigNames_2015) if (m_objTool->IsTrigPassed(trig))
-    { trigPassedElec.push_back(el); break; }
-  else if (m_objTool->treatAsYear()==2016) for(auto trig : CF_trigNames_2016) if (m_objTool->IsTrigPassed(trig))
-    { trigPassedElec.push_back(el); break; }
+  trigElec.push_back(el);
 
   l.ID *= el->charge();
   //l.author = el->author();
@@ -1508,10 +1518,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     }
   }
   
-  if (m_objTool->treatAsYear()==2015) for(auto trig : CF_trigNames_2015) if (m_objTool->IsTrigPassed(trig))
-    { trigPassedMuon.push_back(mu); break; }
-  else if (m_objTool->treatAsYear()==2016) for(auto trig : CF_trigNames_2016) if (m_objTool->IsTrigPassed(trig))
-    { trigPassedMuon.push_back(mu); break; }
+  trigMuon.push_back(mu);
 
   l.ID *= mu->charge();
   //l.author = mu->author();

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import ROOT, sys
+import ROOT, sys, os
+import os.path
 
 def printCutflow(pair):
 	fname, eventNum = pair[0], pair[1]
@@ -16,7 +17,7 @@ def printCutflow(pair):
 				print "%25s : %f" % (hCutFlow.GetXaxis().GetBinLabel(i), hCutFlow.GetBinContent(i))
 	t = f.Get("evt2l")
 	print "Weights for event %d" % eventNum
-	t.Scan("evt.weight:evt.pwt:evt.ElSF:evt.MuSF:evt.BtagSF:evt.JvtSF", "evt.event==%d"%eventNum)
+	t.Scan("evt.weight:evt.pwt:evt.ElSF:evt.MuSF:evt.BtagSF:evt.JvtSF:evt.trigSF", "evt.event==%d"%eventNum)
 	
 
 fileList = [
@@ -28,6 +29,7 @@ fileList = [
 ]
 
 for f in fileList:
-	print "Cutflow for ", f
-	printCutflow(f)
-	print '\n\n'
+	if os.path.isfile(f[0]):
+		print "Cutflow for ", f
+		printCutflow(f)
+		print '\n\n'
