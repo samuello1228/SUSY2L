@@ -1799,7 +1799,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-1");}
   LegsPerTool["ElTrigSF-1"+var] = LegsPerTool["ElTrigEff-1"+var];
 
-  //Trigger efficiency tool for dielectron trigger
+  //Trigger efficiency tool for dielectron trigger 
   AsgElectronEfficiencyCorrectionTool* elEffTool2 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-2"+var);
   elEffTool2->msg().setLevel( MSG::FATAL );
   elEffTool2->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
@@ -1812,7 +1812,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-2");}
   LegsPerTool["ElTrigEff-2"+var] = "e12_lhloose_L1EM10VH,e17_lhvloose_nod0";
 
-  //Trigger SF tool for dilelectron trigger
+  //Trigger SF tool for dilelectron trigger 
   AsgElectronEfficiencyCorrectionTool* elSFTool2 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-2"+var);
   elSFTool2->msg().setLevel( MSG::FATAL );
   elSFTool2->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
@@ -1825,7 +1825,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-2");}
   LegsPerTool["ElTrigSF-2"+var] = LegsPerTool["ElTrigEff-2"+var];
 
-  //Trigger efficiency tool for dilepton trigger
+  //Trigger efficiency tool for dilepton trigger (e17_mu14)
   AsgElectronEfficiencyCorrectionTool* elEffTool3 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-3"+var);
   elEffTool3->msg().setLevel( MSG::FATAL );
   elEffTool3->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
@@ -1838,7 +1838,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-3");}
   LegsPerTool["ElTrigEff-3"+var] = "e17_lhloose,e17_lhloose_nod0";
 
-  //Trigger SF tool for dilepton trigger
+  //Trigger SF tool for dilepton trigger (e17_mu14)
   AsgElectronEfficiencyCorrectionTool* elSFTool3 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-3"+var);
   elSFTool3->msg().setLevel( MSG::FATAL );
   elSFTool3->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
@@ -1850,6 +1850,32 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   if(elSFTool3->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-3"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-3");}
   LegsPerTool["ElTrigSF-3"+var] = LegsPerTool["ElTrigEff-3"+var];
+
+  //Trigger efficiency tool for dilepton trigger (e7_mu24)
+  AsgElectronEfficiencyCorrectionTool* elEffTool4 = new AsgElectronEfficiencyCorrectionTool("ElTrigEff-4"+var);
+  elEffTool4->msg().setLevel( MSG::FATAL );
+  elEffTool4->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elEffTool4->setProperty("TriggerKey","Eff_MULTI_L_2015_e7_lhmedium_2016_e7_lhmedium_nod0").ignore();
+  elEffTool4->setProperty("IdKey","Medium").ignore();
+  elEffTool4->setProperty("IsoKey","FixedCutTight").ignore();
+  elEffTool4->setProperty("CorrelationModel","TOTAL").ignore();
+  elEffTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elEffTool4->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-4"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-4");}
+  LegsPerTool["ElTrigEff-4"+var] = "e17_lhloose,e17_lhloose_nod0";
+
+  //Trigger SF tool for dilepton trigger (e7_mu24)
+  AsgElectronEfficiencyCorrectionTool* elSFTool4 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-4"+var);
+  elSFTool4->msg().setLevel( MSG::FATAL );
+  elSFTool4->setProperty("MapFilePath","/cvmfs/atlas.cern.ch/repo/sw/database/GroupData/ElectronEfficiencyCorrection/2015_2016/rel20.7/Moriond_February2017_v1/map0.txt").ignore();
+  elSFTool4->setProperty("TriggerKey","MULTI_L_2015_e7_lhmedium_2016_e7_lhmedium_nod0").ignore();
+  elSFTool4->setProperty("IdKey","Medium").ignore();
+  elSFTool4->setProperty("IsoKey","FixedCutTight").ignore();
+  elSFTool4->setProperty("CorrelationModel","TOTAL").ignore();
+  elSFTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if(elSFTool4->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-4"); return false;}
+  else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-4");}
+  LegsPerTool["ElTrigSF-4"+var] = LegsPerTool["ElTrigEff-4"+var];
 
   // Trigger Efficiency tool for muon (2015)
   CP::MuonTriggerScaleFactors* toolMuons1 =  new CP::MuonTriggerScaleFactors("MuonTrigEff-2015"+var);
@@ -1873,9 +1899,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   electronEffTools.push_back(elEffTool1);
   electronEffTools.push_back(elEffTool2);
   electronEffTools.push_back(elEffTool3);
+  electronEffTools.push_back(elEffTool4);
   electronSFTools.push_back(elSFTool1);
   electronSFTools.push_back(elSFTool2);
   electronSFTools.push_back(elSFTool3);
+  electronSFTools.push_back(elSFTool4);
   muonTools.push_back(toolMuons1);
   muonTools.push_back(toolMuons2);
 
