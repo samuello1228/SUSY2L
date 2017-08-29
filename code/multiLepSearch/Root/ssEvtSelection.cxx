@@ -1862,7 +1862,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elEffTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
   if(elEffTool4->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-4"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-4");}
-  LegsPerTool["ElTrigEff-4"+var] = "e17_lhloose,e17_lhloose_nod0";
+  LegsPerTool["ElTrigEff-4"+var] = "e7_lhmedium,e7_lhmedium_nod0";
 
   //Trigger SF tool for dilepton trigger (e7_mu24)
   AsgElectronEfficiencyCorrectionTool* elSFTool4 = new AsgElectronEfficiencyCorrectionTool("ElTrigSF-4"+var);
