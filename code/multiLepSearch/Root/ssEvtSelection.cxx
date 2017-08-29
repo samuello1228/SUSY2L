@@ -1208,11 +1208,7 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(nISR>=1) m_susyEvt->evt.flag += 6;
         }
       }
-      // else if (study=="fakes")
-      // {
-      //   if(nISR==1) m_susyEvt->evt.flag += 32;
-      //   else if(nISR==0) m_susyEvt->evt.flag += 16;
-      // }
+
       //Scale factor
       if(CF_isMC){
         // Info("execute()", "Calculate scale factors");
@@ -1220,8 +1216,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         {
           // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
           if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_ee_Key, true);
-            //sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_ee_Key, false);
+            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false /*trigSF*/, true, m_ee_Key, true);
             sEvt.MuSF = 1;
           }else if(sEvt.flag%3 == 2){ // mumu
             sEvt.ElSF = 1;
@@ -1236,69 +1231,34 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
-        // else if (study == "fakes")
-        // {
-        //   sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, true, true, m_em_eKey);
-        //   sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, m_em_mKey);
-        // }
+
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
-        // Info("execute()", "About to calculate trigger scale factors");
-        // if (TriggerSFTool) Info("execute()", "TriggerSFTool initialized");
-        // else Info("execute()", "TriggerSFTool not initialized");
+
         double trigSF=1;
         auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigElec, trigMuon, trigSF);
-        sEvt.trigSF = (trigRet==CP::CorrectionCode::OutOfValidityRange? 0 : trigSF);
+        sEvt.trigSF = trigSF;
 
-        cout << "Event " << m_eventCounter << ": Year " << m_objTool->treatAsYear() << ", trigSF = " << sEvt.trigSF << endl;
-        // if (m_objTool->treatAsYear()==2015)
-        // {
-        //   if (m_objTool->IsTrigPassed("HLT_e24_lhmedium_L1EM20VH") || m_objTool->IsTrigPassed("HLT_e60_lhmedium") || m_objTool->IsTrigPassed("HLT_e120_lhloose")) {
-        //     cout << "Treat event as year 2015 which passed a single electron trigger" << endl;
-        //     double tSF = 1.; 
-        //     cout << "Trig SFs: ";
-        //     for (uint i=0; i<trigElec.size(); i++) {
-        //       electronSFTools[0]->getEfficiencyScaleFactor(*(trigElec[i]), tSF);
-        //       cout << i << ": " << tSF << '\t';
-        //     } cout << endl;
-        //   }//cout << endl << endl;
+        // DEBUG MESSAGES. COMMENT OUT TO READ
+        // if (trigRet==CP::CorrectionCode::OutOfValidityRange){
+        //   cout << "Event " << m_eventCounter << ": Year " << m_objTool->treatAsYear() << ", trigSF = " << sEvt.trigSF << endl;
+        //   cout << sel_Ls.size() << " selected leptons" << endl;
+        //   for (uint i=0; i<sel_Ls.size(); i++)
+        //   {
+        //     cout << "Lepton " << i;
+        //     xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[i]);
+        //     xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[i]);
+        //     if(mu) cout << " muon" ;
+        //     else if (el) cout << " electron";
+        //     else cout << " unknown flavor";
 
-        // } 
-        // if (m_objTool->treatAsYear()==2016)
-        // {
-        //   if (m_objTool->IsTrigPassed("HLT_e26_lhtight_nod0_ivarloose") || m_objTool->IsTrigPassed("HLT_e60_lhmedium_nod0") || m_objTool->IsTrigPassed("HLT_e140_lhloose_nod0")) {
-        //     cout << "Treat event as year 2016 which passed a single electron trigger" << endl;
-        //     double tSF = 1.; 
-        //     cout << "Trig SFs: ";
-        //     for (uint i=0; i<trigElec.size(); i++) {
-        //       electronSFTools[0]->getEfficiencyScaleFactor(*(trigElec[i]), tSF);
-        //       cout << i << ": " << tSF << '\t';
-        //     } cout << endl;
-        //   }//cout << endl << endl;
-
+        //     cout << endl << "PT: " << sel_Ls[i]->pt() << "\t" << "ETA: " << sel_Ls[i]->eta() << endl;      
+        //   }
+        //   cout << endl;
         // }
+        
+        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF*sEvt.trigSF;
 
-        // if (m_objTool->treatAsYear()==2015)
-        // {
-        //   if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15") || m_objTool->IsTrigPassed("HLT_mu40")) {
-        //     cout << "Treat event as year 2015 which passed a single muon trigger" << endl;
-        //     double tSF = 1.; 
-        //     muonTools[0]->getTriggerScaleFactor(*muons_copy, tSF, "HLT_mu20_iloose_L1MU15_OR_HLT_mu40");
-        //     cout << "Trig SF: " << tSF << endl;
-        //   }//cout << endl << endl;
-
-        // } 
-        // if (m_objTool->treatAsYear()==2016)
-        // {
-        //   if (m_objTool->IsTrigPassed("HLT_mu20_iloose_L1MU15") || m_objTool->IsTrigPassed("HLT_mu40")) {
-        //     cout << "Treat event as year 2015 which passed a single muon trigger" << endl;
-        //     double tSF = 1.; 
-        //     muonTools[1]->getTriggerScaleFactor(*muons_copy, tSF, "HLT_mu20_iloose_L1MU15_OR_HLT_mu40");
-        //     cout << "Trig SF: " << tSF << endl;
-        //   }//cout << endl << endl;
-        // }
-        TotalWeight *= sEvt.ElSF*sEvt.MuSF*sEvt.BtagSF*sEvt.JvtSF; //*sEvt.trigSF;
-        // Info("execute()", "Scale factors done");
       }else{
         sEvt.ElSF = 1;
         sEvt.MuSF = 1;
