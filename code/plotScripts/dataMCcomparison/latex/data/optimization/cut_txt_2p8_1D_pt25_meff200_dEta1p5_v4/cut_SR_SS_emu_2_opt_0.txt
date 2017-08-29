@@ -4,6 +4,6 @@ dEta 0 1.5
 METRel 25 -1
 meff 200 -1
 mtm 105 -1
-mlj 0 265
+mlj 0 255
 mTtwo 75 -1
 ptll 0 -1
