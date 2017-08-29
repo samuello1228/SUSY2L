@@ -458,8 +458,8 @@ EL::StatusCode ssEvtSelection :: initialize ()
   ANA_CHECK( TriggerSFTool->setProperty("ElectronScaleFactorTools",electronSFTools) );
   ANA_CHECK( TriggerSFTool->setProperty("MuonTools",muonTools) );
   ANA_CHECK( TriggerSFTool->setProperty("ListOfLegsPerTool",LegsPerTool) );
-  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose || mu20_iloose_L1MU15_OR_mu40 || 2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
-  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0 || mu26_imedium_OR_mu50 || 2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
+  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose || mu20_iloose_L1MU15_OR_mu40 || 2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14 || e7_lhmedium_mu24") );
+  ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0 || mu26_imedium_OR_mu50 || 2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1 || e7_lhmedium_nod0_mu24") );
   
   // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2015", "2e12_lhloose_L12EM10VH || mu18_mu8noL1 || e17_lhloose_mu14") );
   // ANA_CHECK( TriggerSFTool->setProperty("TriggerCombination2016","2e17_lhvloose_nod0 || e17_lhloose_nod0_mu14 || mu22_mu8noL1") );
