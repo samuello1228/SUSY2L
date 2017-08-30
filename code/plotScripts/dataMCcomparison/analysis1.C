@@ -49,6 +49,7 @@ TString setupTag = "2p8_1D_loose_v4";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
+const bool isCombined3Regions = false;
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -2015,7 +2016,8 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2034,13 +2036,13 @@ void analysis1()
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
             RegionInfo.push_back(element);
         }
         
@@ -2052,13 +2054,13 @@ void analysis1()
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
             RegionInfo.push_back(element);
         }
         
@@ -2070,7 +2072,8 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2088,13 +2091,13 @@ void analysis1()
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
             RegionInfo.push_back(element);
         }
         
@@ -2106,13 +2109,13 @@ void analysis1()
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
             RegionInfo.push_back(element);
         }
         
@@ -2138,7 +2141,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2161,7 +2165,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2183,7 +2188,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2205,7 +2211,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2228,7 +2235,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2250,7 +2258,8 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
