@@ -1236,7 +1236,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
 
         double trigSF=1;
-        auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigElec, trigMuon, trigSF);
+        CHECK(TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigElec, trigMuon, trigSF));
         sEvt.trigSF = trigSF;
 
         // DEBUG MESSAGES. COMMENT OUT TO READ
