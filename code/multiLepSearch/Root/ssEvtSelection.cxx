@@ -358,18 +358,20 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(mChargeFlipBkgTool->initialize());
 
   mFakeLepBkgTool = new FakeLepBkgTool("MyFLepTool");
-  //CHECK(mFakeLepBkgTool->setProperty("Method", "Matrix"));
-  //CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/RealFakeLepEff_dummy.root"));
-  //CHECK(mFakeLepBkgTool->setProperty("RealeEffHistoName", "RealeEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("RealuEffHistoName", "RealuEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("FakeeEffHistoName", "FakeeEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("FakeuEffHistoName", "FakeuEff"));
+  CHECK(mFakeLepBkgTool->setProperty("Method", "Matrix"));
+  CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/RealFakeLepEff_WhSS_Aug2017.root"));
+  CHECK(mFakeLepBkgTool->setProperty("RealeEffHistoName", "RealeEff"));
+  CHECK(mFakeLepBkgTool->setProperty("RealuEffHistoName", "RealuEff"));
+  CHECK(mFakeLepBkgTool->setProperty("FakeeEffHistoName", "FakeeEff"));
+  CHECK(mFakeLepBkgTool->setProperty("FakeuEffHistoName", "FakeuEff"));
 
+  /*
   CHECK(mFakeLepBkgTool->setProperty("Method", "FakeFactor"));
   CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/fakefactor_2D_Data16.root"));
   CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele"));
   //CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele_v2")); //this histo has problem of bin error being just the sqrt of bin content
   CHECK(mFakeLepBkgTool->setProperty("uFakeFactorHistoName", "h_ff_mu"));
+  */
 
   CHECK(mFakeLepBkgTool->initialize());
 
@@ -921,10 +923,10 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
     if (study!="fakes" && (sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
-      m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
-      m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
-      m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
-      m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
+      //m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
+      //m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
+      //m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
+      //m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
 
