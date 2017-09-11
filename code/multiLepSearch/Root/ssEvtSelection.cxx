@@ -209,7 +209,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
     m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames_2015[i].c_str());
     std::cout<<CF_trigNames_2015[i].c_str()<<std::endl;
   }
-  for(unsigned int i=0; i<CF_trigNames_2015.size(); i++){
+  for(unsigned int i=0; i<CF_trigNames_2016.size(); i++){
     m_hTrigs->GetXaxis()->SetBinLabel(i+1+CF_trigNames_2015.size(),CF_trigNames_2016[i].c_str());
     std::cout<<CF_trigNames_2016[i].c_str()<<std::endl;
   }
@@ -1096,7 +1096,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     else if (m_objTool->treatAsYear()==2016){ 
       ADD = 1 << CF_trigNames_2015.size(); 
-      for(auto trig : CF_trigNames_2015){
+      for(auto trig : CF_trigNames_2016){
         if(m_objTool->IsTrigPassed(trig)){
           m_susyEvt->sig.trigCode += ADD;
           m_hTrigs->Fill(trig.c_str(), 1);
@@ -1292,6 +1292,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         cout<<"mu: "<<sEvt.MuSF<<endl;
         cout<<"bjet: "<<sEvt.BtagSF<<endl;
         cout<<"jvt: "<<sEvt.JvtSF<<endl;
+        cout<<"trigSF: "<<sEvt.trigSF<<endl;
       }
 
       /// fill events
@@ -1769,10 +1770,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   Info( APP_NAME, "Starting to initialize single lepton efficiency tools for GlobalEfficiencyCorrectionTool[%s]", var.c_str() );
 
   electronEffTools.clear();
-  electronEffTools.clear();
   electronSFTools.clear();
-  electronSFTools.clear();
-  muonTools.clear();
   muonTools.clear();
 
   //Trigger efficiency tool for single lepton trigger
