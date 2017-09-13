@@ -1044,8 +1044,11 @@ EL::StatusCode ssEvtSelection :: execute ()
       l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
       //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
-      auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
-      l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      l.mT = sqrt(2*sel_Ls[i]->pt()*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
+//       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
+//       l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV; --> Wrong
+//       ==> l.mT = sqrt(pow(sel_Ls[i]->p4().Et()+metV.Et(), 2)-xt.Perp2())*iGeV; -->correct, but let's switch to anohter way
+
       
       //// dR with leading jet, and the smallest dR
       l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
