@@ -472,27 +472,56 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
+        int SRIndex = -1;
+        nJet = jets.size();
         if(cutflow)
         {
             if(channelIndex==3)
             {
                 hSRCutflow[0]->Fill("flavour",1);
                 hSRCutflow[3]->Fill("flavour",1);
+                if(nJet == 1)
+                {
+                    SRIndex = 0;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 3;
+                }
+                else continue;
             }
             else if(channelIndex==4)
             {
                 hSRCutflow[1]->Fill("flavour",1);
                 hSRCutflow[4]->Fill("flavour",1);
+                if(nJet == 1)
+                {
+                    SRIndex = 1;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 4;
+                }
+                else continue;
             }
             else if(channelIndex==5)
             {
                 hSRCutflow[2]->Fill("flavour",1);
                 hSRCutflow[5]->Fill("flavour",1);
+                if(nJet == 1)
+                {
+                    SRIndex = 2;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 5;
+                }
+                else continue;
             }
         }
+        hSRCutflow[SRIndex]->Fill("jet",1);
         
         //jets
-        nJet = jets.size();
         nBJet = 0;
         vector<TLorentzVector> cjet_Ls;
         nCJet = 0;
@@ -556,20 +585,22 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             //jetphi = 0;
         }
        
-        /* 
         if(nBJet>0)
         {
-            bjetpt = jets[leadingBJetIndex].pt;
-            bjeteta = jets[leadingBJetIndex].eta;
-            bjetphi = jets[leadingBJetIndex].phi;
+            //bjetpt = jets[leadingBJetIndex].pt;
+            //bjeteta = jets[leadingBJetIndex].eta;
+            //bjetphi = jets[leadingBJetIndex].phi;
+            if(cutflow) continue;
         }
         else
         {
-            bjetpt = 0;
-            bjeteta = 0;
-            bjetphi = 0;
+            //bjetpt = 0;
+            //bjeteta = 0;
+            //bjetphi = 0;
+            if(cutflow) hSRCutflow[SRIndex]->Fill("bjet",1);
         }
         
+        /*
         if(nCJet>0)
         {
             cjetpt = jets[leadingCJetIndex].pt;
