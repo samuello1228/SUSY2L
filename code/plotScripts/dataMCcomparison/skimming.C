@@ -366,8 +366,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
+        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
         fLwt = evt.fLwt;
         
+        int sigIndex[2];
+        sigIndex[0] = 0;
+        sigIndex[1] = 1;
+        pt1 = leps[sigIndex[0]].pt;
+        pt2 = leps[sigIndex[1]].pt;
         if(!evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -381,14 +387,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(leps.size()!=2) continue;
             if(!(leps[0].lFlag & 1<<1)) continue;
             if(!(leps[1].lFlag & 1<<1)) continue;
-            if(cutflow && leps[0].pt<=25) continue;
-            if(cutflow && leps[1].pt<=25) continue;
+            if(cutflow && pt1<=25) continue;
+            if(cutflow && pt2<=25) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("=2SigLep",1);
             }
-
+            
             if(cutflow)
             {
                 for(unsigned int m=0;m<6;m++)
@@ -398,13 +404,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
-        int sigIndex[2];
-        sigIndex[0] = 0;
-        sigIndex[1] = 1;
         ID1 = leps[sigIndex[0]].ID;
         ID2 = leps[sigIndex[1]].ID;
-        pt1 = leps[sigIndex[0]].pt;
-        pt2 = leps[sigIndex[1]].pt;
         eta1 = leps[sigIndex[0]].eta;
         eta2 = leps[sigIndex[1]].eta;
         //pt of leading lepton
@@ -423,34 +424,26 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
-        phi1 = leps[sigIndex[0]].phi;
-        mll = l12.m;
-        ptll = l12.pt;
-        MET = sig.Met;
-        METRel = sig.MetRel;
-        mTtwo = sig.mT2;
-        mt1 = leps[sigIndex[0]].mT;
-        mt2 = leps[sigIndex[1]].mT;
-        if(mt1>mt2) mtm = mt1;
-        else mtm = mt2;
-        meff = sig.HT + sig.Met;
-        mjj = sig.mjj;
-        //R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = l12.dPhi;
-        l12_MET_dPhi = l12.MET_dPhi;
-        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
-        else jet0_MET_dPhi = -999;
-        l12_jet0_dPhi = l12.jet0_dPhi;
-        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
-        
-        qFwt = evt.qFwt;
-        
-        averageMu = evt.averageMu;
+        //OS or SS
+        int channelIndex = 0;
+        if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
+        {
+            channelIndex += 3;
+            element.n++;
+            element.nw += weight;
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<6;m++)
+                {
+                    hSRCutflow[m]->Fill("SS",1);
+                }
+            }
+        }
+        else if(cutflow) continue;
         
         //SF or DF
         TLorentzVector l1;
         TLorentzVector l2;
-        int channelIndex = 0;
         if(int(abs(ID1)/1000) == 11)
         {
             if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_el);
@@ -476,6 +469,25 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
                 channelIndex += 1;
+            }
+        }
+        
+        if(cutflow)
+        {
+            if(channelIndex==3)
+            {
+                hSRCutflow[0]->Fill("flavour",1);
+                hSRCutflow[3]->Fill("flavour",1);
+            }
+            else if(channelIndex==4)
+            {
+                hSRCutflow[1]->Fill("flavour",1);
+                hSRCutflow[4]->Fill("flavour",1);
+            }
+            else if(channelIndex==5)
+            {
+                hSRCutflow[2]->Fill("flavour",1);
+                hSRCutflow[5]->Fill("flavour",1);
             }
         }
         
@@ -585,6 +597,28 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         */
 
+        phi1 = leps[sigIndex[0]].phi;
+        mll = l12.m;
+        ptll = l12.pt;
+        MET = sig.Met;
+        METRel = sig.MetRel;
+        mTtwo = sig.mT2;
+        mt1 = leps[sigIndex[0]].mT;
+        mt2 = leps[sigIndex[1]].mT;
+        if(mt1>mt2) mtm = mt1;
+        else mtm = mt2;
+        meff = sig.HT + sig.Met;
+        mjj = sig.mjj;
+        //R2 = MET/(MET + pt1 + pt2);
+        l12_dPhi = l12.dPhi;
+        l12_MET_dPhi = l12.MET_dPhi;
+        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
+        else jet0_MET_dPhi = -999;
+        l12_jet0_dPhi = l12.jet0_dPhi;
+        
+        qFwt = evt.qFwt;
+        averageMu = evt.averageMu;
+        
         if(recalculate_mlj)
         {
             mlj = -1;
@@ -616,13 +650,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(nISR==0) {}
         else if(nISR>=1) channelIndex += 6;
         //else continue;
-        
-        if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
-        {
-            channelIndex += 3;
-            element.n++;
-            element.nw += weight;
-        }
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -803,8 +830,8 @@ void skimming()
 
             //for(unsigned int j=114;j<=114;j++)
             //for(unsigned int j=119;j<=120;j++)
-            for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
-            //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
+            //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
+            for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
             {
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
                 skimming2(SamplePath,tag,BGSampleName[j],nSS,hSRCutflow);
