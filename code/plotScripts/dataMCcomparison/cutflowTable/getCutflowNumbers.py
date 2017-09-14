@@ -14,6 +14,7 @@ def dumpList():
     dir1 = '/home/dzhang/links/eosOther/cloShared/AnalysisBase-02-04-31-ebcb0e23/user.clo.v10.5.MCBG_myOutput.root/'
 
     cut0 = "Length$(leps)==2&&(leps[0].lFlag&2)==2&&(leps[1].lFlag&2)==2&&leps[0].pt>25&&leps[1].pt>25"
+    cut1Meff = 'leps[0].ID*leps[1].ID>0&&abs(leps[0].ID)/1000==11&&abs(leps[1].ID)/1000==11&&Length$(jets)==1&&Sum$((jets.jFlag&(1<<5))!=0)==0&&fabs(l12.m-91.2)>10&&leps[0].pt>65&&leps[1].pt>25&&fabs(leps[0].eta-leps[1].eta)<1.5&&(sig.HT+sig.Met)>200'
     cut1 = 'leps[0].ID*leps[1].ID>0&&abs(leps[0].ID)/1000==11&&abs(leps[1].ID)/1000==11&&Length$(jets)==1&&Sum$((jets.jFlag&(1<<5))!=0)==0&&fabs(l12.m-91.2)>10&&leps[0].pt>65&&leps[1].pt>25&&fabs(leps[0].eta-leps[1].eta)<1.5&&(sig.HT+sig.Met)>200&&(2*leps[0].pt*sig.Met*(1-cos(leps[0].MET_dPhi))>15625||2*leps[1].pt*sig.Met*(1-cos(leps[1].MET_dPhi))>15625)'
 
     nEvt = 0
@@ -25,12 +26,26 @@ def dumpList():
         fs = line.rstrip().split()
         ds = dir1+"*"+fs[0]+'.'+fs[1]+'*.root'
         print line.rstrip(), ds
+
+        if fs[0]!='361070': continue
+
         ch1.Add(ds)
 
+        ch1.Show(51643)
+#         ch1.Scan("(sig.HT+sig.Met):sqrt(2*leps[0].pt*sig.Met*(1-cos(leps[0].MET_dPhi))):sqrt(2*leps[1].pt*sig.Met*(1-cos(leps[1].MET_dPhi))):sig.mlj","Entry$==51643")
+        ch1.Scan("evt.event:sig.Met",cut0+'&&'+cut1)
+        return
+
+
         ch1.GetPlayer().SetScanRedirect(True); 
-        ch1.GetPlayer().SetScanFileName(fs[1]+"_x.txt"); 
 #         nEvt += ch1.Scan("evt.event", cut0+'&&'+cut1)
-        nEvt += ch1.Scan("evt.event:sqrt(2*leps[0].pt*sig.Met*(1-cos(leps[0].MET_dPhi))):sqrt(2*leps[1].pt*sig.Met*(1-cos(leps[1].MET_dPhi)))", cut0+'&&'+cut1)
+
+#         ch1.GetPlayer().SetScanFileName(fs[1]+"_x.txt"); 
+#         nEvt += ch1.Scan("evt.event:sqrt(2*leps[0].pt*sig.Met*(1-cos(leps[0].MET_dPhi))):sqrt(2*leps[1].pt*sig.Met*(1-cos(leps[1].MET_dPhi)))", cut0+'&&'+cut1)
+
+
+        ch1.GetPlayer().SetScanFileName(fs[1]+"_meff.txt"); 
+        nEvt += ch1.Scan("evt.event:sig.HT+sig.Met:sig.HT:sig.Met", cut0+'&&'+cut1Meff)
 
         print fs[1], ch1.GetEntries()
 #         break
