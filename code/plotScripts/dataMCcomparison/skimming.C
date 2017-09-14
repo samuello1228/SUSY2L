@@ -66,11 +66,85 @@ struct nEvent
     double nAOD;
 };
 
+struct GroupData
+{
+    TString GroupName;
+    TString LegendName;
+    TString LatexName;
+    unsigned int lower;
+    unsigned int upper;
+    int colour;
+    int unweighted;
+    double weighted;
+    double error;
+};
+
 const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
+const bool cutflow = false;
+void initializehCutflow(vector<TH1F*>& hSRCutflow)
+{
+    for(unsigned int j=0;j<6;j++)
+    {
+        TString hName = "cutflow_";
+        hName += TString::Itoa(j,10);
+        TH1F* hTemp = new TH1F(hName.Data(), "cutflow", 100, 0, 100);
+        hSRCutflow.push_back(hTemp);
+
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(1,"nAOD");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(3,"trigger");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(4,"trigger,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(5,"=2BaseLep and =2SigLep");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(6,"=2BaseLep and =2SigLep,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(7,"SS");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(8,"SS,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(9,"flavour");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(10,"flavour,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(11,"jet");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(12,"jet,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(13,"bjet");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(14,"bjet,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(15,"Zmass");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(16,"Zmass,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(17,"pt1");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(18,"pt1,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(19,"pt2");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(20,"pt2,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(21,"dEta");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(22,"dEta,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(23,"meff");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(24,"meff,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(25,"maxmt");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(26,"maxmt,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(27,"mlj");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"mlj,w");
+    }
+}
+
+void deletehCutflow(vector<TH1F*>& hSRCutflow)
+{
+    for(unsigned int j=0;j<6;j++)
+    {
+        delete hSRCutflow[j];
+    }
+}
+
+void printhCutflow(vector<TH1F*>& hSRCutflow)
+{
+    for(unsigned int i=0;i<6;i++)
+    {
+        for(unsigned int j=1;j<=28;j++)
+        {
+            cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": "<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
+        }
+        cout<<endl;
+    }
+}
+
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS,vector<TH1F*>& hSRCutflow)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
@@ -285,7 +359,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //trigger
         if((sig.trigCode & sig.trigMask)==0)
         {
-            continue;
+            if(!cutflow) continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -307,10 +381,20 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(leps.size()!=2) continue;
             if(!(leps[0].lFlag & 1<<1)) continue;
             if(!(leps[1].lFlag & 1<<1)) continue;
+            if(cutflow && leps[0].pt<=25) continue;
+            if(cutflow && leps[1].pt<=25) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("=2SigLep",1);
+            }
+
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<6;m++)
+                {
+                    hSRCutflow[m]->Fill("=2BaseLep and =2SigLep",1);
+                }
             }
         }
         
@@ -641,10 +725,47 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
+    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
     
     std::vector<nEvent> nSS;
+    
+    //Group for MC background
+    std::vector<GroupData> BGMCGroupData;
+    {
+        GroupData element;
+        
+        //Z+jets
+        element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
+        element.lower = 0;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        
+        //W+jets
+        element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
+        element.lower = 60;  element.upper = 101; element.colour = 3; BGMCGroupData.push_back(element);
+        
+        //Top
+        element.GroupName = "top"; element.LegendName = "top"; element.LatexName = "top";
+        element.lower = 102;  element.upper = 116; element.colour = 4; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
+        element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
+
+        element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
+        element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
+        //element.lower = 103;  element.upper = 106; element.colour = 30; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
+        element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
+        element.lower = 115;  element.upper = 116; element.colour = 635; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
+        element.lower = 117;  element.upper = 130; element.colour = 801; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
+        element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
+    }
     
     //Data
     if(false)
@@ -657,7 +778,10 @@ void skimming()
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],nSS);
+            vector<TH1F*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+            skimming2(SamplePath,tag,DataSampleName[i],nSS,hSRCutflow);
+            deletehCutflow(hSRCutflow);
         }
     }
     
@@ -669,12 +793,24 @@ void skimming()
         std::vector<TString> BGSampleName;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=114;i<=114;i++)
-        //for(unsigned int i=119;i<=120;i++)
-        for(unsigned int i=0;i<BGSampleName.size();i++)
+
+        for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
-            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
-            skimming2(SamplePath,tag,BGSampleName[i],nSS);
+            if(BGMCGroupData[i].GroupName != "VV") continue;
+
+            vector<TH1F*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+
+            //for(unsigned int j=114;j<=114;j++)
+            //for(unsigned int j=119;j<=120;j++)
+            for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
+            //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
+            {
+                BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
+                skimming2(SamplePath,tag,BGSampleName[j],nSS,hSRCutflow);
+            }
+            if(cutflow) printhCutflow(hSRCutflow);
+            deletehCutflow(hSRCutflow);
         }
     }
     
@@ -690,7 +826,11 @@ void skimming()
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
-            skimming2(SamplePath,tag,SigSampleName[i],nSS);
+            vector<TH1F*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+            skimming2(SamplePath,tag,SigSampleName[i],nSS,hSRCutflow);
+            if(cutflow) printhCutflow(hSRCutflow);
+            deletehCutflow(hSRCutflow);
         }
     }
     
