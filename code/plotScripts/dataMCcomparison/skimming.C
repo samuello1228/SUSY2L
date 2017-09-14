@@ -635,8 +635,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         MET = sig.Met;
         METRel = sig.MetRel;
         mTtwo = sig.mT2;
-        mt1 = leps[sigIndex[0]].mT;
-        mt2 = leps[sigIndex[1]].mT;
+        //mt1 = leps[sigIndex[0]].mT;
+        //mt2 = leps[sigIndex[1]].mT;
+        mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi)));
+        mt2 = sqrt(2*pt2*MET*(1-cos(leps[1].MET_dPhi)));
         if(mt1>mt2) mtm = mt1;
         else mtm = mt2;
         meff = sig.HT + sig.Met;
