@@ -518,8 +518,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 }
                 else continue;
             }
+            
+            hSRCutflow[SRIndex]->Fill("jet",1);
         }
-        hSRCutflow[SRIndex]->Fill("jet",1);
         
         //jets
         nBJet = 0;
@@ -676,7 +677,52 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         else mlj = sig.mlj;
-
+        
+        if(cutflow)
+        {
+            if(fabs(mll-91.2)>10)
+            {
+                hSRCutflow[SRIndex]->Fill("Zmass",1);
+            }
+            else continue;
+            
+            if(pt1>=65)
+            {
+                hSRCutflow[SRIndex]->Fill("pt1",1);
+            }
+            else continue;
+            
+            if(pt2>=25)
+            {
+                hSRCutflow[SRIndex]->Fill("pt2",1);
+            }
+            else continue;
+            
+            if(fabs(eta1-eta2)<1.5)
+            {
+                hSRCutflow[SRIndex]->Fill("dEta",1);
+            }
+            else continue;
+            
+            if(meff>=200)
+            {
+                hSRCutflow[SRIndex]->Fill("meff",1);
+            }
+            else continue;
+            
+            if(mtm>=125)
+            {
+                hSRCutflow[SRIndex]->Fill("maxmt",1);
+            }
+            else continue;
+            
+            if(mlj<105)
+            {
+                hSRCutflow[SRIndex]->Fill("mlj",1);
+            }
+            else continue;
+        }
+        
         //separate the sample into channels
         if(nISR==0) {}
         else if(nISR>=1) channelIndex += 6;
