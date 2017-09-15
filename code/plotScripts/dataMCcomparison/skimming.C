@@ -850,15 +850,11 @@ void skimming()
         element.lower = 60;  element.upper = 101; element.colour = 3; BGMCGroupData.push_back(element);
         
         //Top
-        element.GroupName = "top"; element.LegendName = "top"; element.LatexName = "top";
-        element.lower = 102;  element.upper = 116; element.colour = 4; BGMCGroupData.push_back(element);
-        
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
         element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
-        //element.lower = 103;  element.upper = 106; element.colour = 30; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
         element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
@@ -871,6 +867,12 @@ void skimming()
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
+
+        element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
+        element.lower = 151;  element.upper = 155; element.colour = 607; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
+        element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
     }
     
     //Data
@@ -902,7 +904,7 @@ void skimming()
 
         for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
-            if(BGMCGroupData[i].GroupName != "VV") continue;
+            //if(BGMCGroupData[i].GroupName != "VV") continue;
 
             vector<TH1F*> hSRCutflow;
             initializehCutflow(hSRCutflow);
