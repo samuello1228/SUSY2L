@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_loose_v4";
+TString setupTag = "2p8_1D_pt25_meff200_dEta1p5_v4";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -1895,20 +1895,20 @@ void analysis1()
             
             OptimizingCutElement2.clear();
             OptimizingCutElement3.RelatedVariable = "pt1";
-            OptimizingCutElement3.min = 20;
+            OptimizingCutElement3.min = 25;
             OptimizingCutElement3.max = 250;
-            OptimizingCutElement3.nBin = 46;
-            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 25;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             OptimizingCutElement2.clear();
             OptimizingCutElement3.RelatedVariable = "pt2";
-            OptimizingCutElement3.min = 20;
+            OptimizingCutElement3.min = 25;
             OptimizingCutElement3.max = 250;
-            OptimizingCutElement3.nBin = 46;
-            OptimizingCutElement3.lower = 20;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 25;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
@@ -1919,7 +1919,8 @@ void analysis1()
             OptimizingCutElement3.max = 5;
             OptimizingCutElement3.nBin = 10;
             OptimizingCutElement3.lower = 0;
-            OptimizingCutElement3.upper = -1;
+            //OptimizingCutElement3.upper = -1;
+            OptimizingCutElement3.upper = 1.5;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -1938,7 +1939,8 @@ void analysis1()
             OptimizingCutElement3.min = 100;
             OptimizingCutElement3.max = 600;
             OptimizingCutElement3.nBin = 50;
-            OptimizingCutElement3.lower = 100;
+            //OptimizingCutElement3.lower = 100;
+            OptimizingCutElement3.lower = 200;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
@@ -2583,6 +2585,12 @@ void analysis1()
                         
                         for(unsigned int VarIndex2=0;VarIndex2<OptimizingCutInfo.size();VarIndex2++)
                         {
+                            if(OptimizingCutInfo[VarIndex2][0].RelatedVariable == "meff" ||
+                               OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta" )
+                            {
+                                continue;
+                            }
+                            
                             const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
                             
                             if(isRemovingCut)
@@ -3651,6 +3659,8 @@ void analysis1()
                             Cut += CommonCut;
                             Cut += ")";
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            //bgCount = tree2BGMC[j][k]->GetEntries(("1"+CommonCut).Data());
+                            
                             BGGroup[j].info->unweighted += bgCount;
                             
                             /*
@@ -3658,7 +3668,7 @@ void analysis1()
                             {
                                 cout<<BGMCSampleInfo[BGMCGroupData[0].lower +k].SampleID.Data()<<endl;
                                 cout<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
-                                tree2BGMC[j][k]->Scan("weight",Cut.Data());
+                                tree2BGMC[j][k]->Scan("weight",("1"+CommonCut).Data());
                             }
                             */
                             
@@ -3767,6 +3777,7 @@ void analysis1()
                         Cut += CommonCut;
                         Cut += ")";
                         SigSampleInfo[j].unweighted = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        //SigSampleInfo[j].unweighted = tree2Sig[j]->GetEntries(("1"+CommonCut).Data());
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
