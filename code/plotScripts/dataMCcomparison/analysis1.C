@@ -7,7 +7,7 @@
 #include <TFile.h>
 #include <TChain.h>
 #include <TBranch.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2D.h>
 #include <TMath.h>
 #include <THStack.h>
@@ -140,7 +140,7 @@ void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfCha
         fileName += ".root";
         
         TFile* file = new TFile(fileName.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
+        TH1D *h1 = (TH1D*) file->Get("hist");
         double nAOD = h1->GetBinContent(2);
         delete file;
         
@@ -164,7 +164,7 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
         fileName += ".root";
         
         TFile* file = new TFile(fileName.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
+        TH1D *h1 = (TH1D*) file->Get("hist");
         int nAOD = h1->GetBinContent(1);
         delete file;
         
@@ -236,8 +236,8 @@ struct GroupData
 struct Group
 {
     GroupData* info;
-    TH1F* h2;
-    TH2F* h3;
+    TH1D* h2;
+    TH2D* h3;
 };
 
 bool compare2(Group Group1,Group Group2)
@@ -617,7 +617,7 @@ void analysis1()
         NameTemp += ".root";
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
+        TH1D *h1 = (TH1D*) file->Get("hist");
         SigSampleInfo[i].nwAOD = h1->GetBinContent(2);
         cout<<SigSampleInfo[i].nwAOD<<endl;
         
@@ -1001,7 +1001,7 @@ void analysis1()
         }
 
         //calculate ratio plot
-        TH1F* h2Ratio_rw[RegionInfo.size()];
+        TH1D* h2Ratio_rw[RegionInfo.size()];
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -1056,12 +1056,12 @@ void analysis1()
             xaxis += Var[VarIndex].unit;
             
             //h2DataSum
-            TH1F* h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2DataSum = new TH1D("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             
             //h2Data
             for(unsigned int j=0;j<DataSampleID.size();j++)
             {
-                TH1F* hTemp = new TH1F("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                TH1D* hTemp = new TH1D("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 
                 //fill histograms from trees
                 TString temp;
@@ -1077,10 +1077,10 @@ void analysis1()
             //For MC background
             for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                 {
-                    TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    TH1D* hTemp = new TH1D("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                     
                     //fill histograms from trees
                     TString temp;
@@ -1101,7 +1101,7 @@ void analysis1()
             {
                 TString NameTemp = "Ratio_";
                 NameTemp += RegionInfo[RegionIndex].RegionName;
-                h2Ratio_rw[RegionIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Ratio_rw[RegionIndex] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2Ratio_rw[RegionIndex]->GetXaxis()->SetTitle(xaxis.Data());
                 h2Ratio_rw[RegionIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
                 h2Ratio_rw[RegionIndex]->SetMarkerColor(RegionIndex+1);
@@ -1112,8 +1112,8 @@ void analysis1()
             h2Ratio_rw[RegionIndex]->Add(h2DataSum);
             
             //Z+jets
-            TH1F* h2Zjets = new TH1F("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            TH1F* h2nonZjets = new TH1F("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2Zjets = new TH1D("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2nonZjets = new TH1D("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
 
             //Non Z+jets
             for(unsigned int j=0;j<tree2BGMC.size();j++)
@@ -2333,8 +2333,8 @@ void analysis1()
     {
         //For SR
         std::vector<Group> SRBGGroup;
-        std::vector<TH1F*> h2SRSig;
-        std::vector<TH1F*> h2SRSignificance;
+        std::vector<TH1D*> h2SRSig;
+        std::vector<TH1D*> h2SRSignificance;
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
             //channelRepresentative for SR
@@ -2354,7 +2354,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGMCGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1D(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
@@ -2371,7 +2371,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGDataGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1D(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
@@ -2382,12 +2382,12 @@ void analysis1()
             //h2SRSig
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
             {
-                TH1F* hTemp = new TH1F(SigMassSplitting[j].IDName.Data(),"",6,0,6);
+                TH1D* hTemp = new TH1D(SigMassSplitting[j].IDName.Data(),"",6,0,6);
                 hTemp->SetLineColor(SigMassSplitting[j].colour);
                 hTemp->SetLineStyle(1);
                 h2SRSig.push_back(hTemp);
                 
-                hTemp = new TH1F((SigMassSplitting[j].IDName+"_significance").Data(),"",6,0,6);
+                hTemp = new TH1D((SigMassSplitting[j].IDName+"_significance").Data(),"",6,0,6);
                 hTemp->SetLineColor(SigMassSplitting[j].colour);
                 hTemp->SetLineStyle(1);
                 h2SRSignificance.push_back(hTemp);
@@ -2608,11 +2608,11 @@ void analysis1()
                                 if(!HasCut) continue;
                             }
                             
-                            TH1F* BGGroupRaw1D[BGGroup.size()];
-                            TH1F* h2Sig1D[OptimizingSignal.size()];
+                            TH1D* BGGroupRaw1D[BGGroup.size()];
+                            TH1D* h2Sig1D[OptimizingSignal.size()];
                             
-                            TH2F* BGGroupRaw2D[BGGroup.size()];
-                            TH2F* h2Sig2D[OptimizingSignal.size()];
+                            TH2D* BGGroupRaw2D[BGGroup.size()];
+                            TH2D* h2Sig2D[OptimizingSignal.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
@@ -2661,29 +2661,29 @@ void analysis1()
                                 {
                                     if(VarNumber==1)
                                     {
-                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
-                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
-                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         {
-                                            TH1F* hTemp1D;
-                                            TH2F* hTemp2D;
+                                            TH1D* hTemp1D;
+                                            TH2D* hTemp2D;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                hTemp1D = new TH1D("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                hTemp2D = new TH2D("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -2717,17 +2717,17 @@ void analysis1()
                                             }
                                         }
                                         {
-                                            TH1F* hTemp1D;
-                                            TH2F* hTemp2D;
+                                            TH1D* hTemp1D;
+                                            TH2D* hTemp2D;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                hTemp1D = new TH1D("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                hTemp2D = new TH2D("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -2765,29 +2765,29 @@ void analysis1()
                                 {
                                     if(VarNumber==1)
                                     {
-                                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
-                                        BGGroupRaw1D[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
-                                        BGGroupRaw2D[j] = new TH2F((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
                                         {
-                                            TH1F* hTemp1D;
-                                            TH2F* hTemp2D;
+                                            TH1D* hTemp1D;
+                                            TH2D* hTemp2D;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                hTemp1D = new TH1D("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                hTemp2D = new TH2D("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -2841,17 +2841,17 @@ void analysis1()
                                             }
                                         }
                                         {
-                                            TH1F* hTemp1D;
-                                            TH2F* hTemp2D;
+                                            TH1D* hTemp1D;
+                                            TH2D* hTemp2D;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
-                                                hTemp1D = new TH1F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                hTemp1D = new TH1D("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                                 temp = VarFormula[0];
                                             }
                                             else if(VarNumber==2)
                                             {
-                                                hTemp2D = new TH2F("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                hTemp2D = new TH2D("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                                 temp = VarFormula[1];
                                                 temp += ":";
                                                 temp += VarFormula[0];
@@ -2907,12 +2907,12 @@ void analysis1()
                                     TString temp;
                                     if(VarNumber==1)
                                     {
-                                        h2Sig1D[j] = new TH1F(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        h2Sig1D[j] = new TH1D(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
                                         temp = VarFormula[0];
                                     }
                                     else if(VarNumber==2)
                                     {
-                                        h2Sig2D[j] = new TH2F(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        h2Sig2D[j] = new TH2D(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                         temp = VarFormula[1];
                                         temp += ":";
                                         temp += VarFormula[0];
@@ -3413,9 +3413,9 @@ void analysis1()
                 xaxis += Var[VarIndex].unit;
                 
                 //Fill histograms from trees
-                TH1F* h2DataSum;
-                TH1F* h2SigSum[SigMassSplitting.size()];
-                TH1F* h2Sig[SigSampleInfo.size()];
+                TH1D* h2DataSum;
+                TH1D* h2SigSum[SigMassSplitting.size()];
+                TH1D* h2Sig[SigSampleInfo.size()];
                 double sumOfEventVV[BGVVData.size()][2];
                 //sample,expN/error
                 
@@ -3559,7 +3559,7 @@ void analysis1()
                     
                     //h2DataSum
                     {
-                        h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2DataSum = new TH1D("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2DataSum->GetYaxis()->SetTitle("Number of events");
                         h2DataSum->SetMarkerColor(1);
                         h2DataSum->SetMarkerStyle(20);
@@ -3568,13 +3568,13 @@ void analysis1()
                     }
                     
                     //h2Data
-                    TH1F* h2Data[DataSampleID.size()];
+                    TH1D* h2Data[DataSampleID.size()];
                     std::vector<TString> hName2Data;
                     for(unsigned int j=0;j<DataSampleID.size();j++)
                     {
                         TString NameTemp = "Data_";
                         NameTemp += TString::Itoa(j,10);
-                        h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Data[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hName2Data.push_back(NameTemp);
                         
                         //Fill data
@@ -3604,7 +3604,7 @@ void analysis1()
                     //For MC background
                     for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
@@ -3612,7 +3612,7 @@ void analysis1()
                         BGGroup[j].info->unweighted = 0;
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
-                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            TH1D* hTemp = new TH1D("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                             
                             //fill histograms from trees
                             TString temp = Var[VarIndex].VarFormula;
@@ -3691,7 +3691,7 @@ void analysis1()
                     //For data-driven background
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
@@ -3754,7 +3754,7 @@ void analysis1()
                     {
                         TString NameTemp = "SigSum_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[j].MassDiff);
-                        h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2SigSum[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
                         h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
                         h2SigSum[j]->SetLineStyle(SigMassSplitting[j].linestyle);
@@ -3766,7 +3766,7 @@ void analysis1()
                     {
                         TString NameTemp = "Sig_";
                         NameTemp += TString::Itoa(j,10);
-                        h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Sig[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         
                         //Fill Signal
                         TString temp = Var[VarIndex].VarFormula;
@@ -4142,14 +4142,14 @@ void analysis1()
                 }
                 
                 //significance calculation
-                TH1F* hSignificance[SigMassSplitting.size()];
+                TH1D* hSignificance[SigMassSplitting.size()];
                 if(DoSignificancePlot)
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "Significance_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                        hSignificance[i] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        hSignificance[i] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
                         hSignificance[i]->SetLineWidth(2);
                     }
@@ -4251,7 +4251,7 @@ void analysis1()
                 }
                 
                 //Add BG
-                TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                TH1D* h2BGSum = new TH1D("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 for(unsigned int j=0;j<BGGroup.size();j++)
                 {
                     h2BGSum->Add(BGGroup[j].h2);
@@ -4352,10 +4352,10 @@ void analysis1()
                     }
                 }
                 
-                TH1F* h2Ratio = nullptr;
+                TH1D* h2Ratio = nullptr;
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
-                TH1F* hPad2 = nullptr;
+                TH1D* hPad2 = nullptr;
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot )
                 {
                     //size for two pads
@@ -4380,7 +4380,7 @@ void analysis1()
                     if(RegionGroup[RegionGroupIndex].showData)
                     {
                         //ratio plot
-                        h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Ratio = new TH1D("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2Ratio->Sumw2();
                         h2Ratio->Add(h2DataSum);
                         h2Ratio->Divide(h2BGSum);
@@ -4705,18 +4705,18 @@ void analysis1()
                     axis[i] += Var[VarIndex[i]].unit;
                 }
                 
-                TH2F* h2SigSum[SigMassSplitting.size()];
+                TH2D* h2SigSum[SigMassSplitting.size()];
                 {
                     TString CommonCut = RegionInfo[RegionIndex].Cut;
                     //Background
                     //For MC background
                     for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                                                 Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
-                            TH2F* hTemp = new TH2F("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            TH2D* hTemp = new TH2D("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                        Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
                             TString temp = Var[VarIndex[1]].VarFormula;
@@ -4744,12 +4744,12 @@ void analysis1()
                     //For data-driven background
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                                                 Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         
                         for(unsigned int k=0;k<DataSampleID.size();k++)
                         {
-                            TH2F* hTemp = new TH2F("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            TH2D* hTemp = new TH2D("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             
                             //fill histograms from trees
@@ -4801,13 +4801,13 @@ void analysis1()
                     {
                         TString NameTemp = "SigSum_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                        h2SigSum[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        h2SigSum[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         unsigned int AOD = 0;
                         for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
                             if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 != SigMassSplitting[i].MassDiff) continue;
-                            TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            TH2D* hTemp = new TH2D("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
                             TString temp = Var[VarIndex[1]].VarFormula;
@@ -4831,12 +4831,12 @@ void analysis1()
                     }
                 }
                 
-                TH2F* hSignificance[SigMassSplitting.size()];
+                TH2D* hSignificance[SigMassSplitting.size()];
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     TString NameTemp = "Significance_";
                     NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                    hSignificance[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                    hSignificance[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                              Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                     hSignificance[i]->GetXaxis()->SetTitle(axis[0].Data());
                     hSignificance[i]->GetYaxis()->SetTitle(axis[1].Data());

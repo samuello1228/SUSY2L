@@ -7,7 +7,7 @@
 
 #include <TFile.h>
 #include <TChain.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLorentzVector.h>
 
 Int_t ID1;
@@ -84,13 +84,13 @@ const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
 const bool cutflow = false;
-void initializehCutflow(vector<TH1F*>& hSRCutflow)
+void initializehCutflow(vector<TH1D*>& hSRCutflow)
 {
     for(unsigned int j=0;j<6;j++)
     {
         TString hName = "cutflow_";
         hName += TString::Itoa(j,10);
-        TH1F* hTemp = new TH1F(hName.Data(), "cutflow", 100, 0, 100);
+        TH1D* hTemp = new TH1D(hName.Data(), "cutflow", 100, 0, 100);
         hSRCutflow.push_back(hTemp);
 
         hSRCutflow[j]->GetXaxis()->SetBinLabel(1,"nAOD");
@@ -124,7 +124,7 @@ void initializehCutflow(vector<TH1F*>& hSRCutflow)
     }
 }
 
-void deletehCutflow(vector<TH1F*>& hSRCutflow)
+void deletehCutflow(vector<TH1D*>& hSRCutflow)
 {
     for(unsigned int j=0;j<6;j++)
     {
@@ -132,7 +132,7 @@ void deletehCutflow(vector<TH1F*>& hSRCutflow)
     }
 }
 
-void printhCutflow(vector<TH1F*>& hSRCutflow)
+void printhCutflow(vector<TH1D*>& hSRCutflow)
 {
     for(unsigned int i=0;i<6;i++)
     {
@@ -146,7 +146,7 @@ void printhCutflow(vector<TH1F*>& hSRCutflow)
     }
 }
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,std::vector<nEvent>& nSS,vector<TH1F*>& hSRCutflow)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,std::vector<nEvent>& nSS,vector<TH1D*>& hSRCutflow)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
@@ -301,14 +301,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     
     //histograms
-    TH1F* h2[channel.size()];
+    TH1D* h2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
         TString hName2 = "hist_";
         hName2 += channel[j];
         
         f2[j]->cd();
-        h2[j] = new TH1F(hName2.Data(), "cut flow", 20, 0, 20);
+        h2[j] = new TH1D(hName2.Data(), "cut flow", 20, 0, 20);
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
@@ -327,7 +327,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             cout<<fileList->At(i)->GetTitle()<<endl;
             TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
-            TH1F *h1 = (TH1F*) f1->Get("hCutFlow");
+            TH1D *h1 = (TH1D*) f1->Get("hCutFlow");
             for(unsigned int j=1;j<30;j++)
             {
                 //cout<<j<<" "<<h1->GetBinContent(j)<<endl;;
@@ -955,7 +955,7 @@ void skimming()
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            vector<TH1F*> hSRCutflow;
+            vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
             skimming2(SamplePath,tag,DataSampleName[i],0,nSS,hSRCutflow);
             deletehCutflow(hSRCutflow);
@@ -976,7 +976,7 @@ void skimming()
         {
             //if(BGMCGroupData[i].GroupName != "VV") continue;
 
-            vector<TH1F*> hSRCutflow;
+            vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
 
             //for(unsigned int j=114;j<=114;j++)
@@ -1009,7 +1009,7 @@ void skimming()
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
-            vector<TH1F*> hSRCutflow;
+            vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
             skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],nSS,hSRCutflow);
             if(cutflow) printhCutflow(hSRCutflow);
