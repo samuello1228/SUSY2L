@@ -907,7 +907,11 @@ void skimming()
         
         //Z+jets
         element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
-        element.lower = 0;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        element.lower = 0;  element.upper = 41; element.colour = 2; BGMCGroupData.push_back(element);
+
+        //DY
+        element.GroupName = "DY";    element.LegendName = "DY";     element.LatexName = "DY";
+        element.lower = 42; element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
         
         //W+jets
         element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
@@ -983,7 +987,11 @@ void skimming()
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
                 skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],nSS,hSRCutflow);
             }
-            if(cutflow) printhCutflow(hSRCutflow);
+            if(cutflow)
+            {
+                cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
+                printhCutflow(hSRCutflow);
+            }
             deletehCutflow(hSRCutflow);
         }
     }
