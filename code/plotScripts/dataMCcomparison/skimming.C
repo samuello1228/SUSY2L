@@ -58,14 +58,6 @@ float mlj;
 float R2;
 float mjj;
 
-struct nEvent
-{
-    TString name;
-    int n;
-    double nw;
-    double nAOD;
-};
-
 struct GroupData
 {
     TString GroupName;
@@ -146,7 +138,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow)
     }
 }
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,std::vector<nEvent>& nSS,vector<TH1D*>& hSRCutflow)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
@@ -342,12 +334,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
     }
     
-    nEvent element;
-    element.name = SampleName;
-    element.n = 0;
-    element.nw = 0;
-    element.nAOD = h2[0]->GetBinContent(2);
-
+    if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
     const double commonWeight = XS /h2[0]->GetBinContent(2) *(32861.6+3212.96);
     
     //loop over all entries
@@ -435,8 +422,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             channelIndex += 3;
-            element.n++;
-            element.nw += weight;
             if(cutflow)
             {
                 for(unsigned int m=0;m<6;m++)
@@ -778,8 +763,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     cout<<endl;
     
-    //cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
-    nSS.push_back(element);
     //delete
     for(unsigned int j=0;j<channel.size();j++)
     {
@@ -898,8 +881,6 @@ void skimming()
     SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
     
-    std::vector<nEvent> nSS;
-    
     //Group for MC background
     std::vector<GroupData> BGMCGroupData;
     {
@@ -957,7 +938,7 @@ void skimming()
         {
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
-            skimming2(SamplePath,tag,DataSampleName[i],0,nSS,hSRCutflow);
+            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow);
             deletehCutflow(hSRCutflow);
         }
     }
@@ -985,7 +966,7 @@ void skimming()
             for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
             {
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
-                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],nSS,hSRCutflow);
+                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow);
             }
             if(cutflow)
             {
@@ -1011,14 +992,9 @@ void skimming()
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
-            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],nSS,hSRCutflow);
+            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow);
             if(cutflow) printhCutflow(hSRCutflow);
             deletehCutflow(hSRCutflow);
         }
-    }
-    
-    for(unsigned int i=0;i<nSS.size();i++)
-    {
-        cout<<nSS[i].name<<" "<<nSS[i].n<<" "<<nSS[i].nw<<" "<<nSS[i].nAOD<<endl;
     }
 }
