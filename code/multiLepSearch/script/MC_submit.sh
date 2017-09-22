@@ -62,4 +62,5 @@ k=${tag}.MCBG
 
 #../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a 1 --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} # --printEvent ${eventNumber} --cutflow | tee cutflow.log
 
+#for(int i=1;i<60;i++) cout<<hCutFlow->GetXaxis()->GetBinLabel(i)<<": "<<hCutFlow->GetBinContent(i)<<endl;
 #grep -e '^[0-9]\+$' cutflow.log |tee trigger.txt

@@ -201,9 +201,6 @@ public:
   ToolHandleArray<IAsgElectronEfficiencyCorrectionTool> electronSFTools;  //!
   ToolHandleArray<IAsgElectronEfficiencyCorrectionTool> electronEffTools; //!  
 
-  std::vector< std::string > triggerInfo; //!
-  std::vector< std::string > triggerList2015; //!
-  std::vector< std::string > triggerList2016; //!
   std::vector< const xAOD::Electron* > trigElec; //!
   std::vector< const xAOD::Muon* > trigMuon; //!
 
