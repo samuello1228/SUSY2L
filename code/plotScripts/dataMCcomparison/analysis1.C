@@ -5443,7 +5443,6 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
-        
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
@@ -5456,19 +5455,27 @@ void analysis1()
         ofstream fout;
         fout.open(PathName.Data());
         
-        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        unsigned int Nminus1 = 0;
+        vector<TString> VarPlot;
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
+        }
+        else
+        {
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            {
+                VarPlot.push_back(Var[VarIndex].VarName);
+            }
+        }
+        
+        for(unsigned int i=0;i<VarPlot.size();i++)
+        {
+            unsigned int VarIndex = findVarIndex(VarPlot[i],Var);
+            
             if(Var[VarIndex].VarName=="averageMu") continue;
             if(Var[VarIndex].VarName=="nVtx") continue;
             
-            
-            TString latexName = RegionGroup[RegionGroupIndex].GroupName;
-            latexName.ReplaceAll("_","\\_");
-            
             fout<<"\\begin{frame}{";
-            //fout<<"For ";
-            //fout<<latexName.Data();
-            //fout<<" \\\\ ";
             fout<<Var[VarIndex].latexName.Data();
             fout<<"}"<<endl;
             
