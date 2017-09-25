@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2";
+TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R1";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -2129,7 +2129,7 @@ void analysis1()
         }
         */
         
-        ///*
+        /*
         //jet1
         {
             element.RegionName = "SR_SS_jet1_opt";
@@ -2168,6 +2168,31 @@ void analysis1()
             
             element.Cut = "";
             element.Cut += " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        */
+        
+        ///*
+        //jet123
+        {
+            element.RegionName = "SR_SS_jet123_opt";
+            element.RegionShortName = "SRjet123";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2335,7 +2360,7 @@ void analysis1()
         }
         */
         
-        ///*
+        /*
         //jet1
         {
             element.RegionName = "SR_SS_jet1_pre";
@@ -2381,6 +2406,36 @@ void analysis1()
             {
                 element.Cut = "";
                 element.Cut += " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        */
+        
+        ///*
+        //jet123
+        {
+            element.RegionName = "SR_SS_jet123_pre";
+            element.RegionShortName = "SRjet123";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            if(!useDani)
+            {
+                element.Cut = "";
+                element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -5886,6 +5941,15 @@ void analysis1()
             fout<<"& SRjet1 & SRjet23 \\\\"<<endl;
             fout<<"\\hline"<<endl;
             fout<<"$n_{cjets}$ & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
+        else if(RegionN == 1)
+        {
+            fout<<"\\begin{tabular}{|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet123 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 to 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
         
