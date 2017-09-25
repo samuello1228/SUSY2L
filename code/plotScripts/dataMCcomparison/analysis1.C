@@ -5646,8 +5646,7 @@ void analysis1()
             
             TString latexName = RegionInfo[RegionIndex].RegionName;
             latexName.ReplaceAll("_","\\_");
-            fout<<latexName.Data()<<": ";
-            fout<<SigMassSplitting[SigOptimizingIndex].IDName;
+            fout<<latexName.Data();
             fout<<": \\\\"<<endl;
             
             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
