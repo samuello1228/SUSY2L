@@ -5599,7 +5599,7 @@ void analysis1()
         fout.close();
     }
     
-    for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+    //cut_latex
     {
         TString optGroupName = "SR_SS_opt";
         unsigned int optRegionGroupIndex = 0;
@@ -5611,93 +5611,94 @@ void analysis1()
             }
         }
         
-        const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
-        
-        ifstream fin;
+        for(unsigned int RegionIndex=RegionGroup[optRegionGroupIndex].lower;RegionIndex<=RegionGroup[optRegionGroupIndex].upper;RegionIndex++)
         {
-            TString PathName = "latex/data/optimization/";
-            if(useDani) PathName += "cut_txt_Dani/";
-            else PathName += "cut_txt/";
-            PathName += "cut_";
-            PathName += RegionInfo[RegionIndex].RegionName;
-            PathName += "_";
-            PathName += TString::Itoa(SigOptimizingIndex,10);
-            PathName += ".txt";
-            fin.open(PathName.Data());
-        }
-        
-        ofstream fout;
-        {
-            TString PathName = "latex/data/optimization/cut_latex/cut_";
-            PathName += RegionInfo[RegionIndex].RegionName;
-            PathName += "_";
-            PathName += TString::Itoa(SigOptimizingIndex,10);
-            PathName += ".tex";
-            fout.open(PathName.Data());
-        }
-        
-        TString latexName = RegionInfo[RegionIndex].RegionName;
-        latexName.ReplaceAll("_","\\_");
-        fout<<latexName.Data()<<": ";
-        fout<<SigMassSplitting[SigOptimizingIndex].IDName;
-        fout<<": \\\\"<<endl;
-
-        for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
-        {
-            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
+            ifstream fin;
             {
-                TString VarName;
-                double lower;
-                double upper;
-                fin>>VarName;
-                fin>>lower;
-                fin>>upper;
-                
-                unsigned int VarIndex = findVarIndex(VarName,Var);
-                
-                if(lower == 0)
+                TString PathName = "latex/data/optimization/";
+                if(useDani) PathName += "cut_txt_Dani/";
+                else PathName += "cut_txt/";
+                PathName += "cut_";
+                PathName += RegionInfo[RegionIndex].RegionName;
+                PathName += "_";
+                PathName += TString::Itoa(SigOptimizingIndex,10);
+                PathName += ".txt";
+                fin.open(PathName.Data());
+            }
+            
+            ofstream fout;
+            {
+                TString PathName = "latex/data/optimization/cut_latex/cut_";
+                PathName += RegionInfo[RegionIndex].RegionName;
+                PathName += "_";
+                PathName += TString::Itoa(SigOptimizingIndex,10);
+                PathName += ".tex";
+                fout.open(PathName.Data());
+            }
+            
+            TString latexName = RegionInfo[RegionIndex].RegionName;
+            latexName.ReplaceAll("_","\\_");
+            fout<<latexName.Data()<<": ";
+            fout<<SigMassSplitting[SigOptimizingIndex].IDName;
+            fout<<": \\\\"<<endl;
+            
+            for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
+            {
+                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
                 {
-                    if(upper == -1)
+                    TString VarName;
+                    double lower;
+                    double upper;
+                    fin>>VarName;
+                    fin>>lower;
+                    fin>>upper;
+                    
+                    unsigned int VarIndex = findVarIndex(VarName,Var);
+                    
+                    if(lower == 0)
                     {
+                        if(upper == -1)
+                        {
+                        }
+                        else
+                        {
+                            // x < a
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $<";
+                            fout<<upper;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
                     }
                     else
                     {
-                        // x < a
-                        fout<<Var[VarIndex].latexName.Data();
-                        fout<<" $<";
-                        fout<<upper;
-                        fout<<"$";
-                        fout<<" \\\\"<<endl;
-                    }
-                }
-                else
-                {
-                    if(upper == -1)
-                    {
-                        // x >= a
-                        fout<<Var[VarIndex].latexName.Data();
-                        fout<<" $\\geq ";
-                        fout<<lower;
-                        fout<<"$";
-                        fout<<" \\\\"<<endl;
-                    }
-                    else
-                    {
-                        // a <= x < b
-                        fout<<"$";
-                        fout<<lower;
-                        fout<<" \\leq$ ";
-                        fout<<Var[VarIndex].latexName.Data();
-                        fout<<" $<";
-                        fout<<upper;
-                        fout<<"$";
-                        fout<<" \\\\"<<endl;
+                        if(upper == -1)
+                        {
+                            // x >= a
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $\\geq ";
+                            fout<<lower;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
+                        else
+                        {
+                            // a <= x < b
+                            fout<<"$";
+                            fout<<lower;
+                            fout<<" \\leq$ ";
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $<";
+                            fout<<upper;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
                     }
                 }
             }
+            fout.close();
+            fin.close();
         }
-        fout.close();
-        fin.close();
     }
     
     //cut table
