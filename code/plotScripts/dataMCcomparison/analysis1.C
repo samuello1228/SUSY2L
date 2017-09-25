@@ -2576,7 +2576,7 @@ void analysis1()
                         vector<double> upperCutRecord2;
                         double nBGRecord2 = 0;
                         double nSigRecord2[OptimizingSignal.size()];
-                        double significanceRecord2;
+                        double significanceRecord2 = 0;
                         
                         if(isOptimizing) significanceRecord2 = significanceRecord3;
                         if(isRemovingCut) significanceRecord2 = -999;
@@ -2673,8 +2673,8 @@ void analysis1()
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         {
-                                            TH1D* hTemp1D;
-                                            TH2D* hTemp2D;
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
@@ -2717,8 +2717,8 @@ void analysis1()
                                             }
                                         }
                                         {
-                                            TH1D* hTemp1D;
-                                            TH2D* hTemp2D;
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
@@ -2777,8 +2777,8 @@ void analysis1()
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
                                         {
-                                            TH1D* hTemp1D;
-                                            TH2D* hTemp2D;
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
@@ -2841,8 +2841,8 @@ void analysis1()
                                             }
                                         }
                                         {
-                                            TH1D* hTemp1D;
-                                            TH2D* hTemp2D;
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
                                             TString temp;
                                             if(VarNumber==1)
                                             {
@@ -2982,7 +2982,7 @@ void analysis1()
                                         if(BGGroup[j].info->GroupName == "VV" ||
                                            BGGroup[j].info->GroupName == "ttV")
                                         {
-                                            double nBGRaw;
+                                            double nBGRaw = 0;
                                             if(VarNumber==1)
                                             {
                                                 nBGRaw = BGGroupRaw1D[j]->Integral(bin1[0],bin2[0]);
@@ -2999,8 +2999,8 @@ void analysis1()
                                             }
                                         }
                                         
-                                        double Error;
-                                        double n;
+                                        double Error = 0;
+                                        double n = 0;
                                         if(VarNumber==1)
                                         {
                                             n = BGGroup[j].h2->IntegralAndError(bin1[0],bin2[0],Error);
@@ -3818,7 +3818,7 @@ void analysis1()
                 Var[VarIndex].CutDirection!=0 && (
                 RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1");
                 
-                unsigned int dataN;
+                unsigned int dataN = 0;
                 double total_BG_weighted = 0;
                 double total_BG_error2 = 0 ;
                 int total_BG_unweighted = 0;
