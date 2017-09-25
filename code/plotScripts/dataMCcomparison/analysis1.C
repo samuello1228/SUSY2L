@@ -5430,8 +5430,6 @@ void analysis1()
     //plot_SR_SS_0B.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        unsigned int startingIndex = 0;
-        
         if(! //Cutflow Attention
            (/*RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS"    ||
@@ -5511,8 +5509,6 @@ void analysis1()
     //plot_significances.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        unsigned int startingIndex = 0;
-        
         /*if(! //Cutflow Attention
            (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
            )*/ continue;
@@ -5875,6 +5871,55 @@ void analysis1()
             fin[SixChannel].close();
         }
         fout.close();
+    }
+    
+    //nSig_SR_SS_opt_0.tex
+    //significance_SR_SS_opt_0.tex
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+    {
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+           ) continue;
+        
+        for(unsigned int i=0;i<=1;i++)
+        {
+            TString PathName = "latex/data/optimization/";
+            if(i==0) PathName += "nSig";
+            if(i==1) PathName += "significance";
+            PathName += "_";
+            PathName += RegionGroup[RegionGroupIndex].GroupName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".tex";
+            
+            ofstream fout;
+            fout.open(PathName.Data());
+            
+            fout<<"\\begin{frame}{";
+            if(i==0) fout<<"signal yield plot";
+            if(i==1) fout<<"significance plot";
+            fout<<"}"<<endl;
+            fout<<"\\Wider{"<<endl;
+            for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+            {
+                const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                
+                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                if(i==0) fout<<"nSig";
+                if(i==1) fout<<"significance";
+                fout<<"_";
+                fout<<RegionInfo[RegionIndex].RegionName.Data();
+                fout<<"_";
+                fout<<TString::Itoa(SigOptimizingIndex,10);
+                fout<<"}";
+                if(SixChannel==2) fout<<" \\\\";
+                fout<<endl;
+            }
+            fout<<"}"<<endl;
+            fout<<"\\end{frame}"<<endl;
+            
+            fout.close();
+        }
     }
     
     /*
