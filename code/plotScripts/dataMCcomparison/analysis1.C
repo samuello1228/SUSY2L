@@ -5016,31 +5016,46 @@ void analysis1()
             
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
-                unsigned int RegionIndex2 = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
+                const unsigned int RegionIndex2 = RegionIndex - RegionGroup[RegionGroupIndex].lower;
                 TString NameTemp;
-                if(RegionIndex2 == 0)
+                if(RegionN == 6)
                 {
-                    NameTemp = "SRee1";
+                    if(RegionIndex2 == 0)
+                    {
+                        NameTemp = "SRee1";
+                    }
+                    else if(RegionIndex2 == 1)
+                    {
+                        NameTemp = "SRmumu1";
+                    }
+                    else if(RegionIndex2 == 2)
+                    {
+                        NameTemp = "SRemu1";
+                    }
+                    else if(RegionIndex2 == 3)
+                    {
+                        NameTemp = "SRee2";
+                    }
+                    else if(RegionIndex2 == 4)
+                    {
+                        NameTemp = "SRmumu2";
+                    }
+                    else if(RegionIndex2 == 5)
+                    {
+                        NameTemp = "SRemu2";
+                    }
                 }
-                else if(RegionIndex2 == 1)
+                else if(RegionN == 2)
                 {
-                    NameTemp = "SRmumu1";
-                }
-                else if(RegionIndex2 == 2)
-                {
-                    NameTemp = "SRemu1";
-                }
-                else if(RegionIndex2 == 3)
-                {
-                    NameTemp = "SRee2";
-                }
-                else if(RegionIndex2 == 4)
-                {
-                    NameTemp = "SRmumu2";
-                }
-                else if(RegionIndex2 == 5)
-                {
-                    NameTemp = "SRemu2";
+                    if(RegionIndex2 == 0)
+                    {
+                        NameTemp = "SRjet1";
+                    }
+                    else if(RegionIndex2 == 1)
+                    {
+                        NameTemp = "SRjet23";
+                    }
                 }
                 
                 h2SRSignificance[0]->GetXaxis()->SetBinLabel(RegionIndex2+1,NameTemp);
