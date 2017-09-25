@@ -2026,7 +2026,6 @@ void analysis1()
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
-            
             RegionInfo.push_back(element);
         }
         
@@ -2130,8 +2129,6 @@ void analysis1()
         GroupElement.lower = RegionInfo.size();
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
-        
-        if(useDani) element.Cut = " && nBJet == 0";
         
         //ee_1
         {
@@ -5723,10 +5720,11 @@ void analysis1()
             fout.open(PathName.Data());
         }
         
-        ifstream fin[6];
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        const unsigned int RegionN = RegionGroup[optRegionGroupIndex].upper - RegionGroup[optRegionGroupIndex].lower +1;
+        ifstream fin[RegionN];
+        for(unsigned int RegionIndex=RegionGroup[optRegionGroupIndex].lower;RegionIndex<=RegionGroup[optRegionGroupIndex].upper;RegionIndex++)
         {
-            const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
+            const unsigned int SixChannel = RegionIndex - RegionGroup[optRegionGroupIndex].lower;
             TString PathName = "latex/data/optimization/";
             if(useDani) PathName += "cut_txt_Dani/";
             else PathName += "cut_txt/";
@@ -5736,6 +5734,18 @@ void analysis1()
             PathName += TString::Itoa(SigOptimizingIndex,10);
             PathName += ".txt";
             fin[SixChannel].open(PathName.Data());
+        }
+        
+        if(RegionN == 6)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|c|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SR$ee$-1 & SR$ee$-2 & SR$\\mu\\mu$-1 & SR$\\mu\\mu$-2 & SR$e\\mu$-1 & SR$e\\mu$-2 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"Lepton flavours & $ee$ & $ee$ & $\\mu\\mu$ & $\\mu\\mu$ & $e\\mu$ & $e\\mu$ \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
         }
         
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
@@ -5791,12 +5801,26 @@ void analysis1()
                         }
                     }
                     
-                    if(SixChannel == 0) SixChannel = 3;
-                    else if(SixChannel == 3) SixChannel = 1;
-                    else if(SixChannel == 1) SixChannel = 4;
-                    else if(SixChannel == 4) SixChannel = 2;
-                    else if(SixChannel == 2) SixChannel = 5;
-                    else if(SixChannel == 5) break;
+                    if(RegionN == 6)
+                    {
+                        if(SixChannel == 0) SixChannel = 3;
+                        else if(SixChannel == 3) SixChannel = 1;
+                        else if(SixChannel == 1) SixChannel = 4;
+                        else if(SixChannel == 4) SixChannel = 2;
+                        else if(SixChannel == 2) SixChannel = 5;
+                        else if(SixChannel == 5) break;
+                    }
+                    else
+                    {
+                        if(SixChannel == RegionN -1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            SixChannel++;
+                        }
+                    }
                 }
                 
                 fout<<"\\\\"<<endl;
@@ -5804,13 +5828,25 @@ void analysis1()
                 
                 if(Var[VarIndex].VarName == "pt2")
                 {
-                    fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                    if(RegionN == 6)
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                    }
+                    else
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] ";
+                        for(unsigned int k=0;k<RegionN;k++)
+                        {
+                            fout<<"& - ";
+                        }
+                        fout<<"\\\\"<<endl;
+                    }
                     fout<<"\\hline"<<endl;
                 }
             }
         }
         
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        for(unsigned int SixChannel=0;SixChannel<RegionN;SixChannel++)
         {
             fin[SixChannel].close();
         }
