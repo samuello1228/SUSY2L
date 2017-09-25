@@ -56,8 +56,8 @@ void GetFakeHist()
     TFile* fPeter = new TFile("RLE_Histos.root","READ");
     //real eff electron
     {
-        float bin_eta[] = {0,0.8,1.37,1.52,2.01};
-        int nBin_eta = 4;
+        float bin_eta[] = {0,0.8,1.37,1.52,2.0,2.47};
+        int nBin_eta = 5;
         
         TH1F* hPeter1 = (TH1F*) fPeter->Get("hEtaSigElStd_1");
         
