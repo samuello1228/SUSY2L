@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_pt25_meff200_dEta1p5_v4";
+TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -2011,6 +2011,7 @@ void analysis1()
             }
         }
         
+        /*
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_opt";
@@ -2126,6 +2127,55 @@ void analysis1()
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
         }
+        */
+        
+        ///*
+        //jet1
+        {
+            element.RegionName = "SR_SS_jet1_opt";
+            element.RegionShortName = "SRjet1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        
+        //jet23
+        {
+            element.RegionName = "SR_SS_jet23_opt";
+            element.RegionShortName = "SRjet23";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        //*/
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
@@ -2137,6 +2187,7 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         
+        /*
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_pre";
@@ -2282,6 +2333,65 @@ void analysis1()
             
             RegionInfo.push_back(element);
         }
+        */
+        
+        ///*
+        //jet1
+        {
+            element.RegionName = "SR_SS_jet1_pre";
+            element.RegionShortName = "SRjet1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            if(!useDani)
+            {
+                element.Cut = "";
+                element.Cut += " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //jet23
+        {
+            element.RegionName = "SR_SS_jet23_pre";
+            element.RegionShortName = "SRjet23";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            if(!useDani)
+            {
+                element.Cut = "";
+                element.Cut += " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        //*/
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
