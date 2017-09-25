@@ -944,6 +944,7 @@ void analysis1()
     struct RegionData
     {
         TString RegionName;
+        TString RegionShortName;
         std::vector<unsigned int> setOfChannel;
         TString Cut;
         vector<AdditionalCutData> AdditionalCut;
@@ -2013,6 +2014,7 @@ void analysis1()
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_opt";
+            element.RegionShortName = "SRee1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2032,6 +2034,7 @@ void analysis1()
         //mumu_1
         {
             element.RegionName = "SR_SS_mumu_1_opt";
+            element.RegionShortName = "SRmumu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2050,6 +2053,7 @@ void analysis1()
         //emu_1
         {
             element.RegionName = "SR_SS_emu_1_opt";
+            element.RegionShortName = "SRemu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2068,6 +2072,7 @@ void analysis1()
         //ee_2
         {
             element.RegionName = "SR_SS_ee_2_opt";
+            element.RegionShortName = "SRee2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2087,6 +2092,7 @@ void analysis1()
         //mumu_2
         {
             element.RegionName = "SR_SS_mumu_2_opt";
+            element.RegionShortName = "SRmumu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2105,6 +2111,7 @@ void analysis1()
         //emu_2
         {
             element.RegionName = "SR_SS_emu_2_opt";
+            element.RegionShortName = "SRemu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2133,6 +2140,7 @@ void analysis1()
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_pre";
+            element.RegionShortName = "SRee1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2157,6 +2165,7 @@ void analysis1()
         //mumu_1
         {
             element.RegionName = "SR_SS_mumu_1_pre";
+            element.RegionShortName = "SRmumu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2180,6 +2189,7 @@ void analysis1()
         //emu_1
         {
             element.RegionName = "SR_SS_emu_1_pre";
+            element.RegionShortName = "SRemu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2203,6 +2213,7 @@ void analysis1()
         //ee_2
         {
             element.RegionName = "SR_SS_ee_2_pre";
+            element.RegionShortName = "SRee2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2227,6 +2238,7 @@ void analysis1()
         //mumu_2
         {
             element.RegionName = "SR_SS_mumu_2_pre";
+            element.RegionShortName = "SRmumu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2250,6 +2262,7 @@ void analysis1()
         //emu_2
         {
             element.RegionName = "SR_SS_emu_2_pre";
+            element.RegionShortName = "SRemu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -5016,48 +5029,8 @@ void analysis1()
             
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
-                const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
                 const unsigned int RegionIndex2 = RegionIndex - RegionGroup[RegionGroupIndex].lower;
-                TString NameTemp;
-                if(RegionN == 6)
-                {
-                    if(RegionIndex2 == 0)
-                    {
-                        NameTemp = "SRee1";
-                    }
-                    else if(RegionIndex2 == 1)
-                    {
-                        NameTemp = "SRmumu1";
-                    }
-                    else if(RegionIndex2 == 2)
-                    {
-                        NameTemp = "SRemu1";
-                    }
-                    else if(RegionIndex2 == 3)
-                    {
-                        NameTemp = "SRee2";
-                    }
-                    else if(RegionIndex2 == 4)
-                    {
-                        NameTemp = "SRmumu2";
-                    }
-                    else if(RegionIndex2 == 5)
-                    {
-                        NameTemp = "SRemu2";
-                    }
-                }
-                else if(RegionN == 2)
-                {
-                    if(RegionIndex2 == 0)
-                    {
-                        NameTemp = "SRjet1";
-                    }
-                    else if(RegionIndex2 == 1)
-                    {
-                        NameTemp = "SRjet23";
-                    }
-                }
-                
+                TString NameTemp = RegionInfo[RegionIndex].RegionShortName;
                 h2SRSignificance[0]->GetXaxis()->SetBinLabel(RegionIndex2+1,NameTemp);
             }
             
