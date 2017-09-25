@@ -5438,8 +5438,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||*/
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||*/
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
@@ -5459,6 +5459,35 @@ void analysis1()
         vector<TString> VarPlot;
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
+            //N-1 plot
+            VarPlot.push_back("pt1");
+            VarPlot.push_back("pt2");
+            VarPlot.push_back("mll");
+            VarPlot.push_back("dEta");
+            VarPlot.push_back("METRel");
+            VarPlot.push_back("meff");
+            VarPlot.push_back("mtm");
+            VarPlot.push_back("mlj");
+            VarPlot.push_back("ptll");
+            VarPlot.push_back("mTtwo");
+            Nminus1 = 10;
+            
+            //N plot
+            VarPlot.push_back("MET");
+            VarPlot.push_back("mt1");
+            VarPlot.push_back("mt2");
+            VarPlot.push_back("jetpt");
+            VarPlot.push_back("jeteta");
+            VarPlot.push_back("nJet");
+            VarPlot.push_back("nBJet");
+            VarPlot.push_back("nCJet");
+            VarPlot.push_back("l12_dPhi");
+            VarPlot.push_back("l12_MET_dPhi");
+            VarPlot.push_back("jet0_MET_dPhi");
+            VarPlot.push_back("mjj");
+            VarPlot.push_back("eta1");
+            VarPlot.push_back("eta2");
+            VarPlot.push_back("phi1");
         }
         else
         {
@@ -5474,6 +5503,12 @@ void analysis1()
             
             if(Var[VarIndex].VarName=="averageMu") continue;
             if(Var[VarIndex].VarName=="nVtx") continue;
+            
+            if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+            {
+                if(i == 0) fout<<"\\subsection{``N-1'' plots}"<<endl;
+                if(i == Nminus1) fout<<"\\subsection{``N'' plots}"<<endl;
+            }
             
             fout<<"\\begin{frame}{";
             fout<<Var[VarIndex].latexName.Data();
