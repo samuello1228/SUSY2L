@@ -5747,6 +5747,15 @@ void analysis1()
             fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
+        else if(RegionN == 2)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet1 & SRjet23 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
         
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
         {
