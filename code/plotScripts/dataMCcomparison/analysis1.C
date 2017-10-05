@@ -5578,6 +5578,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
+        const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
+        
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
@@ -5663,7 +5665,10 @@ void analysis1()
                     Var[VarIndex].VarName=="cjetphi" )
                    ) continue;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                fout<<"\\includegraphics[width=";
+                if(RegionN == 4) fout<<"0.4";
+                else fout<<"0.33";
+                fout<<"\\textwidth]{";
                 fout<<Var[VarIndex].VarName.Data();
                 fout<<"_";
                 fout<<RegionInfo[RegionIndex].RegionName.Data();
@@ -5673,7 +5678,14 @@ void analysis1()
                     fout<<TString::Itoa(SigOptimizingIndex,10);
                 }
                 fout<<"}";
-                if(SixChannel==2) fout<<" \\\\";
+                if(RegionN == 4)
+                {
+                    if(SixChannel==1) fout<<" \\\\";
+                }
+                else
+                {
+                    if(SixChannel==2) fout<<" \\\\";
+                }
                 fout<<endl;
             }
             fout<<"}"<<endl;
@@ -5952,6 +5964,15 @@ void analysis1()
             fout<<"$n_{cjets}$ & 1 to 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
+        else if(RegionN == 4)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet1\\_off & SRjet23\\_off & SRjet1\\_on & SRjet23\\_on \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
         
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
         {
@@ -6037,6 +6058,10 @@ void analysis1()
                     {
                         fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
                     }
+                    else if(RegionN == 4)
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & $\\leq 10$ & $\\leq 10$ \\\\"<<endl;
+                    }
                     else
                     {
                         fout<<"$|m_{ll}-m_Z|$ [GeV] ";
@@ -6066,6 +6091,8 @@ void analysis1()
            (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
            ) continue;
         
+        const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
+        
         for(unsigned int i=0;i<=1;i++)
         {
             TString PathName = "latex/data/optimization/";
@@ -6089,7 +6116,10 @@ void analysis1()
             {
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                fout<<"\\includegraphics[width=";
+                if(RegionN == 4) fout<<"0.4";
+                else fout<<"0.33";
+                fout<<"\\textwidth]{";
                 if(i==0) fout<<"nSig";
                 if(i==1) fout<<"significance";
                 fout<<"_";
@@ -6097,7 +6127,14 @@ void analysis1()
                 fout<<"_";
                 fout<<TString::Itoa(SigOptimizingIndex,10);
                 fout<<"}";
-                if(SixChannel==2) fout<<" \\\\";
+                if(RegionN == 4)
+                {
+                    if(SixChannel==1) fout<<" \\\\";
+                }
+                else
+                {
+                    if(SixChannel==2) fout<<" \\\\";
+                }
                 fout<<endl;
             }
             fout<<"}"<<endl;
