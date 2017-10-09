@@ -1,16 +1,18 @@
 \documentclass[mathserif,serif]{beamer}
 \usepackage{tabularx}
-\setbeamertemplate{footline}[frame number]
-% \useoutertheme{infolines}
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
 \usepackage{slidesphysics}
 \graphicspath{{../plot/}}
 
-\title[]{SS Analysis}
+\title[Muon $|\eta|<2.7$]{SS Analysis}
 \author[]
 {
 Samuel Lo \inst{1}
 \and
 Yanjun Tu  \inst{1}
+\and
+Daniela Paredes \inst{1}
 \and
 Dongliang Zhang  \inst{2}
 }
@@ -24,7 +26,7 @@ University of Michigan
 }
 \date[]{\today}
 
-\newcommand\Wider[2][3em]{%
+\newcommand\Wider[2][2em]{%
 \makebox[\linewidth][c]{%
 \begin{minipage}{\dimexpr\textwidth+#1\relax}
 \raggedright
@@ -36,25 +38,104 @@ University of Michigan
 \begin{document}
 \frame{\titlepage}
 
-\begin{frame}{Introduction}
-\begin{itemize}
-\item Update on the optimization
-\begin{itemize}
-\item Use Jeanette suggestion: The yields of groups of BG need to be positive.
-\end{itemize}
-\item Check the charge flip background
-\begin{itemize}
-\item Compare data and MC background
-\item Compare data and data-driven background (estimation from data OS events)
-\end{itemize}
-\end{itemize}
+\section{Introduction}
+\begin{frame}{What's new?}
+  \begin{itemize}
+    \item Updates
+  \end{itemize}
 \end{frame}
 
-\begin{frame}
-\begin{center}
-\huge
-Update on the optimization
-\end{center}
+\section{Results}
+\begin{frame}{Selection in run1 SR}
+\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
+% \url{https://arxiv.org/pdf/1501.07110.pdf}
+\centering
+\tiny
+\input{data/optimization/cut_table_SR_SS_opt_0.tex}
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Yields and significance in SR}
+\includegraphics[width=\textwidth]{SR_SS_opt}
+\end{frame}
+
+\input{data/optimization/nSig_SR_SS_opt_0.tex}
+\input{data/optimization/significance_SR_SS_opt_0.tex}
+
+\begin{frame}{Combined significance}
+\begin{itemize}
+\item Combine the significance (only channels with $Z_n>0$ are combined)
+\end{itemize}
+\includegraphics[width=0.8\textwidth]{combine_significance_0}
+\end{frame}
+
+
+\section{Final plots}
+\subsection{Yields table}
+\input{data/optimization/opt_SR_SS_opt_0.tex}
+\input{data/plot_SR_SS_opt_0.tex}
+
+\section{Pre-selection plots}
+\begin{frame}{Pre-selection cut}
+\normalsize
+\begin{columns}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\end{itemize}
+\item SR$e\mu$1
+\begin{itemize}
+\item nCJet $=1$
+\item nBJet $=0$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\begin{column}{0.5\textwidth}
+
+\begin{itemize}
+\item SR$ee$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\item $|m_{ll} - 91.2| > 10$
+\end{itemize}
+\item SR$\mu\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\end{itemize}
+\item SR$e\mu$2
+\begin{itemize}
+\item nCJet $=2$ or $3$
+\item nBJet $=0$
+\end{itemize}
+\end{itemize}
+
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{Yields}
+\input{data/expN_SR_SS_pre.tex}
+\subsection{Plots}
+\input{data/plot_SR_SS_pre.tex}
+
+\section*{Backup}
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Update
+\end{itemize}
 \end{frame}
 
 \begin{frame}{optimization constraints}
@@ -75,95 +156,80 @@ The following constraints are applied to reduce the bias from low statistics:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Cuts in SR}
-\vspace{5mm}
-\tiny
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-& SR$ee$-1 & SR$ee$-2 & SR$\mu\mu$-1 & SR$\mu\mu$-2 & SR$e\mu$-1 & SR$e\mu$-2 \\
-\hline
-Lepton flavours & $ee$ & $ee$ & $\mu\mu$ & $\mu\mu$ & $e\mu$ & $e\mu$ \\
-\hline
-$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\
-\hline
-\input{data/optimization/cut_table_SR_SS_opt_0.tex}
-\end{tabular}
-\end{frame}
+% \begin{frame}{Compare with the old one}
+% \begin{itemize}
+% \item Combine the significance (only channels with $Z_n>0$ are combined)
+% \end{itemize}
+% \begin{columns}
+% 
+% \begin{column}{0.5\textwidth}
+% \begin{center}
+% \includegraphics[width=\textwidth]{data/optimization/combine_significance_0_2p8} \\
+% Jet $|\eta|<2.8$
+% \end{center}
+% \end{column}
+% 
+% \begin{column}{0.5\textwidth}
+% \begin{center}
+% \includegraphics[width=\textwidth]{data/optimization/combine_significance_0_2p4} \\
+% Jet $|\eta|<2.4$, \\ forward jet veto
+% \end{center}
+% \end{column}
+% 
+% \end{columns}
+% \end{frame}
 
-\begin{frame}{Yields and significance in SR}
-\includegraphics[width=\textwidth]{SR_SS_opt}
-\end{frame}
+% \begin{frame}
+% \begin{center}
+% \huge
+% Check the charge flip background
+% \end{center}
+% \end{frame}
+% 
+% \begin{frame}{SS\_ee Control Region}
+% \begin{itemize}
+% \item Define SS\_ee Control Region:
+% \begin{itemize}
+% \item $|m_{ll}-m_Z| < 10$ GeV
+% \end{itemize}
+% \item The $m_{ll}$ plot is a N-1 plot.
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}
+% \begin{center}
+% \huge
+% Compare data and MC background
+% \end{center}
+% \end{frame}
+% 
+%\input{data/expN_CR_SS_ee_Zmass_MC.tex}
+%\input{data/plot_CR_SS_ee_Zmass_MC.tex}
 
-\input{data/optimization/nSig_SR_SS_opt_0.tex}
-\input{data/optimization/significance_SR_SS_opt_0.tex}
+% \begin{frame}
+% \begin{center}
+% \huge
+% Compare data and data-driven background \\
+% \normalsize
+% (estimation from data OS events) \\
+% replace Z+jets, ttbar and Wt
+% \end{center}
+% \end{frame}
 
-\begin{frame}{Compare with the old one}
-\begin{itemize}
-\item Combine the significance (only channels with $Z_n>0$ are combined)
-\end{itemize}
-\includegraphics[width=0.5\textwidth]{data/optimization/old_opt}
-\includegraphics[width=0.5\textwidth]{data/optimization/new_opt}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Check the charge flip background
-\end{center}
-\end{frame}
-
-\begin{frame}{SS\_ee Control Region}
-\begin{itemize}
-\item Define SS\_ee Control Region:
-\begin{itemize}
-\item $|m_{ll}-m_Z| < 10$ GeV
-\end{itemize}
-\item The $m_{ll}$ plot is a N-1 plot.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Compare data and MC background
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_SS_ee_Zmass_MC.tex}
-\input{data/plot_CR_SS_ee_Zmass_MC.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-Compare data and data-driven background \\
-\normalsize
-(estimation from data OS events) \\
-replace Z+jets, ttbar and Wt
-\end{center}
-\end{frame}
-
-\input{data/expN_CR_SS_ee_Zmass_data.tex}
-\input{data/plot_CR_SS_ee_Zmass_data.tex}
+%\input{data/expN_CR_SS_ee_Zmass_data.tex}
+%\input{data/plot_CR_SS_ee_Zmass_data.tex}
 
 \section{Conclusion}
 \begin{frame}{Conclusion}
 \begin{itemize}
-\item About the two optimizations, which one is better/prefered?
-\item Charge flip background
-\begin{itemize}
-\item Overestimation in MC
-\item $\pt$ shift in data-driven BG (need to check with Gabriel)
-\end{itemize}
+\item Conclusion
 \end{itemize}
 \end{frame}
 
 \section{Plan}
 \begin{frame}{Plan}
 \begin{itemize}
-\item Optimization with data-driven charge flip background
-\item Try different trigger combination
-\item Try different $\eta$ cut for baseline muons
-\item Try different $\eta$ cut for jets
+\item Plan
 \end{itemize}
 \end{frame}
 
@@ -315,80 +381,5 @@ Scale factor for reconstruction, isolation, ID and trigger is applied.
 \item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
 \end{itemize}
 \end{frame}
-
-\begin{frame}{Selection in run1 SR}
-\includegraphics[width=\textwidth]{data/photo/SRcutrun1.png} \\
-\url{https://arxiv.org/pdf/1501.07110.pdf}
-\end{frame}
-
-\begin{frame}
-\begin{center}
-\huge
-Pre-selection plot
-\end{center}
-\end{frame}
-
-\begin{frame}{Pre-selection cut}
-\normalsize
-\begin{columns}
-\begin{column}{0.5\textwidth}
-
-\begin{itemize}
-\item SR$ee$1
-\begin{itemize}
-\item nCJet $=1$
-\item nBJet $=0$
-\item $|m_{ll} - 91.2| > 10$
-\end{itemize}
-\item SR$\mu\mu$1
-\begin{itemize}
-\item nCJet $=1$
-\item nBJet $=0$
-\end{itemize}
-\item SR$e\mu$1
-\begin{itemize}
-\item nCJet $=1$
-\item nBJet $=0$
-\end{itemize}
-\end{itemize}
-
-\end{column}
-\begin{column}{0.5\textwidth}
-
-\begin{itemize}
-\item SR$ee$2
-\begin{itemize}
-\item nCJet $=2$ or $3$
-\item nBJet $=0$
-\item $|m_{ll} - 91.2| > 10$
-\end{itemize}
-\item SR$\mu\mu$2
-\begin{itemize}
-\item nCJet $=2$ or $3$
-\item nBJet $=0$
-\end{itemize}
-\item SR$e\mu$2
-\begin{itemize}
-\item nCJet $=2$ or $3$
-\item nBJet $=0$
-\end{itemize}
-\end{itemize}
-
-\end{column}
-\end{columns}
-\end{frame}
-
-\input{data/expN_SR_SS_pre.tex}
-\input{data/plot_SR_SS_pre.tex}
-
-\begin{frame}
-\begin{center}
-\huge
-N-1 plot
-\end{center}
-\end{frame}
-
-\input{data/optimization/opt_SR_SS_opt_0.tex}
-\input{data/plot_SR_SS_opt_0.tex}
 
 \end{document}

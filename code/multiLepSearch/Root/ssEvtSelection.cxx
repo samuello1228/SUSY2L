@@ -209,7 +209,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
     m_hTrigs->GetXaxis()->SetBinLabel(i+1,CF_trigNames_2015[i].c_str());
     std::cout<<CF_trigNames_2015[i].c_str()<<std::endl;
   }
-  for(unsigned int i=0; i<CF_trigNames_2015.size(); i++){
+  for(unsigned int i=0; i<CF_trigNames_2016.size(); i++){
     m_hTrigs->GetXaxis()->SetBinLabel(i+1+CF_trigNames_2015.size(),CF_trigNames_2016[i].c_str());
     std::cout<<CF_trigNames_2016[i].c_str()<<std::endl;
   }
@@ -358,18 +358,20 @@ EL::StatusCode ssEvtSelection :: initialize ()
   CHECK(mChargeFlipBkgTool->initialize());
 
   mFakeLepBkgTool = new FakeLepBkgTool("MyFLepTool");
-  //CHECK(mFakeLepBkgTool->setProperty("Method", "Matrix"));
-  //CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/RealFakeLepEff_dummy.root"));
-  //CHECK(mFakeLepBkgTool->setProperty("RealeEffHistoName", "RealeEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("RealuEffHistoName", "RealuEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("FakeeEffHistoName", "FakeeEff"));
-  //CHECK(mFakeLepBkgTool->setProperty("FakeuEffHistoName", "FakeuEff"));
+  CHECK(mFakeLepBkgTool->setProperty("Method", "Matrix"));
+  CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/RealFakeLepEff_WhSS_Aug2017.root"));
+  CHECK(mFakeLepBkgTool->setProperty("RealeEffHistoName", "RealeEff"));
+  CHECK(mFakeLepBkgTool->setProperty("RealuEffHistoName", "RealuEff"));
+  CHECK(mFakeLepBkgTool->setProperty("FakeeEffHistoName", "FakeeEff"));
+  CHECK(mFakeLepBkgTool->setProperty("FakeuEffHistoName", "FakeuEff"));
 
+  /*
   CHECK(mFakeLepBkgTool->setProperty("Method", "FakeFactor"));
   CHECK(mFakeLepBkgTool->setProperty("InputFileName"    , "$ROOTCOREBIN/data/multiLepSearch/root_files/fakefactor_2D_Data16.root"));
   CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele"));
   //CHECK(mFakeLepBkgTool->setProperty("eFakeFactorHistoName", "h_ff_ele_v2")); //this histo has problem of bin error being just the sqrt of bin content
   CHECK(mFakeLepBkgTool->setProperty("uFakeFactorHistoName", "h_ff_mu"));
+  */
 
   CHECK(mFakeLepBkgTool->initialize());
 
@@ -650,12 +652,20 @@ EL::StatusCode ssEvtSelection :: execute ()
     int nBaseEl = 0;
     int nSigEl = 0;
     // Electrons
+
+    trigElec.clear(); trigMuon.clear();
+
     for(auto el: *electrons_copy){
       //if(el->pt()<CF_ElPtCut) continue;
       if(dec_passOR(*el)){
-        if     (dec_signal  (*el)){ sig_Ls.push_back(el);nBaseEl++;nSigEl++;}
+        if     (dec_signal  (*el)){
+           sig_Ls.push_back(el);nBaseEl++;nSigEl++;
+           trigElec.push_back(el);
+        }
         else if(dec_baseline(*el)){ sel_Ls.push_back(el);nBaseEl++;}
+
       }
+      // trigElec.push_back(el);
     }
    
     int nBaseMu = 0;
@@ -664,9 +674,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     for(auto mu: *muons_copy){
       //if(mu->pt()<CF_MuPtCut) continue;
       if(dec_passOR(*mu)){
-        if     (dec_signal  (*mu)){ sig_Ls.push_back(mu);nBaseMu++;nSigMu++;}
+        if     (dec_signal  (*mu)){ 
+          sig_Ls.push_back(mu);nBaseMu++;nSigMu++;
+          trigMuon.push_back(mu);
+        }
         else if(dec_baseline(*mu)){ sel_Ls.push_back(mu);nBaseMu++;}
       }
+      // trigMuon.push_back(mu);
     }
 
     int totLs = sel_Ls.size() + sig_Ls.size();
@@ -921,10 +935,10 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
     if (study!="fakes" && (sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
       m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
-      m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
-      m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
-      m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
-      m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
+      //m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
+      //m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
+      //m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
+      //m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
 
@@ -1034,7 +1048,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     /// save leptons
     m_susyEvt->leps.resize(sel_Ls.size());
-    trigElec.clear(); trigMuon.clear(); 
+    //trigElec.clear(); trigMuon.clear(); 
     // Info("execute()", "There are %lu leptons in this event", sel_Ls.size());
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       auto& l = m_susyEvt->leps[i];
@@ -1042,8 +1056,11 @@ EL::StatusCode ssEvtSelection :: execute ()
       l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
       //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
-      auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
-      l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV;
+      l.mT = sqrt(2*sel_Ls[i]->pt()*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
+//       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
+//       l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV; --> Wrong
+//       ==> l.mT = sqrt(pow(sel_Ls[i]->p4().Et()+metV.Et(), 2)-xt.Perp2())*iGeV; -->correct, but let's switch to anohter way
+
       
       //// dR with leading jet, and the smallest dR
       l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
@@ -1094,7 +1111,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     else if (m_objTool->treatAsYear()==2016){ 
       ADD = 1 << CF_trigNames_2015.size(); 
-      for(auto trig : CF_trigNames_2015){
+      for(auto trig : CF_trigNames_2016){
         if(m_objTool->IsTrigPassed(trig)){
           m_susyEvt->sig.trigCode += ADD;
           m_hTrigs->Fill(trig.c_str(), 1);
@@ -1236,8 +1253,21 @@ EL::StatusCode ssEvtSelection :: execute ()
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
 
         double trigSF=1;
-        CHECK(TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, trigElec, trigMuon, trigSF));
+        auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run,trigElec, trigMuon, trigSF); //sEvt.run
+
         sEvt.trigSF = trigSF;
+
+        if (eventInfo->eventNumber()==4576526 || eventInfo->eventNumber()==5093803 ||
+	    eventInfo->eventNumber()==5095103 || eventInfo->eventNumber()==4660617 ||
+		eventInfo->eventNumber()==5094844 || eventInfo->eventNumber()==4660570 ||
+		eventInfo->eventNumber()==5096519){
+
+          std::cout << "################################################### DEBUGGING #####################################" << std::endl;
+          std::cout << "-- Trigger SF for event : " << eventInfo->eventNumber() << ",   trigger SF :" << trigSF << std::endl;
+          std::cout << "---- Run : " <<  sEvt.run << std::endl;
+          //std::cout << "--- Trigger Electron : " << trigElec << std::endl;
+          //std::cout << "--- Trigger Muon: " << trigMuon << std::endl;
+        }
 
         // DEBUG MESSAGES. COMMENT OUT TO READ
         // if (trigRet==CP::CorrectionCode::OutOfValidityRange){
@@ -1290,6 +1320,7 @@ EL::StatusCode ssEvtSelection :: execute ()
         cout<<"mu: "<<sEvt.MuSF<<endl;
         cout<<"bjet: "<<sEvt.BtagSF<<endl;
         cout<<"jvt: "<<sEvt.JvtSF<<endl;
+        cout<<"trigSF: "<<sEvt.trigSF<<endl;
       }
 
       /// fill events
@@ -1383,7 +1414,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   }
   // Info("fillLepton(el)", "After trigger matching");
 
-  trigElec.push_back(el);
+ // trigElec.push_back(el);
 
   l.ID *= el->charge();
   //l.author = el->author();
@@ -1518,7 +1549,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
     }
   }
   
-  trigMuon.push_back(mu);
+  //trigMuon.push_back(mu);
 
   l.ID *= mu->charge();
   //l.author = mu->author();
@@ -1767,10 +1798,7 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   Info( APP_NAME, "Starting to initialize single lepton efficiency tools for GlobalEfficiencyCorrectionTool[%s]", var.c_str() );
 
   electronEffTools.clear();
-  electronEffTools.clear();
   electronSFTools.clear();
-  electronSFTools.clear();
-  muonTools.clear();
   muonTools.clear();
 
   //Trigger efficiency tool for single lepton trigger
@@ -1781,7 +1809,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elEffTool1->setProperty("IdKey","Medium").ignore();
   elEffTool1->setProperty("IsoKey","FixedCutTight").ignore();
   elEffTool1->setProperty("CorrelationModel","TOTAL").ignore();
-  elEffTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if (CF_isMC){
+       if (CF_isMC==2) elEffTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+       else elEffTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
+
   if(elEffTool1->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-1"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-1");}
   LegsPerTool["ElTrigEff-1"+var] = "e24_lhmedium_L1EM20VH_OR_e60_lhmedium_OR_e120_lhloose,e26_lhtight_nod0_ivarloose_OR_e60_lhmedium_nod0_OR_e140_lhloose_nod0";
@@ -1794,7 +1826,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elSFTool1->setProperty("IdKey","Medium").ignore();
   elSFTool1->setProperty("IsoKey","FixedCutTight").ignore();
   elSFTool1->setProperty("CorrelationModel","TOTAL").ignore();
-  elSFTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+
+  if (CF_isMC){
+     if (CF_isMC==2) elSFTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore(); 
+     else elSFTool1->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
   if(elSFTool1->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-1"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-1");}
   LegsPerTool["ElTrigSF-1"+var] = LegsPerTool["ElTrigEff-1"+var];
@@ -1807,7 +1843,10 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elEffTool2->setProperty("IdKey","Medium").ignore();
   elEffTool2->setProperty("IsoKey","FixedCutTight").ignore();
   elEffTool2->setProperty("CorrelationModel","TOTAL").ignore();
-  elEffTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if (CF_isMC){
+     if (CF_isMC==2) elEffTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+     else elEffTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+   }
   if(elEffTool2->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-2"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-2");}
   LegsPerTool["ElTrigEff-2"+var] = "e12_lhloose_L1EM10VH,e17_lhvloose_nod0";
@@ -1820,7 +1859,10 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elSFTool2->setProperty("IdKey","Medium").ignore();
   elSFTool2->setProperty("IsoKey","FixedCutTight").ignore();
   elSFTool2->setProperty("CorrelationModel","TOTAL").ignore();
-  elSFTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if (CF_isMC){
+     if (CF_isMC==2)  elSFTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+     else elSFTool2->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
   if(elSFTool2->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-2"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-2");}
   LegsPerTool["ElTrigSF-2"+var] = LegsPerTool["ElTrigEff-2"+var];
@@ -1833,7 +1875,10 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elEffTool3->setProperty("IdKey","Medium").ignore();
   elEffTool3->setProperty("IsoKey","FixedCutTight").ignore();
   elEffTool3->setProperty("CorrelationModel","TOTAL").ignore();
-  elEffTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+  if (CF_isMC){
+      if (CF_isMC==1) elEffTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+      else elEffTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+   }
   if(elEffTool3->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-3"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-3");}
   LegsPerTool["ElTrigEff-3"+var] = "e17_lhloose,e17_lhloose_nod0";
@@ -1846,7 +1891,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elSFTool3->setProperty("IdKey","Medium").ignore();
   elSFTool3->setProperty("IsoKey","FixedCutTight").ignore();
   elSFTool3->setProperty("CorrelationModel","TOTAL").ignore();
-  elSFTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+
+  if (CF_isMC){
+     if (CF_isMC==2) elSFTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+     else elSFTool3->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
   if(elSFTool3->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-3"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-3");}
   LegsPerTool["ElTrigSF-3"+var] = LegsPerTool["ElTrigEff-3"+var];
@@ -1859,7 +1908,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elEffTool4->setProperty("IdKey","Medium").ignore();
   elEffTool4->setProperty("IsoKey","FixedCutTight").ignore();
   elEffTool4->setProperty("CorrelationModel","TOTAL").ignore();
-  elEffTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+
+  if (CF_isMC){
+      if (CF_isMC==2) elEffTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+      else elEffTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
   if(elEffTool4->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerEfficiencyTool-4"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerEfficiencyTool-4");}
   LegsPerTool["ElTrigEff-4"+var] = "e7_lhmedium,e7_lhmedium_nod0";
@@ -1872,7 +1925,11 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
   elSFTool4->setProperty("IdKey","Medium").ignore();
   elSFTool4->setProperty("IsoKey","FixedCutTight").ignore();
   elSFTool4->setProperty("CorrelationModel","TOTAL").ignore();
-  elSFTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+
+  if (CF_isMC){
+     if (CF_isMC==2) elSFTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Fast).ignore();
+     else elSFTool4->setProperty("ForceDataType", (int) PATCore::ParticleDataType::Full).ignore();
+  }
   if(elSFTool4->initialize() != StatusCode::SUCCESS){ Error(APP_NAME, "Unable to initialize ElectronTriggerSFTool-4"); return false;}
   else{ Info(APP_NAME, "Initialized ElectronTriggerSFTool-4");}
   LegsPerTool["ElTrigSF-4"+var] = LegsPerTool["ElTrigEff-4"+var];

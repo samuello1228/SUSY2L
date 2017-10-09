@@ -128,8 +128,10 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
 
   if ( m_methodEnum == kMATRIX){
 
-    int binR1, binR2;
-    int binF1, binF2;
+    int binR1x, binR2x;
+    int binR1y, binR2y;
+    int binF1x, binF2x;
+    int binF1y, binF2y;
     double realEff1, realEff2, fakeEff1, fakeEff2;
     TH2D *hRealEff, *hFakeEff;
 
@@ -138,43 +140,145 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
     else if (abs(pdgID[0])==13){ hRealEff = hRealuEff; hFakeEff = hFakeuEff;}
     else { return 0;}
 
-    binR1    = hRealEff->Fill( pt[0], fabs(eta[0]), 0. ); if (binR1==-1) return 0.0;
-    realEff1 = hRealEff->GetBinContent(binR1);
-    binF1    = hFakeEff->Fill( pt[0], fabs(eta[0]), 0. ); if (binF1==-1) return 0.0;
-    fakeEff1 = hFakeEff->GetBinContent(binF1);
+    //for real eff, for pt
+    binR1x = hRealEff->GetXaxis()->FindBin(pt[0]);
+    if(binR1x==0)
+    {
+      //ATH_MSG_ERROR("underflow: pt1: "<<pt[0]);
+      return 0.0;
+    }
+    else if(binR1x==hRealEff->GetXaxis()->GetXbins()->GetSize())
+    {
+      //cout<<"overflow: pt1: "<<pt[0]<<endl;
+    }
+
+    //for real eff, for eta
+    binR1y = hRealEff->GetYaxis()->FindBin(fabs(eta[0]));
+    if(binR1y==0)
+    {
+      ATH_MSG_ERROR("underflow: eta1: "<<eta[0]);
+      return 0.0;
+    }
+    else if(binR1y==hRealEff->GetYaxis()->GetXbins()->GetSize())
+    {
+      ATH_MSG_ERROR("overflow: eta1: "<<eta[0]);
+      return 0.0;
+    }
+
+    realEff1 = hRealEff->GetBinContent(binR1x,binR1y);
+
+    //for fake eff, for pt
+    binF1x = hFakeEff->GetXaxis()->FindBin(pt[0]);
+    if(binF1x==0)
+    {
+      //ATH_MSG_ERROR("underflow: pt1: "<<pt[0]);
+      return 0.0;
+    }
+    else if(binF1x==hFakeEff->GetXaxis()->GetXbins()->GetSize())
+    {
+      //cout<<"overflow: pt1: "<<pt[0]<<endl;
+    }
+
+    //for fake eff, for eta
+    binF1y = hFakeEff->GetYaxis()->FindBin(fabs(eta[0]));
+    if(binF1y==0)
+    {
+      ATH_MSG_ERROR("underflow: eta1: "<<eta[0]);
+      return 0.0;
+    }
+    else if(binF1y==hFakeEff->GetYaxis()->GetXbins()->GetSize())
+    {
+      ATH_MSG_ERROR("overflow: eta1: "<<eta[0]);
+      return 0.0;
+    }
+
+    fakeEff1 = hFakeEff->GetBinContent(binF1x,binF1y);
 
     //particle 2
     if      (abs(pdgID[1])==11){ hRealEff = hRealeEff; hFakeEff = hFakeeEff;}
     else if (abs(pdgID[1])==13){ hRealEff = hRealuEff; hFakeEff = hFakeuEff;}
     else { return 0;}
 
-    binR2    = hRealEff->Fill( pt[1], fabs(eta[1]), 0. ); if (binR2==-1) return 0.0;
-    realEff2 = hRealEff->GetBinContent(binR2);
-    binF2    = hFakeEff->Fill( pt[1], fabs(eta[1]), 0. ); if (binF2==-1) return 0.0;
-    fakeEff2 = hFakeEff->GetBinContent(binF2);
+    //for real eff, for pt
+    binR2x = hRealEff->GetXaxis()->FindBin(pt[1]);
+    if(binR2x==0)
+    {
+      //ATH_MSG_ERROR("underflow: pt2: "<<pt[1]);
+      return 0.0;
+    }
+    else if(binR2x==hRealEff->GetXaxis()->GetXbins()->GetSize())
+    {
+      //cout<<"overflow: pt2: "<<pt[1]<<endl;
+    }
 
-    //--------------------------------------------------------
-    //Use matrix method, via inverting the matrix numerically
-    //--------------------------------------------------------
-    //double elements[16] = 
-    //  { 
-    //    (   realEff1)*(   realEff2), (   realEff1)*(   fakeEff2), (   fakeEff1)*(   realEff2), (   fakeEff1)*(   fakeEff2) ,
-    //    (   realEff1)*(1.-realEff2), (   realEff1)*(1.-fakeEff2), (   fakeEff1)*(1.-realEff2), (   fakeEff1)*(1.-fakeEff2) ,
-    //    (1.-realEff1)*(   realEff2), (1.-realEff1)*(   fakeEff2), (1.-fakeEff1)*(   realEff2), (1.-fakeEff1)*(   fakeEff2) ,
-    //    (1.-realEff1)*(1.-realEff2), (1.-realEff1)*(1.-fakeEff2), (1.-fakeEff1)*(1.-realEff2), (1.-fakeEff1)*(1.-fakeEff2)
-    //  };
+    //for real eff, for eta
+    binR2y = hRealEff->GetYaxis()->FindBin(fabs(eta[1]));
+    if(binR2y==0)
+    {
+      ATH_MSG_ERROR("underflow: eta2: "<<eta[1]);
+      return 0.0;
+    }
+    else if(binR2y==hRealEff->GetYaxis()->GetXbins()->GetSize())
+    {
+      ATH_MSG_ERROR("overflow: eta2: "<<eta[1]);
+      return 0.0;
+    }
 
-    //ROOT::Math::SMatrix<double,4> mat(elements,16);
-    //if (!mat.Invert()){
-    //  ATH_MSG_ERROR("eff " << realEff1 << " " << realEff2 << " " << fakeEff1 << " " << fakeEff2);
-    //  ATH_MSG_ERROR("bin " << binR1 << " " << binR2 << " " << binF1 << " " << binF2);
-    //  return 0.0;
-    //}
-    //
-    //int tarCol = ((!dec_signal(*pList[0]))<<1) + ((!dec_signal(*pList[1]))<<0);
-    //double weight = mat(1, tarCol)* realEff1 * fakeEff2 + 
-    //                mat(2, tarCol)* fakeEff1 * realEff2 + 
-    //                mat(3, tarCol)* fakeEff1 * fakeEff2 ;
+    realEff2 = hRealEff->GetBinContent(binR2x,binR2y);
+
+    //for fake eff, for pt
+    binF2x = hFakeEff->GetXaxis()->FindBin(pt[1]);
+    if(binF2x==0)
+    {
+      //ATH_MSG_ERROR("underflow: pt2: "<<pt[1]);
+      return 0.0;
+    }
+    else if(binF2x==hFakeEff->GetXaxis()->GetXbins()->GetSize())
+    {
+      //cout<<"overflow: pt2: "<<pt[1]<<endl;
+    }
+
+    //for fake eff, for eta
+    binF2y = hFakeEff->GetYaxis()->FindBin(fabs(eta[1]));
+    if(binF2y==0)
+    {
+      ATH_MSG_ERROR("underflow: eta2: "<<eta[1]);
+      return 0.0;
+    }
+    else if(binF2y==hFakeEff->GetYaxis()->GetXbins()->GetSize())
+    {
+      ATH_MSG_ERROR("overflow: eta2: "<<eta[1]);
+      return 0.0;
+    }
+
+    fakeEff2 = hFakeEff->GetBinContent(binF2x,binF2y);
+
+    /*
+    {
+      //--------------------------------------------------------
+      //Use matrix method, via inverting the matrix numerically
+      //--------------------------------------------------------
+      double elements[16] = 
+        { 
+          (   realEff1)*(   realEff2), (   realEff1)*(   fakeEff2), (   fakeEff1)*(   realEff2), (   fakeEff1)*(   fakeEff2) ,
+          (   realEff1)*(1.-realEff2), (   realEff1)*(1.-fakeEff2), (   fakeEff1)*(1.-realEff2), (   fakeEff1)*(1.-fakeEff2) ,
+          (1.-realEff1)*(   realEff2), (1.-realEff1)*(   fakeEff2), (1.-fakeEff1)*(   realEff2), (1.-fakeEff1)*(   fakeEff2) ,
+          (1.-realEff1)*(1.-realEff2), (1.-realEff1)*(1.-fakeEff2), (1.-fakeEff1)*(1.-realEff2), (1.-fakeEff1)*(1.-fakeEff2)
+        };
+
+      ROOT::Math::SMatrix<double,4> mat(elements,16);
+      if (!mat.Invert()){
+        ATH_MSG_ERROR("eff " << realEff1 << " " << realEff2 << " " << fakeEff1 << " " << fakeEff2);
+        return 0.0;
+      }
+      
+      int tarCol = ((!isSig[0])<<1) + ((!isSig[1])<<0);
+      double weight_num = mat(1, tarCol)* realEff1 * fakeEff2 + 
+                          mat(2, tarCol)* fakeEff1 * realEff2 + 
+                          mat(3, tarCol)* fakeEff1 * fakeEff2 ;
+      cout<<"Fake weight numerically: "<<weight_num<<endl;  
+    }
+    */
     
     //--------------------------------------------------------
     //Use matrix method, via inverting the matrix analyticaly
@@ -214,6 +318,8 @@ double FakeLepBkgTool::GetWeight(vector<double> &eta, vector<double> &pt, vector
     weight = Nrf * realEff1 * fakeEff2 + 
              Nfr * fakeEff1 * realEff2 + 
              Nff * fakeEff1 * fakeEff2 ;
+
+    //cout<<"Fake weight: "<<weight<<endl;
   }
 
   else if ( m_methodEnum == kFAKE_FACTOR){

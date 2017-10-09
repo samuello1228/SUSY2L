@@ -7,7 +7,7 @@
 #include <TFile.h>
 #include <TChain.h>
 #include <TBranch.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2D.h>
 #include <TMath.h>
 #include <THStack.h>
@@ -44,6 +44,12 @@ const bool doOptimize = 0;
 const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
+
+TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R1";
+
+const bool FJetVeto = 0; //For jet eta cut 2.4
+const bool ptcut = 0; //For loose (muon |eta|<2.7)
+const bool isCombined3Regions = false;
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -134,7 +140,7 @@ void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfCha
         fileName += ".root";
         
         TFile* file = new TFile(fileName.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
+        TH1D *h1 = (TH1D*) file->Get("hist");
         double nAOD = h1->GetBinContent(2);
         delete file;
         
@@ -158,7 +164,7 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
         fileName += ".root";
         
         TFile* file = new TFile(fileName.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
+        TH1D *h1 = (TH1D*) file->Get("hist");
         int nAOD = h1->GetBinContent(1);
         delete file;
         
@@ -202,7 +208,7 @@ struct VarData
     double ymax;
 };
 
-unsigned int findVarIndex(TString& VarName, std::vector<VarData>& Var)
+unsigned int findVarIndex(TString const& VarName, std::vector<VarData>& Var)
 {
     for(unsigned int i=0;i<Var.size();i++)
     {
@@ -230,13 +236,53 @@ struct GroupData
 struct Group
 {
     GroupData* info;
-    TH1F* h2;
-    TH2F* h3;
+    TH1D* h2;
+    TH2D* h3;
 };
 
 bool compare2(Group Group1,Group Group2)
 {
     return Group1.h2->GetSumOfWeights() < Group2.h2->GetSumOfWeights();
+}
+
+bool NextBin(int& bin1, int& bin2, int const nBin, bool const OnlyHasLowerCut, bool const OnlyHasUpperCut)
+{
+    if(bin2 == nBin || OnlyHasLowerCut)
+    {
+        if(OnlyHasUpperCut) return false;
+        
+        if(bin1 == nBin)
+        {
+            bin1 = nBin+1;
+        }
+        else if(bin1 == nBin+1) //For OnlyHasLowerCut
+        {
+            return false;
+        }
+        else
+        {
+            bin1++;
+        }
+        
+        bin2 = nBin+1;
+    }
+    else if(bin2 == nBin+1)
+    {
+        if(bin1 == nBin+1)
+        {
+            return false;
+        }
+        else
+        {
+            bin2 = bin1;
+        }
+    }
+    else
+    {
+        bin2++;
+    }
+    
+    return true;
 }
 
 // definition of shared parameter
@@ -374,12 +420,16 @@ void analysis1()
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
-    std::vector<TString> BGMCSampleID;
-    std::vector<double> BGMCXS; //cross section in pb
-    BGMCSampleID.reserve(20);
-    BGMCXS.reserve(20);
-    
+    struct MCBGInfo
     {
+        TString SampleID;
+        double XS; //cross section in pb
+    };
+    
+    std::vector<MCBGInfo> BGMCSampleInfo;
+    {
+        MCBGInfo element;
+        
         //read BGSample.txt
         ifstream fin;
         fin.open("BGSample.txt");
@@ -395,7 +445,7 @@ void analysis1()
             fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            BGMCSampleID.push_back(SampleIDTemp);
+            element.SampleID = SampleIDTemp;
             
             double BGMCXSTemp;
             double BGMCXSTemp2;
@@ -404,13 +454,14 @@ void analysis1()
             BGMCXSTemp2 *= BGMCXSTemp;
             fin>>BGMCXSTemp;
             BGMCXSTemp2 *= BGMCXSTemp;
-            BGMCXS.push_back(BGMCXSTemp2);
+            element.XS = BGMCXSTemp2;
             
             fin>>BGMCXSTemp;
+            BGMCSampleInfo.push_back(element);
         }
         fin.close();
     }
-    cout<<"Total number of BG files: "<<BGMCSampleID.size()<<endl;
+    cout<<"Total number of BG files: "<<BGMCSampleInfo.size()<<endl;
     
     //For Signal MC
     struct PlotSigInfo
@@ -445,27 +496,21 @@ void analysis1()
     struct SigInfo
     {
         TString SampleID;
-        double XS;
+        double XS; //cross section in pb
+        double nwAOD;
         double Mass1;
         double Mass2;
         int unweighted;
         double weighted;
         double error;
         double significance;
+        double significance2; //for combined significance
     };
     
     std::vector<SigInfo> SigSampleInfo;
-    
-    std::vector<TString> SigSampleID;
-    std::vector<double> SigXS; //cross section in pb
-    std::vector<double> SigMass1;
-    std::vector<double> SigMass2;
-    SigSampleID.reserve(20);
-    SigXS.reserve(20);
-    SigMass1.reserve(20);
-    SigMass2.reserve(20);
-    
     {
+        SigInfo element;
+        
         //read SigSample.txt
         ifstream fin;
         fin.open("SigSample.txt");
@@ -482,13 +527,14 @@ void analysis1()
             fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            SigSampleID.push_back(SampleIDTemp);
+            
+            element.SampleID = SampleIDTemp;
             
             double SigMass;
             fin>>SigMass;
-            SigMass1.push_back(SigMass);
+            element.Mass1 = SigMass;
             fin>>SigMass;
-            SigMass2.push_back(SigMass);
+            element.Mass2 = SigMass;
             
             double SigXSTemp2;
             fin>>SigXSTemp2;
@@ -528,7 +574,8 @@ void analysis1()
             */
             
             //cout<<SigXSTemp2<<endl;
-            SigXS.push_back(SigXSTemp2);
+            element.XS = SigXSTemp2;
+            SigSampleInfo.push_back(element);
         }
         fin.close();
     }
@@ -537,14 +584,14 @@ void analysis1()
     {
         cout<<"Mass splitting: "<<SigMassSplitting[i].MassDiff<<endl;
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
-        cout<<"Name: "<<SigSampleID[SigMassSplitting[i].ID].Data()<<endl;
-        cout<<"MassDiff: "<<SigMass1[SigMassSplitting[i].ID]-SigMass2[SigMassSplitting[i].ID]<<endl;
-        cout<<"XS: "<<SigXS[SigMassSplitting[i].ID]<<endl<<endl;
+        cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleID.Data()<<endl;
+        cout<<"MassDiff: "<<SigSampleInfo[SigMassSplitting[i].ID].Mass1 - SigSampleInfo[SigMassSplitting[i].ID].Mass2<<endl;
+        cout<<"XS: "<<SigSampleInfo[SigMassSplitting[i].ID].XS<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
-        for(unsigned int j=0;j<SigSampleID.size();j++)
+        for(unsigned int j=0;j<SigSampleInfo.size();j++)
         {
-            if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleID[j].Data()<<endl;
+            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleID.Data()<<endl;
         }
         cout<<endl;
     }
@@ -552,31 +599,31 @@ void analysis1()
     for(unsigned int i=0;i<SigMassSplitting.size();i++)
     {
         TString GroupName = "(";
-        GroupName += TString::Format("%.1f",SigMass1[SigMassSplitting[i].ID]);
+        GroupName += TString::Format("%.1f",SigSampleInfo[SigMassSplitting[i].ID].Mass1);
         GroupName += ",";
-        GroupName += TString::Format("%.1f",SigMass2[SigMassSplitting[i].ID]);
+        GroupName += TString::Format("%.1f",SigSampleInfo[SigMassSplitting[i].ID].Mass2);
         GroupName += ")";
         SigMassSplitting[i].IDName = GroupName;
     }
     
     //Get number of events in AOD
-    std::vector<double> SignAOD;
-    for(unsigned int i=0;i<SigSampleID.size();i++)
+    for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
-        NameTemp += SigSampleID[i];
+        NameTemp += SigSampleInfo[i].SampleID;
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += ChannelInfo[0].ChannelName;
         NameTemp += ".root";
         
         TFile* file = new TFile(NameTemp.Data(),"READ");
-        TH1F *h1 = (TH1F*) file->Get("hist");
-        double nAOD = h1->GetBinContent(2);
-        cout<<nAOD<<endl;
-        SignAOD.push_back(nAOD);
+        TH1D *h1 = (TH1D*) file->Get("hist");
+        SigSampleInfo[i].nwAOD = h1->GetBinContent(2);
+        cout<<SigSampleInfo[i].nwAOD<<endl;
         
         delete file;
+        
+        SigSampleInfo[i].significance2 = 0;
     }
     
     //Group for MC background
@@ -873,19 +920,16 @@ void analysis1()
         TString RelatedVariable;
     };
     
-    struct Interval
+    struct OptimizingCutData
     {
         double lower;
         double upper;
-    };
-    
-    struct OptimizingCutData
-    {
-        Interval Cut;
         double min;
         double max;
         int nBin;
         TString RelatedVariable;
+        bool OnlyHasLowerCut;
+        bool OnlyHasUpperCut;
     };
     
     struct RegionGroupData
@@ -900,10 +944,11 @@ void analysis1()
     struct RegionData
     {
         TString RegionName;
+        TString RegionShortName;
         std::vector<unsigned int> setOfChannel;
         TString Cut;
         vector<AdditionalCutData> AdditionalCut;
-        vector< vector<OptimizingCutData> > OptimizingCut;
+        vector< vector< vector<OptimizingCutData> > > OptimizingCut;
     };
     
     if(dorw)
@@ -957,7 +1002,7 @@ void analysis1()
         }
 
         //calculate ratio plot
-        TH1F* h2Ratio_rw[RegionInfo.size()];
+        TH1D* h2Ratio_rw[RegionInfo.size()];
         for(unsigned int RegionIndex=0;RegionIndex<RegionInfo.size();RegionIndex++)
         {
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
@@ -981,8 +1026,8 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
-                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
@@ -1012,12 +1057,12 @@ void analysis1()
             xaxis += Var[VarIndex].unit;
             
             //h2DataSum
-            TH1F* h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2DataSum = new TH1D("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             
             //h2Data
             for(unsigned int j=0;j<DataSampleID.size();j++)
             {
-                TH1F* hTemp = new TH1F("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                TH1D* hTemp = new TH1D("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 
                 //fill histograms from trees
                 TString temp;
@@ -1033,10 +1078,10 @@ void analysis1()
             //For MC background
             for(unsigned int j=0;j<tree2BGMC.size();j++)
             {
-                BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                 {
-                    TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                    TH1D* hTemp = new TH1D("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                     
                     //fill histograms from trees
                     TString temp;
@@ -1057,7 +1102,7 @@ void analysis1()
             {
                 TString NameTemp = "Ratio_";
                 NameTemp += RegionInfo[RegionIndex].RegionName;
-                h2Ratio_rw[RegionIndex] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                h2Ratio_rw[RegionIndex] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 h2Ratio_rw[RegionIndex]->GetXaxis()->SetTitle(xaxis.Data());
                 h2Ratio_rw[RegionIndex]->GetYaxis()->SetTitle("(Data - NonZjets)/Zjets");
                 h2Ratio_rw[RegionIndex]->SetMarkerColor(RegionIndex+1);
@@ -1068,8 +1113,8 @@ void analysis1()
             h2Ratio_rw[RegionIndex]->Add(h2DataSum);
             
             //Z+jets
-            TH1F* h2Zjets = new TH1F("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
-            TH1F* h2nonZjets = new TH1F("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2Zjets = new TH1D("Zjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+            TH1D* h2nonZjets = new TH1D("nonZjets",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
 
             //Non Z+jets
             for(unsigned int j=0;j<tree2BGMC.size();j++)
@@ -1242,7 +1287,7 @@ void analysis1()
                         for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                         {
                             TChain* tree1 = nullptr;
-                            initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
+                            initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                             
                             TString NameTemp = "tree_rw_";
                             NameTemp += TString::Itoa(k,10);
@@ -1329,7 +1374,7 @@ void analysis1()
                     for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
                     {
                         TChain* tree1 = nullptr;
-                        initializeTree1new(tree1,BGMCSampleID[k],ChannelInfo[ChannelIndex].ChannelName);
+                        initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                         
                         TString NameTemp = "tree_cfw_";
                         NameTemp += TString::Itoa(k,10);
@@ -1378,8 +1423,9 @@ void analysis1()
         RegionGroupData GroupElement;
         RegionData element;
         AdditionalCutData AdditionalCutElement;
-        vector<OptimizingCutData> OptimizingCutElement1;
-        OptimizingCutData OptimizingCutElement2;
+        vector< vector<OptimizingCutData> > OptimizingCutElement1;
+        vector<OptimizingCutData> OptimizingCutElement2;
+        OptimizingCutData OptimizingCutElement3;
         
         //CR_OS
         GroupElement.GroupName = "CR_OS";
@@ -1599,7 +1645,7 @@ void analysis1()
         
         //ee_1
         {
-            element.RegionName = "SR_SS_ee_1";
+            element.RegionName = "SR_SS_ee_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -1639,7 +1685,7 @@ void analysis1()
         
         //mumu_1
         {
-            element.RegionName = "SR_SS_mumu_1";
+            element.RegionName = "SR_SS_mumu_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -1679,7 +1725,7 @@ void analysis1()
         
         //emu_1
         {
-            element.RegionName = "SR_SS_emu_1";
+            element.RegionName = "SR_SS_emu_1_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -1719,7 +1765,7 @@ void analysis1()
         
         //ee_2
         {
-            element.RegionName = "SR_SS_ee_2";
+            element.RegionName = "SR_SS_ee_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -1759,7 +1805,7 @@ void analysis1()
         
         //mumu_2
         {
-            element.RegionName = "SR_SS_mumu_2";
+            element.RegionName = "SR_SS_mumu_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -1795,7 +1841,7 @@ void analysis1()
         
         //emu_2
         {
-            element.RegionName = "SR_SS_emu_2";
+            element.RegionName = "SR_SS_emu_2_run1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -1845,79 +1891,119 @@ void analysis1()
         
         
         {
+            element.OptimizingCut.clear();
             OptimizingCutElement1.clear();
             
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 20;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 46;
-            OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt1";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 25;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 20;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 46;
-            OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "pt2";
+            OptimizingCutElement3.min = 25;
+            OptimizingCutElement3.max = 250;
+            OptimizingCutElement3.nBin = 45;
+            OptimizingCutElement3.lower = 25;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "dEta";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 5;
+            OptimizingCutElement3.nBin = 10;
+            OptimizingCutElement3.lower = 0;
+            //OptimizingCutElement3.upper = -1;
+            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 200;
+            OptimizingCutElement3.nBin = 40;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "meff";
+            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.max = 600;
+            OptimizingCutElement3.nBin = 50;
+            //OptimizingCutElement3.lower = 100;
+            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mlj";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "mTtwo";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 150;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
+            OptimizingCutElement2.clear();
+            OptimizingCutElement3.RelatedVariable = "ptll";
+            OptimizingCutElement3.min = 0;
+            OptimizingCutElement3.max = 300;
+            OptimizingCutElement3.nBin = 30;
+            OptimizingCutElement3.lower = 0;
+            OptimizingCutElement3.upper = -1;
+            OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
+            
+            for(unsigned int i=0;i<OptimizingCutElement1.size();i++)
+            {
+                for(unsigned int j=0;j<OptimizingCutElement1[i].size();j++)
+                {
+                    OptimizingCutElement1[i][j].OnlyHasLowerCut =
+                    (OptimizingCutElement1[i][j].RelatedVariable == "pt1" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "pt2" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "ptll" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mTtwo" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "METRel" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "meff" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mtm" );
+                    
+                    OptimizingCutElement1[i][j].OnlyHasUpperCut =
+                    (OptimizingCutElement1[i][j].RelatedVariable == "dEta" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mlj" );
+                }
+            }
             
             for(unsigned int i=0;i<SigMassSplitting.size();i++)
             {
@@ -1925,595 +2011,196 @@ void analysis1()
             }
         }
         
+        /*
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_opt";
+            element.RegionShortName = "SRee1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 55;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 200;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 90;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
         
         //mumu_1
         {
             element.RegionName = "SR_SS_mumu_1_opt";
+            element.RegionShortName = "SRmumu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 1.5;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 200;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 110;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 90;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
         
         //emu_1
         {
             element.RegionName = "SR_SS_emu_1_opt";
+            element.RegionShortName = "SRemu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && nCJet == 1";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 1.5;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 200;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 110;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 90;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
         
         //ee_2
         {
             element.RegionName = "SR_SS_ee_2_opt";
+            element.RegionShortName = "SRee2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(9);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             element.Cut += " && fabs(mll - 91.2) > 10";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 20;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 110;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 120;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
         
         //mumu_2
         {
             element.RegionName = "SR_SS_mumu_2_opt";
+            element.RegionShortName = "SRmumu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(10);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 1.5;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 200;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 120;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
         
         //emu_2
         {
             element.RegionName = "SR_SS_emu_2_opt";
+            element.RegionShortName = "SRemu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
+            element.Cut = "";
+            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
-            
-            /*
-            element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
-            
-            OptimizingCutElement2.RelatedVariable = "pt1";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "pt2";
-            OptimizingCutElement2.min = 25;
-            OptimizingCutElement2.max = 250;
-            OptimizingCutElement2.nBin = 45;
-            OptimizingCutElement2.Cut.lower = 30;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "ptll";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mTtwo";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 150;
-            OptimizingCutElement2.nBin = 30;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "dEta";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 5;
-            OptimizingCutElement2.nBin = 10;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 1.5;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "METRel";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 200;
-            OptimizingCutElement2.nBin = 40;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "meff";
-            OptimizingCutElement2.min = 100;
-            OptimizingCutElement2.max = 600;
-            OptimizingCutElement2.nBin = 50;
-            OptimizingCutElement2.Cut.lower = 200;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mtm";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 110;
-            OptimizingCutElement2.Cut.upper = -1;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            OptimizingCutElement2.RelatedVariable = "mlj";
-            OptimizingCutElement2.min = 0;
-            OptimizingCutElement2.max = 300;
-            OptimizingCutElement2.nBin = 60;
-            OptimizingCutElement2.Cut.lower = 0;
-            OptimizingCutElement2.Cut.upper = 120;
-            OptimizingCutElement1.push_back(OptimizingCutElement2);
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
-            */
-            
             RegionInfo.push_back(element);
         }
+        */
+        
+        /*
+        //jet1
+        {
+            element.RegionName = "SR_SS_jet1_opt";
+            element.RegionShortName = "SRjet1";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        
+        //jet23
+        {
+            element.RegionName = "SR_SS_jet23_opt";
+            element.RegionShortName = "SRjet23";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        */
+        
+        ///*
+        //jet123
+        {
+            element.RegionName = "SR_SS_jet123_opt";
+            element.RegionShortName = "SRjet123";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.Cut = "";
+            element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
+            if(FJetVeto) element.Cut += " && nFJet == 0";
+            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            
+            element.AdditionalCut.clear();
+            RegionInfo.push_back(element);
+        }
+        //*/
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
@@ -2525,11 +2212,11 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         
-        if(useDani) element.Cut = " && nBJet == 0";
-        
+        /*
         //ee_1
         {
             element.RegionName = "SR_SS_ee_1_pre";
+            element.RegionShortName = "SRee1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2537,14 +2224,16 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
                 element.Cut += " && fabs(mll - 91.2) > 10";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2552,6 +2241,7 @@ void analysis1()
         //mumu_1
         {
             element.RegionName = "SR_SS_mumu_1_pre";
+            element.RegionShortName = "SRmumu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2559,13 +2249,15 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2573,6 +2265,7 @@ void analysis1()
         //emu_1
         {
             element.RegionName = "SR_SS_emu_1_pre";
+            element.RegionShortName = "SRemu1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2580,13 +2273,15 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && nCJet == 1";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2594,6 +2289,7 @@ void analysis1()
         //ee_2
         {
             element.RegionName = "SR_SS_ee_2_pre";
+            element.RegionShortName = "SRee2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
@@ -2601,14 +2297,16 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
                 element.Cut += " && fabs(mll - 91.2) > 10";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2616,6 +2314,7 @@ void analysis1()
         //mumu_2
         {
             element.RegionName = "SR_SS_mumu_2_pre";
+            element.RegionShortName = "SRmumu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
@@ -2623,13 +2322,15 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
@@ -2637,6 +2338,7 @@ void analysis1()
         //emu_2
         {
             element.RegionName = "SR_SS_emu_2_pre";
+            element.RegionShortName = "SRemu2";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
@@ -2644,760 +2346,107 @@ void analysis1()
             
             if(!useDani)
             {
-                element.Cut = " && (nCJet == 2 || nCJet == 3)";
+                element.Cut = "";
+                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
-            OptimizingCutElement1.clear();
             
             RegionInfo.push_back(element);
         }
+        */
         
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //Control region for run 1
-        GroupElement.GroupName = "CR_OS_run1";
-        GroupElement.lower = RegionInfo.size();
-        GroupElement.showData = true;
-        GroupElement.showSignificance = false;
-        
-        //ee_1
+        /*
+        //jet1
         {
-            element.RegionName = "CR_OS_ee_1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(0);
-            element.setOfChannel.push_back(6);
-            
-            element.Cut = " && nCJet == 1";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-            AdditionalCutElement.RelatedVariable = "mll";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 55";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_1
-        {
-            element.RegionName = "CR_OS_mumu_1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(1);
-            element.setOfChannel.push_back(7);
-            
-            element.Cut = " && nCJet == 1";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_1
-        {
-            element.RegionName = "CR_OS_emu_1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(2);
-            element.setOfChannel.push_back(8);
-            
-            element.Cut = " && nCJet == 1";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //ee_2
-        {
-            element.RegionName = "CR_OS_ee_2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(0);
-            element.setOfChannel.push_back(6);
-            
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-            AdditionalCutElement.RelatedVariable = "mll";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 30";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_2
-        {
-            element.RegionName = "CR_OS_mumu_2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(1);
-            element.setOfChannel.push_back(7);
-            
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_2
-        {
-            element.RegionName = "CR_OS_emu_2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(2);
-            element.setOfChannel.push_back(8);
-            
-            element.Cut = " && (nCJet == 2 || nCJet == 3)";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //Control region for run 1, no central jet
-        GroupElement.GroupName = "CR_SS_run1_0CJet";
-        GroupElement.lower = RegionInfo.size();
-        GroupElement.showData = true;
-        GroupElement.showSignificance = false;
-        
-        //ee_1
-        {
-            element.RegionName = "CR_SS_ee_1_0CJet";
+            element.RegionName = "SR_SS_jet1_pre";
+            element.RegionShortName = "SRjet1";
             
             element.setOfChannel.clear();
             element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-            AdditionalCutElement.RelatedVariable = "mll";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 55";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_1
-        {
-            element.RegionName = "CR_SS_mumu_1_0CJet";
-            
-            element.setOfChannel.clear();
             element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_1
-        {
-            element.RegionName = "CR_SS_emu_1_0CJet";
-            
-            element.setOfChannel.clear();
             element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
             element.setOfChannel.push_back(11);
             
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 90";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //ee_2
-        {
-            element.RegionName = "CR_SS_ee_2_0CJet";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 20";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-            AdditionalCutElement.RelatedVariable = "mll";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 30";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_2
-        {
-            element.RegionName = "CR_SS_mumu_2_0CJet";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_2
-        {
-            element.RegionName = "CR_SS_emu_2_0CJet";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            element.Cut = " && nCJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 30";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff > 200";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 110";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mlj < 120";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //CR_SS_mumu
-        GroupElement.GroupName = "CR_SS_mumu";
-        GroupElement.lower = RegionInfo.size();
-        
-        GroupElement.showData = false;
-        GroupElement.showSignificance = false;
-        element.AdditionalCut.clear();
-        
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(4);
-        element.setOfChannel.push_back(10);
-        
-        element.RegionName = "CR_SS_mumu_0CJet";
-        element.Cut = " && nCJet == 0";
-        RegionInfo.push_back(element);
-        
-        element.RegionName = "CR_SS_mumu_1CJet";
-        element.Cut = " && nCJet == 1";
-        RegionInfo.push_back(element);
-        
-        element.RegionName = "CR_SS_mumu_23CJet";
-        element.Cut = " && (nCJet == 2 || nCJet == 3)";
-        RegionInfo.push_back(element);
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //CR_OS_mumu
-        GroupElement.GroupName = "CR_OS_mumu";
-        GroupElement.lower = RegionInfo.size();
-        
-        GroupElement.showData = false;
-        GroupElement.showSignificance = false;
-        element.AdditionalCut.clear();
-        
-        element.setOfChannel.clear();
-        element.setOfChannel.push_back(1);
-        element.setOfChannel.push_back(7);
-        
-        element.RegionName = "CR_OS_mumu_0CJet";
-        element.Cut = " && nCJet == 0";
-        RegionInfo.push_back(element);
-        
-        element.RegionName = "CR_OS_mumu_1CJet";
-        element.Cut = " && nCJet == 1";
-        RegionInfo.push_back(element);
-        
-        element.RegionName = "CR_OS_mumu_23CJet";
-        element.Cut = " && (nCJet == 2 || nCJet == 3)";
-        RegionInfo.push_back(element);
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //Signal region for Dani
-        GroupElement.GroupName = "SR_SS_Dani";
-        GroupElement.lower = RegionInfo.size();
-        GroupElement.showData = false;
-        GroupElement.showSignificance = true;
-        
-        //ee_1
-        {
-            element.RegionName = "SR_SS_ee_Dani";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            element.Cut = " && nCJet <= 3";
-            element.Cut = " && nBJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 20";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 25";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(mll - 91.2) > 10";
-            AdditionalCutElement.RelatedVariable = "mll";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 110";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && meff < 400";
-            AdditionalCutElement.RelatedVariable = "meff";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 125";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 90) || (nCJet >= 2 && mlj < 120) )";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_1
-        {
-            element.RegionName = "SR_SS_mumu_Dani";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            element.Cut = " && nCJet <= 3";
-            element.Cut = " && nBJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 20";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 80";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm < 250";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 80) || (nCJet >= 2 && mlj < 120) )";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_1
-        {
-            element.RegionName = "SR_SS_emu_Dani";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            element.Cut = " && nCJet <= 3";
-            element.Cut = " && nBJet == 0";
-            
-            element.AdditionalCut.clear();
-            
-            AdditionalCutElement.Cut = " && pt1 > 20";
-            AdditionalCutElement.RelatedVariable = "pt1";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && pt2 > 30";
-            AdditionalCutElement.RelatedVariable = "pt2";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && fabs(eta1 - eta2) < 1.5";
-            AdditionalCutElement.RelatedVariable = "dEta";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && METRel > 110";
-            AdditionalCutElement.RelatedVariable = "METRel";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && mtm > 130";
-            AdditionalCutElement.RelatedVariable = "mtm";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            AdditionalCutElement.Cut = " && (nCJet == 0 || (nCJet == 1 && mlj < 80) || (nCJet >= 2 && mlj < 125) )";
-            AdditionalCutElement.RelatedVariable = "mlj";
-            element.AdditionalCut.push_back(AdditionalCutElement);
-            
-            RegionInfo.push_back(element);
-        }
-        
-        GroupElement.upper = RegionInfo.size() -1;
-        RegionGroup.push_back(GroupElement);
-        
-        //Signal region
-        GroupElement.GroupName = "SR";
-        GroupElement.lower = RegionInfo.size();
-        
-        GroupElement.showData = false;
-        GroupElement.showSignificance = true;
-        
-        TString ISR[2] = {"nonISR","ISR"};
-        TString MT[2] = {"mT_0_100","mT_100_inf"};
-        TString PTLL[2] = {"ptll_0_50","ptll_50_inf"};
-        TString MET[3] = {"MET_0_100","MET_100_150","MET_150_inf"};
-        TString lepton[3] = {"ee","mumu","emu"};
-        
-        TString MTCut[2] = {"mtm<100","mtm>=100"};
-        TString PTLLCut[2] = {"ptll<50","ptll>=50"};
-        TString METCut[3] = {"MET<100","MET>=100 && MET<150","MET>=150"};
-        
-        for(int i=0;i<2;i++)
-        {
-            for(int j=0;j<2;j++)
+            if(!useDani)
             {
-                for(int k=0;k<2;k++)
-                {
-                    if(j==1 && k==1) continue;
-                    for(int l=0;l<3;l++)
-                    {
-                        for(int m=0;m<3;m++)
-                        {
-                            element.RegionName = "";
-                            element.Cut = "";
-                            element.Cut = " && (mll<76.18 || mll>106.18)";
-                            
-                            element.RegionName += ISR[i];
-                            
-                            element.RegionName += "_";
-                            element.RegionName += MT[j];
-                            element.Cut += " && ";
-                            element.Cut += MTCut[j];
-                            
-                            if(j==0)
-                            {
-                                element.RegionName += "_";
-                                element.RegionName += PTLL[k];
-                                element.Cut += " && ";
-                                element.Cut += PTLLCut[k];
-                            }
-                            else
-                            {
-                                element.RegionName += "_ptll_no_cut";
-                            }
-                            
-                            element.RegionName += "_";
-                            element.RegionName += MET[l];
-                            element.Cut += " && ";
-                            element.Cut += METCut[l];
-                            
-                            element.RegionName += "_";
-                            element.RegionName += lepton[m];
-                            
-                            const unsigned int ChannelIndex = 3 +6*i +m;
-                            element.setOfChannel.clear();
-                            element.setOfChannel.push_back(ChannelIndex);
-                            
-                            element.AdditionalCut.clear();
-                            
-                            RegionInfo.push_back(element);
-                        }
-                    }
-                }
+                element.Cut = "";
+                element.Cut += " && nCJet == 1";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
         }
+        
+        //jet23
+        {
+            element.RegionName = "SR_SS_jet23_pre";
+            element.RegionShortName = "SRjet23";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            if(!useDani)
+            {
+                element.Cut = "";
+                element.Cut += " && (nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        */
+        
+        ///*
+        //jet123
+        {
+            element.RegionName = "SR_SS_jet123_pre";
+            element.RegionShortName = "SRjet123";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            if(!useDani)
+            {
+                element.Cut = "";
+                element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
+                element.Cut += " && nBJet == 0";
+                if(FJetVeto) element.Cut += " && nFJet == 0";
+                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
+            }
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        //*/
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
@@ -3420,12 +2469,30 @@ void analysis1()
         for(unsigned int i = BGMCGroupData[VVGroupIndex].lower;i <= BGMCGroupData[VVGroupIndex].upper;i++)
         {
             SampleData element;
-            element.SampleName = BGMCSampleID[i].Data();
+            element.SampleName = BGMCSampleInfo[i].SampleID.Data();
             element.SampleName.Remove(0,18);
             element.index = i;
             BGVVData.push_back(element);
         }
     }
+    
+    std::vector<unsigned int> OptimizingSignal;
+    ///*
+    for(unsigned int i=0;i<10;i++)
+    {
+        OptimizingSignal.push_back(i);
+    }
+    //*/
+    /*
+    for(unsigned int i=0;i<SigSampleInfo.size();i++)
+    {
+        if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
+        {
+            cout<<SigSampleInfo[i].SampleID.Data()<<endl;
+            OptimizingSignal.push_back(i);
+        }
+    }
+    */
     
     //plot graph
     unsigned int countVariable = 0;
@@ -3440,11 +2507,9 @@ void analysis1()
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
-        TString PathName_SR = "latex/data/expN/SR.txt";
-        fstream fout_SR;
         std::vector<Group> SRBGGroup;
-        std::vector<TH1F*> h2SRSig;
-        std::vector<TH1F*> h2SRSignificance;
+        std::vector<TH1D*> h2SRSig;
+        std::vector<TH1D*> h2SRSignificance;
         if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
             //channelRepresentative for SR
@@ -3464,7 +2529,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGMCGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1D(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
@@ -3481,7 +2546,7 @@ void analysis1()
                     {
                         Group BGGroupElement;
                         BGGroupElement.info = &(BGDataGroupData[k]);
-                        BGGroupElement.h2 = new TH1F(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
+                        BGGroupElement.h2 = new TH1D(("SR_"+BGMCGroupData[k].GroupName).Data(),"",6,0,6);
                         BGGroupElement.h2->SetLineColor(BGMCGroupData[k].colour);
                         BGGroupElement.h2->SetFillColor(BGMCGroupData[k].colour);
                         SRBGGroup.push_back(BGGroupElement);
@@ -3489,35 +2554,25 @@ void analysis1()
                 }
             }
             
-            //expN for SR
-            fout_SR.open(PathName_SR.Data(), ios::out);
-            fout_SR<<std::setw(46)<<"The Name of Signal Region";
-            for(unsigned int i=0;i<SRBGGroup.size();i++)
-            {
-                fout_SR<<std::setw(15)<<SRBGGroup[i].info->GroupName.Data();
-            }
-            fout_SR<<std::setw(15)<<"Total BG";
-            
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                fout_SR<<std::setw(22)<<SigMassSplitting[i].IDName.Data();
-            }
-            fout_SR<<endl;
-            fout_SR.close();
-            
             //h2SRSig
             for(unsigned int j=0;j<SigMassSplitting.size();j++)
             {
-                TH1F* hTemp = new TH1F(SigMassSplitting[j].IDName.Data(),"",6,0,6);
+                TH1D* hTemp = new TH1D(SigMassSplitting[j].IDName.Data(),"",6,0,6);
                 hTemp->SetLineColor(SigMassSplitting[j].colour);
                 hTemp->SetLineStyle(1);
                 h2SRSig.push_back(hTemp);
                 
-                hTemp = new TH1F((SigMassSplitting[j].IDName+"_significance").Data(),"",6,0,6);
+                hTemp = new TH1D((SigMassSplitting[j].IDName+"_significance").Data(),"",6,0,6);
                 hTemp->SetLineColor(SigMassSplitting[j].colour);
                 hTemp->SetLineStyle(1);
                 h2SRSignificance.push_back(hTemp);
             }
+        }
+        
+        //For combined significance
+        for(unsigned int i=0;i<SigSampleInfo.size();i++)
+        {
+            SigSampleInfo[i].significance2 = 0;
         }
         
         //for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower+0;RegionIndex<=RegionGroup[RegionGroupIndex].lower+0;RegionIndex++)
@@ -3545,8 +2600,8 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleID[m]);
-                                BGMCGroupXSElement.push_back(BGMCXS[m]);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
@@ -3650,7 +2705,14 @@ void analysis1()
             }
             
             std::vector<TChain*> tree2Sig;
-            initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+            {
+                std::vector<TString> SigSampleID;
+                for(unsigned int i=0;i<SigSampleInfo.size();i++)
+                {
+                    SigSampleID.push_back(SigSampleInfo[i].SampleID);
+                }
+                initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+            }
             
             std::vector<TChain*> tree2DataOS;
             if(ChannelInfo[channelRepresentative].isSS_qF)
@@ -3666,87 +2728,143 @@ void analysis1()
             
             //Significance optimization
             const bool doOptimize2 = doOptimize && (
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt"  );
             if(doOptimize2)
             {
                 for(unsigned int SigIndex=SigOptimizingIndex;SigIndex<=SigOptimizingIndex;SigIndex++)
                 //for(unsigned int SigIndex=0;SigIndex<RegionInfo[RegionIndex].OptimizingCut.size();SigIndex++)
                 {
-                    unsigned int VarIndexRecord2 = 0;
-                    double lowerCutRecord2 = 0;
-                    double upperCutRecord2 = 0;
-                    double nBGRecord2 = 0;
-                    double nSigRecord2 = 0;
-                    double significanceRecord2 = -999;
+                    double nBGRecord3 = 0;
+                    double nSigRecord3[OptimizingSignal.size()];
+                    double significanceRecord3 = -999;
+                    double significanceRecord4 = -999;
+                    
+                    bool isOptimizing = true;
+                    bool isRemovingCut = false;
                     
                     while(true)
                     {
+                        const vector< vector<OptimizingCutData> > OptimizingCutInfo = RegionInfo[RegionIndex].OptimizingCut[SigIndex];
+                        
+                        unsigned int VarIndexRecord2 = 0;
+                        vector<double> lowerCutRecord2;
+                        vector<double> upperCutRecord2;
+                        double nBGRecord2 = 0;
+                        double nSigRecord2[OptimizingSignal.size()];
+                        double significanceRecord2 = 0;
+                        
+                        if(isOptimizing) significanceRecord2 = significanceRecord3;
+                        if(isRemovingCut) significanceRecord2 = -999;
+                        
                         bool isChanged = false;
-                        for(unsigned int VarIndex2=0;VarIndex2<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();VarIndex2++)
+                        
+                        for(unsigned int VarIndex2=0;VarIndex2<OptimizingCutInfo.size();VarIndex2++)
                         {
-                            unsigned int VarIndex = 0;
-                            for(unsigned int i=0;i<Var.size();i++)
+                            if(OptimizingCutInfo[VarIndex2][0].RelatedVariable == "meff" ||
+                               OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta" )
                             {
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].RelatedVariable == Var[i].VarName)
-                                {
-                                    VarIndex = i;
-                                }
+                                continue;
                             }
                             
-                            //initialize histograms
-                            TString title = Var[VarIndex].VarTitle;
+                            const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
                             
-                            TString xaxis = Var[VarIndex].VarTitle;
-                            xaxis += " ";
-                            xaxis += Var[VarIndex].unit;
+                            if(isRemovingCut)
+                            {
+                                bool HasCut = false;
+                                for(unsigned int i=0;i<VarNumber;i++)
+                                {
+                                    if(OptimizingCutInfo[VarIndex2][i].lower != OptimizingCutInfo[VarIndex2][i].min ||
+                                       OptimizingCutInfo[VarIndex2][i].upper != -1)
+                                    {
+                                        HasCut = true;
+                                    }
+                                }
+                                
+                                if(!HasCut) continue;
+                            }
                             
-                            //Fill histograms from trees
-                            TH1F* BGGroupRaw[BGGroup.size()];
-                            TH1F* h2Sig[RegionInfo[RegionIndex].OptimizingCut.size()];
+                            TH1D* BGGroupRaw1D[BGGroup.size()];
+                            TH1D* h2Sig1D[OptimizingSignal.size()];
+                            
+                            TH2D* BGGroupRaw2D[BGGroup.size()];
+                            TH2D* h2Sig2D[OptimizingSignal.size()];
                             {
                                 TString CommonCut = RegionInfo[RegionIndex].Cut;
                                 
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                                 {
-                                    if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable != RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].RelatedVariable)
+                                    if(i != VarIndex2)
                                     {
-                                        unsigned int VarIndex3 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
-                                        
-                                        CommonCut += " && ";
-                                        CommonCut += Var[VarIndex3].VarFormula;
-                                        CommonCut += " >= ";
-                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
-                                        
-                                        if(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper != -1)
+                                        for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
                                         {
+                                            unsigned int VarIndex3 = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                            
                                             CommonCut += " && ";
                                             CommonCut += Var[VarIndex3].VarFormula;
-                                            CommonCut += " < ";
-                                            CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
+                                            CommonCut += " >= ";
+                                            CommonCut += OptimizingCutInfo[i][j].lower;
+                                            
+                                            if(OptimizingCutInfo[i][j].upper != -1)
+                                            {
+                                                CommonCut += " && ";
+                                                CommonCut += Var[VarIndex3].VarFormula;
+                                                CommonCut += " < ";
+                                                CommonCut += OptimizingCutInfo[i][j].upper;
+                                            }
                                         }
                                     }
                                 }
                                 cout<<CommonCut.Data()<<endl;
                                 
+                                //initialize histograms
+                                //Fill histograms from trees
+                                vector<TString> VarFormula;
+                                for(unsigned int i=0;i<VarNumber;i++)
+                                {
+                                    for(unsigned int j=0;j<Var.size();j++)
+                                    {
+                                        if(OptimizingCutInfo[VarIndex2][i].RelatedVariable == Var[j].VarName)
+                                        {
+                                            VarFormula.push_back(Var[j].VarFormula);
+                                        }
+                                    }
+                                }
+                                
                                 //Background
                                 //For MC background
                                 for(unsigned int j=0;j<tree2BGMC.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
-                                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                                    BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
-                                    BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
-                                    
-                                    BGGroupRaw[j] = new TH1F((BGGroup[j].info->GroupName+"_raw").Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                    if(VarNumber==1)
+                                    {
+                                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                    }
                                     
                                     for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                                     {
                                         {
-                                            TH1F* hTemp = new TH1F("BGMC",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1D("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2D("BGMC","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
                                             
                                             //fill histograms from trees
-                                            TString temp = Var[VarIndex].VarFormula;
                                             temp += ">>BGMC";
                                             
                                             //Weight
@@ -3760,15 +2878,37 @@ void analysis1()
                                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                             
                                             //normalization for BG
-                                            hTemp->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
-                                            
-                                            BGGroup[j].h2->Add(hTemp);
-                                            delete hTemp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
+                                                BGGroup[j].h2->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D->Scale(BGMCGroupXS[j][k]/BGMCGroupnwAOD[j][k] *sumDataL);
+                                                BGGroup[j].h3->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                         {
-                                            TH1F* hTemp = new TH1F("BGMCRaw",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1D("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2D("BGMCRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
                                             
-                                            TString temp = Var[VarIndex].VarFormula;
+                                            //fill histograms from trees
                                             temp += ">>BGMCRaw";
                                             
                                             //Weight
@@ -3781,8 +2921,16 @@ void analysis1()
                                             
                                             tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
                                             
-                                            BGGroupRaw[j]->Add(hTemp);
-                                            delete hTemp;
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroupRaw1D[j]->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroupRaw2D[j]->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
                                     }
                                 }
@@ -3790,66 +2938,162 @@ void analysis1()
                                 //For data-driven background
                                 for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                                 {
-                                    BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
-                                    BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
-                                    BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
-                                    BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
+                                    if(VarNumber==1)
+                                    {
+                                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        BGGroupRaw1D[j] = new TH1D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        BGGroupRaw2D[j] = new TH2D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                    }
                                     
                                     for(unsigned int k=0;k<DataSampleID.size();k++)
                                     {
-                                        TH1F* hTemp = new TH1F("BGData",title.Data(),RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max);
-                                        
-                                        //fill histograms from trees
-                                        TString temp = Var[VarIndex].VarFormula;
-                                        temp += ">>BGData";
-                                        
-                                        TString Cut = "1";
-                                        if(BGGroup[j].info->GroupName == "charge flip")
                                         {
-                                            Cut += "*qFwt";
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1D("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2D("BGData","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGData";
+                                            
+                                            TString Cut = "1";
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += "*qFwt";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += "*fLwt";
+                                            }
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroup[j].h2->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroup[j].h3->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
                                         {
-                                            Cut += "*fLwt";
+                                            TH1D* hTemp1D = nullptr;
+                                            TH2D* hTemp2D = nullptr;
+                                            TString temp;
+                                            if(VarNumber==1)
+                                            {
+                                                hTemp1D = new TH1D("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                                temp = VarFormula[0];
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                hTemp2D = new TH2D("BGDataRaw","",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                                temp = VarFormula[1];
+                                                temp += ":";
+                                                temp += VarFormula[0];
+                                            }
+                                            
+                                            //fill histograms from trees
+                                            temp += ">>BGDataRaw";
+                                            
+                                            TString Cut = "1";
+                                            
+                                            Cut += "*(1";
+                                            Cut += CommonCut;
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                Cut += " && fLwt==0";
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                Cut += " && fLwt!=0";
+                                            }
+                                            Cut += ")";
+                                            
+                                            if(BGGroup[j].info->GroupName == "charge flip")
+                                            {
+                                                tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            if(BGGroup[j].info->GroupName == "fake lepton")
+                                            {
+                                                tree2Data[k]->Draw(temp.Data(),Cut.Data());
+                                            }
+                                            
+                                            //Add MCData
+                                            if(VarNumber==1)
+                                            {
+                                                BGGroupRaw1D[j]->Add(hTemp1D);
+                                                delete hTemp1D;
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                BGGroupRaw2D[j]->Add(hTemp2D);
+                                                delete hTemp2D;
+                                            }
                                         }
-                                        
-                                        Cut += "*(1";
-                                        Cut += CommonCut;
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            Cut += " && fLwt==0";
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            Cut += " && fLwt!=0";
-                                        }
-                                        
-                                        Cut += ")";
-                                        
-                                        if(BGGroup[j].info->GroupName == "charge flip")
-                                        {
-                                            tree2DataOS[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        if(BGGroup[j].info->GroupName == "fake lepton")
-                                        {
-                                            tree2Data[k]->Draw(temp.Data(),Cut.Data());
-                                        }
-                                        
-                                        //Add MCData
-                                        BGGroup[j].h2->Add(hTemp);
-                                        delete hTemp;
                                     }
                                 }
                                 
                                 //h2Sig
-                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
+                                for(unsigned int j=0;j<OptimizingSignal.size();j++)
                                 {
                                     TString NameTemp = "Sig_";
                                     NameTemp += TString::Itoa(j,10);
-                                    h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].nBin,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].min,RegionInfo[RegionIndex].OptimizingCut[j][VarIndex2].max);
+                                    
+                                    TString temp;
+                                    if(VarNumber==1)
+                                    {
+                                        h2Sig1D[j] = new TH1D(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max);
+                                        temp = VarFormula[0];
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        h2Sig2D[j] = new TH2D(NameTemp.Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
+                                        temp = VarFormula[1];
+                                        temp += ":";
+                                        temp += VarFormula[0];
+                                    }
                                     
                                     //Fill Signal
-                                    TString temp = Var[VarIndex].VarFormula;
                                     temp += ">>";
                                     temp += NameTemp;
                                     
@@ -3857,124 +3101,160 @@ void analysis1()
                                     Cut += CommonCut;
                                     Cut += ")";
                                     
-                                    tree2Sig[SigMassSplitting[j].ID]->Draw(temp.Data(),Cut.Data());
-                                    h2Sig[j]->Scale(SigXS[SigMassSplitting[j].ID] /SignAOD[SigMassSplitting[j].ID] *sumDataL);
+                                    tree2Sig[OptimizingSignal[j]]->Draw(temp.Data(),Cut.Data());
+                                    
+                                    if(VarNumber==1)
+                                    {
+                                        h2Sig1D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        h2Sig2D[j]->Scale(SigSampleInfo[OptimizingSignal[j]].XS /SigSampleInfo[OptimizingSignal[j]].nwAOD *sumDataL);
+                                    }
                                 }
                             }
                             
-                            int lowerBinRecord1 = 1;
-                            int upperBinRecord1 = 1;
+                            int lowerBinRecord1[VarNumber];
+                            int upperBinRecord1[VarNumber];
                             double nBGRecord1 = -1;
-                            double nSigRecord1 = -1;
+                            double nSigRecord1[OptimizingSignal.size()];
                             double significanceRecord1 = -999;
                             bool isPrint = false;
-                            //isPrint = (Var[VarIndex].VarName == "dEta");
+                            //isPrint = (OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta");
                             
-                            int bin1 = 1;
+                            int bin1[VarNumber];
+                            int bin2[VarNumber];
+                            for(unsigned int i=0;i<VarNumber;i++)
+                            {
+                                bin1[i] = 1;
+                                bin2[i] = OptimizingCutInfo[VarIndex2][i].nBin+1;
+                            }
+                            
                             while(true)
                             {
-                                int bin2 = -1;
-                                double significanceRecord0;
-                                while(true)
+                                double nBG = 0;
+                                double nBGError2 = 0;
+                                double nSig[OptimizingSignal.size()];
+                                double nSigError[OptimizingSignal.size()];
+                                bool skip = false;
+                                
+                                if(isPrint)
                                 {
-                                    double nBG = 0;
-                                    double nBGError2 = 0;
-                                    double nSig = 0;
-                                    double nSigError = 0;
-                                    bool skip = false;
-                                    
-                                    if((Var[VarIndex].VarName == "pt1" ||
-                                        Var[VarIndex].VarName == "pt2" ||
-                                        Var[VarIndex].VarName == "ptll" ||
-                                        Var[VarIndex].VarName == "mTtwo" ||
-                                        Var[VarIndex].VarName == "METRel" ||
-                                        Var[VarIndex].VarName == "meff" ||
-                                        Var[VarIndex].VarName == "mtm" ) &&
-                                        bin2!=-1) skip = true;
-                                    
-                                    if((Var[VarIndex].VarName == "dEta" ||
-                                        Var[VarIndex].VarName == "mlj" ) &&
-                                        bin1!=1) skip = true;
-                                    
-                                    if(isPrint && !skip) cout<<"bin1: "<<bin1<<", bin2: "<<bin2<<endl;
-                                    
-                                    if(!skip)
+                                    if(VarNumber==1)
                                     {
-                                        for(unsigned int j=0;j<BGGroup.size();j++)
+                                        cout<<"bin1[0]: "<<bin1[0]<<", bin2[0]: "<<bin2[0]<<endl;
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        cout<<"bin1[0]: "<<bin1[0]<<", bin2[0]: "<<bin2[0]<<", bin1[1]: "<<bin1[1]<<", bin2[1]: "<<bin2[1]<<endl;
+                                    }
+                                }
+                                
+                                if(!skip)
+                                {
+                                    for(unsigned int j=0;j<BGGroup.size();j++)
+                                    {
+                                        if(BGGroup[j].info->GroupName == "VV" ||
+                                           BGGroup[j].info->GroupName == "ttV")
                                         {
-                                            if(BGGroup[j].info->GroupName == "VV" ||
-                                               BGGroup[j].info->GroupName == "ttV")
+                                            double nBGRaw = 0;
+                                            if(VarNumber==1)
                                             {
-                                                double nBGRaw = BGGroupRaw[j]->Integral(bin1,bin2);
-                                                if(nBGRaw<=10)
-                                                {
-                                                    if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
-                                                    skip = true;
-                                                }
+                                                nBGRaw = BGGroupRaw1D[j]->Integral(bin1[0],bin2[0]);
+                                            }
+                                            else if(VarNumber==2)
+                                            {
+                                                nBGRaw = BGGroupRaw2D[j]->Integral(bin1[0],bin2[0],bin1[1],bin2[1]);
                                             }
                                             
-                                            double Error;
-                                            double n = BGGroup[j].h2->IntegralAndError(bin1,bin2,Error);
-                                            if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
-                                            if(n>0)
+                                            if(nBGRaw<=10)
                                             {
-                                                nBG += n;
+                                                if(isPrint) cout<<"VV or ttV do not have 10 raw events."<<endl;
+                                                skip = true;
                                             }
-                                            else
-                                            {
-                                                if(BGGroup[j].info->GroupName != "multitop" &&
-                                                   BGGroup[j].info->GroupName != "Vgamma"   &&
-                                                   BGGroup[j].info->GroupName != "Zjets"   )
-                                                {
-                                                    if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
-                                                    skip = true;
-                                                }
-                                            }
-                                            nBGError2 += Error * Error;
                                         }
-                                        if(isPrint && skip) cout<<endl;
-                                        if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
+                                        
+                                        double Error = 0;
+                                        double n = 0;
+                                        if(VarNumber==1)
+                                        {
+                                            n = BGGroup[j].h2->IntegralAndError(bin1[0],bin2[0],Error);
+                                        }
+                                        else if(VarNumber==2)
+                                        {
+                                            n = BGGroup[j].h3->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],Error);
+                                        }
+                                        
+                                        if(isPrint && !skip) cout<<BGGroup[j].info->GroupName<<": "<<n<<" +/- "<<Error<<endl;
+                                        if(n>0)
+                                        {
+                                            nBG += n;
+                                        }
+                                        else
+                                        {
+                                            if(BGGroup[j].info->GroupName != "multitop" &&
+                                               BGGroup[j].info->GroupName != "Vgamma"   &&
+                                               BGGroup[j].info->GroupName != "Wjets"    &&
+                                               BGGroup[j].info->GroupName != "Zjets"   )
+                                            {
+                                                if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
+                                                skip = true;
+                                            }
+                                        }
+                                        nBGError2 += Error * Error;
+                                    }
+                                    if(isPrint && skip) cout<<endl;
+                                    if(isPrint && !skip) cout<<"nBG: "<<nBG<<", nBGError: "<<sqrt(nBGError2)<<endl;
+                                }
+                                
+                                for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                {
+                                    //expected number of events for signal
+                                    if(VarNumber==1)
+                                    {
+                                        nSig[i] = h2Sig1D[i]->IntegralAndError(bin1[0],bin2[0],nSigError[i]);
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        nSig[i] = h2Sig2D[i]->IntegralAndError(bin1[0],bin2[0],bin1[1],bin2[1],nSigError[i]);
                                     }
                                     
-                                    if(!skip)
-                                    {
-                                        double nSig1Error = 0;
-                                        double nSig1 = h2Sig[1]->IntegralAndError(bin1,bin2,nSig1Error);
-                                        
-                                        if(nSig1 <=1) skip = true;
-                                        else if(nSig1Error == 0) skip = true;
-                                        else if(nSig1/nSig1Error<=2) skip = true;
-                                        
-                                        if(isPrint && skip) cout<<"Signal 1 has low statistics."<<endl<<endl;
-                                    }
+                                    if(nSig[i] <= 1) skip = true;
+                                    else if(nSigError[i] == 0) skip = true;
+                                    else if(nSig[i]/nSigError[i]<=2) skip = true;
                                     
-                                    if(!skip)
-                                    {
-                                        //expected number of events for signal
-                                        nSig = h2Sig[SigIndex]->IntegralAndError(bin1,bin2,nSigError);
-                                        
-                                        
-                                        if(nSig <= 1) skip = true;
-                                        else if(nSigError == 0) skip = true;
-                                        else if(nSig/nSigError<=2) skip = true;
-                                        
-                                        if(isPrint && skip) cout<<"Signal 0 has low statistics."<<endl<<endl;
-                                        if(isPrint && !skip) cout<<"nSig: "<<nSig<<", nSigError: "<<nSigError<<endl;
-                                    }
+                                    if(isPrint && skip) cout<<"Signal "<<i<<" has low statistics."<<endl<<endl;
+                                    if(isPrint && !skip) cout<<"nSig["<<i<<"]: "<<nSig[i]<<", nSigError["<<i<<"]: "<<nSigError[i]<<endl;
                                     
-                                    //Significance
-                                    double significanceTemp = -999;
-                                    if(!skip)
+                                    if(skip) break;
+                                }
+                                
+                                //Significance
+                                if(!skip)
+                                {
+                                    double significanceTemp = 0;
+                                    for(unsigned int i=0;i<OptimizingSignal.size();i++)
                                     {
-                                        significanceTemp = GetSignificance(nSig,nBG,nBGError2);
-                                        if(isPrint) cout<<"Significance: "<<significanceTemp;
-                                        
+                                        significanceTemp += GetSignificance(nSig[i],nBG,nBGError2);
+                                    }
+                                    significanceTemp /= OptimizingSignal.size();
+                                    if(isPrint) cout<<"Significance: "<<significanceTemp;
+                                    
+                                    if(isOptimizing)
+                                    {
                                         if(significanceTemp > significanceRecord1)
                                         {
-                                            lowerBinRecord1 = bin1;
-                                            upperBinRecord1 = bin2;
+                                            for(unsigned int i=0;i<VarNumber;i++)
+                                            {
+                                                lowerBinRecord1[i] = bin1[i];
+                                                upperBinRecord1[i] = bin2[i];
+                                            }
+                                            
                                             nBGRecord1 = nBG;
-                                            nSigRecord1 = nSig;
+                                            for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                            {
+                                                nSigRecord1[i] = nSig[i];
+                                            }
                                             significanceRecord1 = significanceTemp;
                                             if(isPrint) cout<<", accepted."<<endl<<endl;
                                         }
@@ -3984,125 +3264,282 @@ void analysis1()
                                         }
                                     }
                                     
-                                    if(bin2==RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
+                                    if(isRemovingCut)
                                     {
-                                        break;
-                                    }
-                                    else if(bin2==-1)
-                                    {
-                                        if(bin1==-1)
+                                        nBGRecord1 = nBG;
+                                        for(unsigned int i=0;i<OptimizingSignal.size();i++)
                                         {
-                                            break;
+                                            nSigRecord1[i] = nSig[i];
                                         }
-                                        else
+                                        significanceRecord1 = significanceTemp;
+                                        
+                                        if(significanceRecord1 > significanceRecord3)
                                         {
-                                            significanceRecord0 = significanceTemp;
-                                            bin2 = bin1;
+                                            cout<<"Error1"<<endl;
+                                            return;
                                         }
                                     }
-                                    else
+                                }
+                                else if(isRemovingCut)
+                                {
+                                    cout<<"Error2"<<endl;
+                                    //return;
+                                }
+                                
+                                if(isOptimizing)
+                                {
+                                    if(VarNumber==1)
                                     {
-                                        bin2++;
+                                        bool isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
+                                        if(!isContinue) break;
+                                    }
+                                    else if(VarNumber==2)
+                                    {
+                                        bool isContinue = NextBin(bin1[1],bin2[1],OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][1].OnlyHasUpperCut);
+                                        if(!isContinue)
+                                        {
+                                            isContinue = NextBin(bin1[0],bin2[0],OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].OnlyHasLowerCut,OptimizingCutInfo[VarIndex2][0].OnlyHasUpperCut);
+                                            if(isContinue)
+                                            {
+                                                bin1[1] = 1;
+                                                bin2[1] = -1;
+                                            }
+                                            else
+                                            {
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                                 
-                                if(bin1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin)
-                                {
-                                    bin1 = -1;
-                                }
-                                else if(bin1==-1)
+                                if(isRemovingCut)
                                 {
                                     break;
                                 }
-                                else
+                            }
+                            
+                            double lowerCutRecord1[VarNumber];
+                            double upperCutRecord1[VarNumber];
+                            if(isOptimizing)
+                            {
+                                for(unsigned int i=0;i<VarNumber;i++)
                                 {
-                                    bin1++;
+                                    double BinSize = (OptimizingCutInfo[VarIndex2][i].max - OptimizingCutInfo[VarIndex2][i].min)/OptimizingCutInfo[VarIndex2][i].nBin;
+                                    
+                                    lowerCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + (lowerBinRecord1[i]-1) * BinSize;
+                                    
+                                    if(upperBinRecord1[i] != OptimizingCutInfo[VarIndex2][i].nBin+1) upperCutRecord1[i] = OptimizingCutInfo[VarIndex2][i].min + upperBinRecord1[i] * BinSize;
+                                    else upperCutRecord1[i] = -1;
+                                    
+                                    cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<": ";
+                                    cout<<"lowerBinRecord1: "<<lowerBinRecord1[i];
+                                    cout<<", upperBinRecord1: "<<upperBinRecord1[i];
+                                    cout<<", lowerCutRecord1: "<<lowerCutRecord1[i];
+                                    cout<<", upperCutRecord1: "<<upperCutRecord1[i];
+                                    cout<<endl;
+                                }
+                            }
+                            if(isRemovingCut)
+                            {
+                                for(unsigned int i=0;i<VarNumber;i++)
+                                {
+                                    cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<", ";
+                                }
+                            }
+                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1[2]<<", significanceRecord1: "<<significanceRecord1<<endl;
+                            
+                            if(isOptimizing)
+                            {
+                                if(significanceRecord1 > significanceRecord2)
+                                {
+                                    bool isSameCut = true;
+                                    for(unsigned int i=0;i<VarNumber;i++)
+                                    {
+                                        if(lowerCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].lower) isSameCut = false;
+                                        if(upperCutRecord1[i] != OptimizingCutInfo[VarIndex2][i].upper) isSameCut = false;
+                                    }
+                                    
+                                    if(isSameCut)
+                                    {
+                                        cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
+                                    }
+                                    else
+                                    {
+                                        cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
+                                        
+                                        VarIndexRecord2 = VarIndex2;
+                                        lowerCutRecord2.clear();
+                                        upperCutRecord2.clear();
+                                        for(unsigned int i=0;i<VarNumber;i++)
+                                        {
+                                            lowerCutRecord2.push_back(lowerCutRecord1[i]);
+                                            upperCutRecord2.push_back(upperCutRecord1[i]);
+                                        }
+                                        nBGRecord2 = nBGRecord1;
+                                        for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                        {
+                                            nSigRecord2[i] = nSigRecord1[i];
+                                        }
+                                        significanceRecord2 = significanceRecord1;
+                                        
+                                        isChanged = true;
+                                    }
                                 }
                             }
                             
-                            double BinSize = (RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].max - RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min)/RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].nBin;
-                            double lowerCutRecord1 = -1;
-                            double upperCutRecord1 = -1;
-                            if(lowerBinRecord1!=-1) lowerCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + (lowerBinRecord1-1) * BinSize;
-                            if(upperBinRecord1!=-1) upperCutRecord1 = RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].min + upperBinRecord1 * BinSize;
-                            
-                            cout<<Var[VarIndex].VarName.Data()<<": ";
-                            cout<<"lowerBinRecord1: "<<lowerBinRecord1<<", upperBinRecord1: "<<upperBinRecord1;
-                            cout<<", lowerCutRecord1: "<<lowerCutRecord1;
-                            cout<<", upperCutRecord1: "<<upperCutRecord1;
-                            cout<<", nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1<<", significanceRecord1: "<<significanceRecord1<<endl;
-                            
-                            if(significanceRecord1 > significanceRecord2)
+                            if(isRemovingCut)
                             {
-                                if(lowerCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.lower &&
-                                   upperCutRecord1 == RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndex2].Cut.upper )
+                                if(significanceRecord1 != -999 && (significanceRecord4 - significanceRecord1) < 0.05 && significanceRecord1 > significanceRecord2)
                                 {
-                                    cout<<"The cut is the same, but the significance increase becuase we are using different variable to draw."<<endl;
-                                }
-                                else
-                                {
-                                    cout<<"The cut is changed. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
+                                    cout<<"Higher significance is found. significanceRecord2: "<<significanceRecord2<<", significanceRecord1: "<<significanceRecord1<<endl;
                                     
                                     VarIndexRecord2 = VarIndex2;
-                                    lowerCutRecord2 = lowerCutRecord1;
-                                    upperCutRecord2 = upperCutRecord1;
                                     nBGRecord2 = nBGRecord1;
-                                    nSigRecord2 = nSigRecord1;
+                                    for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                    {
+                                        nSigRecord2[i] = nSigRecord1[i];
+                                    }
                                     significanceRecord2 = significanceRecord1;
                                     
                                     isChanged = true;
                                 }
                             }
+                            
                             cout<<endl;
                             
                             //delete
                             for(unsigned int j=0;j<BGGroup.size();j++)
                             {
-                                delete BGGroup[j].h2;
-                                delete BGGroupRaw[j];
+                                if(VarNumber==1)
+                                {
+                                    delete BGGroup[j].h2;
+                                    delete BGGroupRaw1D[j];
+                                }
+                                else if(VarNumber==2)
+                                {
+                                    delete BGGroup[j].h3;
+                                    delete BGGroupRaw2D[j];
+                                }
                             }
                             
-                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut.size();j++)
+                            for(unsigned int j=0;j<OptimizingSignal.size();j++)
                             {
-                                delete h2Sig[j];
+                                if(VarNumber==1)
+                                {
+                                    delete h2Sig1D[j];
+                                }
+                                else if(VarNumber==2)
+                                {
+                                    delete h2Sig2D[j];
+                                }
                             }
                         }
                         
-                        if(isChanged)
+                        if(isOptimizing)
                         {
-                            cout<<"The "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<" cut is applied."<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
-                            cout<<", upperCutRecord2: "<<upperCutRecord2;
-                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
-                            
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].Cut.lower = lowerCutRecord2;
-                            RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].Cut.upper = upperCutRecord2;
-                        }
-                        else
-                        {
-                            cout<<"The cut is the same."<<endl;
-                            cout<<"The last cut is "<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2].RelatedVariable.Data()<<endl;
-                            cout<<"lowerCutRecord2: "<<lowerCutRecord2;
-                            cout<<", upperCutRecord2: "<<upperCutRecord2;
-                            cout<<", nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
-                            
-                            cout<<RegionInfo[RegionIndex].RegionName.Data()<<": ";
-                            cout<<SigMassSplitting[SigIndex].IDName.Data()<<": "<<endl;
-                            
-                            for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                            if(isChanged)
                             {
-                                unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
+                                cout<<"The following cut is applied."<<endl;
+                                for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                                {
+                                    cout<<"The "<<OptimizingCutInfo[VarIndexRecord2][i].RelatedVariable.Data()<<" cut is applied. ";
+                                    cout<<"lowerCutRecord2: "<<lowerCutRecord2[i];
+                                    cout<<", upperCutRecord2: "<<upperCutRecord2[i];
+                                    cout<<endl;
+                                }
+                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                                 
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
-                                cout<<" <= ";
-                                cout<<Var[VarIndex].VarFormula.Data();
-                                cout<<" < ";
-                                cout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
-                                cout<<endl;
+                                for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                                {
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = lowerCutRecord2[i];
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = upperCutRecord2[i];
+                                }
+                                
+                                nBGRecord3 = nBGRecord2;
+                                for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                {
+                                    nSigRecord3[i] = nSigRecord2[i];
+                                }
+                                significanceRecord3 = significanceRecord2;
                             }
-                            cout<<endl;
-                            
+                            else
                             {
+                                cout<<"The cut is the same."<<endl;
+                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
+                                
+                                cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
+                                
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
+                                {
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    {
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                        
+                                        cout<<OptimizingCutInfo[i][j].lower;
+                                        cout<<" <= ";
+                                        cout<<Var[VarIndex].VarFormula.Data();
+                                        cout<<" < ";
+                                        cout<<OptimizingCutInfo[i][j].upper;
+                                        cout<<endl;
+                                    }
+                                }
+                                cout<<endl;
+                                
+                                cout<<"Start to remove cuts."<<endl<<endl;
+                                isOptimizing = false;
+                                isRemovingCut = true;
+                                significanceRecord4 = significanceRecord3;
+                            }
+                        }
+                        else if(isRemovingCut)
+                        {
+                            if(isChanged)
+                            {
+                                cout<<"The following cut is removed."<<endl;
+                                for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
+                                {
+                                    cout<<OptimizingCutInfo[VarIndexRecord2][i].RelatedVariable.Data()<<": ";
+                                    cout<<"lower cut: "<<OptimizingCutInfo[VarIndexRecord2][i].lower;
+                                    cout<<", upper cut: "<<OptimizingCutInfo[VarIndexRecord2][i].upper;
+                                    cout<<endl;
+                                    
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = OptimizingCutInfo[VarIndexRecord2][i].min;
+                                    RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = -1;
+                                }
+                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                                
+                                nBGRecord3 = nBGRecord2;
+                                for(unsigned int i=0;i<OptimizingSignal.size();i++)
+                                {
+                                    nSigRecord3[i] = nSigRecord2[i];
+                                }
+                                significanceRecord3 = significanceRecord2;
+                            }
+                            else
+                            {
+                                cout<<"No any cut can be removed."<<endl;
+                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2];
+                                cout<<", significanceRecord4: "<<significanceRecord4;
+                                cout<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
+                                
+                                cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
+                                
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
+                                {
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    {
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                        
+                                        cout<<OptimizingCutInfo[i][j].lower;
+                                        cout<<" <= ";
+                                        cout<<Var[VarIndex].VarFormula.Data();
+                                        cout<<" < ";
+                                        cout<<OptimizingCutInfo[i][j].upper;
+                                        cout<<endl;
+                                    }
+                                }
+                                cout<<endl;
+                                
                                 TString PathName = "latex/data/optimization/cut_txt/cut_";
                                 PathName += RegionInfo[RegionIndex].RegionName;
                                 PathName += "_";
@@ -4112,22 +3549,24 @@ void analysis1()
                                 ofstream fout;
                                 fout.open(PathName.Data());
                                 
-                                for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigIndex].size();i++)
+                                for(unsigned int i=0;i<OptimizingCutInfo.size();i++)
                                 {
-                                    unsigned int VarIndex = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].RelatedVariable,Var);
-                                    
-                                    fout<<Var[VarIndex].VarName;
-                                    fout<<" ";
-                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.lower;
-                                    fout<<" ";
-                                    fout<<RegionInfo[RegionIndex].OptimizingCut[SigIndex][i].Cut.upper;
-                                    fout<<endl;
+                                    for(unsigned int j=0;j<OptimizingCutInfo[i].size();j++)
+                                    {
+                                        unsigned int VarIndex = findVarIndex(OptimizingCutInfo[i][j].RelatedVariable,Var);
+                                        
+                                        fout<<Var[VarIndex].VarName;
+                                        fout<<" ";
+                                        fout<<OptimizingCutInfo[i][j].lower;
+                                        fout<<" ";
+                                        fout<<OptimizingCutInfo[i][j].upper;
+                                        fout<<endl;
+                                    }
                                 }
-                                
                                 fout.close();
+                                
+                                break;
                             }
-                            
-                            break;
                         }
                     }
                 }
@@ -4140,7 +3579,6 @@ void analysis1()
             //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 //if(Var[VarIndex].VarName!="pt1") continue;
-                if(RegionGroup[RegionGroupIndex].GroupName == "SR"  && VarIndex!=countVariable) continue;
                 
                 //initialize histograms
                 TString title = Var[VarIndex].VarTitle;
@@ -4150,9 +3588,9 @@ void analysis1()
                 xaxis += Var[VarIndex].unit;
                 
                 //Fill histograms from trees
-                TH1F* h2DataSum;
-                TH1F* h2SigSum[SigMassSplitting.size()];
-                TH1F* h2Sig[SigSampleID.size()];
+                TH1D* h2DataSum;
+                TH1D* h2SigSum[SigMassSplitting.size()];
+                TH1D* h2Sig[SigSampleInfo.size()];
                 double sumOfEventVV[BGVVData.size()][2];
                 //sample,expN/error
                 
@@ -4205,21 +3643,24 @@ void analysis1()
                     {
                         for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                         {
-                            if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable != Var[VarIndex].VarName)
+                            for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
                             {
-                                unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
-                                
-                                CommonCut += " && ";
-                                CommonCut += Var[VarIndex2].VarFormula;
-                                CommonCut += " >= ";
-                                CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.lower;
-                                
-                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper != -1)
+                                if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable != Var[VarIndex].VarName)
                                 {
+                                    unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
+                                    
                                     CommonCut += " && ";
                                     CommonCut += Var[VarIndex2].VarFormula;
-                                    CommonCut += " < ";
-                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].Cut.upper;
+                                    CommonCut += " >= ";
+                                    CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].lower;
+                                    
+                                    if(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].upper != -1)
+                                    {
+                                        CommonCut += " && ";
+                                        CommonCut += Var[VarIndex2].VarFormula;
+                                        CommonCut += " < ";
+                                        CommonCut += RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].upper;
+                                    }
                                 }
                             }
                         }
@@ -4242,34 +3683,37 @@ void analysis1()
                             
                             for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
                             {
-                                TString VarName;
-                                double cut;
-                                
-                                fin>>VarName;
-                                if(VarName != Var[VarIndex].VarName)
+                                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
                                 {
-                                    unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
+                                    TString VarName;
+                                    double cut;
                                     
-                                    CommonCut += " && ";
-                                    CommonCut += Var[VarIndex2].VarFormula;
-                                    CommonCut += " >= ";
-                                    
-                                    fin>>cut;
-                                    CommonCut += cut;
-                                    
-                                    fin>>cut;
-                                    if(cut != -1)
+                                    fin>>VarName;
+                                    if(VarName != Var[VarIndex].VarName)
                                     {
+                                        unsigned int VarIndex2 = findVarIndex(RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
+                                        
                                         CommonCut += " && ";
                                         CommonCut += Var[VarIndex2].VarFormula;
-                                        CommonCut += " < ";
+                                        CommonCut += " >= ";
+                                        
+                                        fin>>cut;
                                         CommonCut += cut;
+                                        
+                                        fin>>cut;
+                                        if(cut != -1)
+                                        {
+                                            CommonCut += " && ";
+                                            CommonCut += Var[VarIndex2].VarFormula;
+                                            CommonCut += " < ";
+                                            CommonCut += cut;
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    fin>>cut;
-                                    fin>>cut;
+                                    else
+                                    {
+                                        fin>>cut;
+                                        fin>>cut;
+                                    }
                                 }
                             }
                             
@@ -4290,7 +3734,7 @@ void analysis1()
                     
                     //h2DataSum
                     {
-                        h2DataSum = new TH1F("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2DataSum = new TH1D("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2DataSum->GetYaxis()->SetTitle("Number of events");
                         h2DataSum->SetMarkerColor(1);
                         h2DataSum->SetMarkerStyle(20);
@@ -4299,13 +3743,13 @@ void analysis1()
                     }
                     
                     //h2Data
-                    TH1F* h2Data[DataSampleID.size()];
+                    TH1D* h2Data[DataSampleID.size()];
                     std::vector<TString> hName2Data;
                     for(unsigned int j=0;j<DataSampleID.size();j++)
                     {
                         TString NameTemp = "Data_";
                         NameTemp += TString::Itoa(j,10);
-                        h2Data[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Data[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hName2Data.push_back(NameTemp);
                         
                         //Fill data
@@ -4335,7 +3779,7 @@ void analysis1()
                     //For MC background
                     for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
@@ -4343,7 +3787,7 @@ void analysis1()
                         BGGroup[j].info->unweighted = 0;
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
-                            TH1F* hTemp = new TH1F("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                            TH1D* hTemp = new TH1D("BGMC",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                             
                             //fill histograms from trees
                             TString temp = Var[VarIndex].VarFormula;
@@ -4390,14 +3834,16 @@ void analysis1()
                             Cut += CommonCut;
                             Cut += ")";
                             int bgCount = tree2BGMC[j][k]->Draw(temp.Data(),Cut.Data());
+                            //bgCount = tree2BGMC[j][k]->GetEntries(("1"+CommonCut).Data());
+                            
                             BGGroup[j].info->unweighted += bgCount;
                             
                             /*
                             if(BGGroup[j].info->GroupName == "Zjets" && bgCount>0)
                             {
-                                cout<<BGMCSampleID[BGMCGroupData[0].lower +k]<<endl;
+                                cout<<BGMCSampleInfo[BGMCGroupData[0].lower +k].SampleID.Data()<<endl;
                                 cout<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
-                                tree2BGMC[j][k]->Scan("weight",Cut.Data());
+                                tree2BGMC[j][k]->Scan("weight",("1"+CommonCut).Data());
                             }
                             */
                             
@@ -4420,7 +3866,7 @@ void analysis1()
                     //For data-driven background
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].h2 = new TH1F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        BGGroup[j].h2 = new TH1D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         BGGroup[j].h2->GetYaxis()->SetTitle("Number of events");
                         BGGroup[j].h2->SetLineColor(BGGroup[j].info->colour);
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
@@ -4483,7 +3929,7 @@ void analysis1()
                     {
                         TString NameTemp = "SigSum_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[j].MassDiff);
-                        h2SigSum[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2SigSum[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
                         h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
                         h2SigSum[j]->SetLineStyle(SigMassSplitting[j].linestyle);
@@ -4491,11 +3937,11 @@ void analysis1()
                     }
                     
                     //h2Sig
-                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    for(unsigned int j=0;j<SigSampleInfo.size();j++)
                     {
                         TString NameTemp = "Sig_";
                         NameTemp += TString::Itoa(j,10);
-                        h2Sig[j] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Sig[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         
                         //Fill Signal
                         TString temp = Var[VarIndex].VarFormula;
@@ -4505,12 +3951,15 @@ void analysis1()
                         TString Cut = "weight*(1";
                         Cut += CommonCut;
                         Cut += ")";
-                        int sigCount = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        SigSampleInfo[j].unweighted = tree2Sig[j]->Draw(temp.Data(),Cut.Data());
+                        //SigSampleInfo[j].unweighted = tree2Sig[j]->GetEntries(("1"+CommonCut).Data());
                         
                         for(unsigned int i=0;i<SigMassSplitting.size();i++)
                         {
-                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = sigCount;
+                            if(j==SigMassSplitting[i].ID) SigMassSplitting[i].unweighted = SigSampleInfo[j].unweighted;
                         }
+                        
+                        h2Sig[j]->Scale(SigSampleInfo[j].XS *sumDataL/SigSampleInfo[j].nwAOD);
                     }
                 }
                 
@@ -4519,22 +3968,21 @@ void analysis1()
                 {
                     /*
                     double AOD = 0;
-                    for(unsigned int j=0;j<SigSampleID.size();j++)
+                    for(unsigned int j=0;j<SigSampleInfo.size();j++)
                     {
-                        if(SigMass1[j]-SigMass2[j] == SigMassSplitting[i].MassDiff)
+                        if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff)
                         {
                             h2SigSum[i]->Add(h2Sig[j]);
-                            AOD += SignAOD[j];
+                            AOD += SigSampleInfo[j].nwAOD;
                         }
                     }
                     
                     //preliminary normalization for h2SigSum
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                    h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/AOD);
                     */
                     
                     ///*
                     h2SigSum[i]->Add(h2Sig[SigMassSplitting[i].ID]);
-                    h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/SignAOD[SigMassSplitting[i].ID]);
                     //*/
                 }
                 
@@ -4543,13 +3991,13 @@ void analysis1()
                 
                 const bool DoSignificancePlot = !doOptimize &&
                 Var[VarIndex].CutDirection!=0 && (
-                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_Dani" );
+                RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1");
                 
-                unsigned int dataN;
+                unsigned int dataN = 0;
                 double total_BG_weighted = 0;
                 double total_BG_error2 = 0 ;
                 int total_BG_unweighted = 0;
+                double averageSignificance = 0;
                 if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
                     //expected number of events for Data
@@ -4574,17 +4022,43 @@ void analysis1()
                     cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                     
                     //expected number of events for signal
-                    for(unsigned int i=0;i<SigMassSplitting.size();i++)
+                    for(unsigned int i=0;i<SigSampleInfo.size();i++)
                     {
                         //expected number of events
-                        SigMassSplitting[i].weighted = h2SigSum[i]->IntegralAndError(0,-1,SigMassSplitting[i].error);
+                        SigSampleInfo[i].weighted = h2Sig[i]->IntegralAndError(0,-1,SigSampleInfo[i].error);
                         
                         //Significance
-                        SigMassSplitting[i].significance = GetSignificance(SigMassSplitting[i].weighted,total_BG_weighted,total_BG_error2);
+                        SigSampleInfo[i].significance = GetSignificance(SigSampleInfo[i].weighted,total_BG_weighted,total_BG_error2);
                         
-                        cout<<SigMassSplitting[i].IDName.Data()<<": "<<SigMassSplitting[i].weighted<<" +/- "<<SigMassSplitting[i].error<<" ("<<SigMassSplitting[i].unweighted<<")"<<", Significance: "<<SigMassSplitting[i].significance<<endl;
+                        for(unsigned int j=0;j<SigMassSplitting.size();j++)
+                        {
+                            if(i == SigMassSplitting[j].ID)
+                            {
+                                SigMassSplitting[j].weighted = SigSampleInfo[i].weighted;
+                                SigMassSplitting[j].error = SigSampleInfo[i].error;
+                                SigMassSplitting[j].significance = SigSampleInfo[i].significance;
+                                
+                                cout<<SigMassSplitting[j].IDName.Data()<<": "<<SigMassSplitting[j].weighted<<" +/- "<<SigMassSplitting[j].error<<" ("<<SigMassSplitting[j].unweighted<<")"<<", Significance: "<<SigMassSplitting[j].significance<<endl;
+                            }
+                        }
+                        
+                        for(unsigned int j=0;j<OptimizingSignal.size();j++)
+                        {
+                            if(i == OptimizingSignal[j])
+                            {
+                                averageSignificance += SigSampleInfo[i].significance;
+                            }
+                        }
+                        
+                        //combined significance
+                        if(VarIndex==countVariable && SigSampleInfo[i].significance>0)
+                        {
+                            SigSampleInfo[i].significance2 += SigSampleInfo[i].significance * SigSampleInfo[i].significance;
+                        }
                     }
                     cout<<endl;
+                    
+                    averageSignificance /= OptimizingSignal.size();
                 }
                 
                 if(VarIndex==countVariable)
@@ -4678,53 +4152,6 @@ void analysis1()
                         fout.close();
                     }
                     
-                    //output SR.txt file
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
-                    {
-                        fout_SR.open(PathName_SR.Data(), ios::out | ios::app);
-                        
-                        fout_SR<<std::setw(46)<<RegionInfo[RegionIndex].RegionName;
-                        
-                        fout_SR<<setprecision(1)<<std::fixed;
-                        {
-                            unsigned int j2 = 0;
-                            for(unsigned int j1=0;j1<SRBGGroup.size();j1++)
-                            {
-                                if(j2==BGGroup.size()) break;
-                                if(SRBGGroup[j1].info->GroupName == BGGroup[j2].info->GroupName)
-                                {
-                                    fout_SR<<std::setw(8)<<BGGroup[j2].info->weighted;
-                                    fout_SR<<"+/-";
-                                    fout_SR<<std::setw(4)<<BGGroup[j2].info->error;
-                                    
-                                    j2++;
-                                }
-                                else
-                                {
-                                    fout_SR<<std::setw(8)<<"0"<<std::setw(7)<<"";
-                                }
-                            }
-                        }
-                        
-                        fout_SR<<std::setw(8)<<total_BG_weighted;
-                        fout_SR<<"+/-";
-                        fout_SR<<std::setw(4)<<TMath::Sqrt(total_BG_error2);
-                        
-                        for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                        {
-                            fout_SR<<setprecision(1)<<std::fixed;
-                            fout_SR<<std::setw(5)<<SigMassSplitting[i].weighted;
-                            fout_SR<<"+/-";
-                            fout_SR<<std::setw(3)<<SigMassSplitting[i].error;
-                            
-                            fout_SR<<setprecision(3)<<std::fixed;
-                            fout_SR<<std::setw(7)<<SigMassSplitting[i].significance;
-                            fout_SR<<std::setw(4)<<SigMassSplitting[i].unweighted;
-                        }
-                        fout_SR<<endl;
-                        fout_SR.close();
-                    }
-                    
                     //h2SR
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
@@ -4741,7 +4168,9 @@ void analysis1()
                     }
                     
                     //significance for all mass point
-                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+                    if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+                       RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
+                       RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
                     {
                         PathName = "latex/data/optimization/significance/";
                         PathName += RegionInfo[RegionIndex].RegionName;
@@ -4760,49 +4189,59 @@ void analysis1()
                         }
                         fout<<"#Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                         
-                        TH2F* h2 = new TH2F("h2","h2;m_{C1/N2} [GeV];m_{N1} [GeV]",10,0,600,10,0,120);
                         TGraph2D* g_nSig = new TGraph2D();
                         TGraph2D* g_significance = new TGraph2D();
-                        int pointN = 0;
-                        for(unsigned int j=0;j<SigSampleID.size();j++)
+                        
+                        for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
-                            //expected number of events
-                            h2Sig[j]->Scale(SigXS[j] *sumDataL/SignAOD[j]);
-                            double error;
-                            double expN = h2Sig[j]->IntegralAndError(0,-1,error);
-                            
-                            //Significance
-                            double significance = GetSignificance(expN,total_BG_weighted,total_BG_error2);
-                            
                             fout<<setprecision(1)<<std::fixed;
-                            fout<<SigMass1[j]<<" "<<SigMass2[j]<<" ";
+                            fout<<SigSampleInfo[j].Mass1<<" "<<SigSampleInfo[j].Mass2<<" ";
                             fout<<setprecision(3)<<std::fixed;
-                            fout<<expN<<" "<<error<<" ";
-                            fout<<significance<<endl;
+                            fout<<SigSampleInfo[j].weighted<<" "<<SigSampleInfo[j].error<<" ";
+                            fout<<SigSampleInfo[j].significance<<endl;
                             
                             //2D plot
-                            //if(significance>0)
+                            //if(SigSampleInfo[j].significance>0)
                             {
-                                g_nSig->SetPoint(g_significance->GetN(), SigMass1[j], SigMass2[j], expN);
-                                g_significance->SetPoint(g_significance->GetN(), SigMass1[j], SigMass2[j], significance);
-                                pointN++;
+                                g_nSig->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].weighted);
+                                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, SigSampleInfo[j].significance);
                             }
                         }
+                        
+                        cout<<"average significance: "<<averageSignificance<<endl;
+                        fout<<"#average significance: "<<averageSignificance<<endl;
+                        
                         fout.close();
                         
-                        //if(pointN>=3)
+                        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                         {
                             gStyle->SetPalette(1);
+                            
+                            TH2D* h2 = g_nSig->GetHistogram();
+                            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+                            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+                            h2->GetZaxis()->SetTitle("nSig");
+                            
+                            h2->GetXaxis()->SetRangeUser(0,600);
+                            h2->GetYaxis()->SetRangeUser(0,120);
                             
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
                             c2->SetRightMargin(0.16);
                             h2->Draw();
-                            g_nSig->Draw("colzsame");
+                            g_nSig->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "nSig_";
@@ -4815,18 +4254,36 @@ void analysis1()
                             delete c2;
                         }
                         
+                        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                         {
                             gStyle->SetPalette(1);
+                            
+                            TH2D* h2 = g_significance->GetHistogram();
+                            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+                            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+                            h2->GetZaxis()->SetTitle("Z_{n}");
+                            
+                            h2->GetXaxis()->SetRangeUser(0,600);
+                            h2->GetYaxis()->SetRangeUser(0,120);
+                            //h2->GetZaxis()->SetRangeUser(0,4);
                             
                             TCanvas* c2 = new TCanvas();
                             c2->cd();
                             c2->SetRightMargin(0.16);
                             h2->Draw();
-                            g_significance->Draw("colzsame");
+                            g_significance->Draw("colz");
                             
-                            TLatex lt1;
-                            lt1.DrawLatexNDC(0.2,0.9,RegionInfo[RegionIndex].RegionName.Data());
-                            lt1.SetTextSize(lt1.GetTextSize()*0.3);
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.05,0.05,RegionInfo[RegionIndex].RegionName.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
+                            
+                            {
+                                TLatex lt1;
+                                lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                                lt1.SetTextSize(lt1.GetTextSize());
+                            }
                             
                             TString NameTemp = "plot/";
                             NameTemp += "significance_";
@@ -4839,7 +4296,6 @@ void analysis1()
                             delete c2;
                         }
                         
-                        delete h2;
                         delete g_nSig;
                         delete g_significance;
                     }
@@ -4861,14 +4317,14 @@ void analysis1()
                 }
                 
                 //significance calculation
-                TH1F* hSignificance[SigMassSplitting.size()];
+                TH1D* hSignificance[SigMassSplitting.size()];
                 if(DoSignificancePlot)
                 {
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "Significance_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                        hSignificance[i] = new TH1F(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        hSignificance[i] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
                         hSignificance[i]->SetLineWidth(2);
                     }
@@ -4970,7 +4426,7 @@ void analysis1()
                 }
                 
                 //Add BG
-                TH1F* h2BGSum = new TH1F("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                TH1D* h2BGSum = new TH1D("BGSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 for(unsigned int j=0;j<BGGroup.size();j++)
                 {
                     h2BGSum->Add(BGGroup[j].h2);
@@ -5071,10 +4527,10 @@ void analysis1()
                     }
                 }
                 
-                TH1F* h2Ratio = nullptr;
+                TH1D* h2Ratio = nullptr;
                 TPad* pad1 = nullptr;
                 TPad* pad2 = nullptr;
-                TH1F* hPad2 = nullptr;
+                TH1D* hPad2 = nullptr;
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot )
                 {
                     //size for two pads
@@ -5099,7 +4555,7 @@ void analysis1()
                     if(RegionGroup[RegionGroupIndex].showData)
                     {
                         //ratio plot
-                        h2Ratio = new TH1F("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
+                        h2Ratio = new TH1D("Ratio",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2Ratio->Sumw2();
                         h2Ratio->Add(h2DataSum);
                         h2Ratio->Divide(h2BGSum);
@@ -5212,75 +4668,78 @@ void analysis1()
                     
                     for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].OptimizingCut[SigOptimizingIndex].size();i++)
                     {
-                        TString VarName;
-                        double lower;
-                        double upper;
-                        fin>>VarName;
-                        if(VarName == Var[VarIndex].VarName)
+                        for(unsigned int j=0;j<RegionInfo[ RegionGroup[optRegionGroupIndex].lower+SixChannel ].OptimizingCut[SigOptimizingIndex][i].size();j++)
                         {
-                            fin>>lower;
-                            fin>>upper;
-                            
-                            TString NameTemp;
-                            TLine l;
-                            TLine* l1 = nullptr;
-                            TLine* l2 = nullptr;
-                            if(lower == 0)
+                            TString VarName;
+                            double lower;
+                            double upper;
+                            fin>>VarName;
+                            if(VarName == Var[VarIndex].VarName)
                             {
-                                if(upper == -1)
+                                fin>>lower;
+                                fin>>upper;
+                                
+                                TString NameTemp;
+                                TLine l;
+                                TLine* l1 = nullptr;
+                                TLine* l2 = nullptr;
+                                if(lower == 0)
                                 {
+                                    if(upper == -1)
+                                    {
+                                    }
+                                    else
+                                    {
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " < ";
+                                        NameTemp += upper;
+                                        
+                                        l1 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                    }
                                 }
                                 else
                                 {
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " < ";
-                                    NameTemp += upper;
-                                    
-                                    l1 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
+                                    if(upper == -1)
+                                    {
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " >= ";
+                                        NameTemp += lower;
+                                        
+                                        l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                    }
+                                    else
+                                    {
+                                        NameTemp += lower;
+                                        NameTemp += " <= ";
+                                        NameTemp += Var[VarIndex].VarTitle;
+                                        NameTemp += " < ";
+                                        NameTemp += upper;
+                                        
+                                        l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
+                                        l1->SetLineStyle(9);
+                                        l1->SetLineWidth(2);
+                                        
+                                        l2 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
+                                        l2->SetLineStyle(9);
+                                        l2->SetLineWidth(2);
+                                    }
                                 }
+                                
+                                TLatex lt2;
+                                lt2.DrawLatexNDC(0.2,0.63, NameTemp.Data());
+                                lt2.SetTextSize(lt2.GetTextSize());
+                                
+                                break;
                             }
                             else
                             {
-                                if(upper == -1)
-                                {
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " >= ";
-                                    NameTemp += lower;
-                                    
-                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
-                                }
-                                else
-                                {
-                                    NameTemp += lower;
-                                    NameTemp += " <= ";
-                                    NameTemp += Var[VarIndex].VarTitle;
-                                    NameTemp += " < ";
-                                    NameTemp += upper;
-                                    
-                                    l1 = l.DrawLine(lower, h2DataSum->GetMinimum(), lower, h2DataSum->GetMaximum());
-                                    l1->SetLineStyle(9);
-                                    l1->SetLineWidth(2);
-                                    
-                                    l2 = l.DrawLine(upper, h2DataSum->GetMinimum(), upper, h2DataSum->GetMaximum());
-                                    l2->SetLineStyle(9);
-                                    l2->SetLineWidth(2);
-                                }
+                                fin>>lower;
+                                fin>>upper;
                             }
-                            
-                            TLatex lt2;
-                            lt2.DrawLatexNDC(0.2,0.73, NameTemp.Data());
-                            lt2.SetTextSize(lt2.GetTextSize());
-                            
-                            break;
-                        }
-                        else
-                        {
-                            fin>>lower;
-                            fin>>upper;
                         }
                     }
                     
@@ -5288,11 +4747,17 @@ void analysis1()
                     
                     if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                     {
-                        TString NameTemp = TString::Format("Z_{n} = %.2f",SigMassSplitting[SigOptimizingIndex].significance);
+                        TString NameTemp = TString::Format("Z_{n} = %.2f",averageSignificance);
                         TLatex lt2;
                         lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.2,0.73,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
@@ -5358,7 +4823,7 @@ void analysis1()
                 delete h2BGSum;
                 
                 //h2Sig
-                for(unsigned int j=0;j<SigSampleID.size();j++)
+                for(unsigned int j=0;j<SigSampleInfo.size();j++)
                 {
                     delete h2Sig[j];
                 }
@@ -5415,18 +4880,18 @@ void analysis1()
                     axis[i] += Var[VarIndex[i]].unit;
                 }
                 
-                TH2F* h2SigSum[SigMassSplitting.size()];
+                TH2D* h2SigSum[SigMassSplitting.size()];
                 {
                     TString CommonCut = RegionInfo[RegionIndex].Cut;
                     //Background
                     //For MC background
                     for(unsigned int j=0;j<tree2BGMC.size();j++)
                     {
-                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                                                 Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         for(unsigned int k=0;k<tree2BGMC[j].size();k++)
                         {
-                            TH2F* hTemp = new TH2F("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            TH2D* hTemp = new TH2D("BGMC",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                        Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
                             TString temp = Var[VarIndex[1]].VarFormula;
@@ -5454,12 +4919,12 @@ void analysis1()
                     //For data-driven background
                     for(unsigned int j=tree2BGMC.size();j<BGGroup.size();j++)
                     {
-                        BGGroup[j].h3 = new TH2F(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                                                 Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         
                         for(unsigned int k=0;k<DataSampleID.size();k++)
                         {
-                            TH2F* hTemp = new TH2F("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            TH2D* hTemp = new TH2D("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             
                             //fill histograms from trees
@@ -5511,13 +4976,13 @@ void analysis1()
                     {
                         TString NameTemp = "SigSum_";
                         NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                        h2SigSum[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                        h2SigSum[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         unsigned int AOD = 0;
-                        for(unsigned int j=0;j<SigSampleID.size();j++)
+                        for(unsigned int j=0;j<SigSampleInfo.size();j++)
                         {
-                            if(SigMass1[j]-SigMass2[j] != SigMassSplitting[i].MassDiff) continue;
-                            TH2F* hTemp = new TH2F("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 != SigMassSplitting[i].MassDiff) continue;
+                            TH2D* hTemp = new TH2D("signal",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                             //fill histograms from trees
                             TString temp = Var[VarIndex[1]].VarFormula;
@@ -5533,20 +4998,20 @@ void analysis1()
                             h2SigSum[i]->Add(hTemp);
                             delete hTemp;
                             
-                            AOD += SignAOD[j];
+                            AOD += SigSampleInfo[j].nwAOD;
                         }
                         
                         //normalization for h2SigSum
-                        h2SigSum[i]->Scale(SigXS[SigMassSplitting[i].ID] *sumDataL/AOD);
+                        h2SigSum[i]->Scale(SigSampleInfo[SigMassSplitting[i].ID].XS *sumDataL/AOD);
                     }
                 }
                 
-                TH2F* hSignificance[SigMassSplitting.size()];
+                TH2D* hSignificance[SigMassSplitting.size()];
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     TString NameTemp = "Significance_";
                     NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
-                    hSignificance[i] = new TH2F(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
+                    hSignificance[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                              Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                     hSignificance[i]->GetXaxis()->SetTitle(axis[0].Data());
                     hSignificance[i]->GetYaxis()->SetTitle(axis[1].Data());
@@ -5670,7 +5135,7 @@ void analysis1()
                     delete tree2BGMC[j][k];
                 }
             }
-            for(unsigned int i=0;i<SigSampleID.size();i++)
+            for(unsigned int i=0;i<SigSampleInfo.size();i++)
             {
                 delete tree2Sig[i];
             }
@@ -5704,8 +5169,12 @@ void analysis1()
                 }
             }
             
+            std::vector<Group> SRBGGroup2 = SRBGGroup;
+            std::sort(SRBGGroup2.begin(),SRBGGroup2.end(),compare2);
+            
             //stack
             THStack stackSR;
+            /*
             stackSR.Add(SRBGGroup[5].h2); //multi top
             stackSR.Add(SRBGGroup[3].h2); //single top
             stackSR.Add(SRBGGroup[0].h2); //Z+jets
@@ -5716,36 +5185,17 @@ void analysis1()
             stackSR.Add(SRBGGroup[7].h2); //Vgamma
             stackSR.Add(SRBGGroup[2].h2); //ttbar
             stackSR.Add(SRBGGroup[6].h2); //VV
+            */
+            
+            for(unsigned int i=0;i<SRBGGroup2.size();i++)
+            {
+                stackSR.Add(SRBGGroup2[i].h2);
+            }
             
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
-                unsigned int RegionIndex2 = RegionIndex - RegionGroup[RegionGroupIndex].lower;
-                TString NameTemp;
-                if(RegionIndex2 == 0)
-                {
-                    NameTemp = "SRee1";
-                }
-                else if(RegionIndex2 == 1)
-                {
-                    NameTemp = "SRmumu1";
-                }
-                else if(RegionIndex2 == 2)
-                {
-                    NameTemp = "SRemu1";
-                }
-                else if(RegionIndex2 == 3)
-                {
-                    NameTemp = "SRee2";
-                }
-                else if(RegionIndex2 == 4)
-                {
-                    NameTemp = "SRmumu2";
-                }
-                else if(RegionIndex2 == 5)
-                {
-                    NameTemp = "SRemu2";
-                }
-                
+                const unsigned int RegionIndex2 = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                TString NameTemp = RegionInfo[RegionIndex].RegionShortName;
                 h2SRSignificance[0]->GetXaxis()->SetBinLabel(RegionIndex2+1,NameTemp);
             }
             
@@ -5808,6 +5258,12 @@ void analysis1()
             }
             leg->Draw();
             
+            {
+                TLatex lt1;
+                lt1.DrawLatexNDC(0.2,0.13,setupTag.Data());
+                lt1.SetTextSize(lt1.GetTextSize());
+            }
+            
             c2->cd();
             pad2->Draw();
             pad2->cd();
@@ -5835,6 +5291,116 @@ void analysis1()
                 delete h2SRSignificance[j];
             }
         }
+        
+        //combined significance plot
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+        {
+            TGraph2D* g_significance = new TGraph2D();
+            for(unsigned int j=0;j<SigSampleInfo.size();j++)
+            {
+                g_significance->SetPoint(g_significance->GetN(), SigSampleInfo[j].Mass1, SigSampleInfo[j].Mass2, sqrt(SigSampleInfo[j].significance2));
+                //cout<<SigSampleInfo[j].Mass1<<", "<<SigSampleInfo[j].Mass2<<", "<<sqrt(SigSampleInfo[j].significance2)<<endl;
+            }
+            
+            TH2D* h2 = g_significance->GetHistogram();
+            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+            h2->GetZaxis()->SetTitle("Z_{n}");
+            
+            h2->GetXaxis()->SetRangeUser(0,350);
+            h2->GetZaxis()->SetRangeUser(0,4);
+            
+            gStyle->SetNumberContours(255);
+            {
+                gStyle->SetPalette(1);
+                
+                TCanvas* c2 = new TCanvas();
+                c2->cd();
+                c2->SetRightMargin(0.16);
+                g_significance->Draw("colz");
+                
+                {
+                    TList* grL = g_significance->GetContourList(1);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(2);
+                        obj->Draw("same");
+                        obj->SetName("s0");
+                    }
+                }
+                TGraph* xt0 = (TGraph*) gPad->GetPrimitive("s0");
+                
+                {
+                    TList* grL = g_significance->GetContourList(2);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(5);
+                        obj->Draw("same");
+                        obj->SetName("s1");
+                    }
+                }
+                TGraph* xt1 = (TGraph*) gPad->GetPrimitive("s1");
+                
+                {
+                    TList* grL = g_significance->GetContourList(3);
+                    TIter next1(grL);
+                    while(true)
+                    {
+                        TGraph* obj = (TGraph*) next1();
+                        if(obj == nullptr) break;
+                        obj->SetLineWidth(2);
+                        obj->SetLineStyle(9);
+                        obj->Draw("same");
+                        obj->SetName("s2");
+                    }
+                }
+                TGraph* xt2 = (TGraph*) gPad->GetPrimitive("s2");
+                
+                TLegend* leg;
+                {
+                    Double_t xl1=0.2, yl1=0.7, xl2=xl1+0.2, yl2=yl1+0.2;
+                    leg = new TLegend(xl1,yl1,xl2,yl2);
+                    leg->SetFillStyle(0);
+                    leg->SetBorderSize(0);
+                    
+                    leg->AddEntry(xt0, "Z_{n}=1", "l");
+                    leg->AddEntry(xt1, "Z_{n}=2", "l");
+                    leg->AddEntry(xt2, "Z_{n}=3", "l");
+                }
+                leg->Draw();
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.05,0.05,"combined");
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
+                
+                {
+                    TLatex lt1;
+                    lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
+                    lt1.SetTextSize(lt1.GetTextSize());
+                }
+                
+                TString NameTemp = "plot/";
+                NameTemp += "combine_significance_";
+                NameTemp += TString::Itoa(SigOptimizingIndex,10);
+                NameTemp += ".eps";
+                c2->Print(NameTemp,"eps");
+                
+                delete leg;
+                delete c2;
+            }
+            
+            delete g_significance;
+        }
     }
     
     //delete fout_plot
@@ -5849,7 +5415,7 @@ void analysis1()
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         if(!
-           (RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
+           (/* RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
@@ -5858,8 +5424,8 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_mumu_low_mT2" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_ee_Zmass" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" || */
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre")
            ) continue;
         
         TString PathName = "latex/data/expN_";
@@ -5880,12 +5446,9 @@ void analysis1()
                   RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ) &&
                !(SixChannel == 1 || SixChannel == 4) )) continue;
             
-            TString latexName = RegionInfo[RegionIndex].RegionName;
-            latexName.ReplaceAll("_","\\_");
-            
-            fout<<"\\begin{frame}{Expected number of events \\\\ ";
+            fout<<"\\begin{frame}{";
             fout<<"For ";
-            fout<<latexName.Data();
+            fout<<RegionInfo[RegionIndex].RegionShortName.Data();
             fout<<"}"<<endl;
             
             fout<<"\\vspace{5mm}"<<endl;
@@ -5982,7 +5545,7 @@ void analysis1()
             fout<<Var[VarIndex].latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=0;RegionIndex<=0;RegionIndex++)
             {
                 fout<<"\\includegraphics[width=0.8\\textwidth]{"
@@ -6002,8 +5565,6 @@ void analysis1()
     //plot_SR_SS_0B.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        unsigned int startingIndex = 0;
-        
         if(! //Cutflow Attention
            (/*RegionGroup[RegionGroupIndex].GroupName == "CR_OS"    ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS"    ||
@@ -6011,12 +5572,13 @@ void analysis1()
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_1B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B" ||
             RegionGroup[RegionGroupIndex].GroupName == "CR_SS_2B" ||
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||*/
-            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ||
+            RegionGroup[RegionGroupIndex].GroupName == "SR_SS_run1" ||*/
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt" ||
             RegionGroup[RegionGroupIndex].GroupName == "SR_SS_pre" )
            ) continue;
         
+        const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
         
         TString PathName = "latex/data/plot_";
         PathName += RegionGroup[RegionGroupIndex].GroupName;
@@ -6030,22 +5592,66 @@ void analysis1()
         ofstream fout;
         fout.open(PathName.Data());
         
-        for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+        unsigned int Nminus1 = 0;
+        vector<TString> VarPlot;
+        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
         {
+            //N-1 plot
+            VarPlot.push_back("pt1");
+            VarPlot.push_back("pt2");
+            VarPlot.push_back("mll");
+            VarPlot.push_back("dEta");
+            VarPlot.push_back("METRel");
+            VarPlot.push_back("meff");
+            VarPlot.push_back("mtm");
+            VarPlot.push_back("mlj");
+            VarPlot.push_back("ptll");
+            VarPlot.push_back("mTtwo");
+            Nminus1 = 10;
+            
+            //N plot
+            VarPlot.push_back("MET");
+            VarPlot.push_back("mt1");
+            VarPlot.push_back("mt2");
+            VarPlot.push_back("jetpt");
+            VarPlot.push_back("jeteta");
+            VarPlot.push_back("nJet");
+            VarPlot.push_back("nBJet");
+            VarPlot.push_back("nCJet");
+            VarPlot.push_back("l12_dPhi");
+            VarPlot.push_back("l12_MET_dPhi");
+            VarPlot.push_back("jet0_MET_dPhi");
+            VarPlot.push_back("mjj");
+            VarPlot.push_back("eta1");
+            VarPlot.push_back("eta2");
+            VarPlot.push_back("phi1");
+        }
+        else
+        {
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            {
+                VarPlot.push_back(Var[VarIndex].VarName);
+            }
+        }
+        
+        for(unsigned int i=0;i<VarPlot.size();i++)
+        {
+            unsigned int VarIndex = findVarIndex(VarPlot[i],Var);
+            
             if(Var[VarIndex].VarName=="averageMu") continue;
             if(Var[VarIndex].VarName=="nVtx") continue;
             
+            if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+            {
+                if(i == 0) fout<<"\\subsection{``N-1'' plots}"<<endl;
+                if(i == Nminus1) fout<<"\\subsection{``N'' plots}"<<endl;
+            }
             
-            TString latexName = RegionGroup[RegionGroupIndex].GroupName;
-            latexName.ReplaceAll("_","\\_");
-            
-            fout<<"\\begin{frame}{For ";
-            fout<<latexName.Data();
-            fout<<" \\\\ ";
+            fout<<"\\begin{frame}{";
             fout<<Var[VarIndex].latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
@@ -6059,7 +5665,10 @@ void analysis1()
                     Var[VarIndex].VarName=="cjetphi" )
                    ) continue;
                 
-                fout<<"\\includegraphics[width=0.33\\textwidth]{";
+                fout<<"\\includegraphics[width=";
+                if(RegionN == 4) fout<<"0.4";
+                else fout<<"0.33";
+                fout<<"\\textwidth]{";
                 fout<<Var[VarIndex].VarName.Data();
                 fout<<"_";
                 fout<<RegionInfo[RegionIndex].RegionName.Data();
@@ -6069,7 +5678,14 @@ void analysis1()
                     fout<<TString::Itoa(SigOptimizingIndex,10);
                 }
                 fout<<"}";
-                if(SixChannel==2) fout<<" \\\\";
+                if(RegionN == 4)
+                {
+                    if(SixChannel==1) fout<<" \\\\";
+                }
+                else
+                {
+                    if(SixChannel==2) fout<<" \\\\";
+                }
                 fout<<endl;
             }
             fout<<"}"<<endl;
@@ -6082,8 +5698,6 @@ void analysis1()
     //plot_significances.tex
     for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
-        unsigned int startingIndex = 0;
-        
         /*if(! //Cutflow Attention
            (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" )
            )*/ continue;
@@ -6114,7 +5728,7 @@ void analysis1()
             fout<<latexName.Data();
             fout<<"}"<<endl;
             
-            fout<<"\\Wider[5em]{"<<endl;
+            fout<<"\\Wider{"<<endl;
             for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
             {
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
@@ -6182,7 +5796,7 @@ void analysis1()
         fout.close();
     }
     
-    for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+    //cut_latex
     {
         TString optGroupName = "SR_SS_opt";
         unsigned int optRegionGroupIndex = 0;
@@ -6194,90 +5808,93 @@ void analysis1()
             }
         }
         
-        const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
-        
-        ifstream fin;
+        for(unsigned int RegionIndex=RegionGroup[optRegionGroupIndex].lower;RegionIndex<=RegionGroup[optRegionGroupIndex].upper;RegionIndex++)
         {
-            TString PathName = "latex/data/optimization/";
-            if(useDani) PathName += "cut_txt_Dani/";
-            else PathName += "cut_txt/";
-            PathName += "cut_";
-            PathName += RegionInfo[RegionIndex].RegionName;
-            PathName += "_";
-            PathName += TString::Itoa(SigOptimizingIndex,10);
-            PathName += ".txt";
-            fin.open(PathName.Data());
-        }
-        
-        ofstream fout;
-        {
-            TString PathName = "latex/data/optimization/cut_latex/cut_";
-            PathName += RegionInfo[RegionIndex].RegionName;
-            PathName += "_";
-            PathName += TString::Itoa(SigOptimizingIndex,10);
-            PathName += ".tex";
-            fout.open(PathName.Data());
-        }
-        
-        TString latexName = RegionInfo[RegionIndex].RegionName;
-        latexName.ReplaceAll("_","\\_");
-        fout<<latexName.Data()<<": ";
-        fout<<SigMassSplitting[SigOptimizingIndex].IDName;
-        fout<<": \\\\"<<endl;
-
-        for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
-        {
-            TString VarName;
-            double lower;
-            double upper;
-            fin>>VarName;
-            fin>>lower;
-            fin>>upper;
-            
-            unsigned int VarIndex = findVarIndex(VarName,Var);
-            
-            if(lower == 0)
+            ifstream fin;
             {
-                if(upper == -1)
+                TString PathName = "latex/data/optimization/";
+                if(useDani) PathName += "cut_txt_Dani/";
+                else PathName += "cut_txt/";
+                PathName += "cut_";
+                PathName += RegionInfo[RegionIndex].RegionName;
+                PathName += "_";
+                PathName += TString::Itoa(SigOptimizingIndex,10);
+                PathName += ".txt";
+                fin.open(PathName.Data());
+            }
+            
+            ofstream fout;
+            {
+                TString PathName = "latex/data/optimization/cut_latex/cut_";
+                PathName += RegionInfo[RegionIndex].RegionName;
+                PathName += "_";
+                PathName += TString::Itoa(SigOptimizingIndex,10);
+                PathName += ".tex";
+                fout.open(PathName.Data());
+            }
+            
+            TString latexName = RegionInfo[RegionIndex].RegionName;
+            latexName.ReplaceAll("_","\\_");
+            fout<<latexName.Data();
+            fout<<": \\\\"<<endl;
+            
+            for(unsigned int i=0;i<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex].size();i++)
+            {
+                for(unsigned int j=0;j<RegionInfo[RegionIndex].OptimizingCut[SigOptimizingIndex][i].size();j++)
                 {
-                }
-                else
-                {
-                    // x < a
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $<";
-                    fout<<upper;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
+                    TString VarName;
+                    double lower;
+                    double upper;
+                    fin>>VarName;
+                    fin>>lower;
+                    fin>>upper;
+                    
+                    unsigned int VarIndex = findVarIndex(VarName,Var);
+                    
+                    if(lower == 0)
+                    {
+                        if(upper == -1)
+                        {
+                        }
+                        else
+                        {
+                            // x < a
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $<";
+                            fout<<upper;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
+                    }
+                    else
+                    {
+                        if(upper == -1)
+                        {
+                            // x >= a
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $\\geq ";
+                            fout<<lower;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
+                        else
+                        {
+                            // a <= x < b
+                            fout<<"$";
+                            fout<<lower;
+                            fout<<" \\leq$ ";
+                            fout<<Var[VarIndex].latexName.Data();
+                            fout<<" $<";
+                            fout<<upper;
+                            fout<<"$";
+                            fout<<" \\\\"<<endl;
+                        }
+                    }
                 }
             }
-            else
-            {
-                if(upper == -1)
-                {
-                    // x >= a
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $\\geq ";
-                    fout<<lower;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
-                }
-                else
-                {
-                    // a <= x < b
-                    fout<<"$";
-                    fout<<lower;
-                    fout<<" \\leq$ ";
-                    fout<<Var[VarIndex].latexName.Data();
-                    fout<<" $<";
-                    fout<<upper;
-                    fout<<"$";
-                    fout<<" \\\\"<<endl;
-                }
-            }
+            fout.close();
+            fin.close();
         }
-        fout.close();
-        fin.close();
     }
     
     //cut table
@@ -6302,10 +5919,11 @@ void analysis1()
             fout.open(PathName.Data());
         }
         
-        ifstream fin[6];
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        const unsigned int RegionN = RegionGroup[optRegionGroupIndex].upper - RegionGroup[optRegionGroupIndex].lower +1;
+        ifstream fin[RegionN];
+        for(unsigned int RegionIndex=RegionGroup[optRegionGroupIndex].lower;RegionIndex<=RegionGroup[optRegionGroupIndex].upper;RegionIndex++)
         {
-            const unsigned int RegionIndex = RegionGroup[optRegionGroupIndex].lower + SixChannel;
+            const unsigned int SixChannel = RegionIndex - RegionGroup[optRegionGroupIndex].lower;
             TString PathName = "latex/data/optimization/";
             if(useDani) PathName += "cut_txt_Dani/";
             else PathName += "cut_txt/";
@@ -6317,80 +5935,213 @@ void analysis1()
             fin[SixChannel].open(PathName.Data());
         }
         
+        if(RegionN == 6)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|c|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SR$ee$-1 & SR$ee$-2 & SR$\\mu\\mu$-1 & SR$\\mu\\mu$-2 & SR$e\\mu$-1 & SR$e\\mu$-2 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"Lepton flavours & $ee$ & $ee$ & $\\mu\\mu$ & $\\mu\\mu$ & $e\\mu$ & $e\\mu$ \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
+        else if(RegionN == 2)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet1 & SRjet23 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
+        else if(RegionN == 1)
+        {
+            fout<<"\\begin{tabular}{|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet123 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 to 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
+        else if(RegionN == 4)
+        {
+            fout<<"\\begin{tabular}{|c|c|c|c|c|}"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"& SRjet1\\_off & SRjet23\\_off & SRjet1\\_on & SRjet23\\_on \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"\\hline"<<endl;
+        }
+        
         for(unsigned int i=0;i<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex].size();i++)
         {
-            unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i].RelatedVariable,Var);
-            
-            if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
-            else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
-            else fout<<Var[VarIndex].latexName.Data();
-            
-            fout<<" ";
-            if(Var[VarIndex].unit != "") fout<<Var[VarIndex].unit.Data()<<" ";
-            
-            unsigned int SixChannel = 0;
-            while(true)
+            for(unsigned int j=0;j<RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i].size();j++)
             {
-                TString VarName;
-                double lower;
-                double upper;
-                fin[SixChannel]>>VarName;
-                fin[SixChannel]>>lower;
-                fin[SixChannel]>>upper;
+                unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
                 
-                fout<<"& ";
-                if(lower == 0)
+                if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
+                else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
+                else fout<<Var[VarIndex].latexName.Data();
+                
+                fout<<" ";
+                if(Var[VarIndex].unit != "") fout<<Var[VarIndex].unit.Data()<<" ";
+                
+                unsigned int SixChannel = 0;
+                while(true)
                 {
-                    if(upper == -1)
+                    TString VarName;
+                    double lower;
+                    double upper;
+                    fin[SixChannel]>>VarName;
+                    fin[SixChannel]>>lower;
+                    fin[SixChannel]>>upper;
+                    
+                    fout<<"& ";
+                    if(lower == 0)
                     {
-                        fout<<"- ";
+                        if(upper == -1)
+                        {
+                            fout<<"- ";
+                        }
+                        else
+                        {
+                            // x < a
+                            fout<<"$<";
+                            fout<<upper;
+                            fout<<"$ ";
+                        }
                     }
                     else
                     {
-                        // x < a
-                        fout<<"$<";
-                        fout<<upper;
-                        fout<<"$ ";
+                        if(upper == -1)
+                        {
+                            // x >= a
+                            fout<<"$\\geq ";
+                            fout<<lower;
+                            fout<<"$ ";
+                        }
+                        else
+                        {
+                            // a <= x < b
+                        }
                     }
-                }
-                else
-                {
-                    if(upper == -1)
+                    
+                    if(RegionN == 6)
                     {
-                        // x >= a
-                        fout<<"$\\geq ";
-                        fout<<lower;
-                        fout<<"$ ";
+                        if(SixChannel == 0) SixChannel = 3;
+                        else if(SixChannel == 3) SixChannel = 1;
+                        else if(SixChannel == 1) SixChannel = 4;
+                        else if(SixChannel == 4) SixChannel = 2;
+                        else if(SixChannel == 2) SixChannel = 5;
+                        else if(SixChannel == 5) break;
                     }
                     else
                     {
-                        // a <= x < b
+                        if(SixChannel == RegionN -1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            SixChannel++;
+                        }
                     }
                 }
                 
-                if(SixChannel == 0) SixChannel = 3;
-                else if(SixChannel == 3) SixChannel = 1;
-                else if(SixChannel == 1) SixChannel = 4;
-                else if(SixChannel == 4) SixChannel = 2;
-                else if(SixChannel == 2) SixChannel = 5;
-                else if(SixChannel == 5) break;
-            }
-            
-            fout<<"\\\\"<<endl;
-            fout<<"\\hline"<<endl;
-            
-            if(Var[VarIndex].VarName == "pt2")
-            {
-                fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                fout<<"\\\\"<<endl;
                 fout<<"\\hline"<<endl;
+                
+                if(Var[VarIndex].VarName == "pt2")
+                {
+                    if(RegionN == 6)
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
+                    }
+                    else if(RegionN == 4)
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & $\\leq 10$ & $\\leq 10$ \\\\"<<endl;
+                    }
+                    else
+                    {
+                        fout<<"$|m_{ll}-m_Z|$ [GeV] ";
+                        for(unsigned int k=0;k<RegionN;k++)
+                        {
+                            fout<<"& - ";
+                        }
+                        fout<<"\\\\"<<endl;
+                    }
+                    fout<<"\\hline"<<endl;
+                }
             }
         }
         
-        for(unsigned int SixChannel=0;SixChannel<6;SixChannel++)
+        for(unsigned int SixChannel=0;SixChannel<RegionN;SixChannel++)
         {
             fin[SixChannel].close();
         }
         fout.close();
+    }
+    
+    //nSig_SR_SS_opt_0.tex
+    //significance_SR_SS_opt_0.tex
+    for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
+    {
+        if(!
+           (RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+           ) continue;
+        
+        const unsigned int RegionN = RegionGroup[RegionGroupIndex].upper - RegionGroup[RegionGroupIndex].lower +1;
+        
+        for(unsigned int i=0;i<=1;i++)
+        {
+            TString PathName = "latex/data/optimization/";
+            if(i==0) PathName += "nSig";
+            if(i==1) PathName += "significance";
+            PathName += "_";
+            PathName += RegionGroup[RegionGroupIndex].GroupName;
+            PathName += "_";
+            PathName += TString::Itoa(SigOptimizingIndex,10);
+            PathName += ".tex";
+            
+            ofstream fout;
+            fout.open(PathName.Data());
+            
+            fout<<"\\begin{frame}{";
+            if(i==0) fout<<"signal yield plot";
+            if(i==1) fout<<"significance plot";
+            fout<<"}"<<endl;
+            fout<<"\\Wider{"<<endl;
+            for(unsigned int RegionIndex=RegionGroup[RegionGroupIndex].lower;RegionIndex<=RegionGroup[RegionGroupIndex].upper;RegionIndex++)
+            {
+                const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
+                
+                fout<<"\\includegraphics[width=";
+                if(RegionN == 4) fout<<"0.4";
+                else fout<<"0.33";
+                fout<<"\\textwidth]{";
+                if(i==0) fout<<"nSig";
+                if(i==1) fout<<"significance";
+                fout<<"_";
+                fout<<RegionInfo[RegionIndex].RegionName.Data();
+                fout<<"_";
+                fout<<TString::Itoa(SigOptimizingIndex,10);
+                fout<<"}";
+                if(RegionN == 4)
+                {
+                    if(SixChannel==1) fout<<" \\\\";
+                }
+                else
+                {
+                    if(SixChannel==2) fout<<" \\\\";
+                }
+                fout<<endl;
+            }
+            fout<<"}"<<endl;
+            fout<<"\\end{frame}"<<endl;
+            
+            fout.close();
+        }
     }
     
     /*
@@ -6411,7 +6162,7 @@ void analysis1()
                 if(lepton==1) fout<<"mumu channel";
                 fout<<")}"<<endl;
                 
-                fout<<"\\Wider[5em]{"<<endl;
+                fout<<"\\Wider{"<<endl;
                 for(unsigned int ISR=0;ISR<=6;ISR+=6)
                 {
                     fout<<"\\includegraphics[width=0.5\\textwidth]{../plot_nozpt/"

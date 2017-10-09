@@ -7,7 +7,7 @@
 
 #include <TFile.h>
 #include <TChain.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TLorentzVector.h>
 
 Int_t ID1;
@@ -58,19 +58,87 @@ float mlj;
 float R2;
 float mjj;
 
-struct nEvent
+struct GroupData
 {
-    TString name;
-    int n;
-    double nw;
-    double nAOD;
+    TString GroupName;
+    TString LegendName;
+    TString LatexName;
+    unsigned int lower;
+    unsigned int upper;
+    int colour;
+    int unweighted;
+    double weighted;
+    double error;
 };
 
-const bool recalculate_mlj = true;
+const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName,std::vector<nEvent>& nSS)
+const bool cutflow = false;
+void initializehCutflow(vector<TH1D*>& hSRCutflow)
+{
+    for(unsigned int j=0;j<6;j++)
+    {
+        TString hName = "cutflow_";
+        hName += TString::Itoa(j,10);
+        TH1D* hTemp = new TH1D(hName.Data(), "cutflow", 100, 0, 100);
+        hSRCutflow.push_back(hTemp);
+
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(1,"nAOD");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(3,"trigger");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(4,"trigger,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(5,"=2BaseLep and =2SigLep");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(6,"=2BaseLep and =2SigLep,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(7,"SS");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(8,"SS,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(9,"flavour");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(10,"flavour,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(11,"jet");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(12,"jet,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(13,"bjet");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(14,"bjet,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(15,"Zmass");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(16,"Zmass,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(17,"pt1");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(18,"pt1,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(19,"pt2");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(20,"pt2,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(21,"dEta");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(22,"dEta,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(23,"meff");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(24,"meff,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(25,"maxmt");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(26,"maxmt,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(27,"mlj");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"mlj,w");
+    }
+}
+
+void deletehCutflow(vector<TH1D*>& hSRCutflow)
+{
+    for(unsigned int j=0;j<6;j++)
+    {
+        delete hSRCutflow[j];
+    }
+}
+
+void printhCutflow(vector<TH1D*>& hSRCutflow)
+{
+    for(unsigned int i=0;i<6;i++)
+    {
+        for(unsigned int j=1;j<=28;j++)
+        {
+            cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
+            if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
+            if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
+        }
+        cout<<endl;
+    }
+}
+
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
@@ -87,7 +155,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString fileName = SamplePath;
         fileName += "all/user.*.";
         fileName += SampleName;
-        fileName += ".*.myOutput.root";
+        fileName += ".*.myOutput.root*";
         //*/
         
         /*
@@ -225,14 +293,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     
     //histograms
-    TH1F* h2[channel.size()];
+    TH1D* h2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
         TString hName2 = "hist_";
         hName2 += channel[j];
         
         f2[j]->cd();
-        h2[j] = new TH1F(hName2.Data(), "cut flow", 20, 0, 20);
+        h2[j] = new TH1D(hName2.Data(), "cut flow", 20, 0, 20);
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
@@ -251,7 +319,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             cout<<fileList->At(i)->GetTitle()<<endl;
             TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
-            TH1F *h1 = (TH1F*) f1->Get("hCutFlow");
+            TH1D *h1 = (TH1D*) f1->Get("hCutFlow");
             for(unsigned int j=1;j<30;j++)
             {
                 //cout<<j<<" "<<h1->GetBinContent(j)<<endl;;
@@ -266,11 +334,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
     }
     
-    nEvent element;
-    element.name = SampleName;
-    element.n = 0;
-    element.nw = 0;
-    element.nAOD = h2[0]->GetBinContent(2);
+    if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
+    const double commonWeight = XS /h2[0]->GetBinContent(2) *(32861.6+3212.96);
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -285,15 +350,22 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //trigger
         if((sig.trigCode & sig.trigMask)==0)
         {
-            continue;
+            if(!cutflow) continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("trigger",1);
         }
         
+        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
         fLwt = evt.fLwt;
+        const double TotalWeight = weight * commonWeight;
         
+        int sigIndex[2];
+        sigIndex[0] = 0;
+        sigIndex[1] = 1;
+        pt1 = leps[sigIndex[0]].pt;
+        pt2 = leps[sigIndex[1]].pt;
         if(!evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -307,20 +379,26 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(leps.size()!=2) continue;
             if(!(leps[0].lFlag & 1<<1)) continue;
             if(!(leps[1].lFlag & 1<<1)) continue;
+            if(cutflow && pt1<=25) continue;
+            if(cutflow && pt2<=25) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("=2SigLep",1);
             }
+            
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<6;m++)
+                {
+                    hSRCutflow[m]->Fill("=2BaseLep and =2SigLep",1);
+                    hSRCutflow[m]->Fill("=2BaseLep and =2SigLep,w",TotalWeight);
+                }
+            }
         }
         
-        int sigIndex[2];
-        sigIndex[0] = 0;
-        sigIndex[1] = 1;
         ID1 = leps[sigIndex[0]].ID;
         ID2 = leps[sigIndex[1]].ID;
-        pt1 = leps[sigIndex[0]].pt;
-        pt2 = leps[sigIndex[1]].pt;
         eta1 = leps[sigIndex[0]].eta;
         eta2 = leps[sigIndex[1]].eta;
         //pt of leading lepton
@@ -339,34 +417,25 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
-        phi1 = leps[sigIndex[0]].phi;
-        mll = l12.m;
-        ptll = l12.pt;
-        MET = sig.Met;
-        METRel = sig.MetRel;
-        mTtwo = sig.mT2;
-        mt1 = leps[sigIndex[0]].mT;
-        mt2 = leps[sigIndex[1]].mT;
-        if(mt1>mt2) mtm = mt1;
-        else mtm = mt2;
-        meff = sig.HT + sig.Met;
-        mjj = sig.mjj;
-        //R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = l12.dPhi;
-        l12_MET_dPhi = l12.MET_dPhi;
-        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
-        else jet0_MET_dPhi = -999;
-        l12_jet0_dPhi = l12.jet0_dPhi;
-        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
-        
-        qFwt = evt.qFwt;
-        
-        averageMu = evt.averageMu;
+        //OS or SS
+        int channelIndex = 0;
+        if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
+        {
+            channelIndex += 3;
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<6;m++)
+                {
+                    hSRCutflow[m]->Fill("SS",1);
+                    hSRCutflow[m]->Fill("SS,w",TotalWeight);
+                }
+            }
+        }
+        else if(cutflow) continue;
         
         //SF or DF
         TLorentzVector l1;
         TLorentzVector l2;
-        int channelIndex = 0;
         if(int(abs(ID1)/1000) == 11)
         {
             if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_el);
@@ -395,8 +464,64 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
-        //jets
+        int SRIndex = -1;
         nJet = jets.size();
+        if(cutflow)
+        {
+            if(channelIndex==3)
+            {
+                hSRCutflow[0]->Fill("flavour",1);
+                hSRCutflow[0]->Fill("flavour,w",TotalWeight);
+                hSRCutflow[3]->Fill("flavour",1);
+                hSRCutflow[3]->Fill("flavour,w",TotalWeight);
+                if(nJet == 1)
+                {
+                    SRIndex = 0;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 3;
+                }
+                else continue;
+            }
+            else if(channelIndex==4)
+            {
+                hSRCutflow[1]->Fill("flavour",1);
+                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
+                hSRCutflow[4]->Fill("flavour",1);
+                hSRCutflow[4]->Fill("flavour,w",TotalWeight);
+                if(nJet == 1)
+                {
+                    SRIndex = 1;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 4;
+                }
+                else continue;
+            }
+            else if(channelIndex==5)
+            {
+                hSRCutflow[2]->Fill("flavour",1);
+                hSRCutflow[2]->Fill("flavour,w",TotalWeight);
+                hSRCutflow[5]->Fill("flavour",1);
+                hSRCutflow[5]->Fill("flavour,w",TotalWeight);
+                if(nJet == 1)
+                {
+                    SRIndex = 2;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 5;
+                }
+                else continue;
+            }
+            
+            hSRCutflow[SRIndex]->Fill("jet",1);
+            hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
+        }
+        
+        //jets
         nBJet = 0;
         vector<TLorentzVector> cjet_Ls;
         nCJet = 0;
@@ -460,20 +585,26 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             //jetphi = 0;
         }
        
-        /* 
         if(nBJet>0)
         {
-            bjetpt = jets[leadingBJetIndex].pt;
-            bjeteta = jets[leadingBJetIndex].eta;
-            bjetphi = jets[leadingBJetIndex].phi;
+            //bjetpt = jets[leadingBJetIndex].pt;
+            //bjeteta = jets[leadingBJetIndex].eta;
+            //bjetphi = jets[leadingBJetIndex].phi;
+            if(cutflow) continue;
         }
         else
         {
-            bjetpt = 0;
-            bjeteta = 0;
-            bjetphi = 0;
+            //bjetpt = 0;
+            //bjeteta = 0;
+            //bjetphi = 0;
+            if(cutflow)
+            {
+                hSRCutflow[SRIndex]->Fill("bjet",1);
+                hSRCutflow[SRIndex]->Fill("bjet,w",TotalWeight);
+            }
         }
         
+        /*
         if(nCJet>0)
         {
             cjetpt = jets[leadingCJetIndex].pt;
@@ -501,6 +632,30 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         */
 
+        phi1 = leps[sigIndex[0]].phi;
+        mll = l12.m;
+        ptll = l12.pt;
+        MET = sig.Met;
+        METRel = sig.MetRel;
+        mTtwo = sig.mT2;
+        //mt1 = leps[sigIndex[0]].mT;
+        //mt2 = leps[sigIndex[1]].mT;
+        mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi)));
+        mt2 = sqrt(2*pt2*MET*(1-cos(leps[1].MET_dPhi)));
+        if(mt1>mt2) mtm = mt1;
+        else mtm = mt2;
+        meff = sig.HT + sig.Met;
+        mjj = sig.mjj;
+        //R2 = MET/(MET + pt1 + pt2);
+        l12_dPhi = l12.dPhi;
+        l12_MET_dPhi = l12.MET_dPhi;
+        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
+        else jet0_MET_dPhi = -999;
+        l12_jet0_dPhi = l12.jet0_dPhi;
+        
+        qFwt = evt.qFwt;
+        averageMu = evt.averageMu;
+        
         if(recalculate_mlj)
         {
             mlj = -1;
@@ -527,18 +682,63 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         else mlj = sig.mlj;
-
+        
+        if(cutflow)
+        {
+            if(fabs(mll-91.2)>10)
+            {
+                hSRCutflow[SRIndex]->Fill("Zmass",1);
+                hSRCutflow[SRIndex]->Fill("Zmass,w",TotalWeight);
+            }
+            else continue;
+            
+            if(pt1>=65)
+            {
+                hSRCutflow[SRIndex]->Fill("pt1",1);
+                hSRCutflow[SRIndex]->Fill("pt1,w",TotalWeight);
+            }
+            else continue;
+            
+            if(pt2>=25)
+            {
+                hSRCutflow[SRIndex]->Fill("pt2",1);
+                hSRCutflow[SRIndex]->Fill("pt2,w",TotalWeight);
+            }
+            else continue;
+            
+            if(fabs(eta1-eta2)<1.5)
+            {
+                hSRCutflow[SRIndex]->Fill("dEta",1);
+                hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
+            }
+            else continue;
+            
+            if(meff>=200)
+            {
+                hSRCutflow[SRIndex]->Fill("meff",1);
+                hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
+            }
+            else continue;
+            
+            if(mtm>=125)
+            {
+                hSRCutflow[SRIndex]->Fill("maxmt",1);
+                hSRCutflow[SRIndex]->Fill("maxmt,w",TotalWeight);
+            }
+            else continue;
+            
+            if(mlj<105)
+            {
+                hSRCutflow[SRIndex]->Fill("mlj",1);
+                hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
+            }
+            else continue;
+        }
+        
         //separate the sample into channels
         if(nISR==0) {}
         else if(nISR>=1) channelIndex += 6;
         //else continue;
-        
-        if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
-        {
-            channelIndex += 3;
-            element.n++;
-            element.nw += weight;
-        }
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -563,8 +763,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     cout<<endl;
     
-    //cout<<element.name<<" "<<element.n<<" "<<element.nw<<" "<<element.nAOD<<endl;
-    nSS.push_back(element);
     //delete
     for(unsigned int j=0;j<channel.size();j++)
     {
@@ -582,7 +780,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
 }
 
-void GetSampleName(std::vector<TString>& SampleName, TString const type, int const skip)
+void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TString const type)
 {
     ifstream fin;
     {
@@ -606,10 +804,49 @@ void GetSampleName(std::vector<TString>& SampleName, TString const type, int con
         }
         SampleName.push_back(SampleNameTemp2);
         
-        for(int i=1;i<=skip;i++)
+        if(type == "Data")
         {
-            double temp;
-            fin>>temp;
+            double lumi;
+            fin>>lumi;
+            XS.push_back(lumi);
+            cout<<lumi<<endl;
+        }
+        else if(type == "BG")
+        {
+            double XS1;
+            double XS2;
+
+            fin>>XS2;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            XS.push_back(XS2);
+            cout<<XS2<<endl;
+
+            fin>>XS1;
+        }
+        else if(type == "Sig")
+        {
+            double XS1;
+            double XS2;
+
+            fin>>XS1;
+            fin>>XS1;
+
+            fin>>XS2;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            XS.push_back(XS2);
+            cout<<XS2<<endl;
         }
     }
     fin.close();
@@ -642,8 +879,50 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
     SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
     
-    std::vector<nEvent> nSS;
+    //Group for MC background
+    std::vector<GroupData> BGMCGroupData;
+    {
+        GroupData element;
+        
+        //Z+jets
+        element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
+        element.lower = 0;  element.upper = 41; element.colour = 2; BGMCGroupData.push_back(element);
+
+        //DY
+        element.GroupName = "DY";    element.LegendName = "DY";     element.LatexName = "DY";
+        element.lower = 42; element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        
+        //W+jets
+        element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
+        element.lower = 60;  element.upper = 101; element.colour = 3; BGMCGroupData.push_back(element);
+        
+        //Top
+        element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
+        element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
+
+        element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
+        element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
+        element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
+        element.lower = 115;  element.upper = 116; element.colour = 635; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
+        element.lower = 117;  element.upper = 130; element.colour = 801; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
+        element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
+
+        element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
+        element.lower = 151;  element.upper = 155; element.colour = 607; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
+        element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
+    }
     
     //Data
     if(false)
@@ -651,12 +930,16 @@ void skimming()
         //SamplePath += "data/";
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
+        std::vector<double> XSTemp;
         DataSampleName.reserve(20);
-        GetSampleName(DataSampleName,"Data",1);
+        GetSampleName(DataSampleName,XSTemp,"Data");
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
-            skimming2(SamplePath,tag,DataSampleName[i],nSS);
+            vector<TH1D*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow);
+            deletehCutflow(hSRCutflow);
         }
     }
     
@@ -666,14 +949,31 @@ void skimming()
         //SamplePath += "bkg/";
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
+        std::vector<double> BGXS;
         BGSampleName.reserve(20);
-        GetSampleName(BGSampleName,"BG",4);
-        //for(unsigned int i=114;i<=114;i++)
-        //for(unsigned int i=119;i<=120;i++)
-        for(unsigned int i=0;i<BGSampleName.size();i++)
+        GetSampleName(BGSampleName,BGXS,"BG");
+
+        for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
-            BGSampleName[i] = "mc15_13TeV." + BGSampleName[i];
-            skimming2(SamplePath,tag,BGSampleName[i],nSS);
+            //if(BGMCGroupData[i].GroupName != "VV") continue;
+
+            vector<TH1D*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+
+            //for(unsigned int j=114;j<=114;j++)
+            //for(unsigned int j=119;j<=120;j++)
+            //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
+            for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
+            {
+                BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
+                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow);
+            }
+            if(cutflow)
+            {
+                cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
+                printhCutflow(hSRCutflow);
+            }
+            deletehCutflow(hSRCutflow);
         }
     }
     
@@ -683,18 +983,18 @@ void skimming()
         //SamplePath += "sig/";
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
+        std::vector<double> SigXS;
         SigSampleName.reserve(20);
-        GetSampleName(SigSampleName,"Sig",5);
+        GetSampleName(SigSampleName,SigXS,"Sig");
         for(unsigned int i=0;i<=0;i++)
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
-            skimming2(SamplePath,tag,SigSampleName[i],nSS);
+            vector<TH1D*> hSRCutflow;
+            initializehCutflow(hSRCutflow);
+            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow);
+            if(cutflow) printhCutflow(hSRCutflow);
+            deletehCutflow(hSRCutflow);
         }
-    }
-    
-    for(unsigned int i=0;i<nSS.size();i++)
-    {
-        cout<<nSS[i].name<<" "<<nSS[i].n<<" "<<nSS[i].nw<<" "<<nSS[i].nAOD<<endl;
     }
 }

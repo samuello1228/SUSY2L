@@ -1,0 +1,56 @@
+\documentclass[mathserif,serif,aspectratio=169]{beamer}
+\usepackage{tabularx}
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
+\usepackage{slidesphysics}
+\graphicspath{{../plot/}}
+
+\newif\ifFigS
+
+\newcommand\Wider[2][2em]{%
+\makebox[\linewidth][c]{%
+\begin{minipage}{\dimexpr\textwidth+#1\relax}
+\raggedright
+\centering#2
+\end{minipage}%
+}%
+}
+
+\input{metadata}
+\author[]
+{
+Samuel Lo \inst{1}
+\and
+Yanjun Tu  \inst{1}
+\and
+Dongliang Zhang  \inst{2}
+}
+\institute[]
+{
+\inst{1}
+The University of Hong Kong
+\and
+\inst{2}
+University of Michigan
+}
+\date[]{\today}
+
+
+
+\begin{document}
+\frame{\titlepage}
+
+\section{Introduction}
+\begin{frame}{What's new?}
+  \begin{itemize}
+    \item Updates
+  \end{itemize}
+\end{frame}
+\input{sumPlots}
+\input{NplotsX}
+\ifFigS
+\input{Nplots}
+\input{PrePlots}
+\fi
+
+\end{document}
