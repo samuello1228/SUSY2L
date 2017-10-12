@@ -1310,19 +1310,19 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 		tree->GetEntry(i); 
 		double w = ((TChain*)(tree->tree1))->GetTree()->GetWeight();
 		w *= tree->evt.weight*tree->evt.pwt*tree->evt.ElSF*tree->evt.MuSF*tree->evt.BtagSF*tree->evt.JvtSF;
-		if (w<0) {
-			cout << "Event # " 
-					<< setw(8) << i << '\t'
-					<< setprecision(4) << fixed
-					<< ((TChain*)(tree->tree1))->GetTree()->GetWeight() << '\t'
-					<< tree->evt.weight << '\t'
-					<< tree->evt.pwt << '\t'
-					<< tree->evt.ElSF << '\t'
-					<< tree->evt.MuSF << '\t'
-					<< tree->evt.BtagSF << '\t'
-					<< tree->evt.JvtSF << endl;
-			// continue;
-		}
+		// if (w<0) {
+		// 	cout << "Event # " 
+		// 			<< setw(8) << i << '\t'
+		// 			<< setprecision(4) << fixed
+		// 			<< ((TChain*)(tree->tree1))->GetTree()->GetWeight() << '\t'
+		// 			<< tree->evt.weight << '\t'
+		// 			<< tree->evt.pwt << '\t'
+		// 			<< tree->evt.ElSF << '\t'
+		// 			<< tree->evt.MuSF << '\t'
+		// 			<< tree->evt.BtagSF << '\t'
+		// 			<< tree->evt.JvtSF << endl;
+		// 	// continue;
+		// }
 
 		// Measure unweighted efficiencies
 		if(passRatesCR(tree)){ for(uint j(0); j<tree->leps.size(); j++)
@@ -1635,8 +1635,8 @@ void calcFinalEffs()
 	hEl_final_realRate->Draw("colz text e"); c.Print(TString(hEl_final_realRate->GetName())+".eps"); 
 	hMu_final_realRate->Draw("colz text e"); c.Print(TString(hMu_final_realRate->GetName())+".eps"); 
 
-	DrawOneD(hEl_final_fakeRate, HEAVY, dir_weightedRates);
-	DrawOneD(hMu_final_fakeRate, HEAVY, dir_weightedRates);
+	DrawOneD(hEl_final_fakeRate, HEAVY, dir_weightedRates); // Here HEAVY just means non-prompt. Need "non-real" for the argument
+	DrawOneD(hMu_final_fakeRate, HEAVY, dir_weightedRates); 
 	DrawOneD(hEl_final_realRate, REAL , dir_weightedRates);
 	DrawOneD(hMu_final_realRate, REAL , dir_weightedRates);
 }
