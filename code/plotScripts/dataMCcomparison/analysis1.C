@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R1";
+TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -2129,7 +2129,7 @@ void analysis1()
         }
         */
         
-        /*
+        ///*
         //jet1
         {
             element.RegionName = "SR_SS_jet1_opt";
@@ -2168,31 +2168,6 @@ void analysis1()
             
             element.Cut = "";
             element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        */
-        
-        ///*
-        //jet123
-        {
-            element.RegionName = "SR_SS_jet123_opt";
-            element.RegionShortName = "SRjet123";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(9);
-            element.setOfChannel.push_back(10);
-            element.setOfChannel.push_back(11);
-            
-            element.Cut = "";
-            element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             if(FJetVeto) element.Cut += " && nFJet == 0";
             if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -2360,7 +2335,7 @@ void analysis1()
         }
         */
         
-        /*
+        ///*
         //jet1
         {
             element.RegionName = "SR_SS_jet1_pre";
@@ -2406,36 +2381,6 @@ void analysis1()
             {
                 element.Cut = "";
                 element.Cut += " && (nCJet == 2 || nCJet == 3)";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        */
-        
-        ///*
-        //jet123
-        {
-            element.RegionName = "SR_SS_jet123_pre";
-            element.RegionShortName = "SRjet123";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(9);
-            element.setOfChannel.push_back(10);
-            element.setOfChannel.push_back(11);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                element.Cut += " && (nCJet == 1 || nCJet == 2 || nCJet == 3)";
                 element.Cut += " && nBJet == 0";
                 if(FJetVeto) element.Cut += " && nFJet == 0";
                 if(ptcut) element.Cut += " && pt1>20 && pt2>20";
@@ -5446,9 +5391,12 @@ void analysis1()
                   RegionGroup[RegionGroupIndex].GroupName == "SR_SS_0B" ) &&
                !(SixChannel == 1 || SixChannel == 4) )) continue;
             
+            TString latexName = RegionInfo[RegionIndex].RegionShortName;
+            latexName.ReplaceAll("_","\\_");
+            
             fout<<"\\begin{frame}{";
             fout<<"For ";
-            fout<<RegionInfo[RegionIndex].RegionShortName.Data();
+            fout<<latexName.Data();
             fout<<"}"<<endl;
             
             fout<<"\\vspace{5mm}"<<endl;
@@ -5666,7 +5614,7 @@ void analysis1()
                    ) continue;
                 
                 fout<<"\\includegraphics[width=";
-                if(RegionN == 4) fout<<"0.4";
+                if(RegionN == 3 || RegionN == 4) fout<<"0.4";
                 else fout<<"0.33";
                 fout<<"\\textwidth]{";
                 fout<<Var[VarIndex].VarName.Data();
@@ -5678,7 +5626,7 @@ void analysis1()
                     fout<<TString::Itoa(SigOptimizingIndex,10);
                 }
                 fout<<"}";
-                if(RegionN == 4)
+                if(RegionN == 3 || RegionN == 4)
                 {
                     if(SixChannel==1) fout<<" \\\\";
                 }
@@ -6117,7 +6065,7 @@ void analysis1()
                 const unsigned int SixChannel = RegionIndex - RegionGroup[RegionGroupIndex].lower;
                 
                 fout<<"\\includegraphics[width=";
-                if(RegionN == 4) fout<<"0.4";
+                if(RegionN == 3 || RegionN == 4) fout<<"0.4";
                 else fout<<"0.33";
                 fout<<"\\textwidth]{";
                 if(i==0) fout<<"nSig";
@@ -6127,7 +6075,7 @@ void analysis1()
                 fout<<"_";
                 fout<<TString::Itoa(SigOptimizingIndex,10);
                 fout<<"}";
-                if(RegionN == 4)
+                if(RegionN == 3 || RegionN == 4)
                 {
                     if(SixChannel==1) fout<<" \\\\";
                 }
