@@ -84,7 +84,7 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow)
         hName += TString::Itoa(j,10);
         TH1D* hTemp = new TH1D(hName.Data(), "cutflow", 100, 0, 100);
         hSRCutflow.push_back(hTemp);
-
+        
         hSRCutflow[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(3,"trigger");
@@ -150,7 +150,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fileName += ".";
         fileName += SampleName;*/
         //fileName += "_myOutput.root/*.root*";
-
+        
         ///*
         TString fileName = SamplePath;
         fileName += "all/user.*.";
@@ -174,27 +174,27 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     
     EVT evt;
     tree1->SetBranchAddress("evt", &evt);
-
+    
     vector< L_PAR > leps;
     vector< L_PAR >* vleps = &leps;
     tree1->SetBranchAddress("leps", &vleps);
-
+    
     R_PAR l12;
     tree1->SetBranchAddress("l12", &l12);
-
+    
     vector< J_PAR > jets;
     vector< J_PAR >* vjets = &jets;
     tree1->SetBranchAddress("jets", &vjets);
-
+    
     /*
     vector< TR_PAR > truths;
     vector< TR_PAR >* vtruths = &truths;
     tree1->SetBranchAddress("truths", &vtruths);
     */
-
+    
     SIGNATURE sig;
     tree1->SetBranchAddress("sig", &sig);
-
+    
     /*
     tree1->Show(0);
     tree1->GetEntry(0);
@@ -209,7 +209,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     cout << "sig.mT2 = " << sig.mT2 << endl;
     return;
     */
-
+    
     //channels
     std::vector<TString> channel;
     {
@@ -273,19 +273,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("meff",&meff,"meff/F");
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         tree2[j]->Branch("mjj",&mjj,"mjj/F");
-
+        
         tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/F");
         tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/F");
         tree2[j]->Branch("jet0_MET_dPhi",&jet0_MET_dPhi,"jet0_MET_dPhi/F");
         tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/F");
-
+        
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("jetpt",&jetpt,"jetpt/F");
         tree2[j]->Branch("jeteta",&jeteta,"jeteta/F");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
         tree2[j]->Branch("nFJet",&nFJet,"nFJet/I");
-
+        
         tree2[j]->Branch("weight",&weight,"weight/F");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/F");
@@ -584,7 +584,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             jeteta = 0;
             //jetphi = 0;
         }
-       
+        
         if(nBJet>0)
         {
             //bjetpt = jets[leadingBJetIndex].pt;
@@ -631,7 +631,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             fjetphi = 0;
         }
         */
-
+        
         phi1 = leps[sigIndex[0]].phi;
         mll = l12.m;
         ptll = l12.pt;
@@ -664,11 +664,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 TLorentzVector JetSystem;
                 if(cjet_Ls.size()==1)
                 {
-                  JetSystem = cjet_Ls[0];
+                    JetSystem = cjet_Ls[0];
                 }
                 else if(cjet_Ls.size()==2 || cjet_Ls.size()==3)
                 {
-                  JetSystem = cjet_Ls[0]+cjet_Ls[1];
+                    JetSystem = cjet_Ls[0]+cjet_Ls[1];
                 }
                 
                 double dR1 = JetSystem.DeltaR(l1);
@@ -815,36 +815,36 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TS
         {
             double XS1;
             double XS2;
-
+            
             fin>>XS2;
-
+            
             fin>>XS1;
             XS2 *= XS1;
-
+            
             fin>>XS1;
             XS2 *= XS1;
-
+            
             XS.push_back(XS2);
             cout<<XS2<<endl;
-
+            
             fin>>XS1;
         }
         else if(type == "Sig")
         {
             double XS1;
             double XS2;
-
+            
             fin>>XS1;
             fin>>XS1;
-
+            
             fin>>XS2;
-
+            
             fin>>XS1;
             XS2 *= XS1;
-
+            
             fin>>XS1;
             XS2 *= XS1;
-
+            
             XS.push_back(XS2);
             cout<<XS2<<endl;
         }
@@ -854,12 +854,12 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TS
 
 void skimming()
 {
-    gInterpreter->GenerateDictionary("PAR0","obj_def.h"); 
-    gInterpreter->GenerateDictionary("PAR","obj_def.h"); 
-    gInterpreter->GenerateDictionary("vector<L_PAR>","obj_def.h;vector"); 
-    gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector"); 
-    //gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector"); 
-
+    gInterpreter->GenerateDictionary("PAR0","obj_def.h");
+    gInterpreter->GenerateDictionary("PAR","obj_def.h");
+    gInterpreter->GenerateDictionary("vector<L_PAR>","obj_def.h;vector");
+    gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector");
+    //gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector");
+    
     TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
     //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
@@ -889,7 +889,7 @@ void skimming()
         //Z+jets
         element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
         element.lower = 0;  element.upper = 41; element.colour = 2; BGMCGroupData.push_back(element);
-
+        
         //DY
         element.GroupName = "DY";    element.LegendName = "DY";     element.LatexName = "DY";
         element.lower = 42; element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
@@ -901,7 +901,7 @@ void skimming()
         //Top
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
-
+        
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
         element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
         
@@ -916,7 +916,7 @@ void skimming()
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
-
+        
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
         element.lower = 151;  element.upper = 155; element.colour = 607; BGMCGroupData.push_back(element);
         
@@ -952,14 +952,14 @@ void skimming()
         std::vector<double> BGXS;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,BGXS,"BG");
-
+        
         for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
             //if(BGMCGroupData[i].GroupName != "VV") continue;
-
+            
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
-
+            
             //for(unsigned int j=114;j<=114;j++)
             //for(unsigned int j=119;j<=120;j++)
             //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
