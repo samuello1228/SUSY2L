@@ -139,7 +139,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow)
     }
 }
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow, std::vector<TString>& channel)
 {
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
@@ -210,30 +210,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     cout << "sig.mT2 = " << sig.mT2 << endl;
     return;
     */
-    
-    //channels
-    std::vector<TString> channel;
-    {
-        TString ISR[2] = {"nonISR","ISR"};
-        TString sign[2] = {"OS","SS"};
-        TString lepton[3] = {"ee","mumu","emu"};
-        for(int i=0;i<2;i++)
-        {
-            for(int j=0;j<2;j++)
-            {
-                for(int k=0;k<3;k++)
-                {
-                    TString element = "";
-                    element += ISR[i];
-                    element += "_";
-                    element += sign[j];
-                    element += "_";
-                    element += lepton[k];
-                    channel.push_back(element);
-                }
-            }
-        }
-    }
     
     //create files for storing the resulting trees and histograms
     TFile *f2[channel.size()];
@@ -882,6 +858,30 @@ void skimming()
     SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
     
+    //channels
+    std::vector<TString> channel;
+    {
+        TString ISR[2] = {"nonISR","ISR"};
+        TString sign[2] = {"OS","SS"};
+        TString lepton[3] = {"ee","mumu","emu"};
+        for(int i=0;i<2;i++)
+        {
+            for(int j=0;j<2;j++)
+            {
+                for(int k=0;k<3;k++)
+                {
+                    TString element = "";
+                    element += ISR[i];
+                    element += "_";
+                    element += sign[j];
+                    element += "_";
+                    element += lepton[k];
+                    channel.push_back(element);
+                }
+            }
+        }
+    }
+    
     //Group for MC background
     std::vector<GroupData> BGMCGroupData;
     {
@@ -939,7 +939,7 @@ void skimming()
         {
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
-            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow);
+            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow,channel);
             deletehCutflow(hSRCutflow);
         }
     }
@@ -967,7 +967,7 @@ void skimming()
             for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
             {
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
-                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow);
+                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel);
             }
             if(cutflow)
             {
@@ -993,7 +993,7 @@ void skimming()
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow);
-            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow);
+            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow,channel);
             if(cutflow) printhCutflow(hSRCutflow);
             deletehCutflow(hSRCutflow);
         }
