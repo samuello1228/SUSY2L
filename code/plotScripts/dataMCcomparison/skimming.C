@@ -841,22 +841,23 @@ void skimming()
     //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
+    TString tag = "";
     
-    //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; TString tag = "v8.10";
-    //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; TString tag = "v8.12";
-    //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; TString tag = "v8.13";
-    //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; TString tag = "v9.0";
-    //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; TString tag = "v9.1";
-    //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; TString tag = "v9.3";
-    //SamplePath += "AnalysisBase-02-04-30-71c02737/"; TString tag = "v9.3.1";
-    //SamplePath += "v19.MC/data-myOutput/"; TString tag = "";
-    //SamplePath += "v19.MC.2/data-myOutput/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; TString tag = "";
-    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; TString tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; TString tag = "";
+    //SamplePath += "AnalysisBase-02-04-26-a73a6eda/"; tag = "v8.10";
+    //SamplePath += "AnalysisBase-02-04-26-4dcc2f47/"; tag = "v8.12";
+    //SamplePath += "AnalysisBase-02-04-26-da7031fc/"; tag = "v8.13";
+    //SamplePath += "AnalysisBase-02-04-29-f86dc244/"; tag = "v9.0";
+    //SamplePath += "AnalysisBase-02-04-29-f334c9b6/"; tag = "v9.1";
+    //SamplePath += "AnalysisBase-02-04-30-f15e6058/"; tag = "v9.3";
+    //SamplePath += "AnalysisBase-02-04-30-71c02737/"; tag = "v9.3.1";
+    //SamplePath += "v19.MC/data-myOutput/"; tag = "";
+    //SamplePath += "v19.MC.2/data-myOutput/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-2cf44a2c/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     
     //channels
     std::vector<TString> channel;
