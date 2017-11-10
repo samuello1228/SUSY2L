@@ -59,6 +59,17 @@ float mlj;
 float R2;
 float mjj;
 
+Int_t NlepS;
+Int_t NlepBL;
+float mu_1stPt;
+float mu_2ndPt;
+float mu_1stEta;
+float mu_2ndEta;
+float el_1stPt;
+float el_2ndPt;
+float el_1stEta;
+float el_2ndEta;
+
 struct GroupData
 {
     TString GroupName;
@@ -108,12 +119,14 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow)
         hSRCutflow[j]->GetXaxis()->SetBinLabel(20,"pt2,w");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(21,"dEta");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(22,"dEta,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(23,"meff");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(24,"meff,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(25,"maxmt");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(26,"maxmt,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(27,"mlj");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"mlj,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(23,"METRel");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(24,"METRel,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(25,"meff");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(26,"meff,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(27,"maxmt");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"maxmt,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(29,"mlj");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(30,"mlj,w");
     }
 }
 
@@ -127,9 +140,9 @@ void deletehCutflow(vector<TH1D*>& hSRCutflow)
 
 void printhCutflow(vector<TH1D*>& hSRCutflow)
 {
-    for(unsigned int i=0;i<6;i++)
+    for(unsigned int i=0;i<2;i++)
     {
-        for(unsigned int j=1;j<=28;j++)
+        for(unsigned int j=1;j<=30;j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
             if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
@@ -757,6 +770,332 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
 }
 
+void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector<TH1D*>& hSRCutflow, std::vector<TString>& channel)
+{
+    //get the tree "SS_Fakes_Tree"
+    TChain *tree1 = new TChain("SS_Fakes_Tree");
+    {
+        TString fileName = SamplePath;
+        fileName += SampleName;
+        fileName += ".root";
+        
+        cout<<fileName.Data()<<endl;
+        tree1->Add(fileName.Data());
+    }
+    
+    {
+        tree1->SetBranchAddress("NlepS", &NlepS);
+        tree1->SetBranchAddress("NlepBL", &NlepBL);
+        tree1->SetBranchAddress("Njet20", &nJet);
+        tree1->SetBranchAddress("Nbjet", &nBJet);
+        tree1->SetBranchAddress("FakeWeight", &fLwt);
+        tree1->SetBranchAddress("RelMET", &METRel);
+        tree1->SetBranchAddress("MET", &MET);
+        tree1->SetBranchAddress("Meff", &meff);
+        tree1->SetBranchAddress("Mlj", &mlj);
+        tree1->SetBranchAddress("Mll", &mll);
+        tree1->SetBranchAddress("Ptll", &ptll);
+        tree1->SetBranchAddress("Maxmt", &mtm);
+        tree1->SetBranchAddress("Mt2", &mTtwo);
+        tree1->SetBranchAddress("mu_1stPt", &mu_1stPt);
+        tree1->SetBranchAddress("mu_2ndPt", &mu_2ndPt);
+        tree1->SetBranchAddress("mu_1stEta", &mu_1stEta);
+        tree1->SetBranchAddress("mu_2ndEta", &mu_2ndEta);
+        tree1->SetBranchAddress("el_1stPt", &el_1stPt);
+        tree1->SetBranchAddress("el_2ndPt", &el_2ndPt);
+        tree1->SetBranchAddress("el_1stEta", &el_1stEta);
+        tree1->SetBranchAddress("el_2ndEta", &el_2ndEta);
+        tree1->SetBranchAddress("lep_1stPt", &pt1);
+        tree1->SetBranchAddress("lep_2ndPt", &pt2);
+    }
+    
+    //create files for storing the resulting trees and histograms
+    TFile *f2[channel.size()];
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        TString fileName = "skimming/skimming.";
+        fileName += SampleName;
+        fileName += "_";
+        fileName += channel[j];
+        fileName += ".root";
+        f2[j] = new TFile(fileName.Data(),"RECREATE");
+    }
+    
+    //trees
+    TTree *tree2[channel.size()];
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        TString treeName = "tree_";
+        treeName += channel[j];
+        
+        f2[j]->cd();
+        tree2[j] = new TTree(treeName.Data(),treeName.Data());
+        tree2[j]->Branch("pt1",&pt1,"pt1/F");
+        tree2[j]->Branch("pt2",&pt2,"pt2/F");
+        tree2[j]->Branch("eta1",&eta1,"eta1/F");
+        tree2[j]->Branch("eta2",&eta2,"eta2/F");
+        tree2[j]->Branch("phi1",&phi1,"phi1/F");
+        tree2[j]->Branch("mll",&mll,"mll/F");
+        tree2[j]->Branch("ptll",&ptll,"ptll/F");
+        tree2[j]->Branch("MET",&MET,"MET/F");
+        tree2[j]->Branch("METRel",&METRel,"METRel/F");
+        tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/F");
+        tree2[j]->Branch("mtm",&mtm,"mtm/F");
+        tree2[j]->Branch("meff",&meff,"meff/F");
+        tree2[j]->Branch("mlj",&mlj,"mlj/F");
+        
+        tree2[j]->Branch("nJet",&nJet,"nJet/I");
+        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+        tree2[j]->Branch("fLwt",&fLwt,"fLwt/F");
+    }
+    
+    //histograms
+    TH1D* h2[channel.size()];
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        TString hName2 = "hist_";
+        hName2 += channel[j];
+        
+        f2[j]->cd();
+        h2[j] = new TH1D(hName2.Data(), "cut flow", 20, 0, 20);
+        h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
+        h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
+        h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
+        h2[j]->GetXaxis()->SetBinLabel(4,"trigger");
+        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
+        
+        h2[j]->Fill("nAOD",1);
+        h2[j]->Fill("nwAOD",32861.6+3212.96);
+        h2[j]->Fill("ntuple",tree1->GetEntries());
+    }
+    
+    const double commonWeight = 1;
+    //loop over all entries
+    //for(int j=0;j<=10;j++)
+    for(int j=0;j<tree1->GetEntries();j++)
+    {
+        if(j%100000==0)
+        {
+            cout<<"number of event: " <<j<<endl;
+        }
+        tree1->GetEntry(j);
+        
+        const double TotalWeight = fLwt * commonWeight;
+        
+        {
+            //exact 2 signal leptons
+            if(NlepBL!=2) continue;
+            if(NlepS!=2) continue;
+            
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("=2SigLep",1);
+            }
+            
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<6;m++)
+                {
+                    hSRCutflow[m]->Fill("=2BaseLep and =2SigLep",1);
+                    hSRCutflow[m]->Fill("=2BaseLep and =2SigLep,w",TotalWeight);
+                }
+            }
+        }
+        
+        //OS or SS
+        int channelIndex = 0;
+        channelIndex += 3;
+        if(cutflow)
+        {
+            for(unsigned int m=0;m<6;m++)
+            {
+                hSRCutflow[m]->Fill("SS",1);
+                hSRCutflow[m]->Fill("SS,w",TotalWeight);
+            }
+        }
+        
+        //SF or DF
+        if(el_1stPt > 0 && el_2ndPt > 0)
+        {
+            eta1 = el_1stEta;
+            eta2 = el_2ndEta;
+        }
+        else if(mu_1stPt > 0 && mu_2ndPt > 0)
+        {
+            eta1 = mu_1stEta;
+            eta2 = mu_2ndEta;
+            channelIndex += 1;
+        }
+        else if(el_1stPt > 0 && mu_1stPt > 0)
+        {
+            if(el_1stPt > mu_1stPt)
+            {
+                eta1 = el_1stEta;
+                eta2 = mu_1stEta;
+            }
+            else
+            {
+                eta1 = mu_1stEta;
+                eta2 = el_1stEta;
+            }
+            channelIndex += 2;
+        }
+        
+        int SRIndex = -1;
+        if(cutflow)
+        {
+            if(channelIndex>=3 && channelIndex<=5)
+            {
+                hSRCutflow[0]->Fill("flavour",1);
+                hSRCutflow[0]->Fill("flavour,w",TotalWeight);
+                hSRCutflow[1]->Fill("flavour",1);
+                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
+                if(nJet == 1)
+                {
+                    SRIndex = 0;
+                }
+                else if(nJet == 2 || nJet == 3)
+                {
+                    SRIndex = 1;
+                }
+                else continue;
+            }
+            
+            hSRCutflow[SRIndex]->Fill("jet",1);
+            hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
+        }
+        
+        //jets
+        int nISR = 0;
+        if(nBJet>0)
+        {
+            if(cutflow) continue;
+        }
+        else
+        {
+            if(cutflow)
+            {
+                hSRCutflow[SRIndex]->Fill("bjet",1);
+                hSRCutflow[SRIndex]->Fill("bjet,w",TotalWeight);
+            }
+        }
+        
+        pt1 /= 1000;
+        pt2 /= 1000;
+        mll /= 1000;
+        ptll /= 1000;
+        METRel /= 1000;
+        MET /= 1000;
+        meff /= 1000;
+        mlj /= 1000;
+        mtm /= 1000;
+        mTtwo /= 1000;
+        
+        phi1 = 1;
+        
+        if(cutflow)
+        {
+            if(true)
+            {
+                hSRCutflow[SRIndex]->Fill("Zmass",1);
+                hSRCutflow[SRIndex]->Fill("Zmass,w",TotalWeight);
+            }
+            else continue;
+            
+            if(pt1>=25)
+            {
+                hSRCutflow[SRIndex]->Fill("pt1",1);
+                hSRCutflow[SRIndex]->Fill("pt1,w",TotalWeight);
+            }
+            else continue;
+            
+            if(pt2>=25)
+            {
+                hSRCutflow[SRIndex]->Fill("pt2",1);
+                hSRCutflow[SRIndex]->Fill("pt2,w",TotalWeight);
+            }
+            else continue;
+            
+            if(fabs(eta1-eta2)<1.5)
+            {
+                hSRCutflow[SRIndex]->Fill("dEta",1);
+                hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
+            }
+            else continue;
+            
+            if(METRel>=110)
+            {
+                hSRCutflow[SRIndex]->Fill("METRel",1);
+                hSRCutflow[SRIndex]->Fill("METRel,w",TotalWeight);
+            }
+            else continue;
+            
+            if(meff>=200)
+            {
+                hSRCutflow[SRIndex]->Fill("meff",1);
+                hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
+            }
+            else continue;
+            
+            if(true)
+            {
+                hSRCutflow[SRIndex]->Fill("maxmt",1);
+                hSRCutflow[SRIndex]->Fill("maxmt,w",TotalWeight);
+            }
+            else continue;
+            
+            if(mlj<90)
+            {
+                hSRCutflow[SRIndex]->Fill("mlj",1);
+                hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
+            }
+            else continue;
+        }
+        
+        h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
+        tree2[channelIndex]->Fill();
+    }
+    
+    //save the resulting trees and histograms
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        f2[j]->cd();
+        tree2[j]->Write("tree");
+        h2[j]->Write("hist");
+    }
+    
+    for(int k=1;k<=8;k++)
+    {
+        cout<<long(h2[1]->GetBinContent(k))<<endl;
+    }
+    cout<<endl;
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        cout<<int(h2[j]->GetBinContent(9))<<endl;
+    }
+    cout<<endl;
+    
+    //delete
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        delete tree2[j];
+    }
+    
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        delete h2[j];
+    }
+    delete tree1;
+    for(unsigned int j=0;j<channel.size();j++)
+    {
+        delete f2[j];
+    }
+}
+
 void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TString const type)
 {
     ifstream fin;
@@ -998,5 +1337,16 @@ void skimming()
             if(cutflow) printhCutflow(hSRCutflow);
             deletehCutflow(hSRCutflow);
         }
+    }
+    
+    //Fakes.root from Peter
+    if(false)
+    {
+        TString SampleName = "Fakes";
+        vector<TH1D*> hSRCutflow;
+        initializehCutflow(hSRCutflow);
+        skimmingForFakes(SamplePath,SampleName,hSRCutflow,channel);
+        if(cutflow) printhCutflow(hSRCutflow);
+        deletehCutflow(hSRCutflow);
     }
 }
