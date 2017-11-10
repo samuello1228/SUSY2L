@@ -786,9 +786,9 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     {
         tree1->SetBranchAddress("NlepS", &NlepS);
         tree1->SetBranchAddress("NlepBL", &NlepBL);
-        tree1->SetBranchAddress("Njet20", &nJet);
+        tree1->SetBranchAddress("Njet20", &nCJet);
         tree1->SetBranchAddress("Nbjet", &nBJet);
-        tree1->SetBranchAddress("FakeWeight", &fLwt);
+        tree1->SetBranchAddress("FakeWeight", &weight);
         tree1->SetBranchAddress("RelMET", &METRel);
         tree1->SetBranchAddress("MET", &MET);
         tree1->SetBranchAddress("Meff", &meff);
@@ -813,7 +813,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
-        TString fileName = "skimming/skimming.";
+        TString fileName = "skimming/skimming.mc15_13TeV.999999.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -844,9 +844,9 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree2[j]->Branch("meff",&meff,"meff/F");
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         
-        tree2[j]->Branch("nJet",&nJet,"nJet/I");
+        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
-        tree2[j]->Branch("fLwt",&fLwt,"fLwt/F");
+        tree2[j]->Branch("weight",&weight,"weight/F");
     }
     
     //histograms
@@ -884,7 +884,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         }
         tree1->GetEntry(j);
         
-        const double TotalWeight = fLwt * commonWeight;
+        const double TotalWeight = weight * commonWeight;
         
         {
             //exact 2 signal leptons
@@ -954,11 +954,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
                 hSRCutflow[0]->Fill("flavour,w",TotalWeight);
                 hSRCutflow[1]->Fill("flavour",1);
                 hSRCutflow[1]->Fill("flavour,w",TotalWeight);
-                if(nJet == 1)
+                if(nCJet == 1)
                 {
                     SRIndex = 0;
                 }
-                else if(nJet == 2 || nJet == 3)
+                else if(nCJet == 2 || nCJet == 3)
                 {
                     SRIndex = 1;
                 }
