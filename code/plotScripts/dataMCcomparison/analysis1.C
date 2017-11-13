@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2";
+TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2_Fakes";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -362,6 +362,8 @@ void analysis1()
                             //element.setOfBGData.push_back("charge flip");
                         }
                         //*/
+                        
+                        /*
                         element.setOfBGMC.push_back("Zjets");
                         element.setOfBGMC.push_back("Wjets");
                         
@@ -374,6 +376,16 @@ void analysis1()
                         element.setOfBGMC.push_back("Vgamma");
                         element.setOfBGMC.push_back("VVV");
                         element.setOfBGMC.push_back("Higgs");
+                        */
+                        
+                        ///*
+                        element.setOfBGMC.push_back("VVReal");
+                        element.setOfBGMC.push_back("ttV");
+                        element.setOfBGMC.push_back("multitop");
+                        element.setOfBGMC.push_back("VVV");
+                        element.setOfBGMC.push_back("Higgs");
+                        element.setOfBGMC.push_back("Fakes");
+                        //*/
                     }
                     else
                     {
@@ -668,8 +680,11 @@ void analysis1()
         element.lower = 115;  element.upper = 116; element.colour = 635; BGMCGroupData.push_back(element);
         
         //
-        element.GroupName = "VV"; element.LegendName = "VV"; element.LatexName = "VV";
+        element.GroupName = "VV";     element.LegendName = "VV"; element.LatexName = "VV";
         element.lower = 117;  element.upper = 130; element.colour = 801; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VVReal"; element.LegendName = "VV"; element.LatexName = "VV";
+        element.lower = 117;  element.upper = 123; element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
@@ -685,6 +700,9 @@ void analysis1()
         
         element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
         element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Fakes"; element.LegendName = "Fakes"; element.LatexName = "Fakes";
+        element.lower = 169;  element.upper = 169; element.colour = 3; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -3525,6 +3543,26 @@ void analysis1()
             {
                 //if(Var[VarIndex].VarName!="pt1") continue;
                 
+                if(Var[VarIndex].VarName!="pt1"    &&
+                   Var[VarIndex].VarName!="pt2"    &&
+                   Var[VarIndex].VarName!="eta1"   &&
+                   Var[VarIndex].VarName!="eta2"   &&
+                   Var[VarIndex].VarName!="mll"    &&
+                   Var[VarIndex].VarName!="ptll"   &&
+                   Var[VarIndex].VarName!="dEta"   &&
+                   Var[VarIndex].VarName!="MET"    &&
+                   Var[VarIndex].VarName!="METRel" &&
+                   Var[VarIndex].VarName!="mTtwo"  &&
+                   Var[VarIndex].VarName!="mtm"    &&
+                   Var[VarIndex].VarName!="meff"   &&
+                   Var[VarIndex].VarName!="mlj"    &&
+                   Var[VarIndex].VarName!="nBJet"  &&
+                   Var[VarIndex].VarName!="nCJet"  &&
+                   Var[VarIndex].VarName!="phi1"   )
+                {
+                    continue;
+                }
+                
                 //initialize histograms
                 TString title = Var[VarIndex].VarTitle;
                 
@@ -5542,7 +5580,8 @@ void analysis1()
         
         unsigned int Nminus1 = 0;
         vector<TString> VarPlot;
-        if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+        //if(RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
+        if(true)
         {
             //N-1 plot
             VarPlot.push_back("pt1");
@@ -5559,20 +5598,23 @@ void analysis1()
             
             //N plot
             VarPlot.push_back("MET");
+            VarPlot.push_back("nBJet");
+            VarPlot.push_back("nCJet");
+            VarPlot.push_back("eta1");
+            VarPlot.push_back("eta2");
+            
+            /*
             VarPlot.push_back("mt1");
             VarPlot.push_back("mt2");
             VarPlot.push_back("jetpt");
             VarPlot.push_back("jeteta");
             VarPlot.push_back("nJet");
-            VarPlot.push_back("nBJet");
-            VarPlot.push_back("nCJet");
             VarPlot.push_back("l12_dPhi");
             VarPlot.push_back("l12_MET_dPhi");
             VarPlot.push_back("jet0_MET_dPhi");
             VarPlot.push_back("mjj");
-            VarPlot.push_back("eta1");
-            VarPlot.push_back("eta2");
             VarPlot.push_back("phi1");
+            */
         }
         else
         {
