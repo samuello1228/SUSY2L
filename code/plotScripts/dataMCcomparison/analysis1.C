@@ -225,8 +225,7 @@ struct GroupData
     TString GroupName;
     TString LegendName;
     TString LatexName;
-    unsigned int lower;
-    unsigned int upper;
+    std::vector<unsigned int> BGMCIndex;
     int colour;
     int unweighted;
     double weighted;
@@ -645,64 +644,97 @@ void analysis1()
         
         //Z+jets
         element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
-        element.lower = 0;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=0;i<=59;i++) element.BGMCIndex.push_back(i);
+        element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
-        element.lower = 20;  element.upper = 39; element.colour = 2; BGMCGroupData.push_back(element);
-        //element.lower = 20;  element.upper = 33; element.colour = 2; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=20;i<=39;i++) element.BGMCIndex.push_back(i);
+        element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
-        element.lower = 0;   element.upper = 19; element.colour = 2; BGMCGroupData.push_back(element);
-        //element.lower = 0;   element.upper = 13; element.colour = 2; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=0;i<=19;i++) element.BGMCIndex.push_back(i);
+        element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
-        element.lower = 40;  element.upper = 59; element.colour = 2; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=40;i<=59;i++) element.BGMCIndex.push_back(i);
+        element.colour = 2; BGMCGroupData.push_back(element);
         
         //W+jets
         element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
-        element.lower = 60;  element.upper = 101; element.colour = 3; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=60;i<=101;i++) element.BGMCIndex.push_back(i);
+        element.colour = 3; BGMCGroupData.push_back(element);
         
         //Top
         element.GroupName = "top"; element.LegendName = "top"; element.LatexName = "top";
-        element.lower = 102;  element.upper = 116; element.colour = 4; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=102;i<=116;i++) element.BGMCIndex.push_back(i);
+        element.colour = 4; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
-        element.lower = 102;  element.upper = 102; element.colour = 881; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=102;i<=102;i++) element.BGMCIndex.push_back(i);
+        element.colour = 881; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
-        element.lower = 103;  element.upper = 108; element.colour = 30; BGMCGroupData.push_back(element);
-        //element.lower = 103;  element.upper = 106; element.colour = 30; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=103;i<=108;i++) element.BGMCIndex.push_back(i);
+        element.colour = 30; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
-        element.lower = 109;  element.upper = 114; element.colour = 600; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=109;i<=114;i++) element.BGMCIndex.push_back(i);
+        element.colour = 600; BGMCGroupData.push_back(element);
         
         element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
-        element.lower = 115;  element.upper = 116; element.colour = 635; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=115;i<=116;i++) element.BGMCIndex.push_back(i);
+        element.colour = 635; BGMCGroupData.push_back(element);
         
         //
         element.GroupName = "VV";     element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 117;  element.upper = 130; element.colour = 801; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=117;i<=130;i++) element.BGMCIndex.push_back(i);
+        element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVReal"; element.LegendName = "VV"; element.LatexName = "VV";
-        element.lower = 117;  element.upper = 123; element.colour = 801; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=117;i<=123;i++) element.BGMCIndex.push_back(i);
+        element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
-        element.lower = 131;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=131;i<=150;i++) element.BGMCIndex.push_back(i);
+        element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
-        element.lower = 131;  element.upper = 139; element.colour = 5; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=131;i<=139;i++) element.BGMCIndex.push_back(i);
+        element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
-        element.lower = 140;  element.upper = 150; element.colour = 5; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=140;i<=150;i++) element.BGMCIndex.push_back(i);
+        element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
-        element.lower = 151;  element.upper = 155; element.colour = 607; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=151;i<=155;i++) element.BGMCIndex.push_back(i);
+        element.colour = 607; BGMCGroupData.push_back(element);
         
         element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
-        element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=156;i<=168;i++) element.BGMCIndex.push_back(i);
+        element.colour = 7; BGMCGroupData.push_back(element);
         
         element.GroupName = "Fakes"; element.LegendName = "Fakes"; element.LatexName = "Fakes";
-        element.lower = 169;  element.upper = 169; element.colour = 3; BGMCGroupData.push_back(element);
+        element.BGMCIndex.clear();
+        for(unsigned int i=169;i<=169;i++) element.BGMCIndex.push_back(i);
+        element.colour = 3; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
@@ -710,10 +742,10 @@ void analysis1()
     {
         GroupData element;
         element.GroupName = "charge flip"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
-        element.lower = 0;  element.upper = 0; element.colour = 2; BGDataGroupData.push_back(element);
+        element.colour = 2; BGDataGroupData.push_back(element);
         
         element.GroupName = "fake lepton"; element.LegendName = element.GroupName; element.LatexName = element.GroupName;
-        element.lower = 0;  element.upper = 0; element.colour = 3; BGDataGroupData.push_back(element);
+        element.colour = 3; BGDataGroupData.push_back(element);
     }
     
     //plotting
@@ -1042,10 +1074,10 @@ void analysis1()
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
-                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
-                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleID);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
@@ -1302,13 +1334,13 @@ void analysis1()
                        BGMCGroupData[j].GroupName == "Zmumu"   ||
                        BGMCGroupData[j].GroupName == "Ztautau" )
                     {
-                        for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                        for(unsigned int k=0;k<BGMCGroupData[j].BGMCIndex.size();k++)
                         {
                             TChain* tree1 = nullptr;
-                            initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
+                            initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                             
                             TString NameTemp = "tree_rw_";
-                            NameTemp += TString::Itoa(k,10);
+                            NameTemp += TString::Itoa(BGMCGroupData[j].BGMCIndex[k],10);
                             TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
                             tree2->Branch("rw",&rw,"rw/D");
                             
@@ -1389,13 +1421,13 @@ void analysis1()
             {
                 if(BGMCGroupData[j].GroupName == "Zee")
                 {
-                    for(unsigned int k=BGMCGroupData[j].lower;k<=BGMCGroupData[j].upper;k++)
+                    for(unsigned int k=0;k<BGMCGroupData[j].BGMCIndex.size();k++)
                     {
                         TChain* tree1 = nullptr;
-                        initializeTree1new(tree1,BGMCSampleInfo[k].SampleID,ChannelInfo[ChannelIndex].ChannelName);
+                        initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleID,ChannelInfo[ChannelIndex].ChannelName);
                         
                         TString NameTemp = "tree_cfw_";
-                        NameTemp += TString::Itoa(k,10);
+                        NameTemp += TString::Itoa(BGMCGroupData[j].BGMCIndex[k],10);
                         TTree* tree2 = new TTree(NameTemp.Data(),NameTemp.Data());
                         tree2->Branch("cfw",&cfw,"cfw/D");
                         
@@ -2429,12 +2461,12 @@ void analysis1()
         {
             if(BGMCGroupData[i].GroupName == "VV") VVGroupIndex = i;
         }
-        for(unsigned int i = BGMCGroupData[VVGroupIndex].lower;i <= BGMCGroupData[VVGroupIndex].upper;i++)
+        for(unsigned int i=0;i<BGMCGroupData[VVGroupIndex].BGMCIndex.size();i++)
         {
             SampleData element;
-            element.SampleName = BGMCSampleInfo[i].SampleID.Data();
+            element.SampleName = BGMCSampleInfo[BGMCGroupData[VVGroupIndex].BGMCIndex[i]].SampleID.Data();
             element.SampleName.Remove(0,18);
-            element.index = i;
+            element.index = BGMCGroupData[VVGroupIndex].BGMCIndex[i];
             BGVVData.push_back(element);
         }
     }
@@ -2561,10 +2593,10 @@ void analysis1()
                         {
                             std::vector<TString> BGMCGroupSampleID;
                             std::vector<double> BGMCGroupXSElement;
-                            for(unsigned int m=BGMCGroupData[j].lower;m<=BGMCGroupData[j].upper;m++)
+                            for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[m].SampleID);
-                                BGMCGroupXSElement.push_back(BGMCSampleInfo[m].XS);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleID);
+                                BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
@@ -2602,10 +2634,10 @@ void analysis1()
                                 )
                                )
                             {
-                                for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                                for(unsigned int k=0;k<BGGroupElement.info->BGMCIndex.size();k++)
                                 {
                                     TString NameTemp = "tree_rw_";
-                                    NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                    NameTemp += TString::Itoa(BGGroupElement.info->BGMCIndex[k],10);
                                     TChain* ch_rw = new TChain(NameTemp.Data());
                                     
                                     for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
@@ -2630,10 +2662,10 @@ void analysis1()
                                BGGroupElement.info->GroupName == "Zee"
                                )
                             {
-                                for(unsigned int k=0;k<tree2BGMCElement.size();k++)
+                                for(unsigned int k=0;k<BGGroupElement.info->BGMCIndex.size();k++)
                                 {
                                     TString NameTemp = "tree_cfw_";
-                                    NameTemp += TString::Itoa(k + BGGroupElement.info->lower,10);
+                                    NameTemp += TString::Itoa(BGGroupElement.info->BGMCIndex[k],10);
                                     TChain* ch_cfw = new TChain(NameTemp.Data());
                                     
                                     for(unsigned int m=0;m<RegionInfo[RegionIndex].setOfChannel.size();m++)
@@ -5096,7 +5128,7 @@ void analysis1()
                        )
                     {
                         TString NameTemp = "tree_rw_";
-                        NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                        NameTemp += TString::Itoa(BGGroup[j].info->BGMCIndex[k],10);
                         delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                     }
                     
@@ -5111,7 +5143,7 @@ void analysis1()
                        )
                     {
                         TString NameTemp = "tree_cfw_";
-                        NameTemp += TString::Itoa(k + BGGroup[j].info->lower,10);
+                        NameTemp += TString::Itoa(BGGroup[j].info->BGMCIndex[k],10);
                         delete tree2BGMC[j][k]->GetFriend(NameTemp.Data());
                     }
                     
