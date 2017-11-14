@@ -86,12 +86,12 @@ struct ChannelData
     std::vector<TString> setOfBGData;
 };
 
-void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
+void initializeTree1new(TChain*& tree, TString& SampleName, TString& channel)
 {
     tree = new TChain("tree");
     
     TString fileName = "skimming/skimming.";
-    fileName += SampleID;
+    fileName += SampleName;
     fileName += "_";
     fileName += channel;
     fileName += ".root";
@@ -108,15 +108,15 @@ void initializeTree1new(TChain*& tree, TString& SampleID, TString& channel)
     
 }
 
-void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleName, std::vector<ChannelData>& ChannelInfo)
 {
-    for(unsigned int i=0;i<SampleID.size();i++)
+    for(unsigned int i=0;i<SampleName.size();i++)
     {
         TChain* treeTemp = new TChain("tree");
         for(unsigned int j=0;j<SetOfChannel.size();j++)
         {
             TString fileName = "skimming/skimming.";
-            fileName += SampleID[i];
+            fileName += SampleName[i];
             fileName += "_";
             fileName += ChannelInfo[SetOfChannel[j]].ChannelName;
             fileName += ".root";
@@ -129,12 +129,12 @@ void initializeTree2(std::vector<TChain*>& tree2,std::vector<unsigned int>& SetO
     }
 }
 
-void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleName, std::vector<ChannelData>& ChannelInfo)
 {
-    for(unsigned int i=0;i<SampleID.size();i++)
+    for(unsigned int i=0;i<SampleName.size();i++)
     {
         TString fileName = "skimming/skimming.";
-        fileName += SampleID[i];
+        fileName += SampleName[i];
         fileName += "_";
         fileName += ChannelInfo[SetOfChannel[0]].ChannelName;
         fileName += ".root";
@@ -146,19 +146,19 @@ void getnwAOD(std::vector<double>& BGMCnwAOD,std::vector<unsigned int>& SetOfCha
         
         if(nAOD == 0)
         {
-            cout<<"nAOD is 0. The sample: "<<SampleID[i]<<" is missing."<<endl;
+            cout<<"nAOD is 0. The sample: "<<SampleName[i]<<" is missing."<<endl;
             nAOD=1;
         }
         BGMCnwAOD.push_back(nAOD);
     }
 }
 
-void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleID, std::vector<ChannelData>& ChannelInfo)
+void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel, std::vector<TString>& SampleName, std::vector<ChannelData>& ChannelInfo)
 {
-    for(unsigned int i=0;i<SampleID.size();i++)
+    for(unsigned int i=0;i<SampleName.size();i++)
     {
         TString fileName = "skimming/skimming.";
-        fileName += SampleID[i];
+        fileName += SampleName[i];
         fileName += "_";
         fileName += ChannelInfo[SetOfChannel[0]].ChannelName;
         fileName += ".root";
@@ -170,7 +170,7 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
         
         if(nAOD == 0)
         {
-            cout<<"nAOD is 0. The sample: "<<SampleID[i]<<" is missing."<<endl;
+            cout<<"nAOD is 0. The sample: "<<SampleName[i]<<" is missing."<<endl;
             nAOD=1;
         }
         BGMCnAOD.push_back(nAOD);
@@ -433,7 +433,7 @@ void analysis1()
     //For BGMC
     struct MCBGInfo
     {
-        TString SampleID;
+        TString SampleName;
         double XS; //cross section in pb
     };
     
@@ -456,7 +456,7 @@ void analysis1()
             fin>>SampleNameTemp;
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
-            element.SampleID = SampleIDTemp;
+            element.SampleName = SampleIDTemp;
             
             double BGMCXSTemp;
             double BGMCXSTemp2;
@@ -1076,7 +1076,7 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleID);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
                                 BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
@@ -1337,7 +1337,7 @@ void analysis1()
                         for(unsigned int k=0;k<BGMCGroupData[j].BGMCIndex.size();k++)
                         {
                             TChain* tree1 = nullptr;
-                            initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleID,ChannelInfo[ChannelIndex].ChannelName);
+                            initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleName,ChannelInfo[ChannelIndex].ChannelName);
                             
                             TString NameTemp = "tree_rw_";
                             NameTemp += TString::Itoa(BGMCGroupData[j].BGMCIndex[k],10);
@@ -1424,7 +1424,7 @@ void analysis1()
                     for(unsigned int k=0;k<BGMCGroupData[j].BGMCIndex.size();k++)
                     {
                         TChain* tree1 = nullptr;
-                        initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleID,ChannelInfo[ChannelIndex].ChannelName);
+                        initializeTree1new(tree1,BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[k]].SampleName,ChannelInfo[ChannelIndex].ChannelName);
                         
                         TString NameTemp = "tree_cfw_";
                         NameTemp += TString::Itoa(BGMCGroupData[j].BGMCIndex[k],10);
@@ -2464,7 +2464,7 @@ void analysis1()
         for(unsigned int i=0;i<BGMCGroupData[VVGroupIndex].BGMCIndex.size();i++)
         {
             SampleData element;
-            element.SampleName = BGMCSampleInfo[BGMCGroupData[VVGroupIndex].BGMCIndex[i]].SampleID.Data();
+            element.SampleName = BGMCSampleInfo[BGMCGroupData[VVGroupIndex].BGMCIndex[i]].SampleName.Data();
             element.SampleName.Remove(0,18);
             element.index = BGMCGroupData[VVGroupIndex].BGMCIndex[i];
             BGVVData.push_back(element);
@@ -2595,7 +2595,7 @@ void analysis1()
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleID);
+                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
                                 BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
@@ -3856,7 +3856,7 @@ void analysis1()
                             /*
                             if(BGGroup[j].info->GroupName == "Zjets" && bgCount>0)
                             {
-                                cout<<BGMCSampleInfo[BGMCGroupData[0].lower +k].SampleID.Data()<<endl;
+                                cout<<BGMCSampleInfo[BGMCGroupData[0].lower +k].SampleName.Data()<<endl;
                                 cout<<BGMCGroupXS[j][k]<<" "<<BGMCGroupnwAOD[j][k]<<endl;
                                 tree2BGMC[j][k]->Scan("weight",("1"+CommonCut).Data());
                             }
