@@ -506,7 +506,7 @@ void analysis1()
     
     struct SigInfo
     {
-        TString SampleID;
+        TString SampleName;
         double XS; //cross section in pb
         double nwAOD;
         double Mass1;
@@ -539,7 +539,7 @@ void analysis1()
             SampleIDTemp += ".";
             SampleIDTemp += SampleNameTemp;
             
-            element.SampleID = SampleIDTemp;
+            element.SampleName = SampleIDTemp;
             
             double SigMass;
             fin>>SigMass;
@@ -595,14 +595,14 @@ void analysis1()
     {
         cout<<"Mass splitting: "<<SigMassSplitting[i].MassDiff<<endl;
         cout<<"index:"<<SigMassSplitting[i].ID<<endl;
-        cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleID.Data()<<endl;
+        cout<<"Name: "<<SigSampleInfo[SigMassSplitting[i].ID].SampleName.Data()<<endl;
         cout<<"MassDiff: "<<SigSampleInfo[SigMassSplitting[i].ID].Mass1 - SigSampleInfo[SigMassSplitting[i].ID].Mass2<<endl;
         cout<<"XS: "<<SigSampleInfo[SigMassSplitting[i].ID].XS<<endl<<endl;
         
         cout<<"All samples with the same mass splitting "<<SigMassSplitting[i].MassDiff<<" GeV:"<<endl;
         for(unsigned int j=0;j<SigSampleInfo.size();j++)
         {
-            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleID.Data()<<endl;
+            if(SigSampleInfo[j].Mass1 - SigSampleInfo[j].Mass2 == SigMassSplitting[i].MassDiff) cout<<"index:"<<j<<" "<<SigSampleInfo[j].SampleName.Data()<<endl;
         }
         cout<<endl;
     }
@@ -621,7 +621,7 @@ void analysis1()
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
         TString NameTemp = "skimming/skimming.";
-        NameTemp += SigSampleInfo[i].SampleID;
+        NameTemp += SigSampleInfo[i].SampleName;
         cout<<NameTemp<<": ";
         NameTemp += "_";
         NameTemp += ChannelInfo[0].ChannelName;
@@ -2483,7 +2483,7 @@ void analysis1()
     {
         if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
         {
-            cout<<SigSampleInfo[i].SampleID.Data()<<endl;
+            cout<<SigSampleInfo[i].SampleName.Data()<<endl;
             OptimizingSignal.push_back(i);
         }
     }
@@ -2704,7 +2704,7 @@ void analysis1()
                 std::vector<TString> SigSampleID;
                 for(unsigned int i=0;i<SigSampleInfo.size();i++)
                 {
-                    SigSampleID.push_back(SigSampleInfo[i].SampleID);
+                    SigSampleID.push_back(SigSampleInfo[i].SampleName);
                 }
                 initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
             }
