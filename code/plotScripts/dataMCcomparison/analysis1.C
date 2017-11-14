@@ -1072,19 +1072,19 @@ void analysis1()
                     {
                         if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
-                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<TString> BGMCGroupSampleName;
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
+                                BGMCGroupSampleName.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
                                 BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
-                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleName,ChannelInfo);
                             
                             std::vector<double> BGMCGroupnwAODElement;
-                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleName,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -2591,22 +2591,22 @@ void analysis1()
                     {
                         if(BGMCGroupData[j].GroupName == ChannelInfo[channelRepresentative].setOfBGMC[k])
                         {
-                            std::vector<TString> BGMCGroupSampleID;
+                            std::vector<TString> BGMCGroupSampleName;
                             std::vector<double> BGMCGroupXSElement;
                             for(unsigned int m=0;m<BGMCGroupData[j].BGMCIndex.size();m++)
                             {
-                                BGMCGroupSampleID.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
+                                BGMCGroupSampleName.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].SampleName);
                                 BGMCGroupXSElement.push_back(BGMCSampleInfo[BGMCGroupData[j].BGMCIndex[m]].XS);
                             }
                             
                             std::vector<TChain*> tree2BGMCElement;
-                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            initializeTree2(tree2BGMCElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleName,ChannelInfo);
                             
                             std::vector<int> BGMCGroupnAODElement;
-                            getnAOD(BGMCGroupnAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            getnAOD(BGMCGroupnAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleName,ChannelInfo);
                             
                             std::vector<double> BGMCGroupnwAODElement;
-                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleID,ChannelInfo);
+                            getnwAOD(BGMCGroupnwAODElement,RegionInfo[RegionIndex].setOfChannel,BGMCGroupSampleName,ChannelInfo);
                             
                             tree2BGMC.push_back(tree2BGMCElement);
                             BGMCGroupXS.push_back(BGMCGroupXSElement);
@@ -2701,12 +2701,12 @@ void analysis1()
             
             std::vector<TChain*> tree2Sig;
             {
-                std::vector<TString> SigSampleID;
+                std::vector<TString> SigSampleName;
                 for(unsigned int i=0;i<SigSampleInfo.size();i++)
                 {
-                    SigSampleID.push_back(SigSampleInfo[i].SampleName);
+                    SigSampleName.push_back(SigSampleInfo[i].SampleName);
                 }
-                initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleID,ChannelInfo);
+                initializeTree2(tree2Sig,RegionInfo[RegionIndex].setOfChannel,SigSampleName,ChannelInfo);
             }
             
             std::vector<TChain*> tree2DataOS;
