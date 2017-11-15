@@ -177,6 +177,30 @@ void getnAOD(std::vector<int>& BGMCnAOD,std::vector<unsigned int>& SetOfChannel,
     }
 }
 
+struct MCBGInfo
+{
+    TString SampleName;
+    unsigned int SampleID;
+    double XS; //cross section in pb
+};
+
+void fillBGMCIndex(std::vector<MCBGInfo> const& BGMCSampleInfo, std::vector<unsigned int>& BGMCIndex,unsigned int lower, unsigned int upper)
+{
+    for(unsigned int i=lower;i<=upper;i++)
+    {
+        bool isFound = false;
+        for(unsigned int j=0;j<BGMCSampleInfo.size();j++)
+        {
+            if(i == BGMCSampleInfo[j].SampleID)
+            {
+                BGMCIndex.push_back(j);
+                isFound = true;
+            }
+        }
+        if(!isFound) cout<<"The sample ID "<<i<<" cannot be found."<<endl;
+    }
+}
+
 double GetSignificance(double nSig, double nBG, double nBGError2 = 0)
 {
     //return RooStats::NumberCountingUtils::BinomialExpZ(nSig,nBG,0.3);
@@ -431,13 +455,6 @@ void analysis1()
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
-    struct MCBGInfo
-    {
-        TString SampleName;
-        unsigned int SampleID;
-        double XS; //cross section in pb
-    };
-    
     std::vector<MCBGInfo> BGMCSampleInfo;
     {
         MCBGInfo element;
@@ -648,96 +665,150 @@ void analysis1()
         //Z+jets
         element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
         element.BGMCIndex.clear();
-        for(unsigned int i=0;i<=59;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364100,364141);
         element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
         element.BGMCIndex.clear();
-        for(unsigned int i=20;i<=39;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364114,364127);
         element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zmumu"; element.LegendName = "Z#rightarrow #mu#mu"; element.LatexName = "Z$\\rightarrow\\mu\\mu$";
         element.BGMCIndex.clear();
-        for(unsigned int i=0;i<=19;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364100,364113);
         element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Ztautau"; element.LegendName = "Z#rightarrow #tau#tau"; element.LatexName = "Z$\\rightarrow\\tau\\tau$";
         element.BGMCIndex.clear();
-        for(unsigned int i=40;i<=59;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364128,364141);
+        element.colour = 2; BGMCGroupData.push_back(element);
+        
+        //Drell Yan
+        element.GroupName = "DY"; element.LegendName = "Drell Yan"; element.LatexName = "Drell Yan";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364198,364215);
         element.colour = 2; BGMCGroupData.push_back(element);
         
         //W+jets
         element.GroupName = "Wjets"; element.LegendName = "W+jets"; element.LatexName = "W+jets";
         element.BGMCIndex.clear();
-        for(unsigned int i=60;i<=101;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364156,364197);
         element.colour = 3; BGMCGroupData.push_back(element);
         
         //Top
         element.GroupName = "top"; element.LegendName = "top"; element.LatexName = "top";
         element.BGMCIndex.clear();
-        for(unsigned int i=102;i<=116;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410000,410000);
         element.colour = 4; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttbar"; element.LegendName = "t#bar{t}"; element.LatexName = "$t\\bar{t}$";
         element.BGMCIndex.clear();
-        for(unsigned int i=102;i<=102;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410000,410000);
         element.colour = 881; BGMCGroupData.push_back(element);
 
         element.GroupName = "singletop"; element.LegendName = "single top"; element.LatexName = "single top";
         element.BGMCIndex.clear();
-        for(unsigned int i=103;i<=108;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410011,410012);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410025,410026);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410015,410016);
         element.colour = 30; BGMCGroupData.push_back(element);
         
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
         element.BGMCIndex.clear();
-        for(unsigned int i=109;i<=114;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410218,410220);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410155,410155);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410081,410081);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,407321,407321);
         element.colour = 600; BGMCGroupData.push_back(element);
         
         element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
         element.BGMCIndex.clear();
-        for(unsigned int i=115;i<=116;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,304014,304014);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410080,410080);
         element.colour = 635; BGMCGroupData.push_back(element);
         
-        //
+        //VV
         element.GroupName = "VV";     element.LegendName = "VV"; element.LatexName = "VV";
         element.BGMCIndex.clear();
-        for(unsigned int i=117;i<=130;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361073);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363356,363356);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363358,363360);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363489,363492);
         element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "VVReal"; element.LegendName = "VV"; element.LatexName = "VV";
         element.BGMCIndex.clear();
-        for(unsigned int i=117;i<=123;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361073);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363491);
         element.colour = 801; BGMCGroupData.push_back(element);
         
+        //Vgamma
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.BGMCIndex.clear();
-        for(unsigned int i=131;i<=150;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301535,301536);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301890,301898);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301899,301907);
         element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Wgamma"; element.LegendName = "W + #gamma"; element.LatexName = "W$+\\gamma$";
         element.BGMCIndex.clear();
-        for(unsigned int i=131;i<=139;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301890,301898);
         element.colour = 5; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zgamma"; element.LegendName = "Z + #gamma"; element.LatexName = "Z$+\\gamma$";
         element.BGMCIndex.clear();
-        for(unsigned int i=140;i<=150;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301535,301536);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301899,301907);
         element.colour = 5; BGMCGroupData.push_back(element);
         
+        //VVV
         element.GroupName = "VVV"; element.LegendName = "VVV"; element.LatexName = "VVV";
         element.BGMCIndex.clear();
-        for(unsigned int i=151;i<=155;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,407311,407315);
         element.colour = 607; BGMCGroupData.push_back(element);
         
+        //Higgs
         element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
         element.BGMCIndex.clear();
-        for(unsigned int i=156;i<=168;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341079,341079);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341122,341122);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341195,341195);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,342178,342178);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341080,341080);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341155,341155);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341206,341206);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,342189,342189);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,342284,342285);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341177,341177);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341270,341271);
         element.colour = 7; BGMCGroupData.push_back(element);
         
+        //Fakes
         element.GroupName = "Fakes"; element.LegendName = "Fakes"; element.LatexName = "Fakes";
         element.BGMCIndex.clear();
-        for(unsigned int i=169;i<=169;i++) element.BGMCIndex.push_back(i);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999999,999999);
         element.colour = 3; BGMCGroupData.push_back(element);
+        
+        //charge flip
+        element.GroupName = "charge flip"; element.LegendName = "charge flip"; element.LatexName = "charge flip";
+        element.BGMCIndex.clear();
+        //VV
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363356,363356);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363358,363358);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363492,363492);
+        //top
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410000,410000);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410015,410016);
+        //Zgamma
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301535,301536);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,301899,301907);
+        //Z+jets
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364100,364141);
+        //Drell Yan
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364198,364215);
+        element.colour = 2; BGMCGroupData.push_back(element);
     }
     
     //Group for data-driven background
