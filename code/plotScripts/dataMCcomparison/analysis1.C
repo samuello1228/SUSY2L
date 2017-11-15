@@ -415,11 +415,11 @@ void analysis1()
         fin.open("DataSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp;
-            fin>>SampleIDTemp;
+            TString SampleNameTemp;
+            fin>>SampleNameTemp;
             if(fin.eof()) break;
             
-            DataSampleName.push_back(SampleIDTemp);
+            DataSampleName.push_back(SampleNameTemp);
             
             double DataLTemp;
             fin>>DataLTemp;
@@ -434,6 +434,7 @@ void analysis1()
     struct MCBGInfo
     {
         TString SampleName;
+        unsigned int SampleID;
         double XS; //cross section in pb
     };
     
@@ -446,17 +447,19 @@ void analysis1()
         fin.open("BGSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp = "mc15_13TeV.";
-            TString SampleNameTemp;
-            fin>>SampleNameTemp;
+            TString SampleNameTemp = "mc15_13TeV.";
+            TString SampleNameTemp2;
+            unsigned int SampleIDTemp;
+            fin>>SampleIDTemp;
             if(fin.eof()) break;
+            element.SampleID = SampleIDTemp;
             
-            SampleIDTemp += SampleNameTemp;
+            SampleNameTemp += TString::Itoa(SampleIDTemp,10);
             
-            fin>>SampleNameTemp;
-            SampleIDTemp += ".";
-            SampleIDTemp += SampleNameTemp;
-            element.SampleName = SampleIDTemp;
+            fin>>SampleNameTemp2;
+            SampleNameTemp += ".";
+            SampleNameTemp += SampleNameTemp2;
+            element.SampleName = SampleNameTemp;
             
             double BGMCXSTemp;
             double BGMCXSTemp2;
@@ -527,19 +530,19 @@ void analysis1()
         fin.open("SigSample.txt");
         while(!fin.eof())
         {
-            TString SampleIDTemp = "mc15_13TeV.";
+            TString SampleNameTemp = "mc15_13TeV.";
             //for 125
-            TString SampleNameTemp;
-            fin>>SampleNameTemp;
+            TString SampleNameTemp2;
+            fin>>SampleNameTemp2;
             if(fin.eof()) break;
             
-            SampleIDTemp += SampleNameTemp;
+            SampleNameTemp += SampleNameTemp2;
             
-            fin>>SampleNameTemp;
-            SampleIDTemp += ".";
-            SampleIDTemp += SampleNameTemp;
+            fin>>SampleNameTemp2;
+            SampleNameTemp += ".";
+            SampleNameTemp += SampleNameTemp2;
             
-            element.SampleName = SampleIDTemp;
+            element.SampleName = SampleNameTemp;
             
             double SigMass;
             fin>>SigMass;
