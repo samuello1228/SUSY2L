@@ -405,8 +405,8 @@ void analysis1()
     }
     
     //For Data
-    std::vector<TString> DataSampleID;
-    DataSampleID.reserve(20);
+    std::vector<TString> DataSampleName;
+    DataSampleName.reserve(20);
     double sumDataL = 0; //cross section in pb-1
     
     {
@@ -419,7 +419,7 @@ void analysis1()
             fin>>SampleIDTemp;
             if(fin.eof()) break;
             
-            DataSampleID.push_back(SampleIDTemp);
+            DataSampleName.push_back(SampleIDTemp);
             
             double DataLTemp;
             fin>>DataLTemp;
@@ -427,7 +427,7 @@ void analysis1()
         }
         fin.close();
     }
-    //DataSampleID.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
+    //DataSampleName.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC
@@ -1058,7 +1058,7 @@ void analysis1()
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
             
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleName,ChannelInfo);
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
@@ -1110,7 +1110,7 @@ void analysis1()
             TH1D* h2DataSum = new TH1D("DataSum",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
             
             //h2Data
-            for(unsigned int j=0;j<DataSampleID.size();j++)
+            for(unsigned int j=0;j<DataSampleName.size();j++)
             {
                 TH1D* hTemp = new TH1D("Data",title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                 
@@ -1199,7 +1199,7 @@ void analysis1()
             delete h2nonZjets;
             
             //delete tree2
-            for(unsigned int i=0;i<DataSampleID.size();i++)
+            for(unsigned int i=0;i<DataSampleName.size();i++)
             {
                 delete tree2Data[i];
             }
@@ -2576,7 +2576,7 @@ void analysis1()
             const unsigned int channelRepresentative = RegionInfo[RegionIndex].setOfChannel[0];
             
             std::vector<TChain*> tree2Data;
-            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleID,ChannelInfo);
+            initializeTree2(tree2Data,RegionInfo[RegionIndex].setOfChannel,DataSampleName,ChannelInfo);
             
             std::vector< std::vector<TChain*> > tree2BGMC;
             std::vector< std::vector<double> > BGMCGroupXS;
@@ -2718,7 +2718,7 @@ void analysis1()
                     const unsigned int ChannelIndex  = RegionInfo[RegionIndex].setOfChannel[index];
                     setOfQFChannel.push_back(ChannelInfo[ChannelIndex].qFChannel);
                 }
-                initializeTree2(tree2DataOS,setOfQFChannel,DataSampleID,ChannelInfo);
+                initializeTree2(tree2DataOS,setOfQFChannel,DataSampleName,ChannelInfo);
             }
             
             //Significance optimization
@@ -2944,7 +2944,7 @@ void analysis1()
                                         BGGroupRaw2D[j] = new TH2D((BGGroup[j].info->GroupName+"_raw").Data(),"",OptimizingCutInfo[VarIndex2][0].nBin,OptimizingCutInfo[VarIndex2][0].min,OptimizingCutInfo[VarIndex2][0].max,OptimizingCutInfo[VarIndex2][1].nBin,OptimizingCutInfo[VarIndex2][1].min,OptimizingCutInfo[VarIndex2][1].max);
                                     }
                                     
-                                    for(unsigned int k=0;k<DataSampleID.size();k++)
+                                    for(unsigned int k=0;k<DataSampleName.size();k++)
                                     {
                                         {
                                             TH1D* hTemp1D = nullptr;
@@ -3758,9 +3758,9 @@ void analysis1()
                     }
                     
                     //h2Data
-                    TH1D* h2Data[DataSampleID.size()];
+                    TH1D* h2Data[DataSampleName.size()];
                     std::vector<TString> hName2Data;
-                    for(unsigned int j=0;j<DataSampleID.size();j++)
+                    for(unsigned int j=0;j<DataSampleName.size();j++)
                     {
                         TString NameTemp = "Data_";
                         NameTemp += TString::Itoa(j,10);
@@ -3887,7 +3887,7 @@ void analysis1()
                         BGGroup[j].h2->SetFillColor(BGGroup[j].info->colour);
                         
                         BGGroup[j].info->unweighted = 0;
-                        for(unsigned int k=0;k<DataSampleID.size();k++)
+                        for(unsigned int k=0;k<DataSampleName.size();k++)
                         {
                             h2Data[k]->Scale(0);
                             
@@ -3934,7 +3934,7 @@ void analysis1()
                     }
                     
                     //delete h2Data
-                    for(unsigned int j=0;j<DataSampleID.size();j++)
+                    for(unsigned int j=0;j<DataSampleName.size();j++)
                     {
                         delete h2Data[j];
                     }
@@ -4937,7 +4937,7 @@ void analysis1()
                         BGGroup[j].h3 = new TH2D(BGGroup[j].info->GroupName.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                                                 Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         
-                        for(unsigned int k=0;k<DataSampleID.size();k++)
+                        for(unsigned int k=0;k<DataSampleName.size();k++)
                         {
                             TH2D* hTemp = new TH2D("BGData",title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                          Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
@@ -5101,7 +5101,7 @@ void analysis1()
             }
         
             //delete tree2
-            for(unsigned int i=0;i<DataSampleID.size();i++)
+            for(unsigned int i=0;i<DataSampleName.size();i++)
             {
                 delete tree2Data[i];
                 if(ChannelInfo[channelRepresentative].isSS_qF) delete tree2DataOS[i];
