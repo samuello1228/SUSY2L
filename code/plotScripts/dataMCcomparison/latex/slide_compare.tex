@@ -1,0 +1,372 @@
+\documentclass[mathserif,serif]{beamer}
+\usepackage{tabularx}
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
+\usepackage{slidesphysics}
+\graphicspath{{../plot/}}
+
+\title[SR optimization]{SS Analysis}
+\author[]
+{
+Samuel Lo \inst{1}
+\and
+Yanjun Tu  \inst{1}
+\and
+Daniela Paredes \inst{1}
+\and
+Dongliang Zhang  \inst{2}
+}
+\institute[]
+{
+\inst{1}
+The University of Hong Kong
+\and
+\inst{2}
+University of Michigan
+}
+\date[]{\today}
+
+\newcommand\Wider[2][2em]{%
+\makebox[\linewidth][c]{%
+\begin{minipage}{\dimexpr\textwidth+#1\relax}
+\raggedright
+\centering#2
+\end{minipage}%
+}%
+}
+
+\begin{document}
+\frame{\titlepage}
+
+\section{Introduction}
+\begin{frame}{Update}
+\begin{itemize}
+\item Compare 2 optimizations:
+\begin{itemize}
+\item The SR optimization is based on MC samples only.
+\item The SR optimization is based on MC samples and the fakes from Peter. ($|\Delta\eta_{ll}|$ and $m_{\text{eff}}$ are also optimized.)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{BG composition}
+\begin{frame}[fragile]{BG composition}
+\small
+\begin{itemize}
+\item ttV, multitop, VVV, Higgs
+\item use the following MC as VV (excluding fake):
+
+\tiny
+\begin{verbatim}
+361069.Sherpa_CT10_llvvjj_ss_EW4
+361070.Sherpa_CT10_llvvjj_ss_EW6
+361071.Sherpa_CT10_lllvjj_EW6
+361072.Sherpa_CT10_lllljj_EW6
+361073.Sherpa_CT10_ggllll
+363490.Sherpa_221_NNPDF30NNLO_llll
+363491.Sherpa_221_NNPDF30NNLO_lllv
+\end{verbatim}
+
+\small
+\item fakes from Peter
+\item use following MC as charge flip:
+\begin{itemize}
+\item Z+jets, Drell Yan
+\item Zgamma (301535,301536,301899-301907)
+\item $t\bar{t}$
+\item Wt (410015,410016)
+\item the following VV:
+
+\tiny
+\begin{verbatim}
+361077.Sherpa_CT10_ggllvv
+363356.Sherpa_221_NNPDF30NNLO_ZqqZll
+363358.Sherpa_221_NNPDF30NNLO_WqqZll
+363492.Sherpa_221_NNPDF30NNLO_llvv
+\end{verbatim}
+
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{optimization details}
+\small
+\begin{itemize}
+\item The average significance over the first 10 signal mass points (393820 to 393829) will be maximized in the optimization procedure.
+\end{itemize}
+The following constraints are applied to reduce the bias from low statistics:
+\begin{itemize}
+\small
+\item The yields of groups of BG need to be positive, except for multi-top, V+gamma, Z+jets and W+jets.
+\item At least 10 unweighted events in VV and ttV background.
+\item If the yield for one group of BG is negative (only for multi-top, V+gamma, Z+jets and W+jets), 0 yield is used. But the statistical error still keep unchanged to calculate the statistical error of total BG.
+\item nSig$>$1 and nSig/nSigError $>$ 2 for the first 10 signal mass points (393820 to 393829).
+\item For $\pt^{l1}$, $\pt^{l1}$, $\pt^{ll}$, $m_{T2}$, $E_{\text{T}}^{\text{miss,rel}}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$, only lower cut is applied.
+\item For $|\Delta\eta_{ll}|$ and $m_{lj}$/$m_{ljj}$, only upper cut is applied.
+\end{itemize}
+\end{frame}
+
+\section{Compare results}
+\begin{frame}{Selection in SR}
+\tiny
+\begin{itemize}
+\item $|\Delta\eta_{ll}|$ and $m_{\text{eff}}$ are optimized for new optimization.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\tiny
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\scalebox{0.8}{
+\input{data/optimization/cut_table_SR_SS_opt_0_2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2.tex}
+\end{tabular}
+}
+\caption{\tiny SR optimization with MC only}
+\end{column}
+
+\end{columns}
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\scalebox{0.8}{
+\input{data/optimization/cut_table_SR_SS_opt_0_2p8_1D_mTfix_pt25_v4_R2_DD.tex}
+\end{tabular}
+}
+\caption{\tiny SR optimization with DD}
+\end{column}
+
+\end{columns}
+\end{table}
+\end{frame}
+
+\begin{frame}{Combined significance}
+\tiny
+\begin{itemize}
+\item Combine the significance (only channels with $Z_n>0$ are combined)
+\end{itemize}
+
+\begin{columns}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2/combine_significance_0}
+\caption{\tiny SR optimization with MC only}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+\begin{columns}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD/combine_significance_0}
+\caption{\tiny SR optimization with DD}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+\begin{itemize}
+\item .
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Yields and significance in SR}
+\begin{columns}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2/SR_SS_opt}
+\caption{\tiny SR optimization with MC only}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+\begin{columns}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD/SR_SS_opt}
+\caption{\tiny SR optimization with DD}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+%\section{Conclusion}
+%\begin{frame}{Conclusion}
+%\begin{itemize}
+%\item .
+%\end{itemize}
+%\end{frame}
+
+\section{SRjet1 and SRjet23}
+\begin{frame}
+\begin{center}
+\huge
+More plots for SR optimization with DD
+\end{center}
+\end{frame}
+
+\input{data/optimization/nSig_SR_SS_opt_0.tex}
+\input{data/optimization/significance_SR_SS_opt_0.tex}
+
+\subsection{Yields table}
+\input{data/optimization/opt_SR_SS_opt_0.tex}
+\input{data/plot_SR_SS_opt_0.tex}
+
+\section{Pre-selection plots}
+\subsection{Yields}
+\input{data/expN_SR_SS_pre.tex}
+\subsection{Plots}
+\input{data/plot_SR_SS_pre.tex}
+
+\section*{Backup}
+\begin{frame}
+\begin{center}
+\huge
+Backup
+\end{center}
+\end{frame}
+
+\begin{frame}
+\small
+SUSY scenario:\\
+\begin{figure}
+\includegraphics[width=0.6\textwidth]{data/photo/Wh.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Signal sample}
+\small
+Sample Name(p2949 tag):
+\tiny
+\begin{verbatim}
+mc15_13TeV.
+393822.MGPy8EG_A14N23LO_C1N2_Wh_hall_162p5_12p5_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
+
+mc15_13TeV.
+393823.MGPy8EG_A14N23LO_C1N2_Wh_hall_175p0_0p0_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
+
+mc15_13TeV.
+393895.MGPy8EG_A14N23LO_C1N2_Wh_hall_450p0_0p0_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Data}
+\small
+use both 2015 and 2016 data (3212.96 + 32861.6) /pb
+\tiny
+\begin{verbatim}
+GRL:
+GoodRunsLists/data16_13TeV/20161101/physics_25ns_20.7.xml
+GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{MC BG}
+p-tag: p2949
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+Trigger list:\\
+\scriptsize
+\begin{verbatim}
+2015
+HLT_2e12_lhloose_L12EM10VH
+HLT_e17_lhloose_mu14
+HLT_mu18_mu8noL1
+
+2016(A-D3)
+HLT_2e17_lhvloose_nod0
+HLT_e17_lhloose_nod0_mu14
+HLT_mu20_mu8noL1
+
+2016(D3-)
+HLT_2e17_lhvloose_nod0
+HLT_e17_lhloose_nod0_mu14
+HLT_mu22_mu8noL1
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Object Definitions}
+\small
+Tool: AnalysisBase 2.4.31, SUSYTools-00-08-60\\
+
+\centering
+\begin{table}
+\small
+\begin{tabularx}{\textwidth}{p{1.5cm} | p{3cm} | p{3cm} | p{3cm}}
+& \textbf{Electron} & \textbf{Muon} & \textbf{Jet}\\
+\hline
+\textbf{Baseline}
+& - $p_T>10$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - LooseAndBLayerLLH
+& - $p_T>10$ GeV \newline - $|\eta| < 2.4$ \newline - Medium
+& - $p_T>20$ GeV \\
+\hline
+\textbf{Signal}
+& - $p_T > 20$ GeV \newline - $|\eta^{cluster}| < 2.47$ \newline - MediumLLH \newline - FixedCutTight \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 5$
+& - $p_T > 20$ GeV \newline - $|\eta| < 2.4$ \newline - Medium \newline - GradientLoose \newline - $|z_0 \sin \theta| < 0.5$mm \newline - $|d_0/\sigma_{d_0}| < 3$
+& - $p_T > 20$ GeV \newline - $|\eta|<2.8$ \newline \newline - $|JVT| > 0.59$ \newline if $p_T < 60$ GeV \newline and $|\eta| < 2.4$
+\end{tabularx}
+\end{table}
+
+\raggedright
+Selection:
+\begin{itemize}
+\item Trigger requirement
+\item Exactly 2 baseline leptons and exactly 2 signal leptons
+\end{itemize}
+
+\tiny
+Note: \\
+Pileup reweighting is applied. \\
+Scale factor for reconstruction, isolation, ID and trigger is applied.
+\end{frame}
+
+\begin{frame}
+\frametitle{Definition of jets}
+\normalsize
+\begin{itemize}
+\item Central jets: $\pt>20$ GeV, $|\eta|<2.8$, no b-tagged
+\begin{itemize}
+\item Use new eta cut.
+\end{itemize}
+\item B-jets: b-tagged
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{definition of variables}
+\normalsize
+\begin{itemize}
+\item HT: Sum of the $p_T$ of all signal jets and the two leptons.
+\item R2 = MET / (MET + pt1 + pt2)
+\item l12\_dPhi: difference in phi between the two leptons.
+\item l12\_MET\_dPhi: difference in phi between MET and the sum of 4-momentum of the two leptons.
+\end{itemize}
+\end{frame}
+
+\end{document}

@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_mTfix_pt25_meff200_dEta1p5_v4_R2_Fakes";
+TString setupTag = "2p8_1D_mTfix_pt25_v4_R2_DD";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -408,6 +408,7 @@ void analysis1()
                         element.setOfBGMC.push_back("VVV");
                         element.setOfBGMC.push_back("Higgs");
                         element.setOfBGMC.push_back("Fakes");
+                        element.setOfBGMC.push_back("charge flip");
                         //*/
                     }
                     else
@@ -2044,8 +2045,8 @@ void analysis1()
             OptimizingCutElement3.max = 5;
             OptimizingCutElement3.nBin = 10;
             OptimizingCutElement3.lower = 0;
-            //OptimizingCutElement3.upper = -1;
-            OptimizingCutElement3.upper = 1.5;
+            OptimizingCutElement3.upper = -1;
+            //OptimizingCutElement3.upper = 1.5;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
@@ -2064,8 +2065,8 @@ void analysis1()
             OptimizingCutElement3.min = 100;
             OptimizingCutElement3.max = 600;
             OptimizingCutElement3.nBin = 50;
-            //OptimizingCutElement3.lower = 100;
-            OptimizingCutElement3.lower = 200;
+            OptimizingCutElement3.lower = 100;
+            //OptimizingCutElement3.lower = 200;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
@@ -2832,7 +2833,7 @@ void analysis1()
                             if(OptimizingCutInfo[VarIndex2][0].RelatedVariable == "meff" ||
                                OptimizingCutInfo[VarIndex2][0].RelatedVariable == "dEta" )
                             {
-                                continue;
+                                //continue;
                             }
                             
                             const unsigned int VarNumber = OptimizingCutInfo[VarIndex2].size();
