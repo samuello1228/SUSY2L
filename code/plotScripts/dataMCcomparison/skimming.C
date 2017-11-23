@@ -154,6 +154,9 @@ void printhCutflow(vector<TH1D*>& hSRCutflow)
 
 void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow, std::vector<TString>& channel)
 {
+    bool isCF = false;
+    if(SampleName == "CF") isCF = true;
+    
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
     {
@@ -167,10 +170,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         ///*
         TString fileName = SamplePath;
-        fileName += "all/user.*.";
-        fileName += SampleName;
-        fileName += ".*.myOutput.root*";
-        //*/
+        if(!isCF)
+        {
+            fileName += "all/user.*.";
+            fileName += SampleName;
+            fileName += ".*.myOutput.root*";
+        }
+        else
+        {
+            TString fileName = SamplePath;
+            fileName += "data";
+            fileName += "*.root";
+        }
         
         /*
         TString fileName = SamplePath;
@@ -231,6 +242,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TString fileName = "skimming/skimming.";
         //TString fileName = "skimming_signal_old/skimming.";
         //TString fileName = "skimming_signal_new/skimming.";
+        if(isCF) fileName += "mc15_13TeV.999998.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -324,6 +336,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
     }
     
+    if(isCF)
+    {
+        for(unsigned int j=0;j<channel.size();j++)
+        {
+            h2[j]->SetBinContent(1,1);
+            h2[j]->SetBinContent(2,32861.6+3212.96);
+        }
+    }
+    
     if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
     const double commonWeight = XS /h2[0]->GetBinContent(2) *(32861.6+3212.96);
     
@@ -340,14 +361,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //trigger
         if((sig.trigCode & sig.trigMask)==0)
         {
-            if(!cutflow) continue;
+            if(!cutflow && !isCF) continue;
         }
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("trigger",1);
         }
         
-        weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
+        if(!isCF) weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
+        else weight = evt.qFwt;
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
@@ -356,7 +378,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         sigIndex[1] = 1;
         pt1 = leps[sigIndex[0]].pt;
         pt2 = leps[sigIndex[1]].pt;
-        if(!evt.isMC && fLwt!=0)
+        if(!isCF && !evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -411,7 +433,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         int channelIndex = 0;
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
-            channelIndex += 3;
+            if(!isCF) channelIndex += 3;
             if(cutflow)
             {
                 for(unsigned int m=0;m<6;m++)
@@ -420,6 +442,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                     hSRCutflow[m]->Fill("SS,w",TotalWeight);
                 }
             }
+        }
+        else if(isCF)
+        {
+            channelIndex += 3;
         }
         else if(cutflow) continue;
         
@@ -1346,6 +1372,17 @@ void skimming()
         vector<TH1D*> hSRCutflow;
         initializehCutflow(hSRCutflow);
         skimmingForFakes(SamplePath,SampleName,hSRCutflow,channel);
+        if(cutflow) printhCutflow(hSRCutflow);
+        deletehCutflow(hSRCutflow);
+    }
+    
+    //charge flip from Gabriel
+    //if(false)
+    {
+        TString SampleName = "CF";
+        vector<TH1D*> hSRCutflow;
+        initializehCutflow(hSRCutflow);
+        skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel);
         if(cutflow) printhCutflow(hSRCutflow);
         deletehCutflow(hSRCutflow);
     }
