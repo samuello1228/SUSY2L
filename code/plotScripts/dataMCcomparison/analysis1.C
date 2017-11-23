@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "2p8_1D_mTfix_pt25_v4_R2_DD";
+TString setupTag = "v5_R2_DD_MET";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -2051,7 +2051,8 @@ void analysis1()
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             OptimizingCutElement2.clear();
-            OptimizingCutElement3.RelatedVariable = "METRel";
+            //OptimizingCutElement3.RelatedVariable = "METRel";
+            OptimizingCutElement3.RelatedVariable = "MET";
             OptimizingCutElement3.min = 0;
             OptimizingCutElement3.max = 200;
             OptimizingCutElement3.nBin = 40;
@@ -2547,22 +2548,35 @@ void analysis1()
     }
     
     std::vector<unsigned int> OptimizingSignal;
-    ///*
+    /*
     for(unsigned int i=0;i<10;i++)
     {
         OptimizingSignal.push_back(i);
     }
-    //*/
-    /*
+    */
+    ///*
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
-        if(SigSampleInfo[i].Mass1 >= 200 && SigSampleInfo[i].Mass1 <= 300)
+        if(
+           (SigSampleInfo[i].Mass1 == 150   && SigSampleInfo[i].Mass2 == 0     ) ||
+           (SigSampleInfo[i].Mass1 == 152.5 && SigSampleInfo[i].Mass2 == 22.5  ) ||
+           (SigSampleInfo[i].Mass1 == 175   && SigSampleInfo[i].Mass2 == 25    ) ||
+           (SigSampleInfo[i].Mass1 == 177.5 && SigSampleInfo[i].Mass2 == 47.5  ) ||
+           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5  ) ||
+           (SigSampleInfo[i].Mass1 == 190   && SigSampleInfo[i].Mass2 == 60    ) ||
+           (SigSampleInfo[i].Mass1 == 202.5 && SigSampleInfo[i].Mass2 == 72.5  ) ||
+           (SigSampleInfo[i].Mass1 == 215   && SigSampleInfo[i].Mass2 == 85    ) ||
+           (SigSampleInfo[i].Mass1 == 227.5 && SigSampleInfo[i].Mass2 == 97.5  ) ||
+           (SigSampleInfo[i].Mass1 == 237.5 && SigSampleInfo[i].Mass2 == 87.5  ) ||
+           (SigSampleInfo[i].Mass1 == 240   && SigSampleInfo[i].Mass2 == 110   ) ||
+           (SigSampleInfo[i].Mass1 == 250   && SigSampleInfo[i].Mass2 == 100   ) ||
+           (SigSampleInfo[i].Mass1 == 300   && SigSampleInfo[i].Mass2 == 100   ) )
         {
             cout<<SigSampleInfo[i].SampleName.Data()<<endl;
             OptimizingSignal.push_back(i);
         }
     }
-    */
+    //*/
     
     //plot graph
     unsigned int countVariable = 0;
