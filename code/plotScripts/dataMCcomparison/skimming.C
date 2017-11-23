@@ -178,7 +178,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         else
         {
-            TString fileName = SamplePath;
             fileName += "data";
             fileName += "*.root";
         }
