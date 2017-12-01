@@ -127,6 +127,8 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow)
         hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"maxmt,w");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(29,"mlj");
         hSRCutflow[j]->GetXaxis()->SetBinLabel(30,"mlj,w");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(31,"mTtwo");
+        hSRCutflow[j]->GetXaxis()->SetBinLabel(32,"mTtwo,w");
     }
 }
 
@@ -142,7 +144,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow)
 {
     for(unsigned int i=0;i<2;i++)
     {
-        for(unsigned int j=1;j<=30;j++)
+        for(unsigned int j=1;j<=32;j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
             if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
@@ -368,7 +370,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         if(!isCF) weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
-        else weight = evt.qFwt;
+        else
+        {
+            if(evt.qFwt == 0) continue;
+            weight = evt.qFwt;
+        }
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
@@ -433,6 +439,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
         {
             if(!isCF) channelIndex += 3;
+            else continue;
+        }
+        else if(isCF)
+        {
+            channelIndex += 3;
             if(cutflow)
             {
                 for(unsigned int m=0;m<6;m++)
@@ -441,10 +452,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                     hSRCutflow[m]->Fill("SS,w",TotalWeight);
                 }
             }
-        }
-        else if(isCF)
-        {
-            channelIndex += 3;
         }
         else if(cutflow) continue;
         
@@ -474,6 +481,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             else if(int(abs(ID2)/1000) == 13)
             {
+                if(isCF) continue;
                 if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
                 channelIndex += 1;
             }
@@ -483,51 +491,19 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         nJet = jets.size();
         if(cutflow)
         {
-            if(channelIndex==3)
+            if(channelIndex>=3 && channelIndex<=5)
             {
                 hSRCutflow[0]->Fill("flavour",1);
                 hSRCutflow[0]->Fill("flavour,w",TotalWeight);
-                hSRCutflow[3]->Fill("flavour",1);
-                hSRCutflow[3]->Fill("flavour,w",TotalWeight);
+                hSRCutflow[1]->Fill("flavour",1);
+                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
                 if(nJet == 1)
                 {
                     SRIndex = 0;
                 }
                 else if(nJet == 2 || nJet == 3)
                 {
-                    SRIndex = 3;
-                }
-                else continue;
-            }
-            else if(channelIndex==4)
-            {
-                hSRCutflow[1]->Fill("flavour",1);
-                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
-                hSRCutflow[4]->Fill("flavour",1);
-                hSRCutflow[4]->Fill("flavour,w",TotalWeight);
-                if(nJet == 1)
-                {
                     SRIndex = 1;
-                }
-                else if(nJet == 2 || nJet == 3)
-                {
-                    SRIndex = 4;
-                }
-                else continue;
-            }
-            else if(channelIndex==5)
-            {
-                hSRCutflow[2]->Fill("flavour",1);
-                hSRCutflow[2]->Fill("flavour,w",TotalWeight);
-                hSRCutflow[5]->Fill("flavour",1);
-                hSRCutflow[5]->Fill("flavour,w",TotalWeight);
-                if(nJet == 1)
-                {
-                    SRIndex = 2;
-                }
-                else if(nJet == 2 || nJet == 3)
-                {
-                    SRIndex = 5;
                 }
                 else continue;
             }
@@ -605,7 +581,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             //bjetpt = jets[leadingBJetIndex].pt;
             //bjeteta = jets[leadingBJetIndex].eta;
             //bjetphi = jets[leadingBJetIndex].phi;
-            if(cutflow) continue;
+            continue;
         }
         else
         {
@@ -700,14 +676,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(cutflow)
         {
-            if(fabs(mll-91.2)>10)
+            if(true)
             {
                 hSRCutflow[SRIndex]->Fill("Zmass",1);
                 hSRCutflow[SRIndex]->Fill("Zmass,w",TotalWeight);
             }
             else continue;
             
-            if(pt1>=65)
+            if(pt1>=25)
             {
                 hSRCutflow[SRIndex]->Fill("pt1",1);
                 hSRCutflow[SRIndex]->Fill("pt1,w",TotalWeight);
@@ -721,31 +697,45 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             else continue;
             
-            if(fabs(eta1-eta2)<1.5)
+            if(fabs(eta1-eta2)<2)
             {
                 hSRCutflow[SRIndex]->Fill("dEta",1);
                 hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
             }
             else continue;
             
-            if(meff>=200)
+            if(MET>=100)
+            {
+                hSRCutflow[SRIndex]->Fill("METRel",1);
+                hSRCutflow[SRIndex]->Fill("METRel,w",TotalWeight);
+            }
+            else continue;
+            
+            if(meff>=100)
             {
                 hSRCutflow[SRIndex]->Fill("meff",1);
                 hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
             }
             else continue;
             
-            if(mtm>=125)
+            if(mtm>=130)
             {
                 hSRCutflow[SRIndex]->Fill("maxmt",1);
                 hSRCutflow[SRIndex]->Fill("maxmt,w",TotalWeight);
             }
             else continue;
             
-            if(mlj<105)
+            if(mlj<140)
             {
                 hSRCutflow[SRIndex]->Fill("mlj",1);
                 hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
+            }
+            else continue;
+            
+            if(mTtwo>=65)
+            {
+                hSRCutflow[SRIndex]->Fill("mTtwo",1);
+                hSRCutflow[SRIndex]->Fill("mTtwo,w",TotalWeight);
             }
             else continue;
         }
@@ -998,7 +988,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         int nISR = 0;
         if(nBJet>0)
         {
-            if(cutflow) continue;
+            continue;
         }
         else
         {
@@ -1376,7 +1366,7 @@ void skimming()
     }
     
     //charge flip from Gabriel
-    //if(false)
+    if(false)
     {
         TString SampleName = "CF";
         vector<TH1D*> hSRCutflow;
