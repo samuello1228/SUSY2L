@@ -441,19 +441,23 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(!isCF) channelIndex += 3;
             else continue;
         }
-        else if(isCF)
+        else
         {
-            channelIndex += 3;
-            if(cutflow)
+            if(!isCF)
             {
-                for(unsigned int m=0;m<6;m++)
-                {
-                    hSRCutflow[m]->Fill("SS",1);
-                    hSRCutflow[m]->Fill("SS,w",TotalWeight);
-                }
+                if(cutflow) continue;
+            }
+            else channelIndex += 3;
+        }
+        
+        if(cutflow && channelIndex == 3)
+        {
+            for(unsigned int m=0;m<6;m++)
+            {
+                hSRCutflow[m]->Fill("SS",1);
+                hSRCutflow[m]->Fill("SS,w",TotalWeight);
             }
         }
-        else if(cutflow) continue;
         
         //SF or DF
         TLorentzVector l1;
