@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "v5_R2_DD_MET";
+TString setupTag = "v6_s2_MET";
 
 const bool FJetVeto = 0; //For jet eta cut 2.4
 const bool ptcut = 0; //For loose (muon |eta|<2.7)
@@ -794,6 +794,13 @@ void analysis1()
         //charge flip
         element.GroupName = "charge flip"; element.LegendName = "charge flip"; element.LatexName = "charge flip";
         element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999998,999998);
+        element.colour = 2; BGMCGroupData.push_back(element);
+        
+        /*
+        //charge flip
+        element.GroupName = "charge flip"; element.LegendName = "charge flip"; element.LatexName = "charge flip";
+        element.BGMCIndex.clear();
         //VV
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363356,363356);
@@ -810,6 +817,7 @@ void analysis1()
         //Drell Yan
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364198,364215);
         element.colour = 2; BGMCGroupData.push_back(element);
+        */
     }
     
     //Group for data-driven background
