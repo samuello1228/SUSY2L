@@ -369,12 +369,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("trigger",1);
         }
         
-        if(!isCF) weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
+        if(!isCF)
+        {
+            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
+            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
+        }
         else
         {
             if(evt.qFwt == 0) continue;
             weight = evt.qFwt;
         }
+        
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
