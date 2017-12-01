@@ -667,6 +667,7 @@ void analysis1()
         element.GroupName = "Zjets"; element.LegendName = "Z+jets"; element.LatexName = "Z+jets";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364100,364141);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,364198,364215);
         element.colour = 2; BGMCGroupData.push_back(element);
         
         element.GroupName = "Zee"; element.LegendName = "Z#rightarrow ee"; element.LatexName = "Z$\\rightarrow ee$";
