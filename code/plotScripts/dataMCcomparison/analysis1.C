@@ -6040,7 +6040,7 @@ void analysis1()
         }
         
         const unsigned int RegionN = RegionGroup[optRegionGroupIndex].upper - RegionGroup[optRegionGroupIndex].lower +1;
-        ifstream fin[RegionN];
+        std::vector<ifstream*> fin;
         for(unsigned int RegionIndex=RegionGroup[optRegionGroupIndex].lower;RegionIndex<=RegionGroup[optRegionGroupIndex].upper;RegionIndex++)
         {
             const unsigned int SixChannel = RegionIndex - RegionGroup[optRegionGroupIndex].lower;
@@ -6052,7 +6052,9 @@ void analysis1()
             PathName += "_";
             PathName += TString::Itoa(SigOptimizingIndex,10);
             PathName += ".txt";
-            fin[SixChannel].open(PathName.Data());
+            
+            ifstream* finElement = new ifstream(PathName.Data());
+            fin.push_back(finElement);
         }
         
         if(RegionN == 6)
@@ -6113,9 +6115,9 @@ void analysis1()
                     TString VarName;
                     double lower;
                     double upper;
-                    fin[SixChannel]>>VarName;
-                    fin[SixChannel]>>lower;
-                    fin[SixChannel]>>upper;
+                    (*(fin[SixChannel]))>>VarName;
+                    (*(fin[SixChannel]))>>lower;
+                    (*(fin[SixChannel]))>>upper;
                     
                     fout<<"& ";
                     if(lower == 0)
@@ -6198,7 +6200,8 @@ void analysis1()
         
         for(unsigned int SixChannel=0;SixChannel<RegionN;SixChannel++)
         {
-            fin[SixChannel].close();
+            fin[SixChannel]->close();
+            delete fin[SixChannel];
         }
         fout.close();
     }
