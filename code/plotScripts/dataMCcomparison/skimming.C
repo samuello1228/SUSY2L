@@ -1366,6 +1366,7 @@ void skimming()
     //Fakes.root from Peter
     if(false)
     {
+        SamplePath += "Peter_Fake_Nov/"; tag = "";
         TString SampleName = "Fakes";
         vector<TH1D*> hSRCutflow;
         initializehCutflow(hSRCutflow);
@@ -1377,6 +1378,7 @@ void skimming()
     //charge flip from Gabriel
     if(false)
     {
+        SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
         vector<TH1D*> hSRCutflow;
         initializehCutflow(hSRCutflow);
