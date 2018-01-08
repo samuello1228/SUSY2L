@@ -41,14 +41,12 @@ University of Michigan
 \section{Introduction}
 \begin{frame}{Update}
 \begin{itemize}
-\item Compare 4 SR optimizations:
+\item use 13 signal points at the diagonal.
+\item use MET.
+\item Compare 2 SR optimizations:
 \begin{itemize}
-\item first 10 signal points. (393820 to 393829)
-\item 13 signal points at the diagonal.
-\end{itemize}
-\begin{itemize}
-\item using METRel.
-\item using MET.
+\item using MC to estimate charge flip BG. (listed in page 4)
+\item using data-driven method to estimate charge flip BG. (using Gabriel's ntuple)
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -147,38 +145,18 @@ The following constraints are applied to reduce the bias from low statistics:
 
 \begin{column}{0.5\textwidth}
 \scalebox{0.8}{
-\input{data/optimization/cut_table_SR_SS_opt_0_2p8_1D_mTfix_pt25_v4_R2_DD.tex}
-\end{tabular}
-}
-\caption{\tiny first 10 signal points using METRel}
-\end{column}
-
-\begin{column}{0.5\textwidth}
-\scalebox{0.8}{
-\input{data/optimization/cut_table_SR_SS_opt_0_2p8_1D_mTfix_pt25_v4_R2_DD_MET.tex}
-\end{tabular}
-}
-\caption{\tiny first 10 signal points using MET}
-\end{column}
-
-\end{columns}
-
-\begin{columns}
-
-\begin{column}{0.5\textwidth}
-\scalebox{0.8}{
-\input{data/optimization/cut_table_SR_SS_opt_0_v5_R2_DD.tex}
-\end{tabular}
-}
-\caption{\tiny 13 diagonal signals using METRel}
-\end{column}
-
-\begin{column}{0.5\textwidth}
-\scalebox{0.8}{
 \input{data/optimization/cut_table_SR_SS_opt_0_v5_R2_DD_MET.tex}
 \end{tabular}
 }
-\caption{\tiny 13 diagonal signals using MET}
+\caption{\tiny use MC as charge flip BG}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\scalebox{0.8}{
+\input{data/optimization/cut_table_SR_SS_opt_0_v6_s2_MET.tex}
+\end{tabular}
+}
+\caption{\tiny use DD as charge flip BG}
 \end{column}
 
 \end{columns}
@@ -195,34 +173,16 @@ The following constraints are applied to reduce the bias from low statistics:
 
 \begin{column}{0.4\textwidth}
 \begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD/combine_significance_0}
-\caption{\tiny first 10 signal points using METRel}
-\end{figure}
-\end{column}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD_MET/combine_significance_0}
-\caption{\tiny first 10 signal points using MET}
-\end{figure}
-\end{column}
-
-\end{columns}
-
-\begin{columns}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_v5_R2_DD/combine_significance_0}
-\caption{\tiny 13 diagonal signals using METRel}
-\end{figure}
-\end{column}
-
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
 \includegraphics[width=0.7\textwidth]{../plot_v5_R2_DD_MET/combine_significance_0}
-\caption{\tiny 13 diagonal signals using MET}
+\caption{\tiny use MC as charge flip BG}
+\end{figure}
+\end{column}
+
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_v6_s2_MET/combine_significance_0}
+\caption{\tiny use DD as charge flip BG}
 \end{figure}
 \end{column}
 
@@ -234,37 +194,20 @@ The following constraints are applied to reduce the bias from low statistics:
 \end{frame}
 
 \begin{frame}{Yields and significance in SR}
-\begin{columns}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD/SR_SS_opt}
-\caption{\tiny first 10 signal points using METRel}
-\end{figure}
-\end{column}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_2p8_1D_mTfix_pt25_v4_R2_DD_MET/SR_SS_opt}
-\caption{\tiny first 10 signal points using MET}
-\end{figure}
-\end{column}
-
-\end{columns}
 
 \begin{columns}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\includegraphics[width=0.7\textwidth]{../plot_v5_R2_DD/SR_SS_opt}
-\caption{\tiny 13 diagonal signals using METRel}
-\end{figure}
-\end{column}
 
 \begin{column}{0.4\textwidth}
 \begin{figure}
 \includegraphics[width=0.7\textwidth]{../plot_v5_R2_DD_MET/SR_SS_opt}
-\caption{\tiny 13 diagonal signals using MET}
+\caption{\tiny use MC as charge flip BG}
+\end{figure}
+\end{column}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{../plot_v6_s2_MET/SR_SS_opt}
+\caption{\tiny use DD as charge flip BG}
 \end{figure}
 \end{column}
 
@@ -283,7 +226,7 @@ The following constraints are applied to reduce the bias from low statistics:
 \begin{frame}
 \begin{center}
 \huge
-More plots for SR optimization using MET
+More plots for SR optimization using DD as charge flip BG
 \end{center}
 \end{frame}
 
