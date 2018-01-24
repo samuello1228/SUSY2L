@@ -3439,7 +3439,7 @@ void analysis1()
                                     cout<<OptimizingCutInfo[VarIndex2][i].RelatedVariable.Data()<<", ";
                                 }
                             }
-                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1[2]<<", significanceRecord1: "<<significanceRecord1<<endl;
+                            cout<<"nBG: "<<nBGRecord1<<", nSig: "<<nSigRecord1[0]<<", significanceRecord1: "<<significanceRecord1<<endl;
                             
                             if(isOptimizing)
                             {
@@ -3540,7 +3540,7 @@ void analysis1()
                                     cout<<", upperCutRecord2: "<<upperCutRecord2[i];
                                     cout<<endl;
                                 }
-                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[0]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                                 
                                 for(unsigned int i=0;i<OptimizingCutInfo[VarIndexRecord2].size();i++)
                                 {
@@ -3558,7 +3558,7 @@ void analysis1()
                             else
                             {
                                 cout<<"The cut is the same."<<endl;
-                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
+                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[0]<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
                                 
                                 cout<<RegionInfo[RegionIndex].RegionName.Data()<<": "<<endl;
                                 
@@ -3599,7 +3599,7 @@ void analysis1()
                                     RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].lower = OptimizingCutInfo[VarIndexRecord2][i].min;
                                     RegionInfo[RegionIndex].OptimizingCut[SigIndex][VarIndexRecord2][i].upper = -1;
                                 }
-                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[2]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
+                                cout<<"nBG: "<<nBGRecord2<<", nSig: "<<nSigRecord2[0]<<", significanceRecord2: "<<significanceRecord2<<endl<<endl;
                                 
                                 nBGRecord3 = nBGRecord2;
                                 for(unsigned int i=0;i<OptimizingSignal.size();i++)
@@ -3611,7 +3611,7 @@ void analysis1()
                             else
                             {
                                 cout<<"No any cut can be removed."<<endl;
-                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[2];
+                                cout<<"nBG: "<<nBGRecord3<<", nSig: "<<nSigRecord3[0];
                                 cout<<", significanceRecord4: "<<significanceRecord4;
                                 cout<<", significanceRecord3: "<<significanceRecord3<<endl<<endl;
                                 
@@ -4041,7 +4041,7 @@ void analysis1()
                     for(unsigned int j=0;j<SigMassSplitting.size();j++)
                     {
                         TString NameTemp = "SigSum_";
-                        NameTemp += TString::Format("%.0f",SigMassSplitting[j].MassDiff);
+                        NameTemp += TString::Format("%.0u",j);
                         h2SigSum[j] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         h2SigSum[j]->GetYaxis()->SetTitle("Number of events");
                         h2SigSum[j]->SetLineColor(SigMassSplitting[j].colour);
@@ -4436,7 +4436,7 @@ void analysis1()
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "Significance_";
-                        NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+                        NameTemp += TString::Format("%.0u",i);
                         hSignificance[i] = new TH1D(NameTemp.Data(),title.Data(),Var[VarIndex].bin,Var[VarIndex].xmin,Var[VarIndex].xmax);
                         hSignificance[i]->SetLineColor(SigMassSplitting[i].colour);
                         hSignificance[i]->SetLineWidth(2);
@@ -5088,7 +5088,7 @@ void analysis1()
                     for(unsigned int i=0;i<SigMassSplitting.size();i++)
                     {
                         TString NameTemp = "SigSum_";
-                        NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+                        NameTemp += TString::Format("%.0u",i);
                         h2SigSum[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                             Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                         unsigned int AOD = 0;
@@ -5123,7 +5123,7 @@ void analysis1()
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     TString NameTemp = "Significance_";
-                    NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+                    NameTemp += TString::Format("%.0u",i);
                     hSignificance[i] = new TH2D(NameTemp.Data(),title.Data(),Var[VarIndex[0]].bin,Var[VarIndex[0]].xmin,Var[VarIndex[0]].xmax,
                                                                              Var[VarIndex[1]].bin,Var[VarIndex[1]].xmin,Var[VarIndex[1]].xmax);
                     hSignificance[i]->GetXaxis()->SetTitle(axis[0].Data());
@@ -5189,7 +5189,7 @@ void analysis1()
                     NameTemp += "_";
                     NameTemp += RegionInfo[RegionIndex].RegionName;
                     NameTemp += "_";
-                    NameTemp += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+                    NameTemp += TString::Format("%.0u",i);
                     NameTemp += ".eps";
                     c2->Print(NameTemp,"eps");
                     
@@ -5840,7 +5840,7 @@ void analysis1()
             latexName += "_";
             latexName += RegionGroup[RegionGroupIndex].GroupName;
             latexName += "_";
-            latexName += TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+            latexName += TString::Format("%.0u",i);
             
             latexName.ReplaceAll("_","\\_");
             
@@ -5857,7 +5857,7 @@ void analysis1()
                 fout<<"significance_ptll_MET_";
                 fout<<RegionInfo[RegionIndex].RegionName;
                 fout<<"_";
-                fout<<TString::Format("%.0f",SigMassSplitting[i].MassDiff);
+                fout<<TString::Format("%.0u",i);
                 fout<<"}";
                 
                 if(SixChannel==2) fout<<" \\\\";
