@@ -9,6 +9,7 @@ isMC=1
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
 
 #Samuel
+isMC=1
 #file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttbar_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGhiggs_sample_list.txt
 #file=../multiLepSearch/script/MCBGsingletop_sample_list.txt
 #file=../multiLepSearch/script/MCBGttbar_sample_list.txt
@@ -25,9 +26,14 @@ file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/scr
 #file=../multiLepSearch/script/MCBGmultitop_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
 
+#For fast simulation
+#isMC=2
+#file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt
+
 k=${tag}.MCBG
 
 #For signal MC
+#isMC=2
 #file=../multiLepSearch/script/MCSig_sample_list.txt
 #k=${tag}.MCSig
 
