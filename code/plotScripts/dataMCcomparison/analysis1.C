@@ -410,6 +410,17 @@ void analysis1()
                         element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("charge flip");
                         //*/
+                        
+                        /*
+                        //Dani
+                        element.setOfBGMC.push_back("Fakes");
+                        element.setOfBGMC.push_back("VV_DL");
+                        element.setOfBGMC.push_back("ttV");
+                        element.setOfBGMC.push_back("VVV");
+                        element.setOfBGMC.push_back("Higgs");
+                        element.setOfBGMC.push_back("multitop");
+                        element.setOfBGMC.push_back("DY");
+                        */
                     }
                     else
                     {
@@ -519,10 +530,17 @@ void analysis1()
         element.MassDiff = 400;   element.ID = 2;  element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         */
         
+        /*
         element.MassDiff = 150;   element.ID = 2;  element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 175;   element.ID = 3;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 450;   element.ID = 75; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
+        */
         
+        ///*
+        //Dani
+        element.MassDiff = 150;   element.ID = 20; element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 150;   element.ID = 7;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
+        //*/
     }
     
     struct SigInfo
@@ -743,6 +761,15 @@ void analysis1()
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361073);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363491);
+        element.colour = 801; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VV_DL"; element.LegendName = "VV_DL"; element.LatexName = "VV\\_DL";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361073);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363356,363356);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363358,363358);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363492);
         element.colour = 801; BGMCGroupData.push_back(element);
         
         //Vgamma
@@ -2082,7 +2109,8 @@ void analysis1()
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
             OptimizingCutElement2.clear();
-            OptimizingCutElement3.RelatedVariable = "mtm";
+            //OptimizingCutElement3.RelatedVariable = "mtm";
+            OptimizingCutElement3.RelatedVariable = "mt1"; //Dani
             OptimizingCutElement3.min = 0;
             OptimizingCutElement3.max = 300;
             OptimizingCutElement3.nBin = 60;
@@ -2111,6 +2139,7 @@ void analysis1()
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
             
+            /*
             OptimizingCutElement2.clear();
             OptimizingCutElement3.RelatedVariable = "ptll";
             OptimizingCutElement3.min = 0;
@@ -2120,6 +2149,7 @@ void analysis1()
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
             OptimizingCutElement1.push_back(OptimizingCutElement2);
+            */
             
             for(unsigned int i=0;i<OptimizingCutElement1.size();i++)
             {
@@ -2131,7 +2161,9 @@ void analysis1()
                      OptimizingCutElement1[i][j].RelatedVariable == "ptll" ||
                      OptimizingCutElement1[i][j].RelatedVariable == "mTtwo" ||
                      OptimizingCutElement1[i][j].RelatedVariable == "METRel" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "MET" ||
                      OptimizingCutElement1[i][j].RelatedVariable == "meff" ||
+                     OptimizingCutElement1[i][j].RelatedVariable == "mt1" ||
                      OptimizingCutElement1[i][j].RelatedVariable == "mtm" );
                     
                     OptimizingCutElement1[i][j].OnlyHasUpperCut =
@@ -2566,6 +2598,7 @@ void analysis1()
     ///*
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
+        /*
         if(
            (SigSampleInfo[i].Mass1 == 150   && SigSampleInfo[i].Mass2 == 0     ) ||
            (SigSampleInfo[i].Mass1 == 152.5 && SigSampleInfo[i].Mass2 == 22.5  ) ||
@@ -2580,6 +2613,15 @@ void analysis1()
            (SigSampleInfo[i].Mass1 == 240   && SigSampleInfo[i].Mass2 == 110   ) ||
            (SigSampleInfo[i].Mass1 == 250   && SigSampleInfo[i].Mass2 == 100   ) ||
            (SigSampleInfo[i].Mass1 == 300   && SigSampleInfo[i].Mass2 == 100   ) )
+        */
+        
+        ///*
+        //Dani
+        if(
+           (SigSampleInfo[i].Mass1 == 225   && SigSampleInfo[i].Mass2 == 75   ) ||
+           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5 ) ||
+           false )
+        //*/
         {
             cout<<SigSampleInfo[i].SampleName.Data()<<endl;
             OptimizingSignal.push_back(i);
@@ -3288,6 +3330,7 @@ void analysis1()
                                             if(BGGroup[j].info->GroupName != "multitop" &&
                                                BGGroup[j].info->GroupName != "Vgamma"   &&
                                                BGGroup[j].info->GroupName != "Wjets"    &&
+                                               BGGroup[j].info->GroupName != "DY"       &&
                                                BGGroup[j].info->GroupName != "Zjets"   )
                                             {
                                                 if(isPrint) cout<<"Group of BG is not positive: "<<BGGroup[j].info->GroupName<<endl;
