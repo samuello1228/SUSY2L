@@ -47,10 +47,6 @@ const bool useDani = 0;
 
 TString setupTag = "v6_s2_MET";
 
-const bool FJetVeto = 0; //For jet eta cut 2.4
-const bool ptcut = 0; //For loose (muon |eta|<2.7)
-const bool isCombined3Regions = false;
-
 // Cutflow Attention
 const bool doVVCount = 0;
 
@@ -2178,124 +2174,6 @@ void analysis1()
             }
         }
         
-        /*
-        //ee_1
-        {
-            element.RegionName = "SR_SS_ee_1_opt";
-            element.RegionShortName = "SRee1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            element.Cut += " && fabs(mll - 91.2) > 10";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_1
-        {
-            element.RegionName = "SR_SS_mumu_1_opt";
-            element.RegionShortName = "SRmumu1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_1
-        {
-            element.RegionName = "SR_SS_emu_1_opt";
-            element.RegionShortName = "SRemu1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        
-        //ee_2
-        {
-            element.RegionName = "SR_SS_ee_2_opt";
-            element.RegionShortName = "SRee2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            element.Cut += " && fabs(mll - 91.2) > 10";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_2
-        {
-            element.RegionName = "SR_SS_mumu_2_opt";
-            element.RegionShortName = "SRmumu2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_2
-        {
-            element.RegionName = "SR_SS_emu_2_opt";
-            element.RegionShortName = "SRemu2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            element.Cut = "";
-            if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            
-            element.AdditionalCut.clear();
-            RegionInfo.push_back(element);
-        }
-        */
-        
         ///*
         //jet1
         {
@@ -2313,8 +2191,6 @@ void analysis1()
             element.Cut = "";
             element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2336,8 +2212,6 @@ void analysis1()
             element.Cut = "";
             element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
-            if(FJetVeto) element.Cut += " && nFJet == 0";
-            if(ptcut) element.Cut += " && pt1>20 && pt2>20";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2354,154 +2228,6 @@ void analysis1()
         GroupElement.showData = false;
         GroupElement.showSignificance = true;
         
-        /*
-        //ee_1
-        {
-            element.RegionName = "SR_SS_ee_1_pre";
-            element.RegionShortName = "SRee1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-                element.Cut += " && fabs(mll - 91.2) > 10";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_1
-        {
-            element.RegionName = "SR_SS_mumu_1_pre";
-            element.RegionShortName = "SRmumu1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_1
-        {
-            element.RegionName = "SR_SS_emu_1_pre";
-            element.RegionShortName = "SRemu1";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //ee_2
-        {
-            element.RegionName = "SR_SS_ee_2_pre";
-            element.RegionShortName = "SRee2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(9);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-                element.Cut += " && fabs(mll - 91.2) > 10";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //mumu_2
-        {
-            element.RegionName = "SR_SS_mumu_2_pre";
-            element.RegionShortName = "SRmumu2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(10);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        
-        //emu_2
-        {
-            element.RegionName = "SR_SS_emu_2_pre";
-            element.RegionShortName = "SRemu2";
-            
-            element.setOfChannel.clear();
-            element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(11);
-            
-            if(!useDani)
-            {
-                element.Cut = "";
-                if(!isCombined3Regions) element.Cut += " && (nCJet == 2 || nCJet == 3)";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
-            
-            element.AdditionalCut.clear();
-            element.OptimizingCut.clear();
-            
-            RegionInfo.push_back(element);
-        }
-        */
-        
         ///*
         //jet1
         {
@@ -2516,14 +2242,9 @@ void analysis1()
             element.setOfChannel.push_back(10);
             element.setOfChannel.push_back(11);
             
-            if(!useDani)
-            {
-                element.Cut = "";
-                element.Cut += " && nCJet == 1";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
+            element.Cut = "";
+            element.Cut += " && nCJet == 1";
+            element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2544,14 +2265,9 @@ void analysis1()
             element.setOfChannel.push_back(10);
             element.setOfChannel.push_back(11);
             
-            if(!useDani)
-            {
-                element.Cut = "";
-                element.Cut += " && (nCJet == 2 || nCJet == 3)";
-                element.Cut += " && nBJet == 0";
-                if(FJetVeto) element.Cut += " && nFJet == 0";
-                if(ptcut) element.Cut += " && pt1>20 && pt2>20";
-            }
+            element.Cut = "";
+            element.Cut += " && (nCJet == 2 || nCJet == 3)";
+            element.Cut += " && nBJet == 0";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
