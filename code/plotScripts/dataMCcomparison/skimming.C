@@ -360,10 +360,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree1->GetEntry(j);
         
         //trigger
-        if((sig.trigCode & sig.trigMask)==0)
-        {
-            if(!cutflow && !isCF) continue;
-        }
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("trigger",1);
@@ -371,8 +367,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(!isCF)
         {
-            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
-            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
+            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
+            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
         }
         else
         {
@@ -1222,8 +1218,9 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     
     //channels
     std::vector<TString> channel;
