@@ -1091,7 +1091,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     }
 }
 
-void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TString const type)
+void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, std::vector<int>& amiAOD, std::vector<int>& amiSUSY, TString const type)
 {
     ifstream fin;
     {
@@ -1126,6 +1126,8 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TS
         {
             double XS1;
             double XS2;
+            int AOD;
+            int SUSY;
             
             fin>>XS2;
             
@@ -1139,6 +1141,12 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, TS
             cout<<XS2<<endl;
             
             fin>>XS1;
+            
+            fin>>AOD;
+            amiAOD.push_back(AOD);
+            
+            fin>>SUSY;
+            amiSUSY.push_back(SUSY);
         }
         else if(type == "Sig")
         {
@@ -1304,8 +1312,10 @@ void skimming()
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
         std::vector<double> XSTemp;
+        std::vector<int> amiAOD;
+        std::vector<int> amiSUSY;
         DataSampleName.reserve(20);
-        GetSampleName(DataSampleName,XSTemp,"Data");
+        GetSampleName(DataSampleName,XSTemp,amiAOD,amiSUSY,"Data");
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
@@ -1323,8 +1333,10 @@ void skimming()
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         std::vector<double> BGXS;
+        std::vector<int> amiAOD;
+        std::vector<int> amiSUSY;
         BGSampleName.reserve(20);
-        GetSampleName(BGSampleName,BGXS,"BG");
+        GetSampleName(BGSampleName,BGXS,amiAOD,amiSUSY,"BG");
         
         for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
@@ -1357,8 +1369,10 @@ void skimming()
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         std::vector<double> SigXS;
+        std::vector<int> amiAOD;
+        std::vector<int> amiSUSY;
         SigSampleName.reserve(20);
-        GetSampleName(SigSampleName,SigXS,"Sig");
+        GetSampleName(SigSampleName,SigXS,amiAOD,amiSUSY,"Sig");
         for(unsigned int i=0;i<=0;i++)
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
@@ -1389,6 +1403,8 @@ void skimming()
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
         vector<TH1D*> hSRCutflow;
+        std::vector<int> amiAOD;
+        std::vector<int> amiSUSY;
         initializehCutflow(hSRCutflow,cutflowList);
         skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel);
         if(cutflow) printhCutflow(hSRCutflow,cutflowList);
