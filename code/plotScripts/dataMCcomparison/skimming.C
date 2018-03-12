@@ -88,7 +88,7 @@ const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
 const bool cutflow = false;
-void initializehCutflow(vector<TH1D*>& hSRCutflow)
+void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
     for(unsigned int j=0;j<6;j++)
     {
@@ -97,38 +97,10 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow)
         TH1D* hTemp = new TH1D(hName.Data(), "cutflow", 100, 0, 100);
         hSRCutflow.push_back(hTemp);
         
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(1,"nAOD");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(3,"trigger");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(4,"trigger,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(5,"=2BaseLep and =2SigLep");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(6,"=2BaseLep and =2SigLep,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(7,"SS");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(8,"SS,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(9,"flavour");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(10,"flavour,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(11,"jet");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(12,"jet,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(13,"bjet");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(14,"bjet,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(15,"Zmass");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(16,"Zmass,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(17,"pt1");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(18,"pt1,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(19,"pt2");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(20,"pt2,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(21,"dEta");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(22,"dEta,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(23,"METRel");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(24,"METRel,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(25,"meff");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(26,"meff,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(27,"maxmt");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(28,"maxmt,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(29,"mlj");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(30,"mlj,w");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(31,"mTtwo");
-        hSRCutflow[j]->GetXaxis()->SetBinLabel(32,"mTtwo,w");
+        for(unsigned int k=0;k<cutflowList.size();k++)    
+        {
+            hSRCutflow[j]->GetXaxis()->SetBinLabel(k+1,cutflowList[k].Data());
+        }
     }
 }
 
@@ -140,11 +112,11 @@ void deletehCutflow(vector<TH1D*>& hSRCutflow)
     }
 }
 
-void printhCutflow(vector<TH1D*>& hSRCutflow)
+void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
     for(unsigned int i=0;i<2;i++)
     {
-        for(unsigned int j=1;j<=32;j++)
+        for(unsigned int j=1;j<=cutflowList.size();j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
             if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
@@ -1289,6 +1261,42 @@ void skimming()
         element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
     }
     
+    std::vector<TString> cutflowList;
+    {
+        cutflowList.push_back("nAOD");
+        cutflowList.push_back("nwAOD");
+        cutflowList.push_back("trigger");
+        cutflowList.push_back("trigger,w");
+        cutflowList.push_back("=2BaseLep and =2SigLep");
+        cutflowList.push_back("=2BaseLep and =2SigLep,w");
+        cutflowList.push_back("SS");
+        cutflowList.push_back("SS,w");
+        cutflowList.push_back("flavour");
+        cutflowList.push_back("flavour,w");
+        cutflowList.push_back("jet");
+        cutflowList.push_back("jet,w");
+        cutflowList.push_back("bjet");
+        cutflowList.push_back("bjet,w");
+        cutflowList.push_back("Zmass");
+        cutflowList.push_back("Zmass,w");
+        cutflowList.push_back("pt1");
+        cutflowList.push_back("pt1,w");
+        cutflowList.push_back("pt2");
+        cutflowList.push_back("pt2,w");
+        cutflowList.push_back("dEta");
+        cutflowList.push_back("dEta,w");
+        cutflowList.push_back("METRel");
+        cutflowList.push_back("METRel,w");
+        cutflowList.push_back("meff");
+        cutflowList.push_back("meff,w");
+        cutflowList.push_back("maxmt");
+        cutflowList.push_back("maxmt,w");
+        cutflowList.push_back("mlj");
+        cutflowList.push_back("mlj,w");
+        cutflowList.push_back("mTtwo");
+        cutflowList.push_back("mTtwo,w");
+    }
+    
     //Data
     if(false)
     {
@@ -1302,7 +1310,7 @@ void skimming()
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
             vector<TH1D*> hSRCutflow;
-            initializehCutflow(hSRCutflow);
+            initializehCutflow(hSRCutflow,cutflowList);
             skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow,channel);
             deletehCutflow(hSRCutflow);
         }
@@ -1323,7 +1331,7 @@ void skimming()
             //if(BGMCGroupData[i].GroupName != "VV") continue;
             
             vector<TH1D*> hSRCutflow;
-            initializehCutflow(hSRCutflow);
+            initializehCutflow(hSRCutflow,cutflowList);
             
             //for(unsigned int j=114;j<=114;j++)
             //for(unsigned int j=119;j<=120;j++)
@@ -1336,7 +1344,7 @@ void skimming()
             if(cutflow)
             {
                 cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
-                printhCutflow(hSRCutflow);
+                printhCutflow(hSRCutflow,cutflowList);
             }
             deletehCutflow(hSRCutflow);
         }
@@ -1356,9 +1364,9 @@ void skimming()
         {
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             vector<TH1D*> hSRCutflow;
-            initializehCutflow(hSRCutflow);
+            initializehCutflow(hSRCutflow,cutflowList);
             skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow,channel);
-            if(cutflow) printhCutflow(hSRCutflow);
+            if(cutflow) printhCutflow(hSRCutflow,cutflowList);
             deletehCutflow(hSRCutflow);
         }
     }
@@ -1369,9 +1377,9 @@ void skimming()
         SamplePath += "Peter_Fake_Nov/"; tag = "";
         TString SampleName = "Fakes";
         vector<TH1D*> hSRCutflow;
-        initializehCutflow(hSRCutflow);
+        initializehCutflow(hSRCutflow,cutflowList);
         skimmingForFakes(SamplePath,SampleName,hSRCutflow,channel);
-        if(cutflow) printhCutflow(hSRCutflow);
+        if(cutflow) printhCutflow(hSRCutflow,cutflowList);
         deletehCutflow(hSRCutflow);
     }
     
@@ -1381,9 +1389,9 @@ void skimming()
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
         vector<TH1D*> hSRCutflow;
-        initializehCutflow(hSRCutflow);
+        initializehCutflow(hSRCutflow,cutflowList);
         skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel);
-        if(cutflow) printhCutflow(hSRCutflow);
+        if(cutflow) printhCutflow(hSRCutflow,cutflowList);
         deletehCutflow(hSRCutflow);
     }
 }
