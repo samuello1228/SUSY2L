@@ -1347,6 +1347,14 @@ void skimming()
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,BGXS,amiAOD,amiSUSY,"BG");
         
+        std::vector<int> nAOD;
+        std::vector<int> nSUSY;
+        for(unsigned int i=0;i<BGSampleName.size();i++)
+        {
+            nAOD.push_back(-1);
+            nSUSY.push_back(-1);
+        }
+        
         for(unsigned int i=0;i<BGMCGroupData.size();i++)
         {
             //if(BGMCGroupData[i].GroupName != "VV") continue;
@@ -1361,6 +1369,9 @@ void skimming()
             {
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
                 skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel);
+                
+                nAOD[j] = int(hSRCutflow[0]->GetBinContent(1));
+                nSUSY[j] = int(hSRCutflow[0]->GetBinContent(3));
                 
                 //check whether nAOD is the same as ami number
                 if(int(hSRCutflow[0]->GetBinContent(1)) != amiAOD[j])
@@ -1381,6 +1392,11 @@ void skimming()
                 {
                     cout<<"nSUSY are the same."<<endl;
                 }
+            }
+            
+            for(unsigned int i=0;i<BGSampleName.size();i++)
+            {
+                cout<<BGSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
             }
             
             if(cutflow)
