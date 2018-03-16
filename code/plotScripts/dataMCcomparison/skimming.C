@@ -305,6 +305,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 h2[j]->Fill("nwAOD",h1->GetBinContent(2));
                 h2[j]->Fill("ntuple",tree1->GetEntries());
             }
+            
+            for(unsigned int m=0;m<6;m++)
+            {
+                hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
+                hSRCutflow[m]->Fill("nwAOD",h1->GetBinContent(2));
+                hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
+            }
+            
             delete f1;
         }
     }
@@ -1273,6 +1281,7 @@ void skimming()
     {
         cutflowList.push_back("nAOD");
         cutflowList.push_back("nwAOD");
+        cutflowList.push_back("nSUSY");
         cutflowList.push_back("trigger");
         cutflowList.push_back("trigger,w");
         cutflowList.push_back("=2BaseLep and =2SigLep");
@@ -1352,7 +1361,28 @@ void skimming()
             {
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
                 skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel);
+                
+                //check whether nAOD is the same as ami number
+                if(int(hSRCutflow[0]->GetBinContent(1)) != amiAOD[j])
+                {
+                    cout<<"nAOD are different: nAOD in ami: "<<amiAOD[j]<<", nAOD in ntuple: "<<int(hSRCutflow[0]->GetBinContent(1))<<endl;
+                }
+                else
+                {
+                    cout<<"nAOD are the same."<<endl;
+                }
+                
+                //check whether nSUSY is the same as ami number
+                if(int(hSRCutflow[0]->GetBinContent(3)) != amiSUSY[j])
+                {
+                    cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[j]<<", nSUSY in ntuple: "<<int(hSRCutflow[0]->GetBinContent(3))<<endl;
+                }
+                else
+                {
+                    cout<<"nSUSY are the same."<<endl;
+                }
             }
+            
             if(cutflow)
             {
                 cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
