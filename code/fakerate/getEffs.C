@@ -32,6 +32,7 @@ Execution:
 #include <TString.h>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <TProfile.h>
 #include <TColor.h>
 #include <TMath.h>
@@ -40,6 +41,9 @@ Execution:
 #include <TLorentzVector.h>
 #include "SUSYTools/SUSYCrossSection.h"
 #include <TDirectory.h>
+#include <TLine.h>
+#include <TStopwatch.h>
+#include <TLegend.h>
 
 using std::cout;
 using std::endl;
@@ -69,6 +73,8 @@ const TString inFileSingleTop="../support/inFileList-SingleTop.txt";
 const TString inFileTTV="../support/inFileList-ttV.txt";
 const TString inFileDY="../support/inFileList-DY.txt";
 // const TString inFileMC="../support/inFileList-allMC.txt";
+
+// const TString outFileType
 
 const bool DEBUG=false;
 const bool VERBOSE=DEBUG || true;
@@ -101,7 +107,7 @@ bool passRatesCR(susyEvts* tree){
 		- Relative missing ET < 70?
 		*/
 		pass *= tree->leps.size()==2;
-		pass *= !(abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==121 && fabs(tree->l12.m-91.2)<10);
+		pass *= !( abs(int(tree->leps[0].ID/1000)*int(tree->leps[1].ID/1000))==121 && fabs(tree->l12.m-91.2)<10 );
 		pass *= tree->jets.size()<=3;
 		for(uint i=0; i<tree->jets.size(); i++) pass *= !(tree->jets[i].jFlag & JT_BJET);
 	}
@@ -218,6 +224,8 @@ const TString LS_TOSTRING(LEP_SOURCE s)
 	return "Unknown";
 }
 
+const TString LS_TOSTRING(int s) {return LS_TOSTRING((LEP_SOURCE)s);}
+
 enum LEP_PROC
 {
 	TTBAR=0,
@@ -249,6 +257,7 @@ const TString LP_TOSTRING(LEP_PROC p)
 		default       : return   "Unknown";
 	}
 }
+const TString LP_TOSTRING(int p) {return LP_TOSTRING((LEP_PROC)p);}
 
 enum DATA_TYPE {
 	DATA,
@@ -270,6 +279,8 @@ struct lepInfo
 };
 class Histos;
 class LepProp;
+
+void DrawOneD(TH2* hRate, LEP_SOURCE s=HEAVY, TDirectory* dir=0); // Default s is simply not REAL
 
 class LepProp
 {
@@ -301,20 +312,24 @@ public:
 		TH2D* hFakesPrototype2D = new TH2D("hFakesPrototype2D", "Fake lepton composition fractions;Process;Source", N_PROC, 0, N_PROC, N_FAKES_SOURCE, 0, N_FAKES_SOURCE);
 		TH1D* hRealsPrototype = new TH1D("hRealsPrototype", "Real lepton composition fractions;Process;Fraction", N_PROC, 0, N_PROC);
 
+		hFakesPrototype2D->SetMarkerSize(1.4);
+		hRealsPrototype->SetMarkerSize(1.4);
+
 		hFakesPrototype2D->SetDirectory(0);
 		hRealsPrototype->SetDirectory(0);
-		hFakesPrototype2D->GetZaxis()->SetRangeUser(0,1);
-		hRealsPrototype->GetYaxis()->SetRangeUser(0,1);
+
+		hFakesPrototype2D->Sumw2();
+		hRealsPrototype->Sumw2();
 
 		// Label bins
 		for(int p=0; p<N_PROC; p++)
 		{
-			hRealsPrototype->GetXaxis()->SetBinLabel(p+1, LP_TOSTRING((LEP_PROC) p));
-			hFakesPrototype2D->GetXaxis()->SetBinLabel(p+1, LP_TOSTRING((LEP_PROC) p));
+			hRealsPrototype->GetXaxis()->SetBinLabel(p+1, LP_TOSTRING(p));
+			hFakesPrototype2D->GetXaxis()->SetBinLabel(p+1, LP_TOSTRING(p));
 		}
 		for(int s=0;s<N_FAKES_SOURCE; s++)
 		{
-			hFakesPrototype2D->GetYaxis()->SetBinLabel(s+1, LS_TOSTRING((LEP_SOURCE) s));
+			hFakesPrototype2D->GetYaxis()->SetBinLabel(s+1, LS_TOSTRING(s));
 		}
 
 		histVector.reserve(nPtBins);
@@ -349,11 +364,13 @@ public:
 				tmp.hFake = (TH2*) hFakesPrototype2D->Clone(fakesName);
 				tmp.hFake->SetTitle(tmp.hFake->GetTitle()+ptEtaTitle);
 				tmp.hFake->SetDirectory(dir_lepCompMeasurement_nEvents);
+				tmp.hFake->Sumw2();
 
 				TString realsName = (TString) "h" + name + (TString) "_RealComp_" + ptEtaStr;
 				tmp.hReal = (TH1*) hRealsPrototype->Clone(realsName);
 				tmp.hReal->SetTitle(tmp.hReal->GetTitle()+ptEtaTitle);
 				tmp.hReal->SetDirectory(dir_lepCompMeasurement_nEvents);
+				tmp.hReal->Sumw2();
 
 				tmp.hFakeNorm = 0;
 				tmp.hRealNorm = 0;
@@ -369,7 +386,7 @@ public:
 		delete hRealsPrototype; hRealsPrototype = 0; 
 
 		if (DEBUG){
-			cout << "LepProp " << name << "initialized." << endl;
+			cout << "LepProp " << name << " initialized." << endl;
 		}
 	}
 	~LepProp(){}
@@ -379,6 +396,7 @@ public:
 		if (DEBUG) cout << "### Enter " << name << "::Fill()" << endl;
 		int ptBin = GetPtBin(pt)-1; int etaBin = GetEtaBin(eta)-1;
 		if (DEBUG) cout << "### Pt/Eta Bin acquired" << endl;
+        if (DEBUG) cout << "Pt " << pt << " ("<< ptBin << ")\t Eta "<<eta<<" ("<<etaBin<<")"<<endl;
 		if(ptBin<0 || etaBin<0) return false;
 
 		if(s==REAL) {
@@ -387,7 +405,7 @@ public:
 		}
 		else {
 			if (DEBUG) cout << "### Filling fakes for " << LP_TOSTRING(p) << " " << LS_TOSTRING(s) << endl;
-			histVector[ptBin][etaBin].hFake->Fill(s, p, w);
+			histVector[ptBin][etaBin].hFake->Fill(p, s, w);
 		}
 		if (DEBUG) cout << "### LepProp filled. Return now." << endl;
 
@@ -396,13 +414,46 @@ public:
 
 	bool Normalize()
 	{
+		bool DEBUG=true;
 		if(normalized) return true;
-		// Normalize and set styles
+		if (DEBUG) cout << "LepProp::Normalize() ========= " << endl;
+
 		for(int ptBin=0; ptBin<nPtBins; ptBin++){
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++){
+			double fakeSumW = histVector[ptBin][etaBin].hFake->GetSumOfWeights(); 
+			double realSumW = histVector[ptBin][etaBin].hReal->GetSumOfWeights();
+
+			// Set mildly unreasonable compositions to zero
+			if(DEBUG) cout << "# PtBin " << ptBin << "\t" << "EtaBin " << etaBin << endl;
+			cout << "Can I go into the for loop?" << endl;
+			for(int p=1; p<=N_PROC; p++) {
+				cout << "Checking for mildly unreasonable numbers for reals" << endl;
+				if((histVector[ptBin][etaBin].hReal->GetBinContent(p)<0.) && (histVector[ptBin][etaBin].hReal->GetBinContent(p)>-0.1))
+				{
+					double binErr = fabs(histVector[ptBin][etaBin].hReal->GetBinContent(p));
+					histVector[ptBin][etaBin].hReal->SetBinContent(p,0.); 
+					histVector[ptBin][etaBin].hReal->SetBinError(p,binErr);
+				}
+				cout << "Checking for mildly unreasonable numbers for fakes ";
+				for(int s=1; s<=N_FAKES_SOURCE; s++)
+				{
+					cout << s << " ";
+					if((histVector[ptBin][etaBin].hFake->GetBinContent(p,s)<0.) && (histVector[ptBin][etaBin].hFake->GetBinContent(p)>-0.1))
+					{
+						double binErr = fabs(histVector[ptBin][etaBin].hFake->GetBinContent(p,s));
+						histVector[ptBin][etaBin].hFake->SetBinContent(p,s,0.); 
+						histVector[ptBin][etaBin].hFake->SetBinError(p,s,binErr);
+					}
+				}cout << endl;
+			}
+
+			fakeSumW = histVector[ptBin][etaBin].hFake->GetSumOfWeights(); 
+			realSumW = histVector[ptBin][etaBin].hReal->GetSumOfWeights();
+			
 			// STYLES AND INITIALIZE PROJECTIONS
 			histVector[ptBin][etaBin].hReal->SetFillColor(kAzure+10);
 
+			if (DEBUG) cout << "## Set up projections " << endl;
 			histVector[ptBin][etaBin].hFakeProc = histVector[ptBin][etaBin].hFake->ProjectionX();
 			histVector[ptBin][etaBin].hFakeProc->SetDirectory(dir_lepCompMeasurement_nEvents);
 			histVector[ptBin][etaBin].hFakeProc->SetName(((TString)"_byProcess").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
@@ -418,66 +469,137 @@ public:
 			histVector[ptBin][etaBin].hFakeSource->GetXaxis()->SetRangeUser(0, N_FAKES_SOURCE);
 
 			// NORMALIZE
-			histVector[ptBin][etaBin].hRealNorm = histVector[ptBin][etaBin].hRealNorm->DrawNormalized();
+			if (DEBUG) cout << "## Normalize " << endl; 
+			histVector[ptBin][etaBin].hRealNorm = (TH1*) histVector[ptBin][etaBin].hReal->Clone();
 			histVector[ptBin][etaBin].hRealNorm->SetName(histVector[ptBin][etaBin].hReal->GetName()+TString("_norm"));
+            histVector[ptBin][etaBin].hRealNorm->Scale(1/realSumW);
 			histVector[ptBin][etaBin].hRealNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hRealNorm->GetYaxis()->SetRangeUser(0,1);
 
-			histVector[ptBin][etaBin].hFakeNorm = (TH2*) histVector[ptBin][etaBin].hFakeNorm->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeNorm = (TH2*) histVector[ptBin][etaBin].hFake->Clone();
+            histVector[ptBin][etaBin].hFakeNorm->Scale(1/fakeSumW);
 			histVector[ptBin][etaBin].hFakeNorm->SetName(histVector[ptBin][etaBin].hFake->GetName()+TString("_norm"));
 			histVector[ptBin][etaBin].hFakeNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
 			histVector[ptBin][etaBin].hFakeNorm->GetZaxis()->SetRangeUser(0,1);
 
-			histVector[ptBin][etaBin].hFakeProcNorm = histVector[ptBin][etaBin].hFakeProc->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeProcNorm = (TH1*) histVector[ptBin][etaBin].hFakeProc->Clone();
+            histVector[ptBin][etaBin].hFakeProcNorm->Scale(1/fakeSumW);
+			histVector[ptBin][etaBin].hFakeProcNorm->SetTitle(((TString)" by process").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
 			histVector[ptBin][etaBin].hFakeProcNorm->SetName(histVector[ptBin][etaBin].hFakeProc->GetName()+TString("_norm"));
 			histVector[ptBin][etaBin].hFakeProcNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hFakeProcNorm->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeProcNorm->GetYaxis()->SetRangeUser(0, 1);
+			histVector[ptBin][etaBin].hFakeProcNorm->GetXaxis()->SetRangeUser(0, N_PROC);
 
-			histVector[ptBin][etaBin].hFakeSourceNorm = histVector[ptBin][etaBin].hFakeSource->DrawNormalized();
+			histVector[ptBin][etaBin].hFakeSourceNorm = (TH1*) histVector[ptBin][etaBin].hFakeSource->Clone();
+            histVector[ptBin][etaBin].hFakeSourceNorm->Scale(1/fakeSumW);
+			histVector[ptBin][etaBin].hFakeSourceNorm->SetTitle(((TString)" by source").Prepend(histVector[ptBin][etaBin].hFake->GetTitle()));
 			histVector[ptBin][etaBin].hFakeSourceNorm->SetName(histVector[ptBin][etaBin].hFakeSource->GetName()+TString("_norm"));
 			histVector[ptBin][etaBin].hFakeSourceNorm->SetDirectory(dir_lepCompMeasurement_lepComp);
+			histVector[ptBin][etaBin].hFakeSourceNorm->SetFillColor(kAzure+10);
 			histVector[ptBin][etaBin].hFakeSourceNorm->GetYaxis()->SetRangeUser(0, 1);
+			histVector[ptBin][etaBin].hFakeSourceNorm->GetXaxis()->SetRangeUser(0, N_FAKES_SOURCE);
 		}}
+
 		normalized=true;
 		return true;
 	}
 
 	bool Draw()
 	{
+		//bool DEBUG=true;
 
 		Normalize(); // Normalize histograms first
 
 		// OUTPUT HISTOGRAMS
-		TCanvas *c = new TCanvas();
+		TCanvas *c = new TCanvas(); //c->SetGrid();
 		for(int ptBin=0; ptBin<nPtBins; ptBin++){
 		for(int etaBin=0; etaBin<nEtaBins; etaBin++){
-
+            if (DEBUG) cout << endl;
+            if (DEBUG) cout << "PtBin " << ptBin << "\t EtaBin " << etaBin << endl;
 			// Real composition 
-			histVector[ptBin][etaBin].hReal->Draw("bar text");
-			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
-
-			histVector[ptBin][etaBin].hRealNorm->Draw("bar text");
-			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+			if (histVector[ptBin][etaBin].hReal)
+			{
+				histVector[ptBin][etaBin].hReal->Draw("bar text e");
+				c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+			}
+			if (histVector[ptBin][etaBin].hRealNorm)
+			{
+				histVector[ptBin][etaBin].hRealNorm->Draw("bar text e");
+				c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hReal->GetName()));
+			}
 
 			// Fake composition 2D
 			c->SetGrid();
-			histVector[ptBin][etaBin].hFake->Draw("text");
-			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+			if (histVector[ptBin][etaBin].hFake)
+			{
+                // if (DEBUG) cout << "About to draw un-normalized fakes histo" <<endl;
+				histVector[ptBin][etaBin].hFake->Draw("text e");
+                // if (DEBUG) cout << "Drawn..";
+				c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+                // if (DEBUG) cout << "and printed" << endl;
+			}
+            // if (DEBUG) cout << "Un-normalized fakes histo drawn" << endl;
+			if (histVector[ptBin][etaBin].hFakeNorm)
+			{
+                // if (DEBUG) cout << "About to draw normalized fakes histo" <<endl;
+				histVector[ptBin][etaBin].hFakeNorm->Draw("colz text e");
+                // if (DEBUG) cout << "Drawn..";
+				c->Print(((TString)"_Norm2D.eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
+                // if (DEBUG) cout << "and printed" << endl;
+			}
+			c->SetGridx(false); c->SetGridy(false);
 
-			histVector[ptBin][etaBin].hFakeNorm->Draw("colz text");
+			// Fake composition "2D" source by source
+			TLegend *legProj = new TLegend(0.75, 0.75, 0.9, 0.9);
+			std::vector<TH1*> hProj;
+			for (int s=0; s<=2; s++)
+			{
+				TString sHistName = histVector[ptBin][etaBin].hFakeNorm->GetName();
+				sHistName += "_" + LS_TOSTRING(s);
+				hProj.push_back(histVector[ptBin][etaBin].hFakeNorm->ProjectionX(sHistName, s+1, s+1, "e"));
+				hProj[s]->GetYaxis()->SetRangeUser(0,1);
+				hProj[s]->GetXaxis()->SetRangeUser(0, N_PROC);
+				hProj[s]->SetDirectory(dir_lepCompMeasurement_lepComp);
+				hProj[s]->Draw((s>0?"same":""));
+
+				Color_t col = (s==0? kRed : (s==1? (kBlue) : kBlack));
+
+				hProj[s]->SetMarkerColor(col); hProj[s]->SetLineColor(col);
+
+				legProj->AddEntry(hProj[s], LS_TOSTRING(s), "lpf");
+			}
+			legProj->Draw();
 			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFake->GetName()));
-			c->SetGrid(0,0);
 
 			// Fake composition by process
-			histVector[ptBin][etaBin].hFakeProc->Draw("bar text");
-			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
-			histVector[ptBin][etaBin].hFakeProcNorm->Draw("bar text");
-			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
-
+			if (histVector[ptBin][etaBin].hFakeProc)
+			{
+				histVector[ptBin][etaBin].hFakeProc->Draw("bar text");
+				c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
+			}	
+			if (histVector[ptBin][etaBin].hFakeProcNorm)
+			{
+				histVector[ptBin][etaBin].hFakeProcNorm->Draw("bar text");
+				c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeProc->GetName()));
+			}
+			
 			// Fake composition by source
-			histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
-			c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
-			histVector[ptBin][etaBin].hFakeSourceNorm->Draw("bar text");
-			c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+			if (DEBUG) cout << "Fakes by source" << endl;
+			if (histVector[ptBin][etaBin].hFakeSource)
+			{
+				histVector[ptBin][etaBin].hFakeSource->Draw("bar text");
+				c->Print(((TString)".eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+			}			
+			if (DEBUG) cout << "Fakes by source normalized" << endl;
+			if (histVector[ptBin][etaBin].hFakeSourceNorm)
+			{
+				histVector[ptBin][etaBin].hFakeSourceNorm->Draw("bar text");
+				c->Print(((TString)"_Norm.eps").Prepend(histVector[ptBin][etaBin].hFakeSource->GetName()));
+			}			
+			if (DEBUG) cout << "Fakes by source drawn" << endl;
+
+            if (DEBUG) cout << endl;
 
 		}}
 
@@ -493,9 +615,9 @@ public:
 	pair<double, double> GetWeight(LEP_SOURCE s, LEP_PROC p, pair<int, int> binNum)
 	{
 		int ptBin = binNum.first-1; int etaBin = binNum.second-1; // -1 to be consistent with the binning scheme of TH1
-		if(ptBin<=0 || etaBin<=0) return make_pair(0,0);
-		if(s==REAL) return make_pair(histVector[ptBin][etaBin].hReal->GetBinContent(p), histVector[ptBin][etaBin].hFake->GetBinError(p));
-		else return make_pair(histVector[ptBin][etaBin].hReal->GetBinContent(p,s), histVector[ptBin][etaBin].hFake->GetBinError(p,s));
+		if(ptBin<0 || etaBin<0) return make_pair(0,0);
+		if(s==REAL) return make_pair(histVector[ptBin][etaBin].hRealNorm->GetBinContent(p), histVector[ptBin][etaBin].hRealNorm->GetBinError(p));
+		else return make_pair(histVector[ptBin][etaBin].hFakeNorm->GetBinContent(p,s), histVector[ptBin][etaBin].hFakeNorm->GetBinError(p,s));
 	}
 
 	static int GetPtBin(double pt)
@@ -524,11 +646,14 @@ private:
 	TH2D* Eff;
 	bool ignoreTagTag=false;
 	bool EffCalced=false;
+	TString name;
 
 public:
 	Histos(): Histos("Test") {}
 	Histos(TString name)
 	{
+		this->name = name;
+		hPrototype->SetMarkerSize(1.4);
 		NTight = (TH2D*) hPrototype->Clone(name+"_NTight"); NTight->SetTitle(name+"_NTight"); NTight->Sumw2();
 		NLoose = (TH2D*) hPrototype->Clone(name+"_NLoose"); NLoose->SetTitle(name+"_NLoose"); NLoose->Sumw2();
 		Eff = (TH2D*) hPrototype->Clone(name+"_Eff"); Eff->SetTitle(name+"_Eff"); Eff->Sumw2();
@@ -536,6 +661,10 @@ public:
 		NTight->SetDirectory(dir_unweightedRatesMeasurement_nEvents);
 		NLoose->SetDirectory(dir_unweightedRatesMeasurement_nEvents);
 		Eff->SetDirectory(dir_unweightedRatesMeasurement_rates);
+
+		NTight->Sumw2();
+		NLoose->Sumw2();
+		Eff->Sumw2();
 
 		allHistos.push_back(this);
 	}
@@ -571,6 +700,27 @@ public:
 	bool calcEff() 
 	{
 		if (EffCalced) return true;
+
+		int nBinsx = NTight->GetXaxis()->GetNbins();
+		int nBinsy = NTight->GetYaxis()->GetNbins();
+
+		for(int x=1; x<=nBinsx; x++) 
+		for(int y=1; y<=nBinsy; y++)
+		{
+			if(NTight->GetBinContent(x,y)<0 && NTight->GetBinContent(x,y)>-0.1)
+			{
+				double binErr = fabs(NTight->GetBinContent(x,y)); 
+				NTight->SetBinContent(x,y,0);
+				NTight->SetBinError(x,y,binErr);
+			}
+			if(NLoose->GetBinContent(x,y)<0 && NLoose->GetBinContent(x,y)>-0.1)
+			{
+				double binErr = fabs(NLoose->GetBinContent(x,y)); 
+				NLoose->SetBinContent(x,y,0);
+				NLoose->SetBinError(x,y,binErr);
+			}
+		}
+
 		Eff->Add(NTight); Eff->Divide(NLoose); 
 		EffCalced=true; 
 		return true;
@@ -580,19 +730,24 @@ public:
 	{
 		TCanvas can;
 
-		Eff->Draw("text colz");
+		Eff->Draw("text colz e");
 		can.Print(TString(Eff->GetName())+".eps");
 
-		// Eff->ProfileX()->Draw();
-		// can.Print(TString(Eff->GetName())+"Pt.eps");
+		DrawOneD(Eff, (name.Contains("Real")?REAL:HEAVY), dir_unweightedRatesMeasurement_rates);
 
-		// Eff->ProfileY()->Draw();
-		// can.Print(TString(Eff->GetName())+"Eta.eps");
+		TLine l;
+		l.SetLineStyle(3);
+
+		can.cd();
 
 		NTight->Draw("text");
+		for(int i=1; i<nPtBins-1; i++) l.DrawLine(ptBins[i], etaBins[0], ptBins[i], etaBins[nEtaBins]);
+		for(int i=1; i<nEtaBins-1; i++) l.DrawLine(ptBins[0], etaBins[i], ptBins[nPtBins], etaBins[i]);
 		can.Print(TString(NTight->GetName())+".eps");
 
 		NLoose->Draw("text");
+		for(int i=1; i<nPtBins-1; i++) l.DrawLine(ptBins[i], etaBins[0], ptBins[i], etaBins[nEtaBins]);
+		for(int i=1; i<nEtaBins-1; i++) l.DrawLine(ptBins[0], etaBins[i], ptBins[nPtBins], etaBins[i]);
 		can.Print(TString(NLoose->GetName())+".eps");
 
 	}
@@ -663,7 +818,7 @@ public:
 	void Draw()
 	{
 		TCanvas *c = new TCanvas();
-		hRatio->Draw("colz text");
+		hRatio->Draw("colz text e");
 		c->Print(hRatio->GetName()+(TString)".eps");
 	}
 
@@ -785,22 +940,22 @@ bool initialize()
 
 	// Define output file and structure
 	outFile = new TFile("output.root", "recreate");
-	// {
-		dir_weightedRates = outFile->mkdir("weightedRates");
 
-		dir_unweightedRatesMeasurement = outFile->mkdir("unweightedRatesMeasurement");
-		dir_unweightedRatesMeasurement_rates = dir_unweightedRatesMeasurement->mkdir("rates");
-		dir_unweightedRatesMeasurement_nEvents = dir_unweightedRatesMeasurement->mkdir("nEvents");
+	dir_weightedRates = outFile->mkdir("weightedRates");
 
-		dir_sfMeasurement = outFile->mkdir("sfMeasurement");
-		dir_sfMeasurement_scaleFactors = dir_sfMeasurement->mkdir("scaleFactors");
-		dir_sfMeasurement_effs = dir_sfMeasurement->mkdir("effs");
-		dir_sfMeasurement_nEvents = dir_sfMeasurement->mkdir("nEvents");
+	dir_unweightedRatesMeasurement = outFile->mkdir("unweightedRates");
+	dir_unweightedRatesMeasurement_rates = dir_unweightedRatesMeasurement->mkdir("rates");
+	dir_unweightedRatesMeasurement_nEvents = dir_unweightedRatesMeasurement->mkdir("nEvents");
 
-		dir_lepCompMeasurement = outFile->mkdir("lepCompMeasurement");
-		dir_lepCompMeasurement_lepComp = dir_lepCompMeasurement->mkdir("lepComp");
-		dir_lepCompMeasurement_nEvents = dir_lepCompMeasurement->mkdir("nEvents");
-	// }
+	dir_sfMeasurement = outFile->mkdir("sf");
+	dir_sfMeasurement_scaleFactors = dir_sfMeasurement->mkdir("scaleFactors");
+	dir_sfMeasurement_effs = dir_sfMeasurement->mkdir("effs");
+	dir_sfMeasurement_nEvents = dir_sfMeasurement->mkdir("nEvents");
+
+	dir_lepCompMeasurement = outFile->mkdir("lepComp");
+	dir_lepCompMeasurement_lepComp = dir_lepCompMeasurement->mkdir("lepComp");
+	dir_lepCompMeasurement_nEvents = dir_lepCompMeasurement->mkdir("nEvents");
+
 
 	// Load cross section database
 	gROOT->Macro("$ROOTCOREDIR/scripts/load_packages.C");
@@ -839,10 +994,10 @@ bool initialize()
 
 	lp_El = new LepProp("El");
 	lp_Mu = new LepProp("Mu");
-	lp_El_Tight = new LepProp("El_Tight");
-	lp_Mu_Tight = new LepProp("Mu_Tight");
-	lp_El_LNT = new LepProp("El_LNT");
-	lp_Mu_LNT = new LepProp("Mu_LNT");
+	// lp_El_Tight = new LepProp("El_Tight");
+	// lp_Mu_Tight = new LepProp("Mu_Tight");
+	// lp_El_LNT = new LepProp("El_LNT");
+	// lp_Mu_LNT = new LepProp("Mu_LNT");
 
 	// Tag-and-probe histograms for MC
 	hMu_Real_MCTP = new Histos("hMu_Real_MCTP"); hMu_Real_MCTP->SetHistDir(dir_sfMeasurement_nEvents, dir_sfMeasurement_effs);
@@ -873,6 +1028,7 @@ bool initialize()
 
 int getEffs()
 {
+	TStopwatch sw;
 	initialize(); 
 	TChain* tcMC = new TChain("evt2l");
 
@@ -978,7 +1134,7 @@ int getEffs()
 	hMuFake[LIGHT][VGAMMA] = new Histos("hMu_Light_Vgamma");
 	hElFake[LIGHT][VGAMMA] = new Histos("hEl_Light_Vgamma");
 	hElFake[CONV][VGAMMA] = new Histos("hEl_Conv_Vgamma");
-	cout << "Begin loop over Vgamma: " << vvEvts->tree1->GetEntries() << " events" << endl;
+	// cout << "Begin loop over Vgamma: " << vgammaEvts->tree1->GetEntries() << " events" << endl;
 	loopMC(vgammaEvts, hMuReal[0][VGAMMA], hElReal[0][VGAMMA], hMuFake[HEAVY][VGAMMA], hElFake[HEAVY][VGAMMA], hMuFake[LIGHT][VGAMMA], hElFake[LIGHT][VGAMMA], hElFake[CONV][VGAMMA], VGAMMA);
 	cout << "Vgamma loop finished" << endl << endl;
 
@@ -1002,15 +1158,18 @@ int getEffs()
 		cout << "Executing tag-and-probe on data" << endl;
 		int nDataEntries = dataEvts->tree1->GetEntries();
 		cout << "Begin loop over data:" << nDataEntries << " events" << endl;
-		for(int i=0; i<nDataEntries; i++)
-		{
-			loadbar(i+1, nDataEntries);
-			dataEvts->GetEntry(i);
-			if (DEBUG) cout << "Event no " << i << endl;
-			doTP(dataEvts, hMu_Real_Data, hEl_Real_Data, hMu_Heavy_Data, hEl_Heavy_Data, hEl_Conv_Data);
-		}
+		TStopwatch sw;
+		// for(int i=0; i<nDataEntries; i++)
+		// {
+		// 	loadbar(i+1, nDataEntries);
+		// 	dataEvts->GetEntry(i);
+		// 	if (DEBUG) cout << "Event no " << i << endl;
+		// 	doTP(dataEvts, hMu_Real_Data, hEl_Real_Data, hMu_Heavy_Data, hEl_Heavy_Data, hEl_Conv_Data);
+		// }
 		cout << endl;
 		cout << "Data tag-and-probe finished" << endl;
+		sw.Stop(); sw.Print();
+		cout << endl << endl;
 	}
 
 	if (measureSF) 
@@ -1029,6 +1188,7 @@ int getEffs()
 	if (measureSF && measureLepComp && measureUnweightedRates) calcFinalEffs();
 
 	finalize();
+	sw.Stop(); sw.Print();
 	return 0;
 }
 
@@ -1140,6 +1300,7 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 	if(tree && DEBUG) cout << "tree exists" << endl;
 	if(!tree) return false;
 
+	TStopwatch sw;
 	int nEntries = tree->tree1->GetEntries();
 	if (DEBUG) cout << "Begin loop MC" << endl;
 	for(int i=0; i<nEntries; i++)
@@ -1148,12 +1309,25 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 		if(DEBUG) cout << "Entry " << i << " ===================== " << endl;
 		tree->GetEntry(i); 
 		double w = ((TChain*)(tree->tree1))->GetTree()->GetWeight();
-		w *= tree->evt.weight*tree->evt.pwt*tree->evt.ElSF*tree->evt.MuSF;
+		w *= tree->evt.weight*tree->evt.pwt*tree->evt.ElSF*tree->evt.MuSF*tree->evt.BtagSF*tree->evt.JvtSF;
+		// if (w<0) {
+		// 	cout << "Event # " 
+		// 			<< setw(8) << i << '\t'
+		// 			<< setprecision(4) << fixed
+		// 			<< ((TChain*)(tree->tree1))->GetTree()->GetWeight() << '\t'
+		// 			<< tree->evt.weight << '\t'
+		// 			<< tree->evt.pwt << '\t'
+		// 			<< tree->evt.ElSF << '\t'
+		// 			<< tree->evt.MuSF << '\t'
+		// 			<< tree->evt.BtagSF << '\t'
+		// 			<< tree->evt.JvtSF << endl;
+		// 	// continue;
+		// }
 
 		// Measure unweighted efficiencies
 		if(passRatesCR(tree)){ for(uint j(0); j<tree->leps.size(); j++)
 		{
-			if(tree->leps[j].pt<20) continue;
+			if(tree->leps[j].pt<25) continue;
 			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
 
 			pair<LEP_TYPE, LEP_SOURCE> res;
@@ -1191,7 +1365,7 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 		// Measure composition fractions
 		if (passLepCompCR(tree)){ for(uint j(0); j<tree->leps.size(); j++)
 		{
-			if(tree->leps[j].pt<20) continue;
+			if(tree->leps[j].pt<25) continue;
 
 			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
 
@@ -1225,40 +1399,73 @@ bool loopMC(susyEvts* tree, Histos *hMu_Real, Histos *hEl_Real, Histos *hMu_Heav
 			if (DEBUG) cout << "# Filled lepton composition histograms for lepton " << j << endl;
 		}}
 
-		if (study==SS && passLepCompCR(tree) && (bool(tree->leps[0].lFlag & IS_SIGNAL) != bool(tree->leps[1].lFlag & IS_SIGNAL))) {
-		for(uint j(0); j<tree->leps.size(); j++)
-		{
+		// if (study==SS && passLepCompCR(tree) && (bool(tree->leps[0].lFlag & IS_SIGNAL) != bool(tree->leps[1].lFlag & IS_SIGNAL))) {
+		// for(uint j(0); j<tree->leps.size(); j++)
+		// {
 
-			bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
-			pair<LEP_TYPE, LEP_SOURCE> res;
-			try{
-				res = castSource(tree, j, p);
-			} catch (TString errMsg) {
-				if (DEBUG) cout << errMsg << endl;
-				continue;
-			}
-			LEP_TYPE  recoLepType= res.first;
-			LEP_SOURCE source = res.second;
+		// 	bool lepIsTight = tree->leps[j].lFlag & IS_SIGNAL;
+		// 	pair<LEP_TYPE, LEP_SOURCE> res;
+		// 	try{
+		// 		res = castSource(tree, j, p);
+		// 	} catch (TString errMsg) {
+		// 		if (DEBUG) cout << errMsg << endl;
+		// 		continue;
+		// 	}
+		// 	LEP_TYPE  recoLepType= res.first;
+		// 	LEP_SOURCE source = res.second;
 
-			if (recoLepType==ELEC)
-			{
-				if (lepIsTight) lp_El_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
-				else lp_El_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
-			}
-			else if (recoLepType==MUON)
-			{
-				if (lepIsTight) lp_Mu_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
-				else lp_Mu_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
-			}
-		}}
+		// 	if (recoLepType==ELEC)
+		// 	{
+		// 		if (lepIsTight) lp_El_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+		// 		else lp_El_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+		// 	}
+		// 	else if (recoLepType==MUON)
+		// 	{
+		// 		if (lepIsTight) lp_Mu_Tight->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+		// 		else lp_Mu_LNT->Fill(source, p, tree->leps[j].pt, tree->leps[j].eta, w);
+		// 	}
+		// }}
 
 		// Tag and probe for data/MC scale factors
 		if(measureSF) doTP(tree, hMu_Real_MCTP, hEl_Real_MCTP, hMu_Heavy_MCTP, hEl_Heavy_MCTP, hEl_Conv_MCTP, w);
 
 		if (DEBUG) cout << "# After lepton loop" << endl;
 	}
+	sw.Stop();
 	cout << endl;
+	sw.Print();
 	return true;
+}
+
+void DrawOneD(TH2* hRate, LEP_SOURCE s, TDirectory* dir) 
+{
+	TString sHistName = hRate->GetName();
+	TH1* hRate_lowEta = hRate->ProjectionX(sHistName+"_lowEta", 1, 1, "e");
+	TH1* hRate_highEta = hRate->ProjectionX(sHistName+"_highEta", 2, 2, "e");
+
+	hRate_lowEta->SetMarkerColor(kRed); hRate_lowEta->SetLineColor(kRed);
+	hRate_highEta->SetMarkerColor(kBlue); hRate_highEta->SetLineColor(kBlue);
+
+	hRate_lowEta->GetYaxis()->SetRangeUser(0, 1);
+	hRate_highEta->GetYaxis()->SetRangeUser(0, 1);
+
+	hRate_lowEta->SetDirectory(dir);
+	hRate_highEta->SetDirectory(dir);
+
+	TLegend *leg = 0;
+	if (s==REAL) leg = new TLegend(0.75, 0.3, 0.9, 0.45);
+	else leg = new TLegend(0.75, 0.75, 0.9, 0.9);
+	leg->AddEntry(hRate_lowEta, "0<|#eta|<1.37", "lpf");
+	leg->AddEntry(hRate_highEta, "1.37<|#eta|<2.5", "lpf");
+
+	TCanvas c;
+
+	hRate_lowEta->Draw("e");
+	hRate_highEta->Draw("same e");
+	leg->Draw();
+
+	c.Print(sHistName+"_OneD.eps");
+
 }
 
 // /*
@@ -1269,8 +1476,8 @@ void calcFinalEffs()
 	if(DEBUG) cout << "calcFinalEffs() begins" << endl;
 
 	for(auto h: allHistos) h->calcEff(); 
-    lp_El->Normalize(); lp_El_Tight->Normalize(); lp_El_LNT->Normalize();
-    lp_Mu->Normalize(); lp_Mu_Tight->Normalize(); lp_Mu_LNT->Normalize();
+    lp_El->Normalize(); //lp_El_Tight->Normalize(); lp_El_LNT->Normalize();
+    lp_Mu->Normalize(); //lp_Mu_Tight->Normalize(); lp_Mu_LNT->Normalize();
     if(DEBUG) cout << "Unweighted efficiencies and lepton compositions calculated" << endl;
 
 	hEl_final_fakeRate = new TH2D("hEl_final_fakeRate", "El Fake rate;p_{T} [GeV];|#eta|", nPtBins, ptBins, nEtaBins, etaBins);
@@ -1304,15 +1511,49 @@ void calcFinalEffs()
 			auto elSF 	= make_pair(1.,0.); // hEl_RealScaleFactors->GetSF(binNum);
 			auto elLP 	= lp_El->GetWeight(REAL, (LEP_PROC) p, binNum);
 
-			elRealRate += elEff.first*elSF.first*elLP.first;
-			elRealUnc  += (elRealRate==0)? 0 : (elRealRate*elRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
+			double thisElRealRate = elEff.first*elSF.first*elLP.first;
+			elRealRate += thisElRealRate;
+			elRealUnc  += (thisElRealRate==0)? 0 : (thisElRealRate*thisElRealRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
+
+			if (elEff.first<0 || elEff.first>1)
+			{
+				cout << "Real El Eff = " << setw(5) << elEff.first << endl
+						<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+						<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+						<< "for process " << LP_TOSTRING(p) << endl;
+			}
+
+			if (elLP.first<0 || elLP.first>1)
+			{
+				cout << "Real El composition = " << setw(5) << elLP.first << endl
+						<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+						<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+						<< "for process " << LP_TOSTRING(p) << endl;
+			}
 
 			auto muEff 	= hMuReal[0][p]->GetEff(binNum);
 			auto muSF 	= make_pair(1.,0.); // hMu_RealScaleFactors->GetSF(binNum);
 			auto muLP 	= lp_Mu->GetWeight(REAL, (LEP_PROC) p, binNum);
 
-			muRealRate += muEff.first*muSF.first*muLP.first;
-			muRealUnc  += (muRealRate==0)? 0 : (muRealRate*muRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
+			double thisMuRealRate = muEff.first*muSF.first*muLP.first;
+			muRealRate += thisMuRealRate;
+			muRealUnc  += (thisMuRealRate==0)? 0 : (thisMuRealRate*thisMuRealRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
+
+			if (muEff.first<0 || muEff.first>1)
+			{
+				cout << "Real Mu Eff = " << setw(5) << muEff.first << endl
+						<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+						<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+						<< "for process " << LP_TOSTRING(p) << endl;
+			}
+
+			if (muLP.first<0 || muLP.first>1)
+			{
+				cout << "Real Mu composition = " << setw(5) << muLP.first << endl
+						<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+						<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+						<< "for process " << LP_TOSTRING(p) << endl;
+			}
 
 			for(int s=0; s<N_FAKES_SOURCE; s++)
 			{
@@ -1320,8 +1561,25 @@ void calcFinalEffs()
 				auto elSF 	= make_pair(1.,0.); // sfhEl_FakeScaleFactors[s]->GetSF(binNum);
 				auto elLP 	= lp_El->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
-				elFakeRate += elEff.first*elSF.first*elLP.first;
-				elFakeUnc  += (elFakeRate==0)? 0 : (elFakeRate*elFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
+				double thisElFakeRate = elEff.first*elSF.first*elLP.first;
+				elFakeRate += thisElFakeRate;
+				elFakeUnc  += (thisElFakeRate==0)? 0 : (thisElFakeRate*thisElFakeRate * (pow(elEff.second/elEff.first,2)+pow(elSF.second/elSF.first,2)+pow(elLP.second/elLP.first,2)));
+
+				if (elEff.first<0 || elEff.first>1)
+				{
+					cout << "Unweighted El Eff = " << setw(5) << elEff.first << endl 
+							<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+							<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+							<< "for source " << LS_TOSTRING(s) << " by process " << LP_TOSTRING(p) << endl;
+				}
+
+				if (elLP.first<0 || elLP.first>1)
+				{
+					cout << "Fake El composition = " << setw(5) << elLP.first << endl 
+							<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+							<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+							<< "for source " << LS_TOSTRING(s) << " by process " << LP_TOSTRING(p) << endl;
+				}
 
 				if(((LEP_SOURCE) s)==CONV) continue;
 
@@ -1329,8 +1587,25 @@ void calcFinalEffs()
 				auto muSF 	= make_pair(1.,0.); // sfhMu_FakeScaleFactors[s]->GetSF(binNum);
 				auto muLP 	= lp_Mu->GetWeight((LEP_SOURCE) s, (LEP_PROC) p, binNum);
 
-				muFakeRate += muEff.first*muSF.first*muLP.first;
-				muFakeUnc  += (muFakeRate==0)? 0 : (muFakeRate*muFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
+				double thisMuFakeRate = muEff.first*muSF.first*muLP.first;
+				muFakeRate += thisMuFakeRate;
+				muFakeUnc  += (thisMuFakeRate==0)? 0 : (thisMuFakeRate*thisMuFakeRate * (pow(muEff.second/muEff.first,2)+pow(muSF.second/muSF.first,2)+pow(muLP.second/muLP.first,2)));
+
+				if (muEff.first<0 || muEff.first>1)
+				{
+					cout << "Unweighted Mu Eff = " << setw(5) << muEff.first << endl 
+							<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+							<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+							<< "for source " << LS_TOSTRING(s) << " by process " << LP_TOSTRING(p) << endl;
+				}
+
+				if (muLP.first<0 || muLP.first>1)
+				{
+					cout << "Fake Mu composition = " << setw(5) << muLP.first << endl 
+							<< " in pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+							<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") "
+							<< "for source " << LS_TOSTRING(s) << " by process " << LP_TOSTRING(p) << endl;
+				}
 			}
 		}
 
@@ -1340,6 +1615,13 @@ void calcFinalEffs()
 		elFakeUnc = TMath::Sqrt(elFakeUnc);
 		muFakeUnc = TMath::Sqrt(muFakeUnc);
 
+		cout << endl << "Rates for pT(" << ptBins[ptBin-1] << "," << ptBins[ptBin] <<"), " 
+								<< "eta("<< etaBins[etaBin-1] << "," << etaBins[etaBin] << ") " << endl
+				<< " - elReal: " << setw(5) << elRealRate << "+/-" << elRealUnc << endl
+				<< " - muReal: " << setw(5) << muRealRate << "+/-" << muRealUnc << endl
+				<< " - elFake: " << setw(5) << elFakeRate << "+/-" << elFakeUnc << endl
+				<< " - muFake: " << setw(5) << muFakeRate << "+/-" << muFakeUnc << endl << endl;
+
 		// Fill histograms
 		hEl_final_fakeRate->SetBinContent(ptBin, etaBin, elFakeRate); hEl_final_fakeRate->SetBinError(ptBin, etaBin, elFakeUnc);
 		hMu_final_fakeRate->SetBinContent(ptBin, etaBin, muFakeRate); hMu_final_fakeRate->SetBinError(ptBin, etaBin, muFakeUnc);
@@ -1348,10 +1630,15 @@ void calcFinalEffs()
 	}}
 
     TCanvas c;
-	hEl_final_fakeRate->Draw("colz text"); c.Print(TString(hEl_final_fakeRate->GetName())+".eps");
-	hMu_final_fakeRate->Draw("colz text"); c.Print(TString(hMu_final_fakeRate->GetName())+".eps");
-	hEl_final_realRate->Draw("colz text"); c.Print(TString(hEl_final_realRate->GetName())+".eps");
-	hMu_final_realRate->Draw("colz text"); c.Print(TString(hMu_final_realRate->GetName())+".eps");
+	hEl_final_fakeRate->Draw("colz text e"); c.Print(TString(hEl_final_fakeRate->GetName())+".eps"); 
+	hMu_final_fakeRate->Draw("colz text e"); c.Print(TString(hMu_final_fakeRate->GetName())+".eps"); 
+	hEl_final_realRate->Draw("colz text e"); c.Print(TString(hEl_final_realRate->GetName())+".eps"); 
+	hMu_final_realRate->Draw("colz text e"); c.Print(TString(hMu_final_realRate->GetName())+".eps"); 
+
+	DrawOneD(hEl_final_fakeRate, HEAVY, dir_weightedRates); // Here HEAVY just means non-prompt. Need "non-real" for the argument
+	DrawOneD(hMu_final_fakeRate, HEAVY, dir_weightedRates); 
+	DrawOneD(hEl_final_realRate, REAL , dir_weightedRates);
+	DrawOneD(hMu_final_realRate, REAL , dir_weightedRates);
 }
 
 // // */
@@ -1489,10 +1776,10 @@ bool finalize()
 	if (VERBOSE) cout << "Drawing lepton composition" << endl;
 	lp_El->Normalize(); lp_El->Draw();
 	lp_Mu->Normalize(); lp_Mu->Draw();
-	lp_El_Tight->Normalize(); lp_El_Tight->Draw();
-	lp_Mu_Tight->Normalize(); lp_Mu_Tight->Draw();
-	lp_El_LNT->Normalize(); lp_El_LNT->Draw();
-	lp_Mu_LNT->Normalize(); lp_Mu_LNT->Draw();
+	// lp_El_Tight->Normalize(); lp_El_Tight->Draw();
+	// lp_Mu_Tight->Normalize(); lp_Mu_Tight->Draw();
+	// lp_El_LNT->Normalize(); lp_El_LNT->Draw();
+	// lp_Mu_LNT->Normalize(); lp_Mu_LNT->Draw();
 
 	if (VERBOSE) cout << "Draw MCTC " << endl;
 	TCanvas *can = new TCanvas("cMCTC", "cMCTC", 1280,800); can->SetGrid();
