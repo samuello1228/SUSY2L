@@ -1,9 +1,14 @@
 #!/bin/bash
-tag=v12.0
+tag=v12.1
 dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root,multiLepSearch/prw_MC/merged_prw_mc15c_signal_Sep13.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
 isMC=1
+
+#study=ss
+study=fakes
+
+truth=MCTC
 
 #For background MC
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
@@ -19,9 +24,9 @@ isMC=1
 #file=../multiLepSearch/script/MCBGhiggs_sample_list.txt
 
 #Dongliang
-file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
+#file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
+file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
 #file=../multiLepSearch/script/MCBGmultitop_sample_list.txt
 #file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
@@ -30,14 +35,14 @@ file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/scr
 #isMC=2
 #file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt
 
-k=${tag}.MCBG
+k=${tag}.MCZll
 
 #For signal MC
 #isMC=2
 #file=../multiLepSearch/script/MCSig_sample_list.txt
 #k=${tag}.MCSig
 
-../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a ${isMC} --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
+../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a ${isMC} --study ${study} --mcMatch ${truth} --doSys 0 --ChargeID 1 --conf ${SUSYconf} --fast
 
 
 # file="mc15_13TeV.*.MGPy8EG_A14N23LO_C1N2_Wh_hall_*_2L7.merge.DAOD_SUSY2.e6153_a766_a821_r7676_p2949"
@@ -69,7 +74,7 @@ k=${tag}.MCBG
 
 #mcPRW=dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 
-#../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a ${isMC} --study ss --mcMatch TruthLink --doSys 0 --ChargeID 1 --conf ${SUSYconf} # --printEvent ${eventNumber} --cutflow | tee cutflow.log
+#../multiLepSearch/util/run_ss_selection.py --driver direct -f ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} -o t1 -w -a ${isMC} --study ${study} --mcMatch ${truth} --doSys 0 --ChargeID 1 --conf ${SUSYconf} # --printEvent ${eventNumber} --cutflow | tee cutflow.log
 
 #for(int i=1;i<60;i++) cout<<hCutFlow->GetXaxis()->GetBinLabel(i)<<": "<<hCutFlow->GetBinContent(i)<<endl;
 #grep -e '^[0-9]\+$' cutflow.log |tee trigger.txt
