@@ -12,30 +12,22 @@ truth=MCTC
 
 #For background MC
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
-
-#Samuel
+#k=${tag}.MCBG
 isMC=1
-#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttbar_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt,../multiLepSearch/script/MCBGhiggs_sample_list.txt
-#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt
-#file=../multiLepSearch/script/MCBGttbar_sample_list.txt
-#file=../multiLepSearch/script/MCBGttV_sample_list.txt
-#file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGhiggs_sample_list.txt
 
-#Dongliang
-#file=../multiLepSearch/script/MCBGmultitop_sample_list.txt,../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt,../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt,../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt
-file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt
-#file=../multiLepSearch/script/MCBGmultitop_sample_list.txt
-#file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt
+#file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets
+#file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt k=${tag}.Wjets
+#file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt k=${tag}.DY
+#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGmultitop_sample_list.txt k=${tag}.top
+#file=../multiLepSearch/script/MCBGttbar_sample_list.txt k=${tag}.ttbar
+#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt k=${tag}.Vgamma
+#file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt k=${tag}.VV
+#file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt k=${tag}.VVV
+#file=../multiLepSearch/script/MCBGhiggs_sample_list.txt k=${tag}.higgs
 
 #For fast simulation
 #isMC=2
-#file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt
-
-k=${tag}.MCZll
+#file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt k=${tag}.multitop_fast
 
 #For signal MC
 #isMC=2
