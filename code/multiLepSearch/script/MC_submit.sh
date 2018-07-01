@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v12.2
+tag=v12.3
 dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
 mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root,multiLepSearch/prw_MC/merged_prw_mc15c_signal_Sep13.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
 SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
@@ -8,8 +8,8 @@ isMC=1
 study=ss
 #study=fakes
 
-#truth=MCTC
-truth=dR
+truth=MCTC
+#truth=dR
 
 #For background MC
 #mcPRW=dev/SUSYTools/merged_prw_mc15c_latest.root
@@ -46,6 +46,8 @@ file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt k=${tag}.Zee_NOchfSF
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.364104.Sherpa_221_NNPDF30NNLO_Zmumu_MAXHTPTV70_140_CFilterBVeto.merge.DAOD_SUSY2.e5271_s2726_r7772_r7676_p2949/DAOD_SUSY2.11084041._000011.pool.root.1
 #eventNumber=47
+
+#file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV/DAOD_SUSY2.11084160._000250.pool.root.1
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.410009.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_dil.merge.DAOD_SUSY2.e4511_s2608_s2183_r7725_r7676_p2949/DAOD_SUSY2.10524294._000001.pool.root.1
 #eventNumber=5799815
