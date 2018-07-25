@@ -1,16 +1,11 @@
-#source /afs/cern.ch/atlas/software/tools/pyAMI/setup.sh
-import pyAMI.atlas.api as AtlasAPI
-import pyAMI.client
-
-client = pyAMI.client.Client('atlas')
-AtlasAPI.init()
-
 MCSample=[]
 
 #Signal
+#input_ami="ami_data/SigSample_ami.txt"
 #MCSample.append("../../multiLepSearch/script/MCSig_sample_list.txt")
 
 #MCBG
+input_ami="ami_data/BGSample_ami.txt"
 MCSample.append("../../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGDYSherpa_sample_list.txt")
@@ -24,9 +19,7 @@ MCSample.append("../../multiLepSearch/script/MCBGVVSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGhiggs_sample_list.txt")
 
-#fill dictionary: raw number for each sample id
-dict_AOD={}
-dict_SUSY={}
+dict_sampleName={}
 
 for sample in MCSample:
   with open(sample) as sampleFiles:
@@ -39,31 +32,28 @@ for sample in MCSample:
       name = aLine.rstrip()
       elements = name.split(".")
 
-      #find number of event of SUSY2
-      info = AtlasAPI.get_dataset_info(client, name)[0]
-      SUSYnumber = info['totalEvents']
-
-      #find AOD sample
-      prov = AtlasAPI.get_dataset_prov(client, name)
-      node = prov['node']
-
-      AODname = node[1]['logicalDatasetName']
-      print AODname
-
-      #find number of event of AOD
-      info = AtlasAPI.get_dataset_info(client, AODname)[0]
-      AODnumber = info['totalEvents']
-
-      #find cross section and filter efficiency
-      #xSec = info['crossSection']
-      #unit = info['crossSection_unit']
-      #eff = info['GenFiltEff_mean']
-      #print elements[1], xSec, unit, eff
-
       #output file
-      print elements[1], AODnumber, SUSYnumber
-      dict_AOD[elements[1]] = AODnumber
-      dict_SUSY[elements[1]] = SUSYnumber
+      print elements[1], name
+      dict_sampleName[elements[1]] = name
+
+#fill dictionary: raw number for each sample id
+dict_AOD={}
+dict_SUSY={}
+
+with open(input_ami) as sampleFiles:
+  for aLine in sampleFiles:
+    #remove and ignore comments in line
+    aLine = aLine.split("#")[0]
+    if len(aLine)==0: continue
+
+    #read the line
+    name = aLine.rstrip()
+    elements = name.split(" ")
+
+    #fill dictionary
+    print elements[0], elements[1], elements[2]
+    dict_AOD[elements[0]] = elements[1]
+    dict_SUSY[elements[0]] = elements[2]
 
 #For Data driven BG
 dict_AOD['999998'] = 0
@@ -71,12 +61,11 @@ dict_AOD['999999'] = 0
 dict_SUSY['999998'] = 0
 dict_SUSY['999999'] = 0
 
-
 #append raw number in output file
 #inputFile="SigSample.txt"
 #outputFile="SigSample_add.txt"
 
-inputFile="BGSample.txt"
+inputFile="BGSample_XS.txt"
 outputFile="BGSample_add.txt"
 print "reading", inputFile
 
