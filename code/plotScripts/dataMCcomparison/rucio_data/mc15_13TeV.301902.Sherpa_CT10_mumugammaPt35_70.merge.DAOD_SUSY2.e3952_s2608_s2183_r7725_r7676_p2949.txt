@@ -1,0 +1,24 @@
++----------------------------------------------------+--------------------------------------+-------------+------------+----------+
+| SCOPE:NAME                                         | GUID                                 | ADLER32     | FILESIZE   |   EVENTS |
+|----------------------------------------------------+--------------------------------------+-------------+------------+----------|
+| mc15_13TeV:DAOD_SUSY2.11586825._000001.pool.root.1 | A2395E62-19CA-744F-A761-E29C079A384A | ad:d63b9307 | 90.093 MB  |     3291 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000002.pool.root.1 | 8F07B216-AB76-2043-AB72-DFF830CE4FFB | ad:6c48666b | 88.761 MB  |     3211 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000003.pool.root.1 | A2E6252A-CC9B-A742-8EE6-F64A5007D6EE | ad:9e45af06 | 92.897 MB  |     3351 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000004.pool.root.1 | D0FED41C-B64A-5946-84CA-22568D987A57 | ad:6bef2e62 | 90.948 MB  |     3303 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000005.pool.root.1 | 7F5AF16B-96AE-E841-880E-FA34AA61BB30 | ad:9f6939c9 | 89.204 MB  |     3240 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000006.pool.root.1 | C2E5E9EC-3D70-BE49-9120-57D6AADA06AB | ad:f89644f4 | 90.569 MB  |     3267 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000007.pool.root.1 | FF7CBCDC-28A2-E541-A913-2F7F853B1890 | ad:08df6b1b | 90.059 MB  |     3285 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000008.pool.root.1 | FE3CA14B-4996-7D47-ACA4-B4353E416085 | ad:7b840e4d | 89.913 MB  |     3253 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000009.pool.root.1 | 987C7684-7E45-764E-A175-AE9A36E3BAE7 | ad:4c4749b2 | 93.328 MB  |     3321 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000010.pool.root.1 | C89B77C5-7FDA-1342-A58E-DDA31C631385 | ad:bef3bc77 | 89.250 MB  |     3232 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000011.pool.root.1 | 69EBBEBA-3638-D146-BEBC-8BF9DE4CA851 | ad:8702c2bd | 536.643 MB |    19592 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000012.pool.root.1 | 35A2D397-DF7D-284F-83C4-C18641160C43 | ad:ebbeb024 | 538.453 MB |    19630 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000013.pool.root.1 | E36C8165-30D4-C044-BDB0-45F45A9309CA | ad:85f98a56 | 540.694 MB |    19661 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000014.pool.root.1 | 465AE1D9-80FD-8C47-A9E2-CB40D1445DCF | ad:2186adae | 540.866 MB |    19666 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000015.pool.root.1 | 0CB9838B-2D4F-9845-B0BF-44261B4BA7A9 | ad:a5d24122 | 534.067 MB |    19451 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000016.pool.root.1 | 950402DA-FDA7-2A41-9548-0D5519100F4F | ad:6c0ce8b7 | 523.133 MB |    19085 |
+| mc15_13TeV:DAOD_SUSY2.11586825._000017.pool.root.1 | F62144E7-CD4B-0743-86F8-E55FB783BD7A | ad:5549acea | 362.116 MB |    13190 |
++----------------------------------------------------+--------------------------------------+-------------+------------+----------+
+Total files : 17
+Total size : 4.481 GB
+Total events : 163029

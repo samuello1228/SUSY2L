@@ -1,10 +1,14 @@
 MCSample=[]
 
 #Signal
+#inputFile="SigSample_XS.txt"
+#outputFile="SigSample_add.txt"
 #input_ami="ami_data/SigSample_ami.txt"
 #MCSample.append("../../multiLepSearch/script/MCSig_sample_list.txt")
 
 #MCBG
+inputFile="BGSample_XS.txt"
+outputFile="BGSample_add.txt"
 input_ami="ami_data/BGSample_ami.txt"
 MCSample.append("../../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt")
@@ -19,7 +23,10 @@ MCSample.append("../../multiLepSearch/script/MCBGVVSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGhiggs_sample_list.txt")
 
+#fill dictionary: sample name for each sample id
 dict_sampleName={}
+#fill dictionary: rucio raw number for each sample id
+dict_SUSY_rucio={}
 
 for sample in MCSample:
   with open(sample) as sampleFiles:
@@ -32,13 +39,34 @@ for sample in MCSample:
       name = aLine.rstrip()
       elements = name.split(".")
 
-      #output file
+      #read rucio data
+      rucioFilePath = "rucio_data/" + name + ".txt"
+      with open(rucioFilePath) as rucioFile:
+        for aLine2 in rucioFile:
+            name2 = aLine2.rstrip()
+
+            if "Total events" in name2:
+              number_str=""
+              for digit in name2:
+                if digit.isdigit():
+                  number_str += digit
+              print name2, number_str
+              dict_SUSY_rucio[elements[1]] = number_str
+
+            #if "Total size" in name2:
+              #print name2
+
+      #fill dictionary: sample name
       print elements[1], name
       dict_sampleName[elements[1]] = name
 
-#fill dictionary: raw number for each sample id
-dict_AOD={}
-dict_SUSY={}
+#For Data driven BG
+dict_SUSY_rucio['999998'] = 0
+dict_SUSY_rucio['999999'] = 0
+
+#fill dictionary: ami raw number for each sample id
+dict_AOD_ami={}
+dict_SUSY_ami={}
 
 with open(input_ami) as sampleFiles:
   for aLine in sampleFiles:
@@ -52,23 +80,16 @@ with open(input_ami) as sampleFiles:
 
     #fill dictionary
     print elements[0], elements[1], elements[2]
-    dict_AOD[elements[0]] = elements[1]
-    dict_SUSY[elements[0]] = elements[2]
+    dict_AOD_ami[elements[0]] = elements[1]
+    dict_SUSY_ami[elements[0]] = elements[2]
 
 #For Data driven BG
-dict_AOD['999998'] = 0
-dict_AOD['999999'] = 0
-dict_SUSY['999998'] = 0
-dict_SUSY['999999'] = 0
+dict_AOD_ami['999998'] = 0
+dict_AOD_ami['999999'] = 0
+dict_SUSY_ami['999998'] = 0
+dict_SUSY_ami['999999'] = 0
 
 #append raw number in output file
-#inputFile="SigSample.txt"
-#outputFile="SigSample_add.txt"
-
-inputFile="BGSample_XS.txt"
-outputFile="BGSample_add.txt"
-print "reading", inputFile
-
 with open(inputFile) as File:
   with open(outputFile, 'w') as outFile:
     for aLine in File:
@@ -80,7 +101,11 @@ with open(inputFile) as File:
       elements = aLine.rstrip().split()
       sampleID = elements[0]
 
+      #compare ami and rucio data
+      if dict_SUSY_ami[sampleID] != dict_SUSY_rucio[sampleID]:
+        print "ami and rucio are different", dict_SUSY_ami[sampleID], dict_SUSY_rucio[sampleID]
+
       #output file
-      outStr = aLine.rstrip() + " " + str(dict_AOD[sampleID]) + " " + str(dict_SUSY[sampleID])
+      outStr = aLine.rstrip() + " " + str(dict_AOD_ami[sampleID]) + " " + str(dict_SUSY_ami[sampleID])
       print outStr
       outFile.write(outStr+"\n")
