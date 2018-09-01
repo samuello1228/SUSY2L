@@ -1,8 +1,22 @@
 #!/bin/bash
-tag=v12.3
-dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
-mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root,multiLepSearch/prw_MC/merged_prw_mc15c_signal_Sep13.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+tag=v13.0
+
+#My Data PRW
+#dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
+
+#My MC PRW
+#mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root,multiLepSearch/prw_MC/merged_prw_mc15c_signal_Sep13.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+
+#Peter Data PRW
+dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_276262-284484.root,multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-009.root
+
+#Peter MC PRW
+mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Jun15.root,multiLepSearch/prw_MC/merged_prw_mc15c_signal_Mar1.root,dev/PileupReweighting/mc15c_v2_defaults.NotRecommended.prw.root
+
+#SUSYTools Config File
 SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
+
+#MC type
 isMC=1
 
 study=ss
