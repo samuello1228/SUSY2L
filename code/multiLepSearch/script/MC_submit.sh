@@ -30,24 +30,28 @@ truth=MCTC
 #k=${tag}.MCBG
 isMC=1
 
-#file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets
-#file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt k=${tag}.Wjets
-#file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt k=${tag}.DY
-#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt,../multiLepSearch/script/MCBGttV_sample_list.txt,../multiLepSearch/script/MCBGmultitop_sample_list.txt k=${tag}.top
-#file=../multiLepSearch/script/MCBGttbar_sample_list.txt k=${tag}.ttbar
-#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt k=${tag}.Vgamma
-#file=../multiLepSearch/script/MCBGVVSherpa_sample_list.txt k=${tag}.VV
-#file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt k=${tag}.VVV
-#file=../multiLepSearch/script/MCBGhiggs_sample_list.txt k=${tag}.higgs
-file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt k=${tag}.Zee_NOchfSF
+file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt k=${tag}.Wjets #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt k=${tag}.DY #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGsingletop_sample_list.txt k=${tag}.singletop #ShowerType = PYTHIAEVTGEN
+#file=../multiLepSearch/script/MCBGttV_sample_list.txt k=${tag}.ttV #ShowerType = PYTHIA8EVTGEN
+#file=../multiLepSearch/script/MCBGmultitop_sample_list.txt k=${tag}.multitop #ShowerType = PYTHIA8EVTGEN
+#file=../multiLepSearch/script/MCBGttbar_sample_list.txt k=${tag}.ttbar #ShowerType = PYTHIAEVTGEN
+#file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt k=${tag}.Vgamma #ShowerType = SHERPA_CT10
+#file=../multiLepSearch/script/MCBGVVSherpa_CT10_sample_list.txt k=${tag}.VV_CT10 #ShowerType = SHERPA_CT10
+#file=../multiLepSearch/script/MCBGVVSherpa_221_sample_list.txt k=${tag}.VV_221 #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt k=${tag}.VVV #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGhiggs_Pythia8EvtGen_sample_list.txt k=${tag}.higgs_Pythia8EvtGen #ShowerType = Pythia8EvtGen
+#file=../multiLepSearch/script/MCBGhiggs_HerwigppEvtGen_sample_list.txt k=${tag}.higgs_HerwigppEvtGen #ShowerType = HerwigppEvtGen
+#file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt k=${tag}.Zee_NOchfSF #ShowerType = SHERPA
 
 #For fast simulation
 #isMC=2
-#file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt k=${tag}.multitop_fast
+#file=../multiLepSearch/script/MCBGmultitop_fast_sample_list.txt k=${tag}.multitop_fast #ShowerType = PYTHIA8EVTGEN
 
 #For signal MC
 #isMC=2
-#file=../multiLepSearch/script/MCSig_sample_list.txt
+#file=../multiLepSearch/script/MCSig_sample_list.txt #ShowerType = PYTHIA8EVTGEN
 #k=${tag}.MCSig
 
 ../multiLepSearch/util/run_ss_selection.py --driver grid --inputList ${file} --dataPRW ${dataPRW} --mcPRW ${mcPRW} --outputTag ${k} -o ${k} -a ${isMC} --study ${study} --mcMatch ${truth} --doSys 0 --conf ${SUSYconf} --fast
