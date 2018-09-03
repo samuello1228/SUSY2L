@@ -103,6 +103,7 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
 
   CF_isMC = 0;
   study = "3l";
+  SampleName = "";
   doSys = 0;
 
   // MCTC, TruthLink, dR
@@ -346,8 +347,13 @@ EL::StatusCode ssEvtSelection :: initialize ()
   for(auto x: CF_PRW_confFiles){Info("CF_PRW_confFiles", "%s", x.c_str());}
 
   ST::ISUSYObjDef_xAODTool::DataSource ds = static_cast<ST::ISUSYObjDef_xAODTool::DataSource>(CF_isMC); 
+
+  //Get shower type
+  int ShowerType = CF_isMC ? m_objTool->getMCShowerType(SampleName) : 0;
+
   CHECK(m_objTool->setProperty("DataSource",ds));
   CHECK(m_objTool->setProperty("ConfigFile", CF_ConfigFile));
+  CHECK(m_objTool->setProperty("ShowerType", ShowerType));
   CHECK(m_objTool->setProperty("PRWConfigFiles", CF_PRW_confFiles));
   CHECK(m_objTool->setProperty("PRWLumiCalcFiles", CF_PRW_lcalcFiles));
   CHECK(m_objTool->initialize().isSuccess());
@@ -608,6 +614,9 @@ EL::StatusCode ssEvtSelection :: execute ()
     CHECK( m_objTool->GetJets(jets_copy,jets_copyaux) );
     CHECK(wk()->xaodStore()->record(jets_copy        , m_systInfoList[iSyst].systset.name()+"ShallowCopiedJets"));
     CHECK(wk()->xaodStore()->record(jets_copyaux     , m_systInfoList[iSyst].systset.name()+"ShallowCopiedJetsAux."));
+
+    xAOD::JetContainer* jets_copy_signal = new xAOD::JetContainer(SG::VIEW_ELEMENTS);
+    CHECK(wk()->xaodStore()->record(jets_copy_signal        , m_systInfoList[iSyst].systset.name()+"ShallowCopiedJets_signal"));
 
     /// overlap removal
     CHECK( m_objTool->OverlapRemoval(electrons_copy, muons_copy, jets_copy) );
@@ -958,8 +967,15 @@ EL::StatusCode ssEvtSelection :: execute ()
     vector< xAOD::IParticle* > jet_Ls;
     jet_Ls.reserve(10);
     for(auto jet: *jets_copy){
-      if(cutflow && dec_baseline(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
-      if(!cutflow && dec_signal(*jet) && dec_passOR(*jet)) jet_Ls.push_back(jet);
+      if(cutflow && dec_baseline(*jet) && dec_passOR(*jet)) {
+        jet_Ls.push_back(jet);
+        jets_copy_signal->push_back(jet);
+      }
+      
+      if(!cutflow && dec_signal(*jet) && dec_passOR(*jet)) {
+        jet_Ls.push_back(jet);
+        jets_copy_signal->push_back(jet);
+      }
     }
     sort(jet_Ls.begin(), jet_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
@@ -1249,8 +1265,8 @@ EL::StatusCode ssEvtSelection :: execute ()
           sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
 
-        sEvt.BtagSF = m_objTool->BtagSF(jets_copy);
-        sEvt.JvtSF = m_objTool->JVT_SF(jets_copy);
+        sEvt.BtagSF = m_objTool->BtagSF(jets_copy_signal);
+        sEvt.JvtSF = m_objTool->JVT_SF(jets_copy_signal);
 
         double trigSF=1;
         auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run,trigElec, trigMuon, trigSF); //sEvt.run

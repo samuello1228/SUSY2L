@@ -63,11 +63,13 @@ ROOT.xAOD.Init().ignore();
 # create a new sample handler to describe the data files we use
 logging.info("creating new sample handler")
 sh_all = ROOT.SH.SampleHandler()
+SampleName = ""
 
 if options.inputFiles:
     sample = ROOT.SH.SampleLocal(options.inputTag)
     for file in options.inputFiles.split(','): sample.add(file)
     sh_all.add(sample);
+    SampleName = options.inputFiles.split(',')[0]
 elif options.inputList:
     if options.driver == 'grid':
         mergeSamples = []
@@ -78,6 +80,7 @@ elif options.inputList:
                         print line, 'skipped'
                         continue
                     line = line.split()[0]
+                    SampleName = line.rstrip();
                     if options.fast: mergeSamples.append(line.rstrip())
                     else:
                         if line.find('*') == -1: ROOT.SH.addGrid(sh_all, line.rstrip())
@@ -96,9 +99,11 @@ elif options.inputDir:
     sample = ROOT.SH.SampleLocal(options.inputTag)
     files = [dir0+f for f in os.listdir(options.inputDir) if f.find('.root')!=-1]
     print dir0, len(files), 'files'
+    SampleName = files[0]
     for file in files: sample.add(file)
     sh_all.add (sample)
 elif options.inputDS:
+    SampleName = options.inputDS
     if options.fast:
         sample = ROOT.SH.SampleGrid("gridSamples")
         sample.meta().setString(ROOT.SH.MetaFields.gridName, options.inputDS)
@@ -122,7 +127,9 @@ elif options.samplesDir:
                     sample = ROOT.SH.SampleLocal(s[0])
                     d = dir0+s[-1]
                     print s[0],d
-                    for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)): sample.add(d+'/'+f)
+                    for f in filter(lambda x: x.find('.root')!=-1, os.listdir(d)):
+                        sample.add(d+'/'+f)
+                        SampleName = d+'/'+f
                     sh_all.add(sample)
     else:
         dirs = [dir0+d for d in os.listdir(dir0) if os.path.isdir(dir0+d)]
@@ -137,7 +144,9 @@ elif options.samplesDir:
             sample = ROOT.SH.SampleLocal(tag)
             files = [d+'/'+f for f in os.listdir(d) if f.find('.root')!=-1]
             print len(files), "files"
-            for f in files: sample.add(f)
+            for f in files:
+                sample.add(f)
+                SampleName = f
             sh_all.add(sample)
     if options.test:
         exit(0)
@@ -145,6 +154,7 @@ elif options.samplesDir:
 
 # print out the samples we found
 logging.info("%d different datasets to be processed", len(sh_all))
+logging.info("Sample Name: %s", SampleName)
 
 # set the name of the tree in our files
 sh_all.setMetaString("nc_tree", "CollectionTree")
@@ -159,6 +169,7 @@ logging.info("creating algorithms")
 
 alg = ROOT.ssEvtSelection()
 alg.CF_outputName = "myOutput"
+alg.SampleName = SampleName
 
 if (options.study == "3l"):
     alg.CF_outputTreeName = "evt3l"
