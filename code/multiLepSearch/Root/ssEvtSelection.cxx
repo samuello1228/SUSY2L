@@ -78,7 +78,7 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
   //m_susyEvt = new susyEvts();
 
   CF_outputName = "test.root";
-  CF_outputTreeName = "evt3l";
+  CF_outputTreeName = "evt2l";
   CF_derivationName = "SUSY2";
   //CF_nLepCutExactly = 2;
   //CF_nLepCutMin = 2;
@@ -100,7 +100,7 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
   CF_mT2_m0 = 1;
 
   CF_isMC = 0;
-  study = "3l";
+  study = "ss";
   SampleName = "";
   doSys = 0;
 
@@ -663,6 +663,36 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     int totLs = sel_Ls.size() + sig_Ls.size();
 
+    //cutflow for number of leptons
+    {
+      if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
+      else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
+      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
+      else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
+
+      if(nBaseEl >= 1) m_hCutFlow->Fill(">=1BaseEl", 1);
+      if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
+      if(nBaseMu >= 1) m_hCutFlow->Fill(">=1BaseMu", 1);
+      if(nSigMu >= 1) m_hCutFlow->Fill(">=1SigMu", 1);
+      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep", 1);
+      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep", 1);
+
+      if(nBaseEl >= 2) m_hCutFlow->Fill(">=2BaseEl", 1);
+      if(nSigEl >= 2) m_hCutFlow->Fill(">=2SigEl", 1);
+      if(nBaseMu >= 2) m_hCutFlow->Fill(">=2BaseMu", 1);
+      if(nSigMu >= 2) m_hCutFlow->Fill(">=2SigMu", 1);
+      if(totLs >= 2) m_hCutFlow->Fill(">=2BaseLep", 1);
+      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep", 1);
+
+      if(nBaseEl == 3) m_hCutFlow->Fill("=3BaseEl", 1);
+      if(nSigEl == 3) m_hCutFlow->Fill("=3SigEl", 1);
+      if(nBaseMu == 3) m_hCutFlow->Fill("=3BaseMu", 1);
+      if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
+
+      if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
+      if(totLs == 3 && sig_Ls.size() == 3) m_hCutFlow->Fill("=3BaseLep and =3SigLep", 1);
+    }
+
     /// sort the two leptons for signal pairs and double fake
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -748,7 +778,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       if (!cutflow && !keep) {continue;}
     }
-    if(study == "3l" && totLs != 3) continue;
 
     if(study=="fakes")
     {
@@ -817,35 +846,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       sel_Ls = dilepPair;
     }
 
-    if(study == "ss" || study == "fakes")
-    {
-      if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
-      else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
-      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
-      else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
-
-      if(nBaseEl >= 1) m_hCutFlow->Fill(">=1BaseEl", 1);
-      if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
-      if(nBaseMu >= 1) m_hCutFlow->Fill(">=1BaseMu", 1);
-      if(nSigMu >= 1) m_hCutFlow->Fill(">=1SigMu", 1);
-      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep", 1);
-      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep", 1);
-
-      if(nBaseEl >= 2) m_hCutFlow->Fill(">=2BaseEl", 1);
-      if(nSigEl >= 2) m_hCutFlow->Fill(">=2SigEl", 1);
-      if(nBaseMu >= 2) m_hCutFlow->Fill(">=2BaseMu", 1);
-      if(nSigMu >= 2) m_hCutFlow->Fill(">=2SigMu", 1);
-      if(totLs >= 2) m_hCutFlow->Fill(">=2BaseLep", 1);
-      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep", 1);
-
-      if(nBaseEl == 3) m_hCutFlow->Fill("=3BaseEl", 1);
-      if(nSigEl == 3) m_hCutFlow->Fill("=3SigEl", 1);
-      if(nBaseMu == 3) m_hCutFlow->Fill("=3BaseMu", 1);
-      if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
-
-      if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
-      if(totLs == 3 && sig_Ls.size() == 3) m_hCutFlow->Fill("=3BaseLep and =3SigLep", 1);
-    }
     /////////////////////////
     // Save informations
     ////////////////////////
@@ -1039,7 +1039,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       auto& l = m_susyEvt->leps[i];
       fillLepton(sel_Ls[i], l, i);
       l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
-      //if(study == "3l") m_susyEvt->leps[i].isTight = (m_susyEvt->leps[i].lFlag & 2)/2;
       /// mT
       l.mT = sqrt(2*l.pt*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
 //       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
@@ -1175,7 +1174,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       auto trigCut = getTriggerConf(sEvt.run);
 
       //12 channel
-      if (study=="ss" || study =="fakes")
       {
         m_susyEvt->evt.flag = 0;
         if(totLs == 2)
@@ -1214,7 +1212,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       //Scale factor
       if(CF_isMC){
         // Info("execute()", "Calculate scale factors");
-        if( study == "ss" || study == "fakes")
         {
           // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
           if(sEvt.flag%3 == 1){ // ee
@@ -1227,11 +1224,6 @@ EL::StatusCode ssEvtSelection :: execute ()
             sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_em_eKey, true);
             sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*m_em_eKey*/);
           }
-        }
-        else if(study == "3l")
-        {
-          sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy,true,true,false,true,"HLT_mu24_iloose_L1MU15");
-          sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy,true,true,"HLT_mu24_iloose_L1MU15");
         }
 
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy_signal);

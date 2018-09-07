@@ -171,15 +171,7 @@ alg = ROOT.ssEvtSelection()
 alg.CF_outputName = "myOutput"
 alg.SampleName = SampleName
 
-if (options.study == "3l"):
-    alg.CF_outputTreeName = "evt3l"
-    muonTrig = ["HLT_mu26_imedium", "HLT_mu24_imedium", "HLT_mu24_iloose_L1MU15", "HLT_mu20_iloose_L1MU15", "HLT_mu50", "HLT_mu60_0eta105_msonly"]
-    dimuonTrig = ["HLT_2mu14","HLT_2mu10","HLT_mu24_mu8noL1","HLT_mu22_mu8noL1","HLT_mu20_mu8noL1","HLT_mu18_mu8noL1"]
-    for i in muonTrig: alg.CF_trigNames.push_back(i)
-    for i in dimuonTrig: alg.CF_trigNames.push_back(i)
-    alg.study = "3l"
-
-elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fakes" ):
+if(options.study == "ss" or options.study == "ssSlim" or options.study == "fakes" or options.study == "fakes_Peter"):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger
@@ -216,7 +208,10 @@ elif(options.study == "ss" or options.study == "ssSlim" or options.study == "fak
     dimuonTrig = ["HLT_mu22_mu8noL1"]
     for i in dimuonTrig: alg.CF_trigNames_2016.push_back(i)
 
-    elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e7_lhmedium_nod0_mu24"]
+    if(options.study == "fakes_Peter"):
+        elemuonTrig = ["HLT_e17_lhloose_nod0_mu14"]
+    else:
+        elemuonTrig = ["HLT_e17_lhloose_nod0_mu14","HLT_e7_lhmedium_nod0_mu24"]
     for i in elemuonTrig: alg.CF_trigNames_2016.push_back(i)
  
     alg.study = options.study
