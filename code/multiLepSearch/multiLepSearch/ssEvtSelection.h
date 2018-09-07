@@ -96,8 +96,6 @@ public:
   //float CF_JetPtCut;
   //float CF_JetEtaCut;
   //float CF_JetJvtCut;
-  int CF_vxTrkNMin;
-  float CF_vxTrkPtMin;
   float CF_mT2_m0;
   int printEvent;
   bool cutflow;

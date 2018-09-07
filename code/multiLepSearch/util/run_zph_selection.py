@@ -202,7 +202,6 @@ alg.CF_mT2_m0 = 0
 
 alg.CF_isMC = options.isMC
 alg.CF_ConfigFile = options.conf
-alg.CF_vxTrkPtMin = -1
 if options.grl:
     for x in options.grl.split(','): alg.CF_grlFiles.push_back(x)
 

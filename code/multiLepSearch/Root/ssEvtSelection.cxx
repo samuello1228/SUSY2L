@@ -77,8 +77,6 @@ ssEvtSelection :: ssEvtSelection(string name):m_name(name),m_susyEvt(0),m_grl(0)
 
   //m_susyEvt = new susyEvts();
 
-  CF_vxTrkNMin = 0;
-  CF_vxTrkPtMin = -1*GeV;
   CF_outputName = "test.root";
   CF_outputTreeName = "evt3l";
   CF_derivationName = "SUSY2";
@@ -565,26 +563,9 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_hCutFlow->Fill("CoreFlag", 1);
 
     // Primary vertex
-    unsigned int nPV=0;
-    //m_susyEvt->sig.nVtx=0;
-    const xAOD::VertexContainer* vertices(0);
-    if( wk()->xaodEvent()->retrieve( vertices, "PrimaryVertices" ).isSuccess() ) {
-      for( const auto& vx : *vertices ) {
-        //m_susyEvt->sig.nVtx++;
-        if(vx->vertexType() != xAOD::VxType::PriVtx) continue;
-        int nTrk = 0;
-        for(size_t i=0; i<vx->nTrackParticles(); i++){
-          const xAOD::TrackParticle* trk = vx->trackParticle(i);
-          if(trk && trk->pt()>CF_vxTrkPtMin) nTrk++;
-        }
-        if(nTrk<CF_vxTrkNMin) continue;
-        nPV++;
-      }
-    }else{
-      Error("Failed to retrieve VertexContainer %s, returning NULL", "PrimaryVertices");
-    }
-
-    if(nPV<1) return sc;
+    const xAOD::Vertex* PV = m_objTool->GetPrimVtx();
+    int nTrk = PV ? PV->nTrackParticles() : 0;
+    if( !nTrk ) return sc;
     m_hCutFlow->Fill("PV", 1);
 
     // Get the Electrons from the event
