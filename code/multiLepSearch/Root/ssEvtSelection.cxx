@@ -158,9 +158,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(7,"All");
   m_hCutFlow->GetXaxis()->SetBinLabel(8,"GRL");
   m_hCutFlow->GetXaxis()->SetBinLabel(9,"Trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(10,"LArErr");
-  m_hCutFlow->GetXaxis()->SetBinLabel(11,"TileErr");
-  m_hCutFlow->GetXaxis()->SetBinLabel(12,"CoreFlag");
+  m_hCutFlow->GetXaxis()->SetBinLabel(10,"LAr+Tile+SCT+CoreFlag");
   m_hCutFlow->GetXaxis()->SetBinLabel(13,"PV");
   m_hCutFlow->GetXaxis()->SetBinLabel(14,"BadMuon");
   m_hCutFlow->GetXaxis()->SetBinLabel(15,"cosMuon");
@@ -544,23 +542,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     if (passTrig) m_hCutFlow->Fill("Trigger", 1);
     else return sc;
 
-    /// LArError, tileError, CoreFlags
-    if(eventInfo->errorState(xAOD::EventInfo::LAr)!=xAOD::EventInfo::Error){
-      m_hCutFlow->Fill("LArErr", 1);
-    }
-    else return sc;
+    /// LArError, tileError, SCTError, CoreFlags
+    bool isLArError = (eventInfo->errorState(xAOD::EventInfo::LAr)  == xAOD::EventInfo::Error ||
+                       eventInfo->errorState(xAOD::EventInfo::Tile) == xAOD::EventInfo::Error ||
+                       eventInfo->errorState(xAOD::EventInfo::SCT)  == xAOD::EventInfo::Error ||
+                       eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18)                );
 
-    if(eventInfo->errorState(xAOD::EventInfo::Tile)!=xAOD::EventInfo::Error){
-      m_hCutFlow->Fill("TileErr", 1);
-    }
-    else return sc;
-
-    if(eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18)) {
-    //if(eventInfo->eventFlags(EventInfo::Core) & 0x40000) 
-      ATH_MSG_WARNING("This event is incompletely built. Skipping.");
-      return sc;
-    }
-    m_hCutFlow->Fill("CoreFlag", 1);
+    if(!CF_isMC && isLArError) return sc;
+    m_hCutFlow->Fill("LAr+Tile+SCT+CoreFlag", 1);
 
     // Primary vertex
     const xAOD::Vertex* PV = m_objTool->GetPrimVtx();
