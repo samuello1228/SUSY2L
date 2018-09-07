@@ -160,8 +160,8 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   m_hCutFlow->GetXaxis()->SetBinLabel(9,"Trigger");
   m_hCutFlow->GetXaxis()->SetBinLabel(10,"LAr+Tile+SCT+CoreFlag");
   m_hCutFlow->GetXaxis()->SetBinLabel(13,"PV");
-  m_hCutFlow->GetXaxis()->SetBinLabel(14,"BadMuon");
-  m_hCutFlow->GetXaxis()->SetBinLabel(15,"cosMuon");
+  m_hCutFlow->GetXaxis()->SetBinLabel(14,"cosMuon");
+  m_hCutFlow->GetXaxis()->SetBinLabel(15,"BadMuon");
   m_hCutFlow->GetXaxis()->SetBinLabel(16,"BadJet");
   m_hCutFlow->GetXaxis()->SetBinLabel(17,"nSumW");
   m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
@@ -591,25 +591,24 @@ EL::StatusCode ssEvtSelection :: execute ()
     /// overlap removal
     CHECK( m_objTool->OverlapRemoval(electrons_copy, muons_copy, jets_copy) );
 
-    // Bad muon
+    // Bad muon and Cosmic muon
     bool hasBadMuon = false;
     bool isCosmicMuon = false;
     for(auto mu: *muons_copy){
       if(dec_baseline(*mu) && dec_bad(*mu)){
         hasBadMuon = true;
-        break;
       }
 
       if(dec_baseline(*mu) && dec_passOR(*mu) && dec_cosmic(*mu)){
         isCosmicMuon = true;
       }
     }
-    if(hasBadMuon) continue;
-    m_hCutFlow->Fill("BadMuon", 1);
 
-    // Cosmic muon
     if(isCosmicMuon) continue;
     m_hCutFlow->Fill("cosMuon", 1);
+
+    if(hasBadMuon) continue;
+    m_hCutFlow->Fill("BadMuon", 1);
 
     /// Bad jet
     bool hasBadJet = false;
