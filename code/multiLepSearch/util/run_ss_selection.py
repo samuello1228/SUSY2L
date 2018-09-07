@@ -30,7 +30,7 @@ parser.add_option("--fast", help="Fast submit for grid jobs.", action='store_tru
 parser.add_option("--samplesDir", help="samples dir", default=None)
 parser.add_option("--samplePattern", help="sample pattern", default='(.*)')
 parser.add_option("--sampleList", help="sample list", default=None)
-parser.add_option("--study", help="name of study",choices=("ss", "ssSlim", "3l", "fakes"),default ="3l")
+parser.add_option("--study", help="name of study",choices=("ss", "fakes", "fakes_Peter"), default ="ss")
 parser.add_option("--mcMatch", help="MC truth match algorithm", choices=("MCTC", "dR", "TruthLink", "reverseTruthLink", "tryAll", "MCTCZ", "dRZ"), default="dR")
 # parser.add_option("--isShortJob", action='store_true', default=False, help="use condor_submit_short")
 parser.add_option("--ChargeID", type="int", help="Use ChargeIDSelector", default=1)
@@ -171,7 +171,7 @@ alg = ROOT.ssEvtSelection()
 alg.CF_outputName = "myOutput"
 alg.SampleName = SampleName
 
-if(options.study == "ss" or options.study == "ssSlim" or options.study == "fakes" or options.study == "fakes_Peter"):
+if(options.study == "ss" or options.study == "fakes" or options.study == "fakes_Peter"):
     alg.CF_outputTreeName = "evt2l"
 
     #trigger

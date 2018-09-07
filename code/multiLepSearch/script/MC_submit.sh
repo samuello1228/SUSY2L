@@ -20,7 +20,13 @@ SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
 isMC=1
 
 study=ss
+#study=fakes_Peter
 #study=fakes
+
+if [ "$study" = "fakes_Peter" ]
+then
+    dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-009.root
+fi
 
 truth=MCTC
 #truth=dR

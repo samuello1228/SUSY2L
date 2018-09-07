@@ -698,7 +698,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
     vector< IParticle* > dilepPair(2, nullptr);
-    if(study == "ss"){
+    if(study == "ss" || study == "fakes_Peter"){
       bool keep = false;
 
       //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
@@ -836,7 +836,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       dilepPair[1] = sel_Ls[0];
     }
 
-    if(!cutflow && study == "ss"){
+    if(!cutflow && (study == "ss" || study == "fakes_Peter")){
       //for ss study we put the dilepPair at front, then others sorted by pT at tail
       sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
       for (auto p : sel_Ls){
