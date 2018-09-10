@@ -182,9 +182,30 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=4BaseMu");
   cutflowList.push_back(">=5BaseMu");
 
-  cutflowList.push_back("nSumW");
+  cutflowList.push_back("=0SigLep");
+  cutflowList.push_back("=1SigLep");
   cutflowList.push_back("=2SigLep");
+  cutflowList.push_back("=3SigLep");
+  cutflowList.push_back("=4SigLep");
+  cutflowList.push_back(">=5SigLep");
+
+  cutflowList.push_back("=0SigEl");
+  cutflowList.push_back("=1SigEl");
+  cutflowList.push_back("=2SigEl");
+  cutflowList.push_back("=3SigEl");
+  cutflowList.push_back("=4SigEl");
+  cutflowList.push_back(">=5SigEl");
+
+  cutflowList.push_back("=0SigMu");
+  cutflowList.push_back("=1SigMu");
+  cutflowList.push_back("=2SigMu");
+  cutflowList.push_back("=3SigMu");
+  cutflowList.push_back("=4SigMu");
+  cutflowList.push_back(">=5SigMu");
+
   cutflowList.push_back("=2BaseLep and =2SigLep");
+
+  cutflowList.push_back("nSumW");
   cutflowList.push_back("SS");
   cutflowList.push_back(">=1BaseLep,w");
   cutflowList.push_back(">=1SigLep,w");
@@ -192,19 +213,9 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=2SigLep,w");
   cutflowList.push_back("=2BaseLep and =2SigLep,w");
   cutflowList.push_back("SS,w");
-  cutflowList.push_back(">=1SigEl");
-  cutflowList.push_back(">=1SigMu");
-  cutflowList.push_back(">=1SigLep");
-  cutflowList.push_back(">=2SigEl");
-  cutflowList.push_back(">=2SigMu");
-  cutflowList.push_back(">=2SigLep");
   cutflowList.push_back(">=1BaseJet");
   cutflowList.push_back(">=1SigJet");
   cutflowList.push_back(">=1BJet");
-  cutflowList.push_back("=3SigEl");
-  cutflowList.push_back("=3SigMu");
-  cutflowList.push_back("=3SigLep");
-  cutflowList.push_back("=3BaseLep and =3SigLep");
 
   m_hCutFlow = new TH1D("hCutFlow", "cut flow", cutflowList.size(), 0, cutflowList.size());
   for(unsigned int i=0;i<cutflowList.size();i++) m_hCutFlow->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
@@ -703,22 +714,28 @@ EL::StatusCode ssEvtSelection :: execute ()
       else                m_hCutFlow->Fill(">=5BaseMu", 1);
 
       //Signal leptons
-      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
-      else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
+      if     (sig_Ls.size()==0) m_hCutFlow->Fill("=0SigLep", 1);
+      else if(sig_Ls.size()==1) m_hCutFlow->Fill("=1SigLep", 1);
+      else if(sig_Ls.size()==2) m_hCutFlow->Fill("=2SigLep", 1);
+      else if(sig_Ls.size()==3) m_hCutFlow->Fill("=3SigLep", 1);
+      else if(sig_Ls.size()==4) m_hCutFlow->Fill("=4SigLep", 1);
+      else                      m_hCutFlow->Fill(">=5SigLep", 1);
 
-      if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
-      if(nSigMu >= 1) m_hCutFlow->Fill(">=1SigMu", 1);
-      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep", 1);
+      if     (nSigEl==0) m_hCutFlow->Fill("=0SigEl", 1);
+      else if(nSigEl==1) m_hCutFlow->Fill("=1SigEl", 1);
+      else if(nSigEl==2) m_hCutFlow->Fill("=2SigEl", 1);
+      else if(nSigEl==3) m_hCutFlow->Fill("=3SigEl", 1);
+      else if(nSigEl==4) m_hCutFlow->Fill("=4SigEl", 1);
+      else               m_hCutFlow->Fill(">=5SigEl", 1);
 
-      if(nSigEl >= 2) m_hCutFlow->Fill(">=2SigEl", 1);
-      if(nSigMu >= 2) m_hCutFlow->Fill(">=2SigMu", 1);
-      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep", 1);
-
-      if(nSigEl == 3) m_hCutFlow->Fill("=3SigEl", 1);
-      if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
+      if     (nSigMu==0) m_hCutFlow->Fill("=0SigMu", 1);
+      else if(nSigMu==1) m_hCutFlow->Fill("=1SigMu", 1);
+      else if(nSigMu==2) m_hCutFlow->Fill("=2SigMu", 1);
+      else if(nSigMu==3) m_hCutFlow->Fill("=3SigMu", 1);
+      else if(nSigMu==4) m_hCutFlow->Fill("=4SigMu", 1);
+      else               m_hCutFlow->Fill(">=5SigMu", 1);
 
       if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
-      if(totLs == 3 && sig_Ls.size() == 3) m_hCutFlow->Fill("=3BaseLep and =3SigLep", 1);
     }
 
     /// sort the two leptons for signal pairs and double fake
