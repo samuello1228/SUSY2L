@@ -160,8 +160,29 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("cosMuon");
   cutflowList.push_back("BadMuon");
   cutflowList.push_back("BadJet");
-  cutflowList.push_back("nSumW");
+
+  cutflowList.push_back("=0BaseLep");
+  cutflowList.push_back("=1BaseLep");
   cutflowList.push_back("=2BaseLep");
+  cutflowList.push_back("=3BaseLep");
+  cutflowList.push_back("=4BaseLep");
+  cutflowList.push_back(">=5BaseLep");
+
+  cutflowList.push_back("=0BaseEl");
+  cutflowList.push_back("=1BaseEl");
+  cutflowList.push_back("=2BaseEl");
+  cutflowList.push_back("=3BaseEl");
+  cutflowList.push_back("=4BaseEl");
+  cutflowList.push_back(">=5BaseEl");
+
+  cutflowList.push_back("=0BaseMu");
+  cutflowList.push_back("=1BaseMu");
+  cutflowList.push_back("=2BaseMu");
+  cutflowList.push_back("=3BaseMu");
+  cutflowList.push_back("=4BaseMu");
+  cutflowList.push_back(">=5BaseMu");
+
+  cutflowList.push_back("nSumW");
   cutflowList.push_back("=2SigLep");
   cutflowList.push_back("=2BaseLep and =2SigLep");
   cutflowList.push_back("SS");
@@ -171,26 +192,17 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=2SigLep,w");
   cutflowList.push_back("=2BaseLep and =2SigLep,w");
   cutflowList.push_back("SS,w");
-  cutflowList.push_back(">=1BaseEl");
   cutflowList.push_back(">=1SigEl");
-  cutflowList.push_back(">=1BaseMu");
   cutflowList.push_back(">=1SigMu");
-  cutflowList.push_back(">=1BaseLep");
   cutflowList.push_back(">=1SigLep");
-  cutflowList.push_back(">=2BaseEl");
   cutflowList.push_back(">=2SigEl");
-  cutflowList.push_back(">=2BaseMu");
   cutflowList.push_back(">=2SigMu");
-  cutflowList.push_back(">=2BaseLep");
   cutflowList.push_back(">=2SigLep");
   cutflowList.push_back(">=1BaseJet");
   cutflowList.push_back(">=1SigJet");
   cutflowList.push_back(">=1BJet");
-  cutflowList.push_back("=3BaseEl");
   cutflowList.push_back("=3SigEl");
-  cutflowList.push_back("=3BaseMu");
   cutflowList.push_back("=3SigMu");
-  cutflowList.push_back("=3BaseLep");
   cutflowList.push_back("=3SigLep");
   cutflowList.push_back("=3BaseLep and =3SigLep");
 
@@ -668,28 +680,41 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     //cutflow for number of leptons
     {
-      if(totLs == 2) m_hCutFlow->Fill("=2BaseLep", 1);
-      else if(totLs == 3) m_hCutFlow->Fill("=3BaseLep", 1);
+      //Baseline leptons
+      if     (totLs==0) m_hCutFlow->Fill("=0BaseLep", 1);
+      else if(totLs==1) m_hCutFlow->Fill("=1BaseLep", 1);
+      else if(totLs==2) m_hCutFlow->Fill("=2BaseLep", 1);
+      else if(totLs==3) m_hCutFlow->Fill("=3BaseLep", 1);
+      else if(totLs==4) m_hCutFlow->Fill("=4BaseLep", 1);
+      else              m_hCutFlow->Fill(">=5BaseLep", 1);
+
+      if     (nBaseEl==0) m_hCutFlow->Fill("=0BaseEl", 1);
+      else if(nBaseEl==1) m_hCutFlow->Fill("=1BaseEl", 1);
+      else if(nBaseEl==2) m_hCutFlow->Fill("=2BaseEl", 1);
+      else if(nBaseEl==3) m_hCutFlow->Fill("=3BaseEl", 1);
+      else if(nBaseEl==4) m_hCutFlow->Fill("=4BaseEl", 1);
+      else                m_hCutFlow->Fill(">=5BaseEl", 1);
+
+      if     (nBaseMu==0) m_hCutFlow->Fill("=0BaseMu", 1);
+      else if(nBaseMu==1) m_hCutFlow->Fill("=1BaseMu", 1);
+      else if(nBaseMu==2) m_hCutFlow->Fill("=2BaseMu", 1);
+      else if(nBaseMu==3) m_hCutFlow->Fill("=3BaseMu", 1);
+      else if(nBaseMu==4) m_hCutFlow->Fill("=4BaseMu", 1);
+      else                m_hCutFlow->Fill(">=5BaseMu", 1);
+
+      //Signal leptons
       if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep", 1);
       else if(sig_Ls.size() == 3) m_hCutFlow->Fill("=3SigLep", 1);
 
-      if(nBaseEl >= 1) m_hCutFlow->Fill(">=1BaseEl", 1);
       if(nSigEl >= 1) m_hCutFlow->Fill(">=1SigEl", 1);
-      if(nBaseMu >= 1) m_hCutFlow->Fill(">=1BaseMu", 1);
       if(nSigMu >= 1) m_hCutFlow->Fill(">=1SigMu", 1);
-      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep", 1);
       if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep", 1);
 
-      if(nBaseEl >= 2) m_hCutFlow->Fill(">=2BaseEl", 1);
       if(nSigEl >= 2) m_hCutFlow->Fill(">=2SigEl", 1);
-      if(nBaseMu >= 2) m_hCutFlow->Fill(">=2BaseMu", 1);
       if(nSigMu >= 2) m_hCutFlow->Fill(">=2SigMu", 1);
-      if(totLs >= 2) m_hCutFlow->Fill(">=2BaseLep", 1);
       if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep", 1);
 
-      if(nBaseEl == 3) m_hCutFlow->Fill("=3BaseEl", 1);
       if(nSigEl == 3) m_hCutFlow->Fill("=3SigEl", 1);
-      if(nBaseMu == 3) m_hCutFlow->Fill("=3BaseMu", 1);
       if(nSigMu == 3) m_hCutFlow->Fill("=3SigMu", 1);
 
       if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
