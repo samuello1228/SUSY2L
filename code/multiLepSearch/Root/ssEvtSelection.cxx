@@ -145,57 +145,60 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   //m_susyEvt->makeTree(CF_outputTreeName);     //moved to initialize()
   //m_susyEvt->tree2->SetDirectory(outputFile);
 
-  m_hCutFlow = new TH1D("hCutFlow", "cut flow", 60, 0, 60);
+  //list of cutflow
+  cutflowList.push_back("AOD");
+  cutflowList.push_back("aSumW");
+  cutflowList.push_back("aSumW2");
+  cutflowList.push_back("SUSY2");
+  cutflowList.push_back("dSumW");
+  cutflowList.push_back("dSumW2");
+  cutflowList.push_back("All");
+  cutflowList.push_back("GRL");
+  cutflowList.push_back("Trigger");
+  cutflowList.push_back("LAr+Tile+SCT+CoreFlag");
+  cutflowList.push_back("PV");
+  cutflowList.push_back("cosMuon");
+  cutflowList.push_back("BadMuon");
+  cutflowList.push_back("BadJet");
+  cutflowList.push_back("nSumW");
+  cutflowList.push_back("=2BaseLep");
+  cutflowList.push_back("=2SigLep");
+  cutflowList.push_back("=2BaseLep and =2SigLep");
+  cutflowList.push_back("SS");
+  cutflowList.push_back(">=1BaseLep,w");
+  cutflowList.push_back(">=1SigLep,w");
+  cutflowList.push_back(">=2SigLep,w");
+  cutflowList.push_back("=2SigLep,w");
+  cutflowList.push_back("=2BaseLep and =2SigLep,w");
+  cutflowList.push_back("SS,w");
+  cutflowList.push_back(">=1BaseEl");
+  cutflowList.push_back(">=1SigEl");
+  cutflowList.push_back(">=1BaseMu");
+  cutflowList.push_back(">=1SigMu");
+  cutflowList.push_back(">=1BaseLep");
+  cutflowList.push_back(">=1SigLep");
+  cutflowList.push_back(">=2BaseEl");
+  cutflowList.push_back(">=2SigEl");
+  cutflowList.push_back(">=2BaseMu");
+  cutflowList.push_back(">=2SigMu");
+  cutflowList.push_back(">=2BaseLep");
+  cutflowList.push_back(">=2SigLep");
+  cutflowList.push_back(">=1BaseJet");
+  cutflowList.push_back(">=1SigJet");
+  cutflowList.push_back(">=1BJet");
+  cutflowList.push_back("=3BaseEl");
+  cutflowList.push_back("=3SigEl");
+  cutflowList.push_back("=3BaseMu");
+  cutflowList.push_back("=3SigMu");
+  cutflowList.push_back("=3BaseLep");
+  cutflowList.push_back("=3SigLep");
+  cutflowList.push_back("=3BaseLep and =3SigLep");
+
+  m_hCutFlow = new TH1D("hCutFlow", "cut flow", cutflowList.size(), 0, cutflowList.size());
+  for(unsigned int i=0;i<cutflowList.size();i++) m_hCutFlow->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
   m_hCutFlow->SetDirectory(outputFile);
   // m_hCutFlow->SetDirectory(0);
   // m_susyEvt->tree2->GetUserInfo()->Add(m_hCutFlow);
-  m_hCutFlow->GetXaxis()->SetBinLabel(1,"AOD");
-  m_hCutFlow->GetXaxis()->SetBinLabel(2,"aSumW");
-  m_hCutFlow->GetXaxis()->SetBinLabel(3,"aSumW2");
-  m_hCutFlow->GetXaxis()->SetBinLabel(4,"SUSY2");
-  m_hCutFlow->GetXaxis()->SetBinLabel(5,"dSumW");
-  m_hCutFlow->GetXaxis()->SetBinLabel(6,"dSumW2");
-  m_hCutFlow->GetXaxis()->SetBinLabel(7,"All");
-  m_hCutFlow->GetXaxis()->SetBinLabel(8,"GRL");
-  m_hCutFlow->GetXaxis()->SetBinLabel(9,"Trigger");
-  m_hCutFlow->GetXaxis()->SetBinLabel(10,"LAr+Tile+SCT+CoreFlag");
-  m_hCutFlow->GetXaxis()->SetBinLabel(13,"PV");
-  m_hCutFlow->GetXaxis()->SetBinLabel(14,"cosMuon");
-  m_hCutFlow->GetXaxis()->SetBinLabel(15,"BadMuon");
-  m_hCutFlow->GetXaxis()->SetBinLabel(16,"BadJet");
-  m_hCutFlow->GetXaxis()->SetBinLabel(17,"nSumW");
-  m_hCutFlow->GetXaxis()->SetBinLabel(20,"=2BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(21,"=2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(22,"=2BaseLep and =2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(23,"SS");
-  m_hCutFlow->GetXaxis()->SetBinLabel(24,">=1BaseLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(25,">=1SigLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(26,">=2SigLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(27,"=2SigLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(28,"=2BaseLep and =2SigLep,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(29,"SS,w");
-  m_hCutFlow->GetXaxis()->SetBinLabel(30,">=1BaseEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(31,">=1SigEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(32,">=1BaseMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(33,">=1SigMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(34,">=1BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(35,">=1SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(36,">=2BaseEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(37,">=2SigEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(38,">=2BaseMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(39,">=2SigMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(40,">=2BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(41,">=2SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(42,">=1BaseJet");
-  m_hCutFlow->GetXaxis()->SetBinLabel(43,">=1SigJet");
-  m_hCutFlow->GetXaxis()->SetBinLabel(44,">=1BJet");
-  m_hCutFlow->GetXaxis()->SetBinLabel(45,"=3BaseEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(46,"=3SigEl");
-  m_hCutFlow->GetXaxis()->SetBinLabel(47,"=3BaseMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(48,"=3SigMu");
-  m_hCutFlow->GetXaxis()->SetBinLabel(49,"=3BaseLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(50,"=3SigLep");
-  m_hCutFlow->GetXaxis()->SetBinLabel(51,"=3BaseLep and =3SigLep");
 
   m_hCutFlowNominal = m_hCutFlow;
   m_hCutFlowDummy = new TH1D( *(TH1D*)m_hCutFlow );
@@ -1337,6 +1340,18 @@ EL::StatusCode ssEvtSelection :: finalize ()
   // gets called on worker nodes that processed input events.
 
 //  xAOD::IOStats::instance().stats().printSmartSlimmingBranchList();
+
+  //Print Cutflow
+  std::cout << " Cutflow summary: " << std::endl;
+  std::cout << "============================" << std::endl;
+  for(unsigned int i=1;i<=cutflowList.size();i++)
+  {
+    TString LabelName = m_hCutFlow->GetXaxis()->GetBinLabel(i);
+    std::cout<<LabelName<<": ";
+    if(LabelName.Contains(",w")) std::cout<< m_hCutFlow->GetBinContent(i) << std::endl;
+    else std::cout<< int(m_hCutFlow->GetBinContent(i)) << std::endl;
+  }
+  std::cout << "============================" << std::endl; 
 
  for(auto x: m_trigSel) delete x;
  m_trigSel.clear();

@@ -150,6 +150,7 @@ public:
  protected:
   std::string m_name; //!
   // Tree *myTree; //!
+  std::vector<TString> cutflowList; //!
   TH1 *m_hCutFlow; //!
   TH1 *m_hCutFlowNominal; //!
   TH1 *m_hCutFlowDummy; //!
