@@ -82,6 +82,10 @@ const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt
 
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
+  int nBaseLep;
+  int nSigLep;
+  int nJet;
+  int nBJet;
   float Met;
   float MetRel;
   float MetX;
@@ -91,7 +95,7 @@ struct SIGNATURE{
   float mjj;
   float mlj;
 };
-const string SIGNATURE_s = "trigCode/l:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
+const string SIGNATURE_s = "trigCode/l:nBaseLep/I:nSigLep/I:nJet/I:nBJet/I:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
 
 struct TR_PAR:PAR0{
   int pdgId; 

@@ -205,6 +205,25 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
 
   cutflowList.push_back("=2BaseLep and =2SigLep");
 
+  cutflowList.push_back("=0SigJet");
+  cutflowList.push_back("=1SigJet");
+  cutflowList.push_back("=2SigJet");
+  cutflowList.push_back("=3SigJet");
+  cutflowList.push_back("=4SigJet");
+  cutflowList.push_back("=5SigJet");
+  cutflowList.push_back("=6SigJet");
+  cutflowList.push_back("=7SigJet");
+  cutflowList.push_back("=8SigJet");
+  cutflowList.push_back("=9SigJet");
+  cutflowList.push_back(">=10SigJet");
+
+  cutflowList.push_back("=0BJet");
+  cutflowList.push_back("=1BJet");
+  cutflowList.push_back("=2BJet");
+  cutflowList.push_back("=3BJet");
+  cutflowList.push_back("=4BJet");
+  cutflowList.push_back(">=5BJet");
+
   cutflowList.push_back("nSumW");
   cutflowList.push_back("SS");
   cutflowList.push_back(">=1BaseLep,w");
@@ -213,9 +232,6 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=2SigLep,w");
   cutflowList.push_back("=2BaseLep and =2SigLep,w");
   cutflowList.push_back("SS,w");
-  cutflowList.push_back(">=1BaseJet");
-  cutflowList.push_back(">=1SigJet");
-  cutflowList.push_back(">=1BJet");
 
   m_hCutFlow = new TH1D("hCutFlow", "cut flow", cutflowList.size(), 0, cutflowList.size());
   for(unsigned int i=0;i<cutflowList.size();i++) m_hCutFlow->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
@@ -736,6 +752,47 @@ EL::StatusCode ssEvtSelection :: execute ()
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
     sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
+    // jets
+    vector< xAOD::IParticle* > jet_Ls;
+    jet_Ls.reserve(10);
+    int& nBJet = m_susyEvt->sig.nBJet;
+    nBJet = 0;
+    for(auto jet: *jets_copy){
+      if(!dec_passOR(*jet)) continue;
+      if(!dec_signal(*jet)) continue;
+      //float jvt = jet->isAvailable<float>("Jvt") ? jet->auxdata<float>("Jvt") : 0.;
+      //if(jet->pt()<60000 && fabs(jet->eta()) < 2.4 && jvt < 0.59) continue;
+      bool isbjet = m_objTool->IsBJet(*jet);
+      if(isbjet && fabs(jet->eta()) >= 2.4) continue;
+
+      jet_Ls.push_back(jet);
+      jets_copy_signal->push_back(jet);
+      if(isbjet) nBJet++;
+    }
+    int& nSigJet = m_susyEvt->sig.nJet;
+    nSigJet = jet_Ls.size();
+
+    //Cutflow for signal jets
+    if     (nSigJet==0) m_hCutFlow->Fill("=0SigJet", 1);
+    else if(nSigJet==1) m_hCutFlow->Fill("=1SigJet", 1);
+    else if(nSigJet==2) m_hCutFlow->Fill("=2SigJet", 1);
+    else if(nSigJet==3) m_hCutFlow->Fill("=3SigJet", 1);
+    else if(nSigJet==4) m_hCutFlow->Fill("=4SigJet", 1);
+    else if(nSigJet==5) m_hCutFlow->Fill("=5SigJet", 1);
+    else if(nSigJet==6) m_hCutFlow->Fill("=6SigJet", 1);
+    else if(nSigJet==7) m_hCutFlow->Fill("=7SigJet", 1);
+    else if(nSigJet==8) m_hCutFlow->Fill("=8SigJet", 1);
+    else if(nSigJet==9) m_hCutFlow->Fill("=9SigJet", 1);
+    else                m_hCutFlow->Fill(">=10SigJet", 1);
+
+    //Cutflow for b-jets
+    if     (nBJet==0) m_hCutFlow->Fill("=0BJet", 1);
+    else if(nBJet==1) m_hCutFlow->Fill("=1BJet", 1);
+    else if(nBJet==2) m_hCutFlow->Fill("=2BJet", 1);
+    else if(nBJet==3) m_hCutFlow->Fill("=3BJet", 1);
+    else if(nBJet==4) m_hCutFlow->Fill("=4BJet", 1);
+    else              m_hCutFlow->Fill(">=5BJet", 1);
+
     vector< IParticle* > dilepPair(2, nullptr);
     if(study == "ss" || study == "fakes_Peter"){
       bool keep = false;
@@ -971,28 +1028,11 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.MetY = metFinal->mpy()*iGeV;
     TLorentzVector metV(metFinal->mpx(), metFinal->mpy(), 0, metFinal->met());
 
-    // jets
-    vector< xAOD::IParticle* > jet_Ls;
-    jet_Ls.reserve(10);
-    for(auto jet: *jets_copy){
-      if(cutflow && dec_baseline(*jet) && dec_passOR(*jet)) {
-        jet_Ls.push_back(jet);
-        jets_copy_signal->push_back(jet);
-      }
-      
-      if(!cutflow && dec_signal(*jet) && dec_passOR(*jet)) {
-        jet_Ls.push_back(jet);
-        jets_copy_signal->push_back(jet);
-      }
-    }
+    //sort jets
     sort(jet_Ls.begin(), jet_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
-    if(jet_Ls.size() >= 1) m_hCutFlow->Fill(">=1BaseJet", 1);
 
     m_susyEvt->sig.HT = 0;
-    //m_susyEvt->sig.nJet = jet_Ls.size();
     m_susyEvt->jets.resize(jet_Ls.size());
-    int nSigJet = 0;
-    int nBJet = 0;
     for(unsigned int i=0;i<jet_Ls.size(); i++){
       auto j = dynamic_cast<xAOD::Jet*>(jet_Ls[i]);
       
@@ -1003,15 +1043,12 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->jets[i].MET_dPhi = metV.DeltaPhi(j->p4());
       unsigned int& flag = m_susyEvt->jets[i].jFlag;
       flag = 0;
-      if(dec_signal(*j)) {flag |= IS_SIGNAL;nSigJet++;}
-      if(dec_bjet_loose(*j)) flag |= JT_BJET_LOOSE;
-      if(m_objTool->IsBJet(*j)) {flag |= JT_BJET;nBJet++;}
+      if(dec_signal(*j)) flag |= IS_SIGNAL;
+      //if(dec_bjet_loose(*j)) flag |= JT_BJET_LOOSE;
+      if(m_objTool->IsBJet(*j)) flag |= JT_BJET;
 
       m_susyEvt->sig.HT += j->pt()*iGeV;
     }
-
-    if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
-    if(nBJet >= 1) m_hCutFlow->Fill(">=1BJet", 1);
 
     // Save Z decay chain
     // Info("execute()", "Save Z decay chain");
