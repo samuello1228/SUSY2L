@@ -61,7 +61,6 @@ struct EVT{
   unsigned int isMC;
   unsigned int cut;
   int flag;
-//   float actualMu;
   float weight;
   float averageMu;
   float pwt;
@@ -79,12 +78,10 @@ struct EVT{
   float fLwt_u_sys_1up;
   float fLwt_u_sys_1dn;
  };
-// const string EVT_s = "run/l:event/l:isMC/i:cut/i;flag/I:actualMu/F:averageMu/F:weight/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
 const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:trigSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
 
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
-  unsigned long int trigMask;//trigger info
   float Met;
   float MetRel;
   float MetX;
@@ -94,7 +91,7 @@ struct SIGNATURE{
   float mjj;
   float mlj;
 };
-const string SIGNATURE_s = "trigCode/l:trigMask:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
+const string SIGNATURE_s = "trigCode/l:Met/F:MetRel/F:MetX/F:MetY/F:mT2/F:HT/F:mjj:mlj";
 
 struct TR_PAR:PAR0{
   int pdgId; 

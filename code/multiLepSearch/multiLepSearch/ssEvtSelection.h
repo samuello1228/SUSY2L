@@ -14,10 +14,6 @@
 #include "SUSYTools/SUSYCrossSection.h"
 #include "susyEvts.h"
 
-//trigger
-#include <TrigConfxAOD/xAODConfigTool.h>
-#include <TrigDecisionTool/TrigDecisionTool.h>
-
 //pileup reweighting
 #include "PileupReweighting/PileupReweightingTool.h"
 #include "AsgTools/ToolHandle.h"
@@ -45,17 +41,6 @@ class TH1;
 
 class ChargeFlipBkgTool;
 class FakeLepBkgTool;
-
-struct TRIGCONF{
-   uint32_t runStart;
-   uint32_t runEnd;
-   std::vector<std::string> eeTrig;
-   std::vector<std::string> emTrig;
-   std::vector<std::string> mmTrig;
-   unsigned long int ee_mask;
-   unsigned long int em_mask;
-   unsigned long int mm_mask;
-};
 
 class ssEvtSelection : public EL::Algorithm
 {
@@ -140,12 +125,8 @@ public:
     return charge(*p1)*charge(*p2)>0;
   }
 
-  // New trigger tool
+  //Trigger tool
   bool InitializeTriggerTools(std::string var="");
-
-  // Old trigger tools
-  void setupTriggers();
-  TRIGCONF* getTriggerConf(uint32_t run);
 
  protected:
   std::string m_name; //!
@@ -166,17 +147,6 @@ public:
   ChargeFlipBkgTool* mChargeFlipBkgTool; //!
   FakeLepBkgTool*    mFakeLepBkgTool;  //!
 
-  //////// trigger
-  //TrigConf::xAODConfigTool *configTool;//!
-  //ToolHandle<TrigConf::ITrigConfigTool> *configHandle;//!
-  //Trig::TrigDecisionTool *trigDecTool;//!
-  bool start;//!
-
-  //static const int nTrig = 15;
-  //static int trigCount[nTrig];
-  //static const string trigNames[nTrig];
-  ///////////////////////////////////////
-
 //   std::vector<susyEvts*> m_susyEvtList; //!
 
   int m_eventCounter; //!
@@ -187,11 +157,6 @@ public:
   //std::map<OFLAGS, CP::IsolationSelectionTool* > m_isoTools; //!
   CP::IsolationSelectionTool* m_isoTool; //!
   TH1* mh_ElChargeFlip; //!
-  std::vector< TRIGCONF* > m_trigSel; //!
-  TRIGCONF* m_nowTrigSel{0}; //!
-  std::string m_em_eKey;
-  std::string m_em_mKey;
-  std::string m_ee_Key;
 
   // For TrigGlobalEfficiencyTool
   TrigGlobalEfficiencyCorrectionTool* TriggerSFTool;     //!

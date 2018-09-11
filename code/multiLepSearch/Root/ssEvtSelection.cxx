@@ -473,12 +473,6 @@ EL::StatusCode ssEvtSelection :: initialize ()
   }
   std::cout << "===============================" << std::endl;
 
-
-  setupTriggers();
-
-
-
-
   //Initialization of the Trigger SF Tool
   Info("initialize()", "Initializing Tool: \t %s", "TrigGlobalEfficiencyCorrectionTool");
   if( !this->InitializeTriggerTools() ){
@@ -1216,7 +1210,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       auto& sEvt = m_susyEvt->evt;
       //sEvt.run = eventInfo->runNumber();
       sEvt.run = m_objTool->GetRunNumber();
-      auto trigCut = getTriggerConf(sEvt.run);
 
       //12 channel
       {
@@ -1226,24 +1219,20 @@ EL::StatusCode ssEvtSelection :: execute ()
           if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
              TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
             m_susyEvt->evt.flag += 1;
-            m_susyEvt->sig.trigMask = trigCut->ee_mask;
           }
 
           else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
                   TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
             m_susyEvt->evt.flag += 3;
-            m_susyEvt->sig.trigMask = trigCut->em_mask;
           }
 
           else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
                   TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
             m_susyEvt->evt.flag += 3;
-            m_susyEvt->sig.trigMask = trigCut->em_mask;
           }
           else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
                   TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
             m_susyEvt->evt.flag += 2;
-            m_susyEvt->sig.trigMask = trigCut->mm_mask;
           }
 
           if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
@@ -1257,20 +1246,9 @@ EL::StatusCode ssEvtSelection :: execute ()
       //Scale factor
       if(CF_isMC){
         // Info("execute()", "Calculate scale factors");
-        {
-          // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
-          if(sEvt.flag%3 == 1){ // ee
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false /*trigSF*/, true, m_ee_Key, true);
-            sEvt.MuSF = 1;
-          }else if(sEvt.flag%3 == 2){ // mumu
-            sEvt.ElSF = 1;
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*trigCut->mmTrig[0]*/);
-          }else if(sEvt.flag%3 == 0){ // emu
-            sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false, true, m_em_eKey, true);
-            sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "" /*m_em_eKey*/);
-          }
-        }
-
+        // Trigger SF from SUSYTools turned off as of Aug 3 2017. Replaced by TrigGlobalEfficiencyTool 11 Aug 2017.
+        sEvt.ElSF = m_objTool->GetTotalElectronSF(*electrons_copy, true, true, false /*trigSF*/, true, "", true);
+        sEvt.MuSF = m_objTool->GetTotalMuonSF(*muons_copy, true, true, "");
         sEvt.BtagSF = m_objTool->BtagSF(jets_copy_signal);
         sEvt.JvtSF = m_objTool->JVT_SF(jets_copy_signal);
 
@@ -1395,10 +1373,7 @@ EL::StatusCode ssEvtSelection :: finalize ()
   }
   std::cout << "============================" << std::endl; 
 
- for(auto x: m_trigSel) delete x;
- m_trigSel.clear();
-
- return EL::StatusCode::SUCCESS;
+  return EL::StatusCode::SUCCESS;
 }
 
 
@@ -2000,86 +1975,4 @@ bool ssEvtSelection :: InitializeTriggerTools(std::string var){
 
   Info( APP_NAME, "Initialized single lepton efficiency tools for GlobalEfficiencyCorrectionTool[%s]", var.c_str() );
   return true;
-}
-
-void ssEvtSelection::setupTriggers(){
-
-  // if (study=="ss") {
-      /// try di lepton trigger for now
-      /// 2015
-      m_trigSel.push_back(new TRIGCONF{276073,284484,{"HLT_2e12_lhloose_L12EM10VH"},{"HLT_e17_lhloose_mu14"},{"HLT_mu18_mu8noL1"},0,0,0}); /// 2015 data
-      /// 2016: A-D3
-    //   m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-      m_trigSel.push_back(new TRIGCONF{296939,302872,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-      /// 2016: D4-
-      m_trigSel.push_back(new TRIGCONF{302919,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-      m_ee_Key = "DI_E_2015_e12_lhloose_L1EM10VH_2016_e17_lhvloose_nod0";
-      m_em_eKey = "MULTI_L_2015_e17_lhloose_2016_e17_lhloose_nod0";
-      m_em_mKey = "HLT_mu14";
-
-    //   /// 2016: A
-    //   m_trigSel.push_back(new TRIGCONF{296939,300287,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: B-D3
-    //   m_trigSel.push_back(new TRIGCONF{300345,302872,{"HLT_2e15_lhvloose_nod0_L12EM13VH"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu20_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: D4-E
-    //   m_trigSel.push_back(new TRIGCONF{302919,303892 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: F
-    //   m_trigSel.push_back(new TRIGCONF{303943,304494 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: G1-G2
-    //   m_trigSel.push_back(new TRIGCONF{305291,305293 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: G3-I3
-    //   m_trigSel.push_back(new TRIGCONF{305380,307601 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-    // 
-    //   /// 2016: I4-
-    //   m_trigSel.push_back(new TRIGCONF{307619,311481 ,{"HLT_2e17_lhvloose_nod0"},{"HLT_e17_lhloose_nod0_mu14"},{"HLT_mu22_mu8noL1"},0,0,0});
-
-
-    //   /// 2016: temp
-    //   m_trigSel.push_back(new TRIGCONF{-1,-1,{"", ""},{"",""},{"",""}});
-  // }
-  // else if (study=="fakes")
-  // {
-  //   // Using lowest un-prescaled single-lepton triggers
-  // }
-  
-
-  for(auto& t: m_trigSel){
-    unsigned long int m1(1);
-    for(auto& x: CF_trigNames_2015){
-      if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
-      if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
-      if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
-      m1 *= 2;
-    }
-    for(auto& x: CF_trigNames_2016){
-      if(find(t->eeTrig.begin(),t->eeTrig.end(),x)!=t->eeTrig.end()) t->ee_mask |= m1;
-      if(find(t->emTrig.begin(),t->emTrig.end(),x)!=t->emTrig.end()) t->em_mask |= m1;
-      if(find(t->mmTrig.begin(),t->mmTrig.end(),x)!=t->mmTrig.end()) t->mm_mask |= m1;
-      m1 *= 2;
-    }
-  }
-
-  return;
-}
-
-TRIGCONF* ssEvtSelection::getTriggerConf(uint32_t run){
-  /// use the cached one if possible to save time
-  if(m_nowTrigSel && run>=m_nowTrigSel->runStart && run<=m_nowTrigSel->runEnd) return m_nowTrigSel;
-
-  /// if not cached, fine the new one
-  m_nowTrigSel = nullptr;
-  for(auto& x: m_trigSel){
-    if(run>=x->runStart && run<=x->runEnd){
-      m_nowTrigSel = x;
-      break;
-    }
-  }
-
-  return m_nowTrigSel; 
 }
