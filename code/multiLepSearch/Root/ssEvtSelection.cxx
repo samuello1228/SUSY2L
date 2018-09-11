@@ -993,9 +993,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->jets.resize(jet_Ls.size());
     int nSigJet = 0;
     int nBJet = 0;
-    int nISR = 0;
-    vector< xAOD::Jet* > cjet_Ls;
-    cjet_Ls.reserve(10);
     for(unsigned int i=0;i<jet_Ls.size(); i++){
       auto j = dynamic_cast<xAOD::Jet*>(jet_Ls[i]);
       
@@ -1009,15 +1006,8 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_signal(*j)) {flag |= IS_SIGNAL;nSigJet++;}
       if(dec_bjet_loose(*j)) flag |= JT_BJET_LOOSE;
       if(m_objTool->IsBJet(*j)) {flag |= JT_BJET;nBJet++;}
-      if(m_susyEvt->jets[i].pt > 40 && fabs(m_susyEvt->jets[i].eta) < 2.4) nISR++;
 
-      //Central jets
-      if(fabs(j->eta())<2.8 && j->pt()>20e3 && !(flag & JT_BJET))
-      {
-        flag |= JT_CJET;
-        cjet_Ls.push_back(j);
-        m_susyEvt->sig.HT += j->pt()*iGeV;
-      }
+      m_susyEvt->sig.HT += j->pt()*iGeV;
     }
 
     if(nSigJet >= 1) m_hCutFlow->Fill(">=1SigJet", 1);
@@ -1050,16 +1040,16 @@ EL::StatusCode ssEvtSelection :: execute ()
     // cout << l1->pt() << " " << l2->pt() << endl;
 
     m_susyEvt->sig.mlj = -1;
-    if(cjet_Ls.size()>=1 && cjet_Ls.size()<=3)
+    if(jet_Ls.size()>=1 && jet_Ls.size()<=3)
     {
       TLorentzVector JetSystem;
-      if(cjet_Ls.size()==1)
+      if(jet_Ls.size()==1)
       {
-        JetSystem = cjet_Ls[0]->p4();
+        JetSystem = jet_Ls[0]->p4();
       }
-      else if(cjet_Ls.size()==2 || cjet_Ls.size()==3)
+      else if(jet_Ls.size()==2 || jet_Ls.size()==3)
       {
-        JetSystem = cjet_Ls[0]->p4()+cjet_Ls[1]->p4();
+        JetSystem = jet_Ls[0]->p4()+jet_Ls[1]->p4();
       }
 
       double dR1 = JetSystem.DeltaR(l1->p4());
