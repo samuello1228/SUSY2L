@@ -1211,38 +1211,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       //sEvt.run = eventInfo->runNumber();
       sEvt.run = m_objTool->GetRunNumber();
 
-      //12 channel
-      {
-        m_susyEvt->evt.flag = 0;
-        if(totLs == 2)
-        {
-          if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
-             TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
-            m_susyEvt->evt.flag += 1;
-          }
-
-          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 11 &&
-                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
-            m_susyEvt->evt.flag += 3;
-          }
-
-          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
-                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 11 ){
-            m_susyEvt->evt.flag += 3;
-          }
-          else if(TMath::Abs(m_susyEvt->leps[0].ID)/1000 == 13 &&
-                  TMath::Abs(m_susyEvt->leps[1].ID)/1000 == 13 ){
-            m_susyEvt->evt.flag += 2;
-          }
-
-          if((m_susyEvt->leps[0].ID > 0 && m_susyEvt->leps[1].ID > 0) ||
-             (m_susyEvt->leps[0].ID < 0 && m_susyEvt->leps[1].ID < 0) )
-            m_susyEvt->evt.flag += 3;
-
-          if(nISR>=1) m_susyEvt->evt.flag += 6;
-        }
-      }
-
       //Scale factor
       if(CF_isMC){
         // Info("execute()", "Calculate scale factors");
@@ -1304,7 +1272,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(totLs == 2 && sig_Ls.size() == 2)
       {
         m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
-        if(sEvt.flag%6 == 4 || sEvt.flag%6 == 5 || sEvt.flag%6 == 0)
+        if(m_susyEvt->leps[0].ID * m_susyEvt->leps[1].ID > 0)
         {
            m_hCutFlow->Fill("SS", 1);
            m_hCutFlow->Fill("SS,w", TotalWeight);
