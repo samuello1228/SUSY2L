@@ -160,6 +160,8 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("cosMuon");
   cutflowList.push_back("BadMuon");
   cutflowList.push_back("BadJet");
+  cutflowList.push_back(">=1 passOR jet");
+  cutflowList.push_back(">=1 signal jet");
 
   cutflowList.push_back("=0BaseLep");
   cutflowList.push_back("=1BaseLep");
@@ -648,14 +650,27 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     /// Bad jet
     bool hasBadJet = false;
+    bool hasBaselineJet = false;
+    bool hasSignalJet = false;
     for(auto jet: *jets_copy){
-      if(dec_baseline(*jet) && dec_passOR(*jet) && dec_bad(*jet)){
-        hasBadJet = true;
-        break;
+      if(dec_baseline(*jet) && dec_passOR(*jet)){
+        hasBaselineJet = true;
+        if(dec_bad(*jet)) hasBadJet = true;
       }
+
+      if(dec_signal(*jet)) hasSignalJet = true;
     }
     if(hasBadJet) continue;
     m_hCutFlow->Fill("BadJet", 1);
+
+    if(false)
+    {
+      if(!hasBaselineJet) continue;
+      m_hCutFlow->Fill(">=1 passOR jet", 1);
+      if(!hasSignalJet) continue;
+      m_hCutFlow->Fill(">=1 signal jet", 1);
+    }
+    m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
 
     //// let's select the two leptons
     vector< IParticle* > sel_Ls;
