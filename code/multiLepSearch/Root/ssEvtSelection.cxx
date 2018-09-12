@@ -763,7 +763,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       //float jvt = jet->isAvailable<float>("Jvt") ? jet->auxdata<float>("Jvt") : 0.;
       //if(jet->pt()<60000 && fabs(jet->eta()) < 2.4 && jvt < 0.59) continue;
       bool isbjet = m_objTool->IsBJet(*jet);
-      if(isbjet && fabs(jet->eta()) >= 2.4) continue;
+      if(study != "fakes_Peter" && isbjet && fabs(jet->eta()) >= 2.4) continue;
 
       jet_Ls.push_back(jet);
       jets_copy_signal->push_back(jet);
