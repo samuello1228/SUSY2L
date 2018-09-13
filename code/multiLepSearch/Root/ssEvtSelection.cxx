@@ -160,8 +160,6 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("cosMuon");
   cutflowList.push_back("BadMuon");
   cutflowList.push_back("BadJet");
-  cutflowList.push_back(">=1 passOR jet");
-  cutflowList.push_back(">=1 signal jet");
 
   cutflowList.push_back("=0BaseLep");
   cutflowList.push_back("=1BaseLep");
@@ -235,6 +233,8 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=2SigLep,w");
   cutflowList.push_back("=2BaseLep and =2SigLep,w");
   cutflowList.push_back("SS,w");
+  cutflowList.push_back(">=1 passOR jet");
+  cutflowList.push_back(">=1 signal jet");
 
   m_hCutFlow = new TH1D("hCutFlow", "cut flow", cutflowList.size(), 0, cutflowList.size());
   for(unsigned int i=0;i<cutflowList.size();i++) m_hCutFlow->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
@@ -663,15 +663,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     if(hasBadJet) continue;
     m_hCutFlow->Fill("BadJet", 1);
-
-    if(false)
-    {
-      if(!hasBaselineJet) continue;
-      m_hCutFlow->Fill(">=1 passOR jet", 1);
-      if(!hasSignalJet) continue;
-      m_hCutFlow->Fill(">=1 signal jet", 1);
-    }
-    m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
 
     //// count the leptons
     vector< IParticle* > sel_Ls;
@@ -1192,6 +1183,16 @@ EL::StatusCode ssEvtSelection :: execute ()
         }
       }
       
+      //jet cut      
+      if(false)
+      {
+        if(!hasBaselineJet) continue;
+        m_hCutFlow->Fill(">=1 passOR jet", 1);
+        if(!hasSignalJet) continue;
+        m_hCutFlow->Fill(">=1 signal jet", 1);
+      }
+      m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
+
       if(CF_isMC && printEvent>=0 && m_susyEvt->evt.event == (uint) printEvent)
       {
         cout<<"event: "<<m_susyEvt->evt.event<<endl;
