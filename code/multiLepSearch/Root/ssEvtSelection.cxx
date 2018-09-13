@@ -226,6 +226,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back("=4BJet");
   cutflowList.push_back(">=5BJet");
 
+  cutflowList.push_back(">=2BaseLep");
   cutflowList.push_back("nSumW");
   cutflowList.push_back("SS");
   cutflowList.push_back(">=1BaseLep,w");
@@ -672,7 +673,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
 
-    //// let's select the two leptons
+    //// count the leptons
     vector< IParticle* > sel_Ls;
     vector< IParticle* > sig_Ls;
     sel_Ls.reserve(3);
@@ -712,17 +713,20 @@ EL::StatusCode ssEvtSelection :: execute ()
       // trigMuon.push_back(mu);
     }
 
-    int totLs = sel_Ls.size() + sig_Ls.size();
+    int& nBaseLep = m_susyEvt->sig.nBaseLep;
+    int& nSigLep = m_susyEvt->sig.nSigLep;
+    nBaseLep = sel_Ls.size() + sig_Ls.size();
+    nSigLep  = sig_Ls.size();
 
     //cutflow for number of leptons
     {
       //Baseline leptons
-      if     (totLs==0) m_hCutFlow->Fill("=0BaseLep", 1);
-      else if(totLs==1) m_hCutFlow->Fill("=1BaseLep", 1);
-      else if(totLs==2) m_hCutFlow->Fill("=2BaseLep", 1);
-      else if(totLs==3) m_hCutFlow->Fill("=3BaseLep", 1);
-      else if(totLs==4) m_hCutFlow->Fill("=4BaseLep", 1);
-      else              m_hCutFlow->Fill(">=5BaseLep", 1);
+      if     (nBaseLep==0) m_hCutFlow->Fill("=0BaseLep", 1);
+      else if(nBaseLep==1) m_hCutFlow->Fill("=1BaseLep", 1);
+      else if(nBaseLep==2) m_hCutFlow->Fill("=2BaseLep", 1);
+      else if(nBaseLep==3) m_hCutFlow->Fill("=3BaseLep", 1);
+      else if(nBaseLep==4) m_hCutFlow->Fill("=4BaseLep", 1);
+      else                 m_hCutFlow->Fill(">=5BaseLep", 1);
 
       if     (nBaseEl==0) m_hCutFlow->Fill("=0BaseEl", 1);
       else if(nBaseEl==1) m_hCutFlow->Fill("=1BaseEl", 1);
@@ -739,12 +743,12 @@ EL::StatusCode ssEvtSelection :: execute ()
       else                m_hCutFlow->Fill(">=5BaseMu", 1);
 
       //Signal leptons
-      if     (sig_Ls.size()==0) m_hCutFlow->Fill("=0SigLep", 1);
-      else if(sig_Ls.size()==1) m_hCutFlow->Fill("=1SigLep", 1);
-      else if(sig_Ls.size()==2) m_hCutFlow->Fill("=2SigLep", 1);
-      else if(sig_Ls.size()==3) m_hCutFlow->Fill("=3SigLep", 1);
-      else if(sig_Ls.size()==4) m_hCutFlow->Fill("=4SigLep", 1);
-      else                      m_hCutFlow->Fill(">=5SigLep", 1);
+      if     (nSigLep==0) m_hCutFlow->Fill("=0SigLep", 1);
+      else if(nSigLep==1) m_hCutFlow->Fill("=1SigLep", 1);
+      else if(nSigLep==2) m_hCutFlow->Fill("=2SigLep", 1);
+      else if(nSigLep==3) m_hCutFlow->Fill("=3SigLep", 1);
+      else if(nSigLep==4) m_hCutFlow->Fill("=4SigLep", 1);
+      else                m_hCutFlow->Fill(">=5SigLep", 1);
 
       if     (nSigEl==0) m_hCutFlow->Fill("=0SigEl", 1);
       else if(nSigEl==1) m_hCutFlow->Fill("=1SigEl", 1);
@@ -760,12 +764,8 @@ EL::StatusCode ssEvtSelection :: execute ()
       else if(nSigMu==4) m_hCutFlow->Fill("=4SigMu", 1);
       else               m_hCutFlow->Fill(">=5SigMu", 1);
 
-      if(totLs == 2 && sig_Ls.size() == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
+      if(nBaseLep == 2 && nSigLep == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep", 1);
     }
-
-    /// sort the two leptons for signal pairs and double fake
-    sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
-    sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
 
     // jets
     vector< xAOD::IParticle* > jet_Ls;
@@ -808,154 +808,25 @@ EL::StatusCode ssEvtSelection :: execute ()
     else if(nBJet==4) m_hCutFlow->Fill("=4BJet", 1);
     else              m_hCutFlow->Fill(">=5BJet", 1);
 
-    vector< IParticle* > dilepPair(2, nullptr);
-    if(study == "ss" || study == "fakes_Peter"){
-      bool keep = false;
+    //at least 2 baseline leptons
+    if(nBaseLep < 2) continue;
+    m_hCutFlow->Fill(">=2BaseLep", 1);
 
-      //this catches 2SigLepSS and 2SigLepOS(i.e. charge flip)
-      if (sig_Ls.size() == 2) {
-      	dilepPair[0] = sig_Ls[0];
-      	dilepPair[1] = sig_Ls[1];
-        keep = true;
-        m_susyEvt->evt.flag = 1;
-      } 
-
-      //this catches 1SigLep1FakeLepSS -.-
-      if (sig_Ls.size() == 1) {
-      	int sigLepSign = 0;
-        xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sig_Ls[0]);
-        if(mu) sigLepSign = mu->charge();
-        else{
-          xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sig_Ls[0]);
-          if(el) sigLepSign = el->charge();
-        }
-      	dilepPair[0] = sig_Ls[0];
-
-      	for (auto p : sel_Ls){
-      	  int baseLepSign = -999;
-          xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(p);
-          if(mu) baseLepSign = mu->charge();
-          else{
-            xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(p);
-            if(el) baseLepSign = el->charge();
-          }
-          if (baseLepSign==sigLepSign){
-      	    dilepPair[1] = p;
-            keep = true;
-            m_susyEvt->evt.flag = 2;
-      	    break;
-      	  }
-      	}
-      }
-
-      //this catches 2FakeLepSS
-      if (sig_Ls.size() == 0) {
-        if (sel_Ls.size() >=2) { 
-          int baseLep0Sign = 0;
-          xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
-          if(mu) baseLep0Sign = mu->charge();
-          else{
-            xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
-           if(el) baseLep0Sign = el->charge();
-          }
-
-      	  for (unsigned int i = 1; i<sel_Ls.size(); i++){
-      	    int baseLep1Sign = -999;
-            xAOD::Muon* mu = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
-            if(mu) baseLep1Sign = mu->charge();
-            else{
-              xAOD::Electron* el = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
-              if(el) baseLep1Sign = el->charge();
-            }
-            if (baseLep0Sign==baseLep1Sign){
-      	      dilepPair[0] = sel_Ls[0];
-      	      dilepPair[1] = sel_Ls[1];
-      	      keep = true;
-              m_susyEvt->evt.flag = 3;
-      	      break;
-      	    }
-      	  }
-
-      	  if (dilepPair[0]==nullptr && sel_Ls.size()>2){
-      	    //no one has same sign as the first lep
-      	    //=> everyone except the first lep is Same sign among themselves
-      	    dilepPair[0] = sel_Ls[1];
-      	    dilepPair[1] = sel_Ls[2];
-      	    keep = true;
-            m_susyEvt->evt.flag = 3;
-      	  }
-      	}
-      } 
-
-      if (!cutflow && !keep) {continue;}
-    }
-
-    if(study=="fakes")
-    {
-
-      /* Keep only the events which match either of the conditions listed here.
-       * - Exactly two leptons
-       * - Exactly three leptons, where we have two signal muons and one electrons (sig or base)
-       *
-       * Save the cut information in the evt.flag variable
-       * First two bits store number of leptons, third and fourth bit saves number of signal
-       * e.g. for three leptons with two signal, evt.flag = 1011
-       */
-
-      if (totLs==2 && sig_Ls.size()==2) // Exactly two leptons, both signal
-      {
-        dilepPair[0] = sig_Ls[0];
-        dilepPair[1] = sig_Ls[1];
-      }
-      else if (totLs==2 && sig_Ls.size()==1) // Exactly two leptons, 1 signal, 1 baseline
-      {
-        dilepPair[0] = sig_Ls[0];
-        dilepPair[1] = sel_Ls[0];
-      }
-      else if (totLs==2 && sig_Ls.size()==0) // Exactly two leptons, both baseline
-      {
-        dilepPair[0] = sel_Ls[0];
-        dilepPair[1] = sel_Ls[1];
-      }
-      else if (totLs==3 && sig_Ls.size()>=2) // Exactly three leptons, at least two signal
-      {
-        dilepPair[0] = sig_Ls[0];
-        dilepPair[1] = sig_Ls[1];
-      }
-      else if (totLs==3 && sig_Ls.size()==1) // Exactly three leptons, one signal
-      {
-        dilepPair[0] = sig_Ls[0];
-        dilepPair[1] = sel_Ls[0];
-      }
-      else if (totLs==3 && sig_Ls.size()==0) // Exactly three leptons, no signal
-      {
-        dilepPair[0] = sel_Ls[0];
-        dilepPair[1] = sel_Ls[1];
-      }
-      else if (!cutflow) continue;
-
-      m_susyEvt->evt.flag = totLs + sig_Ls.size()*4; 
-    }
-
-    sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
+    /// sort leptons
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
+    sort(sig_Ls.begin(), sig_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
+    sel_Ls.insert( sel_Ls.begin(), sig_Ls.begin(), sig_Ls.end());
 
-    if(cutflow)
-    {
-      if(totLs == 0) continue;
-      dilepPair[0] = sel_Ls[0];
-      dilepPair[1] = sel_Ls[0];
+    /// sort the two leptons
+    if(sel_Ls[0]->pt() < sel_Ls[1]->pt()) {
+      IParticle* temp = sel_Ls[0];
+      sel_Ls[0] = sel_Ls[1];
+      sel_Ls[1] = temp;
     }
 
-    if(!cutflow && (study == "ss" || study == "fakes_Peter")){
-      //for ss study we put the dilepPair at front, then others sorted by pT at tail
-      sort(dilepPair.begin(), dilepPair.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
-      for (auto p : sel_Ls){
-        if (p==dilepPair[0] || p==dilepPair[1])continue;
-      	dilepPair.push_back(p);
-      }
-      sel_Ls = dilepPair;
-    }
+    vector< IParticle* > dilepPair(2, nullptr);
+    dilepPair[0] = sel_Ls[0];
+    dilepPair[1] = sel_Ls[1];
 
     /////////////////////////
     // Save informations
@@ -984,7 +855,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.qFwt = 0.0;
     m_susyEvt->evt.qFwt_sys_1up = 0.0;
     m_susyEvt->evt.qFwt_sys_1dn = 0.0;
-    if (((study!="fakes")&&(sel_Ls.size()==2)&&(m_susyEvt->evt.flag==1)) || (study=="fakes" && m_susyEvt->evt.flag==10)){
+    if (nBaseLep == 2 && nSigLep == 2){
       //ugly code to get lep0 type and charge :(
       xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
       int sigLepSign0 = 0;
@@ -1022,8 +893,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
     m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
     m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
-    if (study!="fakes" && (sel_Ls.size()==2)&&( (m_susyEvt->evt.flag==2) || (m_susyEvt->evt.flag==3) )){
-      m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
+    if (nBaseLep == 2){
+      //m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
       //m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
       //m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
       //m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
@@ -1306,12 +1177,12 @@ EL::StatusCode ssEvtSelection :: execute ()
         sEvt.JvtSF = 1;
       }
 
-      if(totLs >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
-      if(sig_Ls.size() >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
-      if(sig_Ls.size() >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
-      if(sig_Ls.size() == 2) m_hCutFlow->Fill("=2SigLep,w", TotalWeight);
+      if(nBaseLep >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
+      if(nSigLep >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
+      if(nSigLep >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
+      if(nSigLep == 2) m_hCutFlow->Fill("=2SigLep,w", TotalWeight);
 
-      if(totLs == 2 && sig_Ls.size() == 2)
+      if(nBaseLep == 2 && nSigLep == 2)
       {
         m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
         if(m_susyEvt->leps[0].ID * m_susyEvt->leps[1].ID > 0)
