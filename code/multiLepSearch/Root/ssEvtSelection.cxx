@@ -978,13 +978,20 @@ EL::StatusCode ssEvtSelection :: execute ()
       auto& l = m_susyEvt->leps[i];
       fillLepton(sel_Ls[i], l, i);
       l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
-      /// mT
-      l.mT = sqrt(2*l.pt*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
-//       auto xt(sel_Ls[i]->p4()+metV); /// sqrt((E_1+E_2)^2-(p_T1+pT_2))
-//       l.mT = sqrt(xt.Et2()-xt.Perp2())*iGeV; --> Wrong
-//       ==> l.mT = sqrt(pow(sel_Ls[i]->p4().Et()+metV.Et(), 2)-xt.Perp2())*iGeV; -->correct, but let's switch to anohter way
 
-      
+      {
+        /// mT
+        TVector3 lepVec;
+        lepVec.SetPtEtaPhi(l.pt, 0, l.phi);
+        TLorentzVector Vt;
+        Vt.SetPxPyPzE( m_susyEvt->sig.Met * TMath::Cos(m_susyEvt->sig.MetPhi) + lepVec.Px(),
+                       m_susyEvt->sig.Met * TMath::Sin(m_susyEvt->sig.MetPhi) + lepVec.Py(),
+                       0,
+                       m_susyEvt->sig.Met + lepVec.Pt() );
+        l.mT = Vt.M();
+        //l.mT = sqrt(2*l.pt*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
+      }
+
       //// dR with leading jet, and the smallest dR
       l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
       l.jet_dRm = l.jet0_dR;
