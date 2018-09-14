@@ -159,6 +159,7 @@ int main()
     //Our ntuple
     TChain* tree2 = new TChain("evt2l");
     tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
     susyEvts* evt = new susyEvts(tree2);
     cout<<"tree2 has events: "<<tree2->GetEntries()<<endl;
 
@@ -181,15 +182,16 @@ int main()
             cout<<"Error: Event number are different."<<endl;
             return 0;
         }
+        //cout<<"Event number: "<<EventNumber<<", index: "<<i<<endl;
 
         //leptons
         //find sorting index
         vector<pt_index> BaseLep;
-        for(unsigned int i=0;i<evt->leps.size();i++)
+        for(unsigned int j=0;j<evt->leps.size();j++)
         {
             pt_index temp;
-            temp.pt = evt->leps[i].pt;
-            temp.index = i;
+            temp.pt = evt->leps[j].pt;
+            temp.index = j;
             BaseLep.push_back(temp);
         }
         sort(BaseLep.begin(), BaseLep.end(), [](pt_index a, pt_index b)->bool{return a.pt > b.pt;});
@@ -198,36 +200,66 @@ int main()
         if(NlepBL != int(lepTLV_BL->size())) cout<<"nBaseLep are different."<<endl;
         if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
         if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
-        for(unsigned int i=0;i<lepTLV_BL->size();i++)
+        for(unsigned int j=0;j<lepTLV_BL->size();j++)
         {
-            int index = BaseLep[i].index;
-            checkError(lepTLV_BL->at(i).Pt(), evt->leps[index].pt * 1000, "pt", 2e-7);
-            checkError(lepTLV_BL->at(i).Eta(), evt->leps[index].eta, "eta", 2e-7);
-            checkError(lepTLV_BL->at(i).Phi(), evt->leps[index].phi, "phi", 2e-7);
+            int index = BaseLep[j].index;
+            checkError(lepTLV_BL->at(j).Pt(), evt->leps[index].pt * 1000, "pt", 2e-7);
+            checkError(lepTLV_BL->at(j).Eta(), evt->leps[index].eta, "eta", 2e-7);
+            checkError(lepTLV_BL->at(j).Phi(), evt->leps[index].phi, "phi", 2e-7);
         }
 
         //check signal leptons
         if(NlepSig != int(lepTLV->size())) cout<<"nSigLep are different."<<endl;
+        if(NlepSig != int(lepCharges->size())) cout<<"nSigLep are different."<<endl;
         if(NlepSig != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
-        for(unsigned int i=0;i<lepTLV->size();i++)
+        for(unsigned int j=0;j<lepTLV->size();j++)
         {
-            checkError(lepTLV->at(i).Pt(), evt->leps[i].pt * 1000, "pt", 2e-7);
-            checkError(lepTLV->at(i).Eta(), evt->leps[i].eta, "eta", 2e-7);
-            checkError(lepTLV->at(i).Phi(), evt->leps[i].phi, "phi", 2e-7);
+            checkError(lepTLV->at(j).Pt(), evt->leps[j].pt * 1000, "pt", 2e-7);
+            checkError(lepTLV->at(j).Eta(), evt->leps[j].eta, "eta", 2e-7);
+            checkError(lepTLV->at(j).Phi(), evt->leps[j].phi, "phi", 2e-7);
+            int charge1 = lepCharges->at(j);
+            int charge2 = evt->leps[j].ID;
+            if(charge2 > 0) charge2 = 1;
+            else charge2 = -1;
+            if(charge1 != charge2) cout<<"charge are different."<<endl;
+
+            //lepTruth
         }
 
         //check jets
         if(int(jetTLV->size()) != evt->sig.nJet) cout<<"nJet are different."<<endl;
         if(jetTLV->size() != evt->jets.size()) cout<<"nJet are different."<<endl;
-        for(unsigned int i=0;i<jetTLV->size();i++)
+        for(unsigned int j=0;j<jetTLV->size();j++)
         {
-            checkError(jetTLV->at(i).Pt(), evt->jets[i].pt * 1000, "pt", 2e-7);
-            checkError(jetTLV->at(i).Eta(), evt->jets[i].eta, "eta", 2e-7);
-            checkError(jetTLV->at(i).Phi(), evt->jets[i].phi, "phi", 2e-7);
-            bool isbjet1 = jetBtag->at(i);
-            bool isbjet2 = evt->jets[i].jFlag & JT_BJET;
+            checkError(jetTLV->at(j).Pt(), evt->jets[j].pt * 1000, "pt", 2e-7);
+            checkError(jetTLV->at(j).Eta(), evt->jets[j].eta, "eta", 2e-7);
+            checkError(jetTLV->at(j).Phi(), evt->jets[j].phi, "phi", 2e-7);
+            bool isbjet1 = jetBtag->at(j);
+            bool isbjet2 = evt->jets[j].jFlag & JT_BJET;
             if(isbjet1 != isbjet2) cout<<"btag are different."<<endl;
         }
+
+        //check weight
+        checkError(EventWeight, evt->evt.weight, "MC weight", 2e-7);
+        checkError(PileUpWeight, evt->evt.pwt, "pile up weight", 2e-7);
+        checkError(triggerSF, evt->evt.trigSF, "trigger weight", 2e-7);
+        checkError(ObjectSF * chargeFlipSF, evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "object weight", 4e-7);
+        checkError(weight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 5e-7);
+
+        //MET
+        checkError(EtMiss, evt->sig.Met * 1000, "MET", 2e-7);
+        checkError(EtMissPhi, evt->sig.MetPhi, "MetPhi", 2e-7);
+
+        //HT
+        if(NlepSig == 2)
+        {
+            checkError(ht, evt->sig.HT * 1000, "HT", 3e-7);
+            checkError(meff, (evt->sig.HT + evt->sig.Met) * 1000, "meff", 3e-7);
+            checkError(minv, evt->l12.m * 1000, "mll", 2e-7);
+        }
+
+        //leading mT
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-7);
     }
 
     //delete objects
