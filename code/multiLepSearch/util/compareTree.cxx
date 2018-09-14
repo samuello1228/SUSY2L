@@ -1,7 +1,5 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
-#include <map>
 #include <algorithm>
 using namespace std;
 
@@ -9,10 +7,6 @@ using namespace std;
 #include "TFile.h"
 #include "TString.h"
 #include "TLorentzVector.h"
-#include "TROOT.h"
-#include "TKey.h"
-#include "TSystem.h"
-#include "TSystemDirectory.h"
 #include "TMath.h"
 
 //#include "MT2_ROOT.h"
@@ -86,6 +80,12 @@ void checkError(float x, float y, TString name, float limit)
         cout<<name.Data()<<" are different: "<<x<<", "<<y<<", "<<error<<endl;
     }
 }
+
+struct pt_index
+{
+    float pt;
+    int index;
+};
 
 int main()
 {
@@ -183,14 +183,51 @@ int main()
         }
 
         //leptons
+        //find sorting index
+        vector<pt_index> BaseLep;
+        for(unsigned int i=0;i<evt->leps.size();i++)
+        {
+            pt_index temp;
+            temp.pt = evt->leps[i].pt;
+            temp.index = i;
+            BaseLep.push_back(temp);
+        }
+        sort(BaseLep.begin(), BaseLep.end(), [](pt_index a, pt_index b)->bool{return a.pt > b.pt;});
+
+        //check baseline leptons
+        if(NlepBL != int(lepTLV_BL->size())) cout<<"nBaseLep are different."<<endl;
+        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
+        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
+        for(unsigned int i=0;i<lepTLV_BL->size();i++)
+        {
+            int index = BaseLep[i].index;
+            checkError(lepTLV_BL->at(i).Pt(), evt->leps[index].pt * 1000, "pt", 2e-7);
+            checkError(lepTLV_BL->at(i).Eta(), evt->leps[index].eta, "eta", 2e-7);
+            checkError(lepTLV_BL->at(i).Phi(), evt->leps[index].phi, "phi", 2e-7);
+        }
+
+        //check signal leptons
+        if(NlepSig != int(lepTLV->size())) cout<<"nSigLep are different."<<endl;
         if(NlepSig != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
         for(unsigned int i=0;i<lepTLV->size();i++)
         {
-            checkError(lepTLV->at(i).Pt(), evt->leps[i].pt * 1000, "pt", 1e-6);
+            checkError(lepTLV->at(i).Pt(), evt->leps[i].pt * 1000, "pt", 2e-7);
+            checkError(lepTLV->at(i).Eta(), evt->leps[i].eta, "eta", 2e-7);
+            checkError(lepTLV->at(i).Phi(), evt->leps[i].phi, "phi", 2e-7);
         }
 
-        //jets
+        //check jets
         if(int(jetTLV->size()) != evt->sig.nJet) cout<<"nJet are different."<<endl;
+        if(jetTLV->size() != evt->jets.size()) cout<<"nJet are different."<<endl;
+        for(unsigned int i=0;i<jetTLV->size();i++)
+        {
+            checkError(jetTLV->at(i).Pt(), evt->jets[i].pt * 1000, "pt", 2e-7);
+            checkError(jetTLV->at(i).Eta(), evt->jets[i].eta, "eta", 2e-7);
+            checkError(jetTLV->at(i).Phi(), evt->jets[i].phi, "phi", 2e-7);
+            bool isbjet1 = jetBtag->at(i);
+            bool isbjet2 = evt->jets[i].jFlag & JT_BJET;
+            if(isbjet1 != isbjet2) cout<<"btag are different."<<endl;
+        }
     }
 
     //delete objects
