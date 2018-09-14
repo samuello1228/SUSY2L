@@ -603,13 +603,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     CHECK(wk()->xaodStore()->record(electrons_copy   , m_systInfoList[iSyst].systset.name()+"ShallowCopiedElectrons"));
     CHECK(wk()->xaodStore()->record(electrons_copyaux, m_systInfoList[iSyst].systset.name()+"ShallowCopiedElectronsAux."));
 
-    /// photon Check
-    xAOD::PhotonContainer* photons_copy(0);
-    xAOD::ShallowAuxContainer* photons_copyaux(0);
-    CHECK( m_objTool->GetPhotons(photons_copy,photons_copyaux) );
-    CHECK(wk()->xaodStore()->record(photons_copy       , m_systInfoList[iSyst].systset.name()+"ShallowCopiedPhotons"));
-    CHECK(wk()->xaodStore()->record(photons_copyaux    , m_systInfoList[iSyst].systset.name()+"ShallowCopiedPhotonsAux."));
-
     /// muon Check
     xAOD::MuonContainer* muons_copy(0);
     xAOD::ShallowAuxContainer* muons_copyaux(0);
@@ -815,9 +808,9 @@ EL::StatusCode ssEvtSelection :: execute ()
       sel_Ls[1] = temp;
     }
 
-    vector< IParticle* > dilepPair(2, nullptr);
-    dilepPair[0] = sel_Ls[0];
-    dilepPair[1] = sel_Ls[1];
+    //The two leptons
+    xAOD::IParticle* l1 = sel_Ls[0];
+    xAOD::IParticle* l2 = sel_Ls[1];
 
     /////////////////////////
     // Save informations
@@ -893,6 +886,13 @@ EL::StatusCode ssEvtSelection :: execute ()
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
     }
 
+    /// photon Check
+    xAOD::PhotonContainer* photons_copy(0);
+    xAOD::ShallowAuxContainer* photons_copyaux(0);
+    CHECK( m_objTool->GetPhotons(photons_copy,photons_copyaux) );
+    CHECK(wk()->xaodStore()->record(photons_copy       , m_systInfoList[iSyst].systset.name()+"ShallowCopiedPhotons"));
+    CHECK(wk()->xaodStore()->record(photons_copyaux    , m_systInfoList[iSyst].systset.name()+"ShallowCopiedPhotonsAux."));
+
     /// met
     xAOD::MissingETContainer* metcst = new xAOD::MissingETContainer();
     xAOD::MissingETAuxContainer* metcst_aux = new xAOD::MissingETAuxContainer();
@@ -947,11 +947,6 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
     else m_susyEvt->sig.mjj = -1;
-
-    //The two leading leptons
-    xAOD::IParticle* l1 = dilepPair[0];
-    xAOD::IParticle* l2 = dilepPair[1];
-    // cout << l1->pt() << " " << l2->pt() << endl;
 
     m_susyEvt->sig.mlj = -1;
     if(jet_Ls.size()>=1 && jet_Ls.size()<=3)
