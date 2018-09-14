@@ -903,6 +903,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.Met  = metFinal->met()*iGeV;
     m_susyEvt->sig.MetX = metFinal->mpx()*iGeV;
     m_susyEvt->sig.MetY = metFinal->mpy()*iGeV;
+    m_susyEvt->sig.MetPhi = metFinal->phi();
     TLorentzVector metV(metFinal->mpx(), metFinal->mpy(), 0, metFinal->met());
 
     //sort jets
