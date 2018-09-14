@@ -51,6 +51,7 @@
 #pragma link C++ class ntupEvtInfo+;
 #pragma link C++ class vector<ntupLep>+;
 #pragma link C++ class vector<ntupJet>+;
+#pragma link C++ class vector<TLorentzVector>+;
 #endif
 
 #ifdef __CINT__
