@@ -204,6 +204,7 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back(">=5SigMu");
 
   cutflowList.push_back("=2BaseLep and =2SigLep");
+  cutflowList.push_back("=2BaseLep and =2SigLep,w");
 
   cutflowList.push_back("=0SigJet");
   cutflowList.push_back("=1SigJet");
@@ -225,16 +226,13 @@ EL::StatusCode ssEvtSelection :: histInitialize ()
   cutflowList.push_back(">=5BJet");
 
   cutflowList.push_back(">=2BaseLep");
-  cutflowList.push_back("nSumW");
-  cutflowList.push_back("SS");
-  cutflowList.push_back(">=1BaseLep,w");
-  cutflowList.push_back(">=1SigLep,w");
+  cutflowList.push_back(">=2BaseLep,w");
+  cutflowList.push_back(">=2SigLep");
   cutflowList.push_back(">=2SigLep,w");
-  cutflowList.push_back("=2SigLep,w");
-  cutflowList.push_back("=2BaseLep and =2SigLep,w");
-  cutflowList.push_back("SS,w");
+  cutflowList.push_back("SS leptons");
   cutflowList.push_back(">=1 passOR jet");
   cutflowList.push_back(">=1 signal jet");
+  cutflowList.push_back("Z veto");
 
   m_hCutFlow = new TH1D("hCutFlow", "cut flow", cutflowList.size(), 0, cutflowList.size());
   for(unsigned int i=0;i<cutflowList.size();i++) m_hCutFlow->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
@@ -831,7 +829,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     else m_susyEvt->evt.weight = 1;
     
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
-    m_hCutFlow->Fill("nSumW", m_susyEvt->evt.weight);
 
     m_susyEvt->truths.clear();
 
@@ -1153,30 +1150,31 @@ EL::StatusCode ssEvtSelection :: execute ()
         sEvt.JvtSF = 1;
       }
 
-      if(nBaseLep >= 1) m_hCutFlow->Fill(">=1BaseLep,w", TotalWeight);
-      if(nSigLep >= 1) m_hCutFlow->Fill(">=1SigLep,w", TotalWeight);
+      if(nBaseLep >= 2) m_hCutFlow->Fill(">=2BaseLep,w", TotalWeight);
       if(nSigLep >= 2) m_hCutFlow->Fill(">=2SigLep,w", TotalWeight);
-      if(nSigLep == 2) m_hCutFlow->Fill("=2SigLep,w", TotalWeight);
+      if(nBaseLep == 2 && nSigLep == 2) m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
 
-      if(nBaseLep == 2 && nSigLep == 2)
+      m_susyEvt->sig.isSS = 0;
+      m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
+      m_susyEvt->sig.isZ = 0;
+      //cutflow for Dani ntuple
+      if(nSigLep >= 2)
       {
-        m_hCutFlow->Fill("=2BaseLep and =2SigLep,w", TotalWeight);
-        if(m_susyEvt->leps[0].ID * m_susyEvt->leps[1].ID > 0)
+        m_hCutFlow->Fill(">=2SigLep", 1);
+        if(isSS(sig_Ls[0], sig_Ls[1]) || nSigLep >= 3)
         {
-           m_hCutFlow->Fill("SS", 1);
-           m_hCutFlow->Fill("SS,w", TotalWeight);
+          m_susyEvt->sig.isSS = 1;
+          m_hCutFlow->Fill("SS leptons", 1);
+          if(hasBaselineJet)
+          {
+            m_hCutFlow->Fill(">=1 passOR jet", 1);
+            if(hasSignalJet)
+            {
+              m_hCutFlow->Fill(">=1 signal jet", 1);
+            }
+          }
         }
       }
-      
-      //jet cut      
-      if(false)
-      {
-        if(!hasBaselineJet) continue;
-        m_hCutFlow->Fill(">=1 passOR jet", 1);
-        if(!hasSignalJet) continue;
-        m_hCutFlow->Fill(">=1 signal jet", 1);
-      }
-      m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
 
       if(CF_isMC && printEvent>=0 && m_susyEvt->evt.event == (uint) printEvent)
       {
