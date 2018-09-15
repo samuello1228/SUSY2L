@@ -660,7 +660,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     //// count the leptons
     vector< IParticle* > sel_Ls;
     vector< IParticle* > sig_Ls;
-    vector< float > sig_charge;
     sel_Ls.reserve(3);
     sig_Ls.reserve(3);
 
@@ -675,7 +674,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*el)){
         if     (dec_signal  (*el)){
            sig_Ls.push_back(el);nBaseEl++;nSigEl++;
-           sig_charge.push_back(el->charge());
            trigElec.push_back(el);
         }
         else if(dec_baseline(*el)){ sel_Ls.push_back(el);nBaseEl++;}
@@ -692,7 +690,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*mu)){
         if     (dec_signal  (*mu)){ 
           sig_Ls.push_back(mu);nBaseMu++;nSigMu++;
-          sig_charge.push_back(mu->charge());
           trigMuon.push_back(mu);
         }
         else if(dec_baseline(*mu)){ sel_Ls.push_back(mu);nBaseMu++;}
@@ -843,7 +840,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.qFwt_sys_1up = 0.0;
     m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if (nBaseLep == 2 && nSigLep == 2){
-      if (sig_charge[0] != sig_charge[1]){
+      if (!isSS(sel_Ls[0], sel_Ls[1])){
         m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
         m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
         m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
