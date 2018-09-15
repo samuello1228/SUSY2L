@@ -660,6 +660,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     //// count the leptons
     vector< IParticle* > sel_Ls;
     vector< IParticle* > sig_Ls;
+    vector< float > sig_charge;
     sel_Ls.reserve(3);
     sig_Ls.reserve(3);
 
@@ -674,6 +675,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*el)){
         if     (dec_signal  (*el)){
            sig_Ls.push_back(el);nBaseEl++;nSigEl++;
+           sig_charge.push_back(el->charge());
            trigElec.push_back(el);
         }
         else if(dec_baseline(*el)){ sel_Ls.push_back(el);nBaseEl++;}
@@ -690,6 +692,7 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*mu)){
         if     (dec_signal  (*mu)){ 
           sig_Ls.push_back(mu);nBaseMu++;nSigMu++;
+          sig_charge.push_back(mu->charge());
           trigMuon.push_back(mu);
         }
         else if(dec_baseline(*mu)){ sel_Ls.push_back(mu);nBaseMu++;}
@@ -840,25 +843,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->evt.qFwt_sys_1up = 0.0;
     m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if (nBaseLep == 2 && nSigLep == 2){
-      //ugly code to get lep0 type and charge :(
-      xAOD::Electron* tmpE0 = NULL;  xAOD::Muon* tmpMu0 = NULL;
-      int sigLepSign0 = 0;
-      tmpMu0 = dynamic_cast<xAOD::Muon*>(sel_Ls[0]);
-      if(tmpMu0) sigLepSign0 = tmpMu0->charge();
-      else{
-        tmpE0 = dynamic_cast<xAOD::Electron*>(sel_Ls[0]);
-        if(tmpE0) sigLepSign0 = tmpE0->charge();
-      }
-      //get lep1 type and charge
-      xAOD::Electron* tmpE1 = NULL;  xAOD::Muon* tmpMu1 = NULL;
-      int sigLepSign1 = 0;
-      tmpMu1 = dynamic_cast<xAOD::Muon*>(sel_Ls[1]);
-      if(tmpMu1) sigLepSign1 = tmpMu1->charge();
-      else{
-        tmpE1 = dynamic_cast<xAOD::Electron*>(sel_Ls[1]);
-        if(tmpE1) sigLepSign1 = tmpE1->charge();
-      }
-      if (sigLepSign0!=sigLepSign1){
+      if (sig_charge[0] != sig_charge[1]){
         m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
         m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
         m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
