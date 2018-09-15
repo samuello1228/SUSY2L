@@ -12,6 +12,7 @@ using namespace std;
 Float_t totweight;
 Float_t lumiScaling;
 int MCId;
+Long64_t evn;
 
 int NlepBL;
 int nSigLep;
@@ -28,6 +29,15 @@ Float_t meff;
 Float_t mljj_comb;
 Float_t MT2;
 
+void checkError(float x, float y, TString name, float limit)
+{
+    float error = fabs((y-x)/x);
+    if(error > limit)
+    {
+        cout<<name.Data()<<" are different: "<<x<<", "<<y<<", "<<error<<endl;
+    }
+}
+
 int main()
 {
     const TString CHAIN_NAME = "WZ_nom";
@@ -36,11 +46,12 @@ int main()
     TString path = "/eos/user/d/dkoeck/WHSS/HistFitterTrees/Trees/IncludingLepTruth/Backgrounds_inclTruth_tWZ_tH.36100.root";
     TChain* tree1 = new TChain(CHAIN_NAME);
     tree1->Add(path.Data());
-    cout << "There are " << tree1->GetEntries() << " events" << endl;
+    cout << "Dani ntuple has events: " <<tree1->GetEntries()<<endl;
 
     tree1->SetBranchAddress("totweight", &totweight);
     tree1->SetBranchAddress("lumiScaling", &lumiScaling);
     tree1->SetBranchAddress("MCId", &MCId);
+    tree1->SetBranchAddress("evn", &evn);
 
     tree1->SetBranchAddress("NlepBL", &NlepBL);
     tree1->SetBranchAddress("nSigLep", &nSigLep);
@@ -57,6 +68,13 @@ int main()
     tree1->SetBranchAddress("mljj_comb", &mljj_comb);
     tree1->SetBranchAddress("MT2", &MT2);
     //tree1->SetBranchAddress("", &);
+
+    //Our ntuple
+    TChain* tree2 = new TChain("evt2l");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
+    tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
+    susyEvts* evt = new susyEvts(tree2);
+    cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
     std::vector<TString> cutflowList;
     cutflowList.push_back("=2BaseLep && =2SigLep && SS");
@@ -205,6 +223,56 @@ int main()
         if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hCutflow->GetBinContent(j)<<endl;
     }
     */
+
+    int j = 0;
+    for (long i = 0; i < tree2->GetEntries(); i++)
+    {
+        tree2->GetEntry(i);
+
+        if(evt->sig.nSigLep < 2) continue;
+        if(!evt->sig.isSS) continue;
+        if(!evt->sig.JetCut) continue;
+        if(evt->sig.isZ) continue;
+
+        tree1->GetEntry(j);
+
+        //check event number
+        if(evn != long(evt->evt.event) )
+        {
+            cout<<"Error: Event number are different."<<endl;
+            return 0;
+        }
+        //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
+
+        //wight
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 3e-7);
+
+        //number of leptons
+        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
+        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
+        if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
+
+        //lepTruth
+
+        //number of jets
+        if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
+        if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
+
+        //variables
+        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 2e-7);
+        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
+        checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
+        checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 2e-7);
+
+        //meff
+        float pt_sum = 0;
+        for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
+        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 3e-7);
+
+        j++;
+    }
+    cout<<"Total number of event in Dani selection: "<<j<<endl;
 
     delete hCutflow;
     delete tree1;

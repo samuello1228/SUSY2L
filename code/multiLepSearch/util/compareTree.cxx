@@ -229,6 +229,7 @@ int main()
         //check jets
         if(int(jetTLV->size()) != evt->sig.nJet) cout<<"nJet are different."<<endl;
         if(jetTLV->size() != evt->jets.size()) cout<<"nJet are different."<<endl;
+        if(Nbjet != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
         for(unsigned int j=0;j<jetTLV->size();j++)
         {
             checkError(jetTLV->at(j).Pt(), evt->jets[j].pt * 1000, "pt", 2e-7);
