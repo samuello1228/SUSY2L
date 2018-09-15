@@ -660,6 +660,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     vector< IParticle* > sig_Ls;
     sel_Ls.reserve(3);
     sig_Ls.reserve(3);
+    vector< IParticle* > base_el;
+    vector< IParticle* > base_mu;
 
     int nBaseEl = 0;
     int nSigEl = 0;
@@ -672,9 +674,10 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*el)){
         if     (dec_signal  (*el)){
            sig_Ls.push_back(el);nBaseEl++;nSigEl++;
+           base_el.push_back(el);
            trigElec.push_back(el);
         }
-        else if(dec_baseline(*el)){ sel_Ls.push_back(el);nBaseEl++;}
+        else if(dec_baseline(*el)){ sel_Ls.push_back(el);base_el.push_back(el);nBaseEl++;}
 
       }
       // trigElec.push_back(el);
@@ -688,9 +691,10 @@ EL::StatusCode ssEvtSelection :: execute ()
       if(dec_passOR(*mu)){
         if     (dec_signal  (*mu)){ 
           sig_Ls.push_back(mu);nBaseMu++;nSigMu++;
+          base_mu.push_back(mu);
           trigMuon.push_back(mu);
         }
-        else if(dec_baseline(*mu)){ sel_Ls.push_back(mu);nBaseMu++;}
+        else if(dec_baseline(*mu)){ sel_Ls.push_back(mu);base_mu.push_back(mu);nBaseMu++;}
       }
       // trigMuon.push_back(mu);
     }
@@ -1156,7 +1160,7 @@ EL::StatusCode ssEvtSelection :: execute ()
 
       m_susyEvt->sig.isSS = 0;
       m_susyEvt->sig.JetCut = (hasBaselineJet && hasSignalJet);
-      m_susyEvt->sig.isZ = 0;
+      m_susyEvt->sig.isZ = isZ(base_el) || isZ(base_mu);
       //cutflow for Dani ntuple
       if(nSigLep >= 2)
       {
@@ -1171,6 +1175,7 @@ EL::StatusCode ssEvtSelection :: execute ()
             if(hasSignalJet)
             {
               m_hCutFlow->Fill(">=1 signal jet", 1);
+              if(!m_susyEvt->sig.isZ) m_hCutFlow->Fill("Z veto", 1);
             }
           }
         }
