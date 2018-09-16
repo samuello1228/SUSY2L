@@ -1051,7 +1051,14 @@ EL::StatusCode ssEvtSelection :: execute ()
     auto tl1 = l1->p4();
     auto tl2 = l2->p4();
     //https://svnweb.cern.ch/trac/atlasphys-susy/browser/Physics/SUSY/Tools/CalcGenericMT2
-    m_susyEvt->sig.mT2 =  anaHelper::get_mT2(tl1.M(), tl1.Px(), tl1.Py(), tl2.M(), tl2.Px(), tl2.Py(), metFinal->mpx(), metFinal->mpy(), CF_mT2_m0*GeV, CF_mT2_m0*GeV)*iGeV;
+    m_susyEvt->sig.mT2 = anaHelper::get_mT2(tl1.M(), tl1.Px(), tl1.Py(),
+                                            tl2.M(), tl2.Px(), tl2.Py(),
+                                            //metFinal->mpx(),
+                                            //metFinal->mpy(),
+                                            metFinal->met() * TMath::Cos(metFinal->phi()),
+                                            metFinal->met() * TMath::Sin(metFinal->phi()),
+                                            //CF_mT2_m0*GeV, CF_mT2_m0*GeV) *iGeV;
+                                            tl1.M(), tl2.M()) *iGeV;
 
     //loop over systematics and vary scale factor for weight based systematics
     for (unsigned int jSyst=0; jSyst<m_systInfoList.size();jSyst++){

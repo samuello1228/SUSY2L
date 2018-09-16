@@ -273,6 +273,9 @@ int main()
         //mlj
         if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
 
+        //MT2
+        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 1e-6);
+
         j++;
     }
     cout<<"Total number of event in Dani selection: "<<j<<endl;
