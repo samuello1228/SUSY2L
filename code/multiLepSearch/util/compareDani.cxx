@@ -270,6 +270,9 @@ int main()
         for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
         checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 3e-7);
 
+        //mlj
+        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
+
         j++;
     }
     cout<<"Total number of event in Dani selection: "<<j<<endl;
