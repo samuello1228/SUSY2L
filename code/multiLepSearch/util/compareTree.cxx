@@ -158,8 +158,8 @@ int main()
 
     //Our ntuple
     TChain* tree2 = new TChain("evt2l");
-    tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
+    tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
     susyEvts* evt = new susyEvts(tree2);
     cout<<"tree2 has events: "<<tree2->GetEntries()<<endl;
 
@@ -224,6 +224,9 @@ int main()
             if(charge1 != charge2) cout<<"charge are different."<<endl;
 
             //lepTruth
+            int lepTruth1 = lepTruth->at(j);
+            int lepTruth2 = evt->leps[j].lepTruth;
+            if(lepTruth1 != lepTruth2) cout<<"lepTruth are different."<<endl;
         }
 
         //check jets

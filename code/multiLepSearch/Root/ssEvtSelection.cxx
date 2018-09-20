@@ -47,8 +47,8 @@ static SG::AuxElement::Accessor<char> dec_bjet_loose("bjet_loose");
 static SG::AuxElement::Accessor<char> dec_bjet("bjet");
 static SG::AuxElement::Accessor<char> dec_cosmic("cosmic");
 typedef ElementLink< xAOD::TruthParticleContainer > TruthLink;
-//static SG::AuxElement::Accessor< int > acc_truthType("truthType");
-//static SG::AuxElement::Accessor< int > acc_truthOrig("truthOrigin");
+static SG::AuxElement::Accessor<int> acc_truthType("truthType");
+static SG::AuxElement::Accessor<int> acc_truthOrig("truthOrigin");
 // static SG::AuxElement::Accessor< float > acc_truthProb("truthMatchProbability"); // only ID track
 static SG::AuxElement::Accessor< TruthLink > acc_truthLink("truthParticleLink"); // ID track, electron
 typedef ElementLink< xAOD::ElectronContainer > RecoElLink;
@@ -1343,15 +1343,16 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
     res = m_truthClassifier->particleTruthClassifier(el);
     // Info("fillLepton(el)", "After particleTruthClassifier()");
 
-    l.truthType = res.first;
-    l.truthOrig = res.second;
+    //l.truthType = res.first;
+    //l.truthOrig = res.second;
+    l.truthType = acc_truthType(*el);
+    l.truthOrig = acc_truthOrig(*el);
     l.firstEgMotherPdgId = el->auxdata<int>("firstEgMotherPdgId");
+    l.lepTruth = (l.truthType==2) || //IsoElectron
+                 (l.truthOrig==5 && abs(l.firstEgMotherPdgId)==11 && el->charge() * l.firstEgMotherPdgId < 0); //PhotonConv 
 
     const xAOD::TruthParticle *tp = 0;
     if (mcTruthMatch == "TruthLink" || (mcTruthMatch=="tryAll" && !tp)) {
-      //l.truthType = acc_truthType(*el);
-      //l.truthOrig = acc_truthOrig(*el);
-
       auto tl = acc_truthLink(*el);
       if (tl.isValid()) tp = *tl;
     }
@@ -1474,19 +1475,16 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   /// truth
   if(CF_isMC)
   {
-    /*
-    if(trk){
-      l.truthType = acc_truthType(*trk);
-      l.truthOrig = acc_truthOrig(*trk);
-    }
-    */
     // Info("fillLepton(mu)", "Before MCTruthClassifier");
     std::pair<MCTruthPartClassifier::ParticleType, MCTruthPartClassifier::ParticleOrigin> res;
     res = m_truthClassifier->particleTruthClassifier(mu);
     l.firstEgMotherPdgId = 0;
 
-    l.truthType = res.first;
-    l.truthOrig = res.second;
+    //l.truthType = res.first;
+    //l.truthOrig = res.second;
+    l.truthType = acc_truthType(*mu);
+    l.truthOrig = acc_truthOrig(*mu);
+    l.lepTruth = (l.truthType==6); //IsoMuon
 
     const xAOD::TruthParticle *tp = 0;
     if(mcTruthMatch=="TruthLink" || (mcTruthMatch=="tryAll" && !tp))

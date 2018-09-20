@@ -253,6 +253,8 @@ int main()
         if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
 
         //lepTruth
+        if(isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
+        if(isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
 
         //number of jets
         if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;

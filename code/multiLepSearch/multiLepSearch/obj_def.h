@@ -36,8 +36,9 @@ struct L_PAR:PAR{
   int truthType;
   int truthOrig;
   int firstEgMotherPdgId;
+  int lepTruth;
 };
-const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I:firstEgMotherPdgId/I";
+const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I:firstEgMotherPdgId/I:lepTruth/I";
 
 struct EL_Par:L_PAR{
   int elID;
