@@ -829,8 +829,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     double TotalWeight = 1;
     if(CF_isMC) TotalWeight *= eventInfo->mcEventWeight();
     if(!CF_isMC) m_susyEvt->evt.weight = 1;
-    else if(fabs(eventInfo->mcEventWeight())<100) m_susyEvt->evt.weight = eventInfo->mcEventWeight();
-    else m_susyEvt->evt.weight = 1;
+    else m_susyEvt->evt.weight = eventInfo->mcEventWeight();
     
     m_susyEvt->evt.isMC = CF_isMC? 1:0;
 
