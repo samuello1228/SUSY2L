@@ -9,8 +9,6 @@ using namespace std;
 // My packages
 #include "../multiLepSearch/susyEvts.h"
 
-Float_t totweight;
-Float_t lumiScaling;
 int MCId;
 Long64_t evn;
 
@@ -28,6 +26,20 @@ Float_t mt;
 Float_t meff;
 Float_t mljj_comb;
 Float_t MT2;
+
+//weight
+Float_t mcweight;
+Float_t puweight;
+Float_t totweight;
+Float_t lumiScaling;
+
+Float_t wmu_nom;
+Float_t wel_nom;
+Float_t wjet_nom;
+Float_t wpu_nom_bkg;
+Float_t wtrig_nom;
+Float_t wchflip_nom;
+Float_t wttV_nom;
 
 void checkError(float x, float y, TString name, float limit)
 {
@@ -48,8 +60,19 @@ int main()
     tree1->Add(path.Data());
     cout << "Dani ntuple has events: " <<tree1->GetEntries()<<endl;
 
+    tree1->SetBranchAddress("mcweight", &mcweight);
+    tree1->SetBranchAddress("puweight", &puweight);
     tree1->SetBranchAddress("totweight", &totweight);
     tree1->SetBranchAddress("lumiScaling", &lumiScaling);
+
+    tree1->SetBranchAddress("wmu_nom", &wmu_nom);
+    tree1->SetBranchAddress("wel_nom", &wel_nom);
+    tree1->SetBranchAddress("wjet_nom", &wjet_nom);
+    tree1->SetBranchAddress("wpu_nom_bkg", &wpu_nom_bkg);
+    tree1->SetBranchAddress("wtrig_nom", &wtrig_nom);
+    tree1->SetBranchAddress("wchflip_nom", &wchflip_nom);
+    tree1->SetBranchAddress("wttV_nom", &wttV_nom);
+
     tree1->SetBranchAddress("MCId", &MCId);
     tree1->SetBranchAddress("evn", &evn);
 
@@ -245,7 +268,15 @@ int main()
         //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
 
         //wight
-        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 3e-7);
+        checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
+        checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
+        checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
+        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 4e-7);
+        checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
+        checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
+        checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
+        //checkError(wttV_nom, evt->evt.ttVSF, "ttV weight", 2e-7);
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 4e-7);
 
         //number of leptons
         if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
