@@ -46,7 +46,7 @@ void checkError(float x, float y, TString name, float limit)
     float error = fabs((y-x)/x);
     if(error > limit)
     {
-        cout<<name.Data()<<" are different: "<<x<<", "<<y<<", "<<error<<endl;
+        cout<<"Event number: "<<evn<<": "<<name.Data()<<" are different: "<<x<<", "<<y<<", "<<error<<endl;
     }
 }
 
@@ -296,18 +296,18 @@ int main()
         checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
         checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
         checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
-        checkError(mt, evt->leps[0].mT * 1000, "mT", 2e-7);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 4e-7);
 
         //meff
         float pt_sum = 0;
         for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
-        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 3e-7);
+        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 4e-7);
 
         //mlj
         if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
 
         //MT2
-        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 1e-6);
+        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
 
         j++;
     }
