@@ -36,7 +36,7 @@ truth=MCTC
 #k=${tag}.MCBG
 isMC=1
 
-file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets #ShowerType = SHERPA
+#file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGWjetsSherpa_sample_list.txt k=${tag}.Wjets #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGDYSherpa_sample_list.txt k=${tag}.DY #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGsingletop_sample_list.txt k=${tag}.singletop #ShowerType = PYTHIAEVTGEN
@@ -44,7 +44,7 @@ file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets #Sh
 #file=../multiLepSearch/script/MCBGmultitop_sample_list.txt k=${tag}.multitop #ShowerType = PYTHIA8EVTGEN
 #file=../multiLepSearch/script/MCBGttbar_sample_list.txt k=${tag}.ttbar #ShowerType = PYTHIAEVTGEN
 #file=../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt k=${tag}.Vgamma #ShowerType = SHERPA_CT10
-#file=../multiLepSearch/script/MCBGVVSherpa_CT10_sample_list.txt k=${tag}.VV_CT10 #ShowerType = SHERPA_CT10
+file=../multiLepSearch/script/MCBGVVSherpa_CT10_sample_list.txt k=${tag}.VV_CT10 #ShowerType = SHERPA_CT10
 #file=../multiLepSearch/script/MCBGVVSherpa_221_sample_list.txt k=${tag}.VV_221 #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt k=${tag}.VVV #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGhiggs_Pythia8EvtGen_sample_list.txt k=${tag}.higgs_Pythia8EvtGen #ShowerType = Pythia8EvtGen
@@ -72,6 +72,9 @@ file=../multiLepSearch/script/MCBGZjetsSherpa_sample_list.txt k=${tag}.Zjets #Sh
 #eventNumber=47
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV/DAOD_SUSY2.11084160._000250.pool.root.1
+
+#file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949/DAOD_SUSY2.11085088._000011.pool.root.1
+#eventNumber=160509
 
 #file=/afs/cern.ch/work/c/clo/sample/mc15_13TeV.410009.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_dil.merge.DAOD_SUSY2.e4511_s2608_s2183_r7725_r7676_p2949/DAOD_SUSY2.10524294._000001.pool.root.1
 #eventNumber=5799815
