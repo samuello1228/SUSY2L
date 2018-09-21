@@ -73,16 +73,14 @@ struct SIGNATURE{
   int JetCut;
   int isZ;
   float Met;
-  float MetRel;
   float MetX;
   float MetY;
   float MetPhi;
   float mT2;
   float HT;
-  float mjj;
   float mlj;
 };
-const string SIGNATURE_s = "trigCode/l:nBaseLep/I:nSigLep/I:nJet/I:nBJet/I:isSS/I:JetCut/I:isZ/I:Met/F:MetRel/F:MetX/F:MetY/F:MetPhi/F:mT2/F:HT/F:mjj:mlj";
+const string SIGNATURE_s = "trigCode/l:nBaseLep/I:nSigLep/I:nJet/I:nBJet/I:isSS/I:JetCut/I:isZ/I:Met/F:MetX/F:MetY/F:MetPhi/F:mT2/F:HT/F:mlj";
 
 struct TR_PAR:PAR0{
   int pdgId; 

@@ -933,9 +933,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     // Info("execute()", "Z decay saved");
 
-    if(jet_Ls.size()>=2)  m_susyEvt->sig.mjj = (jet_Ls[0]->p4()+jet_Ls[1]->p4()).M() *iGeV;
-    else m_susyEvt->sig.mjj = -1;
-
     if(jet_Ls.size() == 0) m_susyEvt->sig.mlj = -1;
     else
     {
