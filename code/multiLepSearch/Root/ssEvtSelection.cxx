@@ -825,7 +825,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     ////////////////////////
     
     //unused variables
-    m_susyEvt->evt.cut = 0;
+    m_susyEvt->evt.flag = 0;
 
     //event information
     m_susyEvt->evt.event = eventInfo->eventNumber();
@@ -843,13 +843,13 @@ EL::StatusCode ssEvtSelection :: execute ()
 
     // charge flip weight and pT correction (have to apply before other calculation that use lep pT)
     m_susyEvt->evt.qFwt = 0.0;
-    m_susyEvt->evt.qFwt_sys_1up = 0.0;
-    m_susyEvt->evt.qFwt_sys_1dn = 0.0;
+    //m_susyEvt->evt.qFwt_sys_1up = 0.0;
+    //m_susyEvt->evt.qFwt_sys_1dn = 0.0;
     if (nBaseLep == 2 && nSigLep == 2){
       if (!isSS(sel_Ls[0], sel_Ls[1])){
         m_susyEvt->evt.qFwt = mChargeFlipBkgTool->GetWeight( sel_Ls ,0,0);
-        m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
-        m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
+        //m_susyEvt->evt.qFwt_sys_1up = mChargeFlipBkgTool->GetWeight( sel_Ls , 1,0);
+        //m_susyEvt->evt.qFwt_sys_1dn = mChargeFlipBkgTool->GetWeight( sel_Ls ,-1,0);
         // auto tmpPt = mChargeFlipBkgTool->GetCorrectedPt( sel_Ls ,0,0);
         // if(tmpPt.size()==2){
         //   if (tmpE0) tmpE0->setP4( tmpPt[0]*1000., tmpE0->eta(), tmpE0->phi(), tmpE0->m());
@@ -861,18 +861,18 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     //fake lep weight
     m_susyEvt->evt.fLwt = 0.0;
-    m_susyEvt->evt.fLwt_e_sys_1up = 0.0; 
-    m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
-    m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
-    m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
-    if (nBaseLep == 2){
+    //m_susyEvt->evt.fLwt_e_sys_1up = 0.0; 
+    //m_susyEvt->evt.fLwt_e_sys_1dn = 0.0; 
+    //m_susyEvt->evt.fLwt_u_sys_1up = 0.0; 
+    //m_susyEvt->evt.fLwt_u_sys_1dn = 0.0; 
+    //if (nBaseLep == 2){
       //m_susyEvt->evt.fLwt = mFakeLepBkgTool->GetWeight(sel_Ls, 0,0);
       //m_susyEvt->evt.fLwt_e_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,0);
       //m_susyEvt->evt.fLwt_e_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,0);
       //m_susyEvt->evt.fLwt_u_sys_1up = mFakeLepBkgTool->GetWeight(sel_Ls, 1,1);
       //m_susyEvt->evt.fLwt_u_sys_1dn = mFakeLepBkgTool->GetWeight(sel_Ls,-1,1);
       //ATH_MSG_ERROR("FW " << mFakeLepBkgTool->GetWeight(sel_Ls, 0,0));
-    }
+    //}
 
     /// photon Check
     xAOD::PhotonContainer* photons_copy(0);

@@ -60,7 +60,6 @@ struct EVT{
   unsigned long int run;
   unsigned long int event;
   unsigned int isMC;
-  unsigned int cut;
   int flag;
   float weight;
   float averageMu;
@@ -71,15 +70,9 @@ struct EVT{
   float JvtSF;
   float trigSF;
   float qFwt;
-  float qFwt_sys_1up;
-  float qFwt_sys_1dn;
   float fLwt;
-  float fLwt_e_sys_1up;
-  float fLwt_e_sys_1dn;
-  float fLwt_u_sys_1up;
-  float fLwt_u_sys_1dn;
  };
-const string EVT_s = "run/l:event/l:isMC/i:cut/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:trigSF/F:qFwt/F:qFwt_sys_1up/F:qFwt_sys_1dn/F:fLwt/F:fLwt_e_sys_1up/F:fLwt_e_sys_1dn/F:fLwt_u_sys_1up/F:fLwt_u_sys_1dn/F";
+const string EVT_s = "run/l:event/l:isMC/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:trigSF/F:qFwt/F:fLwt/F";
 
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info
