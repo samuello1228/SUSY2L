@@ -978,11 +978,6 @@ EL::StatusCode ssEvtSelection :: execute ()
         l.mT = Vt.M();
         //l.mT = sqrt(2*l.pt*m_susyEvt->sig.Met*(1-cos(l.MET_dPhi)));
       }
-
-      //// dR with leading jet, and the smallest dR
-      l.jet0_dR = jet_Ls.size()>0?jet_Ls[0]->p4().DeltaR(sel_Ls[i]->p4()):-1;
-      l.jet_dRm = l.jet0_dR;
-      for(size_t j=1; j<jet_Ls.size(); j++){auto dRn=jet_Ls[j]->p4().DeltaR(sel_Ls[i]->p4()); if(dRn<l.jet_dRm) l.jet_dRm = dRn;}
     }
     // Info("execute()", "After fillLepton");
 
@@ -1316,7 +1311,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
   //if(!el->isolationValue(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(el)", "ptcone20 failed."); 
   //if(!el->isolationValue(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(el)", "ptcone30 failed."); 
   //if(!el->isolationValue(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(el)", "ptcone40 failed."); 
-  l.isoPass = m_isoTool->accept(*el).getCutResultBitSet().to_ulong();
+  //l.isoPass = m_isoTool->accept(*el).getCutResultBitSet().to_ulong();
 
   /*
   //track
@@ -1452,7 +1447,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   //if(!mu->isolation(l.ptcone20, xAOD::Iso::ptcone20)) Error("fillLepton(mu)", "ptcone20 failed."); 
   //if(!mu->isolation(l.ptcone30, xAOD::Iso::ptcone30)) Error("fillLepton(mu)", "ptcone30 failed."); 
   //if(!mu->isolation(l.ptcone40, xAOD::Iso::ptcone40)) Error("fillLepton(mu)", "ptcone40 failed."); 
-  l.isoPass = m_isoTool->accept(*mu).getCutResultBitSet().to_ulong();
+  //l.isoPass = m_isoTool->accept(*mu).getCutResultBitSet().to_ulong();
 
   /*
   //track

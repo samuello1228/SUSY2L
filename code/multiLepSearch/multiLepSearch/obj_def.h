@@ -22,18 +22,15 @@ const string R_PAR_s = PAR0_s+":m/F:dPhi:dR:jet0_dPhi";
 
 struct L_PAR:PAR0{
   float mT;
-  float jet0_dR;
-  float jet_dRm;
+  unsigned int lFlag;
   int ID;
   int truthI;
-  unsigned int lFlag;
-  unsigned int isoPass;
   int truthType;
   int truthOrig;
   int firstEgMotherPdgId;
   int lepTruth;
 };
-const string L_PAR_s = PAR0_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I:firstEgMotherPdgId/I:lepTruth/I";
+const string L_PAR_s = PAR0_s+":mT/F:lFlag/i:ID/I:truthI/I:truthType/I:truthOrig/I:firstEgMotherPdgId/I:lepTruth/I";
 
 struct EL_Par:L_PAR{
   int elID;
