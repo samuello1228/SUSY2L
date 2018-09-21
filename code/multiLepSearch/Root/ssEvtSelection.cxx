@@ -892,7 +892,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->sig.MetX = metFinal->mpx()*iGeV;
     m_susyEvt->sig.MetY = metFinal->mpy()*iGeV;
     m_susyEvt->sig.MetPhi = metFinal->phi();
-    TLorentzVector metV(metFinal->mpx(), metFinal->mpy(), 0, metFinal->met());
+    //TLorentzVector metV(metFinal->mpx(), metFinal->mpy(), 0, metFinal->met());
 
     //sort jets
     sort(jet_Ls.begin(), jet_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -906,7 +906,6 @@ EL::StatusCode ssEvtSelection :: execute ()
       m_susyEvt->jets[i].eta = j->eta(); 
       m_susyEvt->jets[i].phi = j->phi();
       m_susyEvt->jets[i].m = j->m()*iGeV;
-      m_susyEvt->jets[i].MET_dPhi = metV.DeltaPhi(j->p4());
       unsigned int& flag = m_susyEvt->jets[i].jFlag;
       flag = 0;
       if(dec_signal(*j)) flag |= IS_SIGNAL;
@@ -965,7 +964,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     for(unsigned int i=0;i<sel_Ls.size(); i++){
       auto& l = m_susyEvt->leps[i];
       fillLepton(sel_Ls[i], l, i);
-      l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
+      //l.MET_dPhi = metV.DeltaPhi(sel_Ls[i]->p4());
 
       {
         /// mT
@@ -987,6 +986,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     // Info("execute()", "After fillLepton");
 
+    /*
     ///MetRel correction factor (See Eq6, 2LSS note: https://cds.cern.ch/record/1747285/files/ATL-COM-PHYS-2014-954.pdf)
     float minMetdPhi = FLT_MAX; //Met's dPhi from nearest obj (e/mu/jet)
     for(unsigned int i=0;i<sel_Ls.size(); i++){
@@ -997,7 +997,7 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     m_susyEvt->sig.MetRel = m_susyEvt->sig.Met;
     if (minMetdPhi<1.570796327) m_susyEvt->sig.MetRel *= sin(minMetdPhi);
-
+    */
     /*
     /// tau
     xAOD::TauJetContainer* taus_copy(0);
@@ -1046,7 +1046,6 @@ EL::StatusCode ssEvtSelection :: execute ()
     m_susyEvt->l12.phi = ll.Phi(); 
     m_susyEvt->l12.dPhi = l1->p4().DeltaPhi(l2->p4()); 
     m_susyEvt->l12.dR = l1->p4().DeltaR(l2->p4()); 
-    m_susyEvt->l12.MET_dPhi = metV.DeltaPhi(ll);
     if(jet_Ls.size()>=1) m_susyEvt->l12.jet0_dPhi = ll.DeltaPhi(jet_Ls[0]->p4());
     else m_susyEvt->l12.jet0_dPhi = -100;
 

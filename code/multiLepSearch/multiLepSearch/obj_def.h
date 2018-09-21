@@ -12,20 +12,15 @@ struct PAR0{
 };
 const string PAR0_s = "pt/F:eta/F:phi/F";
 
-struct PAR:PAR0{
-  float MET_dPhi;
-};
-const string PAR_s = PAR0_s+":MET_dPhi/F";
-
-struct R_PAR:PAR{
+struct R_PAR:PAR0{
   float m;
   float dPhi;
   float dR;
   float jet0_dPhi;
 };
-const string R_PAR_s = PAR_s+":m/F:dPhi:dR:jet0_dPhi";
+const string R_PAR_s = PAR0_s+":m/F:dPhi:dR:jet0_dPhi";
 
-struct L_PAR:PAR{
+struct L_PAR:PAR0{
   float mT;
   float jet0_dR;
   float jet_dRm;
@@ -38,7 +33,7 @@ struct L_PAR:PAR{
   int firstEgMotherPdgId;
   int lepTruth;
 };
-const string L_PAR_s = PAR_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I:firstEgMotherPdgId/I:lepTruth/I";
+const string L_PAR_s = PAR0_s+":mT/F:jet0_dR:jet_dRm:ID/I:truthI/I:lFlag/i:isoPass/i:truthType/I:truthOrig/I:firstEgMotherPdgId/I:lepTruth/I";
 
 struct EL_Par:L_PAR{
   int elID;
@@ -50,11 +45,11 @@ struct MU_Par:L_PAR{
 };
 const string MU_PAR_s = L_PAR_s+":muID/i";
 
-struct J_PAR:PAR{
+struct J_PAR:PAR0{
   float m;
   unsigned int jFlag ;
 };
-const string J_PAR_s = PAR_s+":m/F:jFlag/I";
+const string J_PAR_s = PAR0_s+":m/F:jFlag/I";
 
 struct EVT{
   unsigned long int run;
@@ -134,7 +129,7 @@ enum JFALGS{
 };
 
 typedef std::vector< L_PAR > LEPTONS;
-typedef std::vector< PAR > PARTICLES;
+typedef std::vector< PAR0 > PARTICLES;
 typedef std::vector< J_PAR > JETS;
 typedef std::vector< TR_PAR > TRUTHS;
 
