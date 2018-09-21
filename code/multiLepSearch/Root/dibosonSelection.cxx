@@ -320,16 +320,16 @@ EL::StatusCode dibosonSelection :: execute ()
       m_zphEvt->l12.pt = ll.Pt()*iGeV; 
       m_zphEvt->l12.eta = ll.Eta(); 
       m_zphEvt->l12.phi = ll.Phi(); 
-      m_zphEvt->l12.dPhi = v1.DeltaPhi(v2); 
-      m_zphEvt->l12.dR = v1.DeltaR(v2);
+      //m_zphEvt->l12.dPhi = v1.DeltaPhi(v2); 
+      //m_zphEvt->l12.dR = v1.DeltaR(v2);
 
       TLorentzVector vllp(ll+v0);
       m_zphEvt->llp.m = vllp.M()*iGeV;
       m_zphEvt->llp.pt = vllp.Pt()*iGeV; 
       m_zphEvt->llp.eta = vllp.Eta(); 
       m_zphEvt->llp.phi = vllp.Phi(); 
-      m_zphEvt->llp.dPhi = ll.DeltaPhi(v0); 
-      m_zphEvt->llp.dR = ll.DeltaR(v0);
+      //m_zphEvt->llp.dPhi = ll.DeltaPhi(v0); 
+      //m_zphEvt->llp.dR = ll.DeltaR(v0);
 
       m_zphEvt->evt.flag = 1;
       m_zphEvt->fill();
@@ -352,16 +352,16 @@ EL::StatusCode dibosonSelection :: execute ()
       m_zphEvt->l12.pt = ll.Pt()*iGeV; 
       m_zphEvt->l12.eta = ll.Eta(); 
       m_zphEvt->l12.phi = ll.Phi(); 
-      m_zphEvt->l12.dPhi = v1.DeltaPhi(v2); 
-      m_zphEvt->l12.dR = v1.DeltaR(v2);
+      //m_zphEvt->l12.dPhi = v1.DeltaPhi(v2); 
+      //m_zphEvt->l12.dR = v1.DeltaR(v2);
 
       TLorentzVector vllp(ll+v0);
       m_zphEvt->llp.m = vllp.M()*iGeV;
       m_zphEvt->llp.pt = vllp.Pt()*iGeV; 
       m_zphEvt->llp.eta = vllp.Eta(); 
       m_zphEvt->llp.phi = vllp.Phi(); 
-      m_zphEvt->llp.dPhi = ll.DeltaPhi(v0); 
-      m_zphEvt->llp.dR = ll.DeltaR(v0);
+      //m_zphEvt->llp.dPhi = ll.DeltaPhi(v0); 
+      //m_zphEvt->llp.dR = ll.DeltaR(v0);
 
       m_zphEvt->evt.flag = 2;
       m_zphEvt->fill();

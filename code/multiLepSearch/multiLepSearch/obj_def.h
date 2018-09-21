@@ -14,11 +14,8 @@ const string PAR0_s = "pt/F:eta/F:phi/F";
 
 struct R_PAR:PAR0{
   float m;
-  float dPhi;
-  float dR;
-  float jet0_dPhi;
 };
-const string R_PAR_s = PAR0_s+":m/F:dPhi:dR:jet0_dPhi";
+const string R_PAR_s = PAR0_s+":m/F";
 
 struct L_PAR:PAR0{
   float mT;

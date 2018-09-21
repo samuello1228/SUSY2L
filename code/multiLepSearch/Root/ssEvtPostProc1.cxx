@@ -333,8 +333,8 @@ int ssEvtPostProc1 :: recalPtRelatedVar (susyEvts* inTree)
   inTree->l12.pt = ll.Pt(); 
   inTree->l12.eta = ll.Eta(); 
   inTree->l12.phi = ll.Phi(); 
-  inTree->l12.dPhi = l1.DeltaPhi(l2); 
-  inTree->l12.dR = l1.DeltaR(l2); 
+  //inTree->l12.dPhi = l1.DeltaPhi(l2); 
+  //inTree->l12.dR = l1.DeltaR(l2); 
   //inTree->l12.MET_dPhi = metV.DeltaPhi(ll);
 
   inTree->sig.HT = 0.0;
