@@ -761,7 +761,13 @@ EL::StatusCode ssEvtSelection :: execute ()
     for(auto jet: *jets_copy){
       if(!dec_passOR(*jet)) continue;
       if(!dec_signal(*jet)) continue;
-      float jvt = jet->isAvailable<float>("Jvt") ? jet->auxdata<float>("Jvt") : 0.;
+
+      float jvt = 0;
+      if(jet->isAvailable<float>("Jvt")) {
+        //don't know the reason why accessing jvt will change the information of jet, and MET will be changed. use a new copy.
+        xAOD::Jet jet_copy = (*jet);
+        jvt = jet_copy.auxdata<float>("Jvt");
+      }
       if(jet->pt()<60000 && fabs(jet->eta()) < 2.4 && jvt < 0.59) continue;
       bool isbjet = m_objTool->IsBJet(*jet);
       if(study != "fakes_Peter" && isbjet && fabs(jet->eta()) >= 2.4) continue;
