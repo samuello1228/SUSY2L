@@ -95,7 +95,10 @@ int main()
     //Our ntuple
     TChain* tree2 = new TChain("evt2l");
     //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
-    tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
+    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-c1d5464d/user.clo.v13.0.";
+    tree2->Add(path2 + "VV_CT10_myOutput.root/user.clo.mc15_13TeV.361071.*.myOutput.root*");
+    tree2->Add(path2 + "VV_221_myOutput.root/user.clo.mc15_13TeV.363491.*.myOutput.root*");
     susyEvts* evt = new susyEvts(tree2);
     cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
@@ -248,6 +251,7 @@ int main()
     */
 
     int j = 0;
+    int count = 0;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
@@ -262,8 +266,26 @@ int main()
         //check event number
         if(evn != long(evt->evt.event) )
         {
-            cout<<"Error: Event number are different."<<endl;
-            return 0;
+            //search for event number
+            bool isFound = false;
+            cout<<"Searching event number: "<<evt->evt.event<<endl;
+            for (long k = 0; k < tree1->GetEntries(); k++)
+            {
+                tree1->GetEntry(k);
+                if(evn == long(evt->evt.event))
+                {
+                    isFound = true;
+                    j=k;
+                    cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
+                    break;
+                }
+            }
+
+            if(!isFound)
+            {
+                cout<<"Event number: "<<evt->evt.event<<" cannot be found. End. "<<endl;
+                return 0;
+            }
         }
         //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
 
@@ -310,8 +332,9 @@ int main()
         if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
 
         j++;
+        count++;
     }
-    cout<<"Total number of event in Dani selection: "<<j<<endl;
+    cout<<"Total number of event in Dani selection: "<<count<<endl;
 
     delete hCutflow;
     delete tree1;
