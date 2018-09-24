@@ -91,6 +91,7 @@ int main()
 {
     bool isSR = true;
     bool isCR = false;
+    //isSR = false; isCR = true;
 
     //Peter
     TString path1 = "";
@@ -178,8 +179,16 @@ int main()
 
     //Our ntuple
     TChain* tree2 = new TChain("evt2l");
-    tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_s2/data-myOutput/test.root");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1/data-myOutput/test.root");
+    TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1/data-myOutput/test.root";
+    if(isSR)
+    {
+        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_s2/data-myOutput/test.root";
+    }
+    else if(isCR)
+    {
+        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR/data-myOutput/test.root";
+    }
+    tree2->Add(path2.Data());
     susyEvts* evt = new susyEvts(tree2);
     cout<<"tree2 has events: "<<tree2->GetEntries()<<endl;
 
