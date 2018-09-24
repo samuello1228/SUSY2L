@@ -120,18 +120,30 @@ public:
   EL::StatusCode fillLepton(xAOD::Muon* p, L_PAR& l, unsigned int i);
   void fillLeptonCommon(xAOD::IParticle* p, L_PAR& l);
   int addTruthPar(const xAOD::TruthParticle* p, TRUTHS& v, int saveParent=0);
-  bool isSS(xAOD::IParticle* p1, xAOD::IParticle* p2){
+  bool isSS(const xAOD::IParticle* p1,const xAOD::IParticle* p2){
     static SG::AuxElement::Accessor<float> charge("charge");
     return charge(*p1)*charge(*p2)>0;
   }
-  bool isZ(xAOD::IParticle* p1, xAOD::IParticle* p2){
+  bool isZ(const xAOD::IParticle* p1,const xAOD::IParticle* p2){
     if(isSS(p1,p2)) return false;
     float mll = (p1->p4() + p2->p4()).M();
     if(mll <= 75000) return false;
     if(mll >= 105000) return false;
     return true;
   }
-  bool isZ(std::vector< xAOD::IParticle* > sel_Ls){
+  bool isZ(std::vector<const xAOD::Electron* > sel_Ls){
+    if(sel_Ls.size() < 2) return false;
+    if(isZ(sel_Ls[0],sel_Ls[1])) return true;
+    if(sel_Ls.size() < 3) return false;
+    if(isZ(sel_Ls[0],sel_Ls[2])) return true;
+    if(isZ(sel_Ls[1],sel_Ls[2])) return true;
+    if(sel_Ls.size() < 4) return false;
+    if(isZ(sel_Ls[0],sel_Ls[3])) return true;
+    if(isZ(sel_Ls[1],sel_Ls[3])) return true;
+    if(isZ(sel_Ls[2],sel_Ls[3])) return true;
+    return false;
+  }
+  bool isZ(std::vector<const xAOD::Muon* > sel_Ls){
     if(sel_Ls.size() < 2) return false;
     if(isZ(sel_Ls[0],sel_Ls[1])) return true;
     if(sel_Ls.size() < 3) return false;

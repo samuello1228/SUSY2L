@@ -58,10 +58,11 @@ struct EVT{
   float BtagSF;
   float JvtSF;
   float trigSF;
+  float trigSF_BL;
   float qFwt;
   float fLwt;
  };
-const string EVT_s = "run/l:event/l:isMC/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:trigSF/F:qFwt/F:fLwt/F";
+const string EVT_s = "run/l:event/l:isMC/i:flag/I:weight/F:averageMu/F:pwt/F:ElSF/F:MuSF/F:BtagSF/F:JvtSF/F:trigSF/F:trigSF_BL/F:qFwt/F:fLwt/F";
 
 struct SIGNATURE{
   unsigned long int trigCode;//trigger info

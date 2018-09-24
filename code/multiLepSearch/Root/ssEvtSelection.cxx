@@ -660,8 +660,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     vector< IParticle* > sig_Ls;
     sel_Ls.reserve(3);
     sig_Ls.reserve(3);
-    vector< IParticle* > base_el;
-    vector< IParticle* > base_mu;
+    vector< const xAOD::Electron* > base_el(0);
+    vector< const xAOD::Muon* > base_mu(0);
 
     int nBaseEl = 0;
     int nSigEl = 0;
@@ -1111,8 +1111,11 @@ EL::StatusCode ssEvtSelection :: execute ()
 
         double trigSF=1;
         auto trigRet = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run,trigElec, trigMuon, trigSF); //sEvt.run
+        double trigSF_BL=1;
+        auto trigRet_BL = TriggerSFTool->getEfficiencyScaleFactor(sEvt.run, base_el, base_mu, trigSF_BL); //sEvt.run
 
         sEvt.trigSF = trigSF;
+        sEvt.trigSF_BL = trigSF_BL;
 
         if (eventInfo->eventNumber()==4576526 || eventInfo->eventNumber()==5093803 ||
 	    eventInfo->eventNumber()==5095103 || eventInfo->eventNumber()==4660617 ||
