@@ -329,8 +329,8 @@ int main()
         hCutflow_Samuel->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
     }
 
+    ///*
     //cutflow for Dani ntuple
-    //for (long i = 0; i < 100000; i++)
     for (long i = 0; i < tree1->GetEntries(); i++)
     {
         tree1->GetEntry(i);
@@ -338,13 +338,7 @@ int main()
         if(MCId != sampleID) continue;
         FillHist_Dani(hCutflow_Dani);
     }
-
-    for(unsigned int j=1;j<=cutflowList.size();j++)
-    {
-        cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
-        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
-    }
+    //*/
 
     double nwAOD = 0;
     TObjArray* fileList = tree2->GetListOfFiles();
@@ -361,6 +355,7 @@ int main()
 
     double lumi = 36100;
     double commonWeight = XS *lumi /nwAOD;
+    ///*
     //cutflow for My ntuple
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
@@ -372,13 +367,7 @@ int main()
         if(evt->sig.isZ) continue;
         FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
     }
-
-    for(unsigned int j=1;j<=cutflowList.size();j++)
-    {
-        cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
-    }
+    //*/
 
     int j = 0;
     int count = 0;
@@ -398,7 +387,7 @@ int main()
         {
             //search for event number
             bool isFound = false;
-            cout<<"Searching event number: "<<evt->evt.event<<endl;
+            //cout<<"Searching event number: "<<evt->evt.event<<endl;
             for (long k = 0; k < tree1->GetEntries(); k++)
             {
                 tree1->GetEntry(k);
@@ -406,7 +395,7 @@ int main()
                 {
                     isFound = true;
                     j=k;
-                    cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
+                    //cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
                     break;
                 }
             }
@@ -461,10 +450,35 @@ int main()
         //MT2
         if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
 
+        /*
+        //cutflow for Dani ntuple
+        if(MCId == sampleID)
+        {
+            FillHist_Dani(hCutflow_Dani);
+        }
+
+        //cutflow for My ntuple
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
+        */
+
         j++;
         count++;
     }
     cout<<"Total number of event in Dani selection: "<<count<<endl;
+
+    for(unsigned int j=1;j<=cutflowList.size();j++)
+    {
+        cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
+        if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
+        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
+    }
+
+    for(unsigned int j=1;j<=cutflowList.size();j++)
+    {
+        cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
+        if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
+    }
 
     delete hCutflow_Dani;
     delete hCutflow_Samuel;
