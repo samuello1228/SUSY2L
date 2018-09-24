@@ -104,20 +104,20 @@ int main()
     cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
     std::vector<TString> cutflowList;
-    cutflowList.push_back("=2BaseLep && =2SigLep && SS");
-    cutflowList.push_back("=2BaseLep && =2SigLep && SS,w");
-    cutflowList.push_back("isTruthLep1");
-    cutflowList.push_back("isTruthLep1,w");
-    cutflowList.push_back("isTruthLep2");
-    cutflowList.push_back("isTruthLep2,w");
-    cutflowList.push_back("nJet");
-    cutflowList.push_back("nJet,w");
-    cutflowList.push_back("nBJets20");
-    cutflowList.push_back("nBJets20,w");
+    cutflowList.push_back("=2BaseLep && =2SigLep");
+    cutflowList.push_back("=2BaseLep && =2SigLep,w");
     cutflowList.push_back("pt1");
     cutflowList.push_back("pt1,w");
     cutflowList.push_back("pt2");
     cutflowList.push_back("pt2,w");
+    cutflowList.push_back("isTruthLep1");
+    cutflowList.push_back("isTruthLep1,w");
+    cutflowList.push_back("isTruthLep2");
+    cutflowList.push_back("isTruthLep2,w");
+    cutflowList.push_back("nBJets20");
+    cutflowList.push_back("nBJets20,w");
+    cutflowList.push_back("nJet");
+    cutflowList.push_back("nJet,w");
     cutflowList.push_back("DeltaEtaLep");
     cutflowList.push_back("DeltaEtaLep,w");
     cutflowList.push_back("met");
@@ -154,33 +154,8 @@ int main()
         if(NlepBL !=2) continue;
         if(nSigLep !=2) continue;
         double weight = totweight*lumiScaling;
-        hCutflow_Dani->Fill("=2BaseLep && =2SigLep && SS",1);
-        hCutflow_Dani->Fill("=2BaseLep && =2SigLep && SS,w",weight);
-
-        if(isTruthLep1 != 1) continue;
-        hCutflow_Dani->Fill("isTruthLep1",1);
-        hCutflow_Dani->Fill("isTruthLep1,w",weight);
-
-        if(isTruthLep2 != 1) continue;
-        hCutflow_Dani->Fill("isTruthLep2",1);
-        hCutflow_Dani->Fill("isTruthLep2,w",weight);
-
-        if(SR == 1)
-        {
-            if(nJets20 !=1) continue;
-            hCutflow_Dani->Fill("nJet",1);
-            hCutflow_Dani->Fill("nJet,w",weight);
-        }
-        else if(SR == 2)
-        {
-            if(nJets20 !=2 && nJets20 !=3) continue;
-            hCutflow_Dani->Fill("nJet",1);
-            hCutflow_Dani->Fill("nJet,w",weight);
-        }
-
-        if(nBJets20 !=0) continue;
-        hCutflow_Dani->Fill("nBJets20",1);
-        hCutflow_Dani->Fill("nBJets20,w",weight);
+        hCutflow_Dani->Fill("=2BaseLep && =2SigLep",1);
+        hCutflow_Dani->Fill("=2BaseLep && =2SigLep,w",weight);
 
         if(Pt_l < 25000) continue;
         hCutflow_Dani->Fill("pt1",1);
@@ -190,8 +165,24 @@ int main()
         hCutflow_Dani->Fill("pt2",1);
         hCutflow_Dani->Fill("pt2,w",weight);
 
+        if(isTruthLep1 != 1) continue;
+        hCutflow_Dani->Fill("isTruthLep1",1);
+        hCutflow_Dani->Fill("isTruthLep1,w",weight);
+
+        if(isTruthLep2 != 1) continue;
+        hCutflow_Dani->Fill("isTruthLep2",1);
+        hCutflow_Dani->Fill("isTruthLep2,w",weight);
+
+        if(nBJets20 !=0) continue;
+        hCutflow_Dani->Fill("nBJets20",1);
+        hCutflow_Dani->Fill("nBJets20,w",weight);
+
         if(SR == 1)
         {
+            if(nJets20 !=1) continue;
+            hCutflow_Dani->Fill("nJet",1);
+            hCutflow_Dani->Fill("nJet,w",weight);
+
             if(fabs(DeltaEtaLep)>1.5) continue;
             hCutflow_Dani->Fill("DeltaEtaLep",1);
             hCutflow_Dani->Fill("DeltaEtaLep,w",weight);
@@ -218,6 +209,10 @@ int main()
         }
         else if(SR == 2)
         {
+            if(nJets20 !=2 && nJets20 !=3) continue;
+            hCutflow_Dani->Fill("nJet",1);
+            hCutflow_Dani->Fill("nJet,w",weight);
+
             hCutflow_Dani->Fill("DeltaEtaLep",1);
             hCutflow_Dani->Fill("DeltaEtaLep,w",weight);
 
@@ -278,33 +273,8 @@ int main()
         if(evt->sig.nBaseLep !=2) continue;
         if(evt->sig.nSigLep !=2) continue;
         double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
-        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep && SS",1);
-        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep && SS,w",weight);
-
-        if(evt->leps[0].lepTruth != 1) continue;
-        hCutflow_Samuel->Fill("isTruthLep1",1);
-        hCutflow_Samuel->Fill("isTruthLep1,w",weight);
-
-        if(evt->leps[1].lepTruth != 1) continue;
-        hCutflow_Samuel->Fill("isTruthLep2",1);
-        hCutflow_Samuel->Fill("isTruthLep2,w",weight);
-
-        if(SR == 1)
-        {
-            if(evt->sig.nJet !=1) continue;
-            hCutflow_Samuel->Fill("nJet",1);
-            hCutflow_Samuel->Fill("nJet,w",weight);
-        }
-        else if(SR == 2)
-        {
-            if(evt->sig.nJet !=2 && evt->sig.nJet !=3) continue;
-            hCutflow_Samuel->Fill("nJet",1);
-            hCutflow_Samuel->Fill("nJet,w",weight);
-        }
-
-        if(evt->sig.nBJet !=0) continue;
-        hCutflow_Samuel->Fill("nBJets20",1);
-        hCutflow_Samuel->Fill("nBJets20,w",weight);
+        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep",1);
+        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep,w",weight);
 
         if(evt->leps[0].pt < 25) continue;
         hCutflow_Samuel->Fill("pt1",1);
@@ -314,8 +284,24 @@ int main()
         hCutflow_Samuel->Fill("pt2",1);
         hCutflow_Samuel->Fill("pt2,w",weight);
 
+        if(evt->leps[0].lepTruth != 1) continue;
+        hCutflow_Samuel->Fill("isTruthLep1",1);
+        hCutflow_Samuel->Fill("isTruthLep1,w",weight);
+
+        if(evt->leps[1].lepTruth != 1) continue;
+        hCutflow_Samuel->Fill("isTruthLep2",1);
+        hCutflow_Samuel->Fill("isTruthLep2,w",weight);
+
+        if(evt->sig.nBJet !=0) continue;
+        hCutflow_Samuel->Fill("nBJets20",1);
+        hCutflow_Samuel->Fill("nBJets20,w",weight);
+
         if(SR == 1)
         {
+            if(evt->sig.nJet !=1) continue;
+            hCutflow_Samuel->Fill("nJet",1);
+            hCutflow_Samuel->Fill("nJet,w",weight);
+
             if(fabs(evt->leps[0].eta - evt->leps[1].eta) > 1.5) continue;
             hCutflow_Samuel->Fill("DeltaEtaLep",1);
             hCutflow_Samuel->Fill("DeltaEtaLep,w",weight);
@@ -342,6 +328,10 @@ int main()
         }
         else if(SR == 2)
         {
+            if(evt->sig.nJet !=2 && evt->sig.nJet !=3) continue;
+            hCutflow_Samuel->Fill("nJet",1);
+            hCutflow_Samuel->Fill("nJet,w",weight);
+
             hCutflow_Samuel->Fill("DeltaEtaLep",1);
             hCutflow_Samuel->Fill("DeltaEtaLep,w",weight);
 
