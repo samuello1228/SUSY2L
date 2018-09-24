@@ -50,6 +50,180 @@ void checkError(float x, float y, TString name, float limit)
     }
 }
 
+void FillHist_Dani(TH1D* hCutflow_Dani)
+{
+    if(NlepBL !=2) return;
+    if(nSigLep !=2) return;
+    double weight = totweight*lumiScaling;
+    hCutflow_Dani->Fill("=2BaseLep && =2SigLep",1);
+    hCutflow_Dani->Fill("=2BaseLep && =2SigLep,w",weight);
+
+    if(Pt_l < 25000) return;
+    hCutflow_Dani->Fill("pt1",1);
+    hCutflow_Dani->Fill("pt1,w",weight);
+
+    if(Pt_subl < 25000) return;
+    hCutflow_Dani->Fill("pt2",1);
+    hCutflow_Dani->Fill("pt2,w",weight);
+
+    if(isTruthLep1 != 1) return;
+    hCutflow_Dani->Fill("isTruthLep1",1);
+    hCutflow_Dani->Fill("isTruthLep1,w",weight);
+
+    if(isTruthLep2 != 1) return;
+    hCutflow_Dani->Fill("isTruthLep2",1);
+    hCutflow_Dani->Fill("isTruthLep2,w",weight);
+
+    if(nBJets20 !=0) return;
+    hCutflow_Dani->Fill("nBJets20",1);
+    hCutflow_Dani->Fill("nBJets20,w",weight);
+
+    if(nJets20 ==1)
+    {
+        hCutflow_Dani->Fill("SR1:nJet",1);
+        hCutflow_Dani->Fill("SR1:nJet,w",weight);
+
+        if(fabs(DeltaEtaLep)>1.5) return;
+        hCutflow_Dani->Fill("SR1:DeltaEtaLep",1);
+        hCutflow_Dani->Fill("SR1:DeltaEtaLep,w",weight);
+
+        if(met<100000) return;
+        hCutflow_Dani->Fill("SR1:met",1);
+        hCutflow_Dani->Fill("SR1:met,w",weight);
+
+        if(mt<140000) return;
+        hCutflow_Dani->Fill("SR1:mt",1);
+        hCutflow_Dani->Fill("SR1:mt,w",weight);
+
+        if(meff<260000) return;
+        hCutflow_Dani->Fill("SR1:meff",1);
+        hCutflow_Dani->Fill("SR1:meff,w",weight);
+
+        if(mljj_comb>=180000) return;
+        hCutflow_Dani->Fill("SR1:mljj",1);
+        hCutflow_Dani->Fill("SR1:mljj,w",weight);
+
+        if(MT2<80000) return;
+        hCutflow_Dani->Fill("SR1:MT2",1);
+        hCutflow_Dani->Fill("SR1:MT2,w",weight);
+    }
+    else if(nJets20 ==2 || nJets20 ==3)
+    {
+        hCutflow_Dani->Fill("SR2:nJet",1);
+        hCutflow_Dani->Fill("SR2:nJet,w",weight);
+
+        hCutflow_Dani->Fill("SR2:DeltaEtaLep",1);
+        hCutflow_Dani->Fill("SR2:DeltaEtaLep,w",weight);
+
+        if(met<100000) return;
+        hCutflow_Dani->Fill("SR2:met",1);
+        hCutflow_Dani->Fill("SR2:met,w",weight);
+
+        if(mt<120000) return;
+        hCutflow_Dani->Fill("SR2:mt",1);
+        hCutflow_Dani->Fill("SR2:mt,w",weight);
+
+        if(meff<240000) return;
+        hCutflow_Dani->Fill("SR2:meff",1);
+        hCutflow_Dani->Fill("SR2:meff,w",weight);
+
+        if(mljj_comb>=130000) return;
+        hCutflow_Dani->Fill("SR2:mljj",1);
+        hCutflow_Dani->Fill("SR2:mljj,w",weight);
+
+        if(MT2<70000) return;
+        hCutflow_Dani->Fill("SR2:MT2",1);
+        hCutflow_Dani->Fill("SR2:MT2,w",weight);
+    }
+}
+
+void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, double commonWeight)
+{
+    if(evt->sig.nBaseLep !=2) return;
+    if(evt->sig.nSigLep !=2) return;
+    double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
+    hCutflow_Samuel->Fill("=2BaseLep && =2SigLep",1);
+    hCutflow_Samuel->Fill("=2BaseLep && =2SigLep,w",weight);
+
+    if(evt->leps[0].pt < 25) return;
+    hCutflow_Samuel->Fill("pt1",1);
+    hCutflow_Samuel->Fill("pt1,w",weight);
+
+    if(evt->leps[1].pt < 25) return;
+    hCutflow_Samuel->Fill("pt2",1);
+    hCutflow_Samuel->Fill("pt2,w",weight);
+
+    if(evt->leps[0].lepTruth != 1) return;
+    hCutflow_Samuel->Fill("isTruthLep1",1);
+    hCutflow_Samuel->Fill("isTruthLep1,w",weight);
+
+    if(evt->leps[1].lepTruth != 1) return;
+    hCutflow_Samuel->Fill("isTruthLep2",1);
+    hCutflow_Samuel->Fill("isTruthLep2,w",weight);
+
+    if(evt->sig.nBJet !=0) return;
+    hCutflow_Samuel->Fill("nBJets20",1);
+    hCutflow_Samuel->Fill("nBJets20,w",weight);
+
+    if(evt->sig.nJet ==1)
+    {
+        hCutflow_Samuel->Fill("SR1:nJet",1);
+        hCutflow_Samuel->Fill("SR1:nJet,w",weight);
+
+        if(fabs(evt->leps[0].eta - evt->leps[1].eta) > 1.5) return;
+        hCutflow_Samuel->Fill("SR1:DeltaEtaLep",1);
+        hCutflow_Samuel->Fill("SR1:DeltaEtaLep,w",weight);
+
+        if(evt->sig.Met<100) return;
+        hCutflow_Samuel->Fill("SR1:met",1);
+        hCutflow_Samuel->Fill("SR1:met,w",weight);
+
+        if(evt->leps[0].mT<140) return;
+        hCutflow_Samuel->Fill("SR1:mt",1);
+        hCutflow_Samuel->Fill("SR1:mt,w",weight);
+
+        if(evt->sig.HT + evt->sig.Met < 260) return;
+        hCutflow_Samuel->Fill("SR1:meff",1);
+        hCutflow_Samuel->Fill("SR1:meff,w",weight);
+
+        if(evt->sig.mlj>=180) return;
+        hCutflow_Samuel->Fill("SR1:mljj",1);
+        hCutflow_Samuel->Fill("SR1:mljj,w",weight);
+
+        if(evt->sig.mT2<80) return;
+        hCutflow_Samuel->Fill("SR1:MT2",1);
+        hCutflow_Samuel->Fill("SR1:MT2,w",weight);
+    }
+    else if(evt->sig.nJet ==2 || evt->sig.nJet ==3)
+    {
+        hCutflow_Samuel->Fill("SR2:nJet",1);
+        hCutflow_Samuel->Fill("SR2:nJet,w",weight);
+
+        hCutflow_Samuel->Fill("SR2:DeltaEtaLep",1);
+        hCutflow_Samuel->Fill("SR2:DeltaEtaLep,w",weight);
+
+        if(evt->sig.Met<100) return;
+        hCutflow_Samuel->Fill("SR2:met",1);
+        hCutflow_Samuel->Fill("SR2:met,w",weight);
+
+        if(evt->leps[0].mT<120) return;
+        hCutflow_Samuel->Fill("SR2:mt",1);
+        hCutflow_Samuel->Fill("SR2:mt,w",weight);
+
+        if(evt->sig.HT + evt->sig.Met < 240) return;
+        hCutflow_Samuel->Fill("SR2:meff",1);
+        hCutflow_Samuel->Fill("SR2:meff,w",weight);
+
+        if(evt->sig.mlj>=130) return;
+        hCutflow_Samuel->Fill("SR2:mljj",1);
+        hCutflow_Samuel->Fill("SR2:mljj,w",weight);
+
+        if(evt->sig.mT2<70) return;
+        hCutflow_Samuel->Fill("SR2:MT2",1);
+        hCutflow_Samuel->Fill("SR2:MT2,w",weight);
+    }
+}
+
 int main()
 {
     const TString CHAIN_NAME = "WZ_nom";
@@ -162,89 +336,7 @@ int main()
         tree1->GetEntry(i);
 
         if(MCId != sampleID) continue;
-        if(NlepBL !=2) continue;
-        if(nSigLep !=2) continue;
-        double weight = totweight*lumiScaling;
-        hCutflow_Dani->Fill("=2BaseLep && =2SigLep",1);
-        hCutflow_Dani->Fill("=2BaseLep && =2SigLep,w",weight);
-
-        if(Pt_l < 25000) continue;
-        hCutflow_Dani->Fill("pt1",1);
-        hCutflow_Dani->Fill("pt1,w",weight);
-
-        if(Pt_subl < 25000) continue;
-        hCutflow_Dani->Fill("pt2",1);
-        hCutflow_Dani->Fill("pt2,w",weight);
-
-        if(isTruthLep1 != 1) continue;
-        hCutflow_Dani->Fill("isTruthLep1",1);
-        hCutflow_Dani->Fill("isTruthLep1,w",weight);
-
-        if(isTruthLep2 != 1) continue;
-        hCutflow_Dani->Fill("isTruthLep2",1);
-        hCutflow_Dani->Fill("isTruthLep2,w",weight);
-
-        if(nBJets20 !=0) continue;
-        hCutflow_Dani->Fill("nBJets20",1);
-        hCutflow_Dani->Fill("nBJets20,w",weight);
-
-        if(nJets20 ==1)
-        {
-            hCutflow_Dani->Fill("SR1:nJet",1);
-            hCutflow_Dani->Fill("SR1:nJet,w",weight);
-
-            if(fabs(DeltaEtaLep)>1.5) continue;
-            hCutflow_Dani->Fill("SR1:DeltaEtaLep",1);
-            hCutflow_Dani->Fill("SR1:DeltaEtaLep,w",weight);
-
-            if(met<100000) continue;
-            hCutflow_Dani->Fill("SR1:met",1);
-            hCutflow_Dani->Fill("SR1:met,w",weight);
-
-            if(mt<140000) continue;
-            hCutflow_Dani->Fill("SR1:mt",1);
-            hCutflow_Dani->Fill("SR1:mt,w",weight);
-
-            if(meff<260000) continue;
-            hCutflow_Dani->Fill("SR1:meff",1);
-            hCutflow_Dani->Fill("SR1:meff,w",weight);
-
-            if(mljj_comb>=180000) continue;
-            hCutflow_Dani->Fill("SR1:mljj",1);
-            hCutflow_Dani->Fill("SR1:mljj,w",weight);
-
-            if(MT2<80000) continue;
-            hCutflow_Dani->Fill("SR1:MT2",1);
-            hCutflow_Dani->Fill("SR1:MT2,w",weight);
-        }
-        else if(nJets20 ==2 || nJets20 ==3)
-        {
-            hCutflow_Dani->Fill("SR2:nJet",1);
-            hCutflow_Dani->Fill("SR2:nJet,w",weight);
-
-            hCutflow_Dani->Fill("SR2:DeltaEtaLep",1);
-            hCutflow_Dani->Fill("SR2:DeltaEtaLep,w",weight);
-
-            if(met<100000) continue;
-            hCutflow_Dani->Fill("SR2:met",1);
-            hCutflow_Dani->Fill("SR2:met,w",weight);
-
-            if(mt<120000) continue;
-            hCutflow_Dani->Fill("SR2:mt",1);
-            hCutflow_Dani->Fill("SR2:mt,w",weight);
-
-            if(meff<240000) continue;
-            hCutflow_Dani->Fill("SR2:meff",1);
-            hCutflow_Dani->Fill("SR2:meff,w",weight);
-
-            if(mljj_comb>=130000) continue;
-            hCutflow_Dani->Fill("SR2:mljj",1);
-            hCutflow_Dani->Fill("SR2:mljj,w",weight);
-
-            if(MT2<70000) continue;
-            hCutflow_Dani->Fill("SR2:MT2",1);
-            hCutflow_Dani->Fill("SR2:MT2,w",weight);
-        }
+        FillHist_Dani(hCutflow_Dani);
     }
 
     for(unsigned int j=1;j<=cutflowList.size();j++)
@@ -278,90 +370,7 @@ int main()
         if(!evt->sig.isSS) continue;
         if(!evt->sig.JetCut) continue;
         if(evt->sig.isZ) continue;
-
-        if(evt->sig.nBaseLep !=2) continue;
-        if(evt->sig.nSigLep !=2) continue;
-        double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
-        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep",1);
-        hCutflow_Samuel->Fill("=2BaseLep && =2SigLep,w",weight);
-
-        if(evt->leps[0].pt < 25) continue;
-        hCutflow_Samuel->Fill("pt1",1);
-        hCutflow_Samuel->Fill("pt1,w",weight);
-
-        if(evt->leps[1].pt < 25) continue;
-        hCutflow_Samuel->Fill("pt2",1);
-        hCutflow_Samuel->Fill("pt2,w",weight);
-
-        if(evt->leps[0].lepTruth != 1) continue;
-        hCutflow_Samuel->Fill("isTruthLep1",1);
-        hCutflow_Samuel->Fill("isTruthLep1,w",weight);
-
-        if(evt->leps[1].lepTruth != 1) continue;
-        hCutflow_Samuel->Fill("isTruthLep2",1);
-        hCutflow_Samuel->Fill("isTruthLep2,w",weight);
-
-        if(evt->sig.nBJet !=0) continue;
-        hCutflow_Samuel->Fill("nBJets20",1);
-        hCutflow_Samuel->Fill("nBJets20,w",weight);
-
-        if(evt->sig.nJet ==1)
-        {
-            hCutflow_Samuel->Fill("SR1:nJet",1);
-            hCutflow_Samuel->Fill("SR1:nJet,w",weight);
-
-            if(fabs(evt->leps[0].eta - evt->leps[1].eta) > 1.5) continue;
-            hCutflow_Samuel->Fill("SR1:DeltaEtaLep",1);
-            hCutflow_Samuel->Fill("SR1:DeltaEtaLep,w",weight);
-
-            if(evt->sig.Met<100) continue;
-            hCutflow_Samuel->Fill("SR1:met",1);
-            hCutflow_Samuel->Fill("SR1:met,w",weight);
-
-            if(evt->leps[0].mT<140) continue;
-            hCutflow_Samuel->Fill("SR1:mt",1);
-            hCutflow_Samuel->Fill("SR1:mt,w",weight);
-
-            if(evt->sig.HT + evt->sig.Met < 260) continue;
-            hCutflow_Samuel->Fill("SR1:meff",1);
-            hCutflow_Samuel->Fill("SR1:meff,w",weight);
-
-            if(evt->sig.mlj>=180) continue;
-            hCutflow_Samuel->Fill("SR1:mljj",1);
-            hCutflow_Samuel->Fill("SR1:mljj,w",weight);
-
-            if(evt->sig.mT2<80) continue;
-            hCutflow_Samuel->Fill("SR1:MT2",1);
-            hCutflow_Samuel->Fill("SR1:MT2,w",weight);
-        }
-        else if(evt->sig.nJet ==2 || evt->sig.nJet ==3)
-        {
-            hCutflow_Samuel->Fill("SR2:nJet",1);
-            hCutflow_Samuel->Fill("SR2:nJet,w",weight);
-
-            hCutflow_Samuel->Fill("SR2:DeltaEtaLep",1);
-            hCutflow_Samuel->Fill("SR2:DeltaEtaLep,w",weight);
-
-            if(evt->sig.Met<100) continue;
-            hCutflow_Samuel->Fill("SR2:met",1);
-            hCutflow_Samuel->Fill("SR2:met,w",weight);
-
-            if(evt->leps[0].mT<120) continue;
-            hCutflow_Samuel->Fill("SR2:mt",1);
-            hCutflow_Samuel->Fill("SR2:mt,w",weight);
-
-            if(evt->sig.HT + evt->sig.Met < 240) continue;
-            hCutflow_Samuel->Fill("SR2:meff",1);
-            hCutflow_Samuel->Fill("SR2:meff,w",weight);
-
-            if(evt->sig.mlj>=130) continue;
-            hCutflow_Samuel->Fill("SR2:mljj",1);
-            hCutflow_Samuel->Fill("SR2:mljj,w",weight);
-
-            if(evt->sig.mT2<70) continue;
-            hCutflow_Samuel->Fill("SR2:MT2",1);
-            hCutflow_Samuel->Fill("SR2:MT2,w",weight);
-        }
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
     }
 
     for(unsigned int j=1;j<=cutflowList.size();j++)
