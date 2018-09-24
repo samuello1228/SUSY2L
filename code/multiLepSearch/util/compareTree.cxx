@@ -24,18 +24,24 @@ float EventWeight;
 float PileUpWeight;
 float ObjectSF;
 float triggerSF;
+float triggerSF_CR;
 float chargeFlipSF;
 float weight;
+float weight_CR;
 float EtMiss;
 float EtMissPhi;
 float meff;
-float minv;
+float mll;
 float mt;
 float ht;
+float dEtall;
+float mlj;
 float mj;
 float mjj;
 float mjjdR;
 float mjRec;
+float relMET;
+float maxmt;
 float truthHt;
 float truthMET;
 int isZevent;
@@ -43,6 +49,7 @@ int nW;
 int NlepBL;
 int NlepSig;
 int NlepBLEta;
+int Njet20;
 int Njet25;
 int Njet35;
 int Njet40;
@@ -52,11 +59,22 @@ std::vector<float>* jetBtag;
 std::vector<TLorentzVector>* jetTLV;
 std::vector<TLorentzVector>* lepTLV;
 std::vector<TLorentzVector>* lepTLV_BL;
+std::vector<TLorentzVector>* elTLV_BL;
+std::vector<TLorentzVector>* muTLV_BL;
 std::vector<float>* lepZ0;
+std::vector<float>* elZ0_BL;
 std::vector<float>* lepCharges;
+std::vector<float>* lepCharges_BL;
+std::vector<float>* lepQualities_BL;
 std::vector<float>* lepCFmedium;
 std::vector<float>* lepCFloose;
+std::vector<float>* lepType_BL;
+std::vector<float>* lepOrigin_BL;
+std::vector<float>* lepMotherPdg_BL;
 std::vector<float>* lepTruth;
+std::vector<float>* lepTruth_BL;
+std::vector<float>* elMotherPdg;
+std::vector<float>* muMotherPdg;
 int SSChannel;
 bool SameSign;
 std::vector<std::string>* SysNames;
@@ -71,6 +89,10 @@ int PDGId2;
 int GLDec1;
 int GLDec2;
 int IntPerX;
+
+bool passTrigger;
+bool isLeadTrigMatched;
+bool isSubleadTrigMatched;
 
 void checkError(float x, float y, TString name, float limit)
 {
@@ -93,7 +115,7 @@ int main()
     bool isCR = false;
     //isSR = false; isCR = true;
 
-    //Peter
+    //Peter ntuple
     TString path1 = "";
     TString treeName1 = "";
     if(isSR)
@@ -130,7 +152,7 @@ int main()
         tree1->SetBranchAddress("EtMiss",       &EtMiss);
         tree1->SetBranchAddress("EtMissPhi",    &EtMissPhi);
         tree1->SetBranchAddress("Meff",         &meff);
-        tree1->SetBranchAddress("Minv",         &minv);
+        tree1->SetBranchAddress("Minv",         &mll);
         tree1->SetBranchAddress("Mt",           &mt);
         tree1->SetBranchAddress("Ht",           &ht);
         //tree1->SetBranchAddress("Mj",           &mj);
@@ -175,6 +197,55 @@ int main()
     }
     else if(isCR)
     {
+        tree1->SetBranchAddress("EventNumber",          &EventNumber);
+        //tree1->SetBranchAddress("RunNumber",            &RunNumber);
+        //tree1->SetBranchAddress("PileUpHash",           &PileUpHash);         
+        //tree1->SetBranchAddress("RandomRN",             &randomRN);
+        //tree1->SetBranchAddress("ConfigYear",           &configYear);
+        //tree1->SetBranchAddress("MCId",                 &MCId);
+        tree1->SetBranchAddress("MCWeight",             &EventWeight);
+        tree1->SetBranchAddress("PileUpWeight",         &PileUpWeight);     
+        tree1->SetBranchAddress("ObjectSF",             &ObjectSF);
+        tree1->SetBranchAddress("TriggerSF",            &triggerSF_CR);
+        tree1->SetBranchAddress("ChargeFlipSF",         &chargeFlipSF);
+        tree1->SetBranchAddress("TotalWeight",          &weight_CR);
+        tree1->SetBranchAddress("passTrigger",          &passTrigger);
+        tree1->SetBranchAddress("NlepBL",               &NlepBL);
+        tree1->SetBranchAddress("NlepSig",              &NlepSig);
+        tree1->SetBranchAddress("Njet20",               &Njet20);
+        tree1->SetBranchAddress("Nbjet",                &Nbjet);
+        tree1->SetBranchAddress("jetBtag",              &jetBtag);
+        tree1->SetBranchAddress("jetTLV",               &jetTLV);
+        tree1->SetBranchAddress("elTLV",                &elTLV_BL);
+        tree1->SetBranchAddress("muTLV",                &muTLV_BL);
+        tree1->SetBranchAddress("lepTLV",               &lepTLV_BL);
+        tree1->SetBranchAddress("lepQualities",         &lepQualities_BL);
+        //tree1->SetBranchAddress("elZ0",                 &elZ0_BL);
+        tree1->SetBranchAddress("lepCharges",           &lepCharges_BL);
+        tree1->SetBranchAddress("lepType",              &lepType_BL);
+        tree1->SetBranchAddress("lepOrigin",            &lepOrigin_BL);
+        tree1->SetBranchAddress("lepMotherPdg",         &lepMotherPdg_BL);
+        tree1->SetBranchAddress("lepTruthBL",           &lepTruth_BL);
+        tree1->SetBranchAddress("isLeadTrigMatched",    &isLeadTrigMatched);
+        tree1->SetBranchAddress("isSubleadTrigMatched", &isSubleadTrigMatched);
+        tree1->SetBranchAddress("MET",                  &EtMiss);
+        tree1->SetBranchAddress("METphi",               &EtMissPhi);
+        tree1->SetBranchAddress("RelMET",               &relMET);
+        tree1->SetBranchAddress("Mt",                   &mt);
+        tree1->SetBranchAddress("MaxMt",                &maxmt);
+        tree1->SetBranchAddress("dEtall",               &dEtall);
+        tree1->SetBranchAddress("Ht",                   &ht);
+        tree1->SetBranchAddress("Meff",                 &meff);
+        tree1->SetBranchAddress("Mlj",                  &mlj);
+        tree1->SetBranchAddress("Mll",                  &mll);
+        //tree1->SetBranchAddress("elMotherPdg",          &elMotherPdg);
+        //tree1->SetBranchAddress("muMotherPdg",          &muMotherPdg);
+        //tree1->SetBranchAddress("SysNames",             &SysNames);
+        //tree1->SetBranchAddress("SysWeights",           &SysWeights); 
+        //tree1->SetBranchAddress("PDFWeights",           &PDFWeights);
+        //tree1->SetBranchAddress("CFTWeights",           &CFTWeights);
+        //tree1->SetBranchAddress("TrigWeights",          &TrigWeights); 
+        //tree1->SetBranchAddress("triggerInfo",          &triggerInfo);
     }
 
     //Our ntuple
@@ -237,25 +308,28 @@ int main()
             checkError(lepTLV_BL->at(j).Phi(), evt->leps[index].phi, "phi", 2e-7);
         }
 
-        //check signal leptons
-        if(NlepSig != int(lepTLV->size())) cout<<"nSigLep are different."<<endl;
-        if(NlepSig != int(lepCharges->size())) cout<<"nSigLep are different."<<endl;
         if(NlepSig != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
-        for(unsigned int j=0;j<lepTLV->size();j++)
+        if(isSR)
         {
-            checkError(lepTLV->at(j).Pt(), evt->leps[j].pt * 1000, "pt", 2e-7);
-            checkError(lepTLV->at(j).Eta(), evt->leps[j].eta, "eta", 2e-7);
-            checkError(lepTLV->at(j).Phi(), evt->leps[j].phi, "phi", 2e-7);
-            int charge1 = lepCharges->at(j);
-            int charge2 = evt->leps[j].ID;
-            if(charge2 > 0) charge2 = 1;
-            else charge2 = -1;
-            if(charge1 != charge2) cout<<"charge are different."<<endl;
-
-            //lepTruth
-            int lepTruth1 = lepTruth->at(j);
-            int lepTruth2 = evt->leps[j].lepTruth;
-            if(lepTruth1 != lepTruth2) cout<<"lepTruth are different."<<endl;
+            //check signal leptons
+            if(NlepSig != int(lepTLV->size())) cout<<"nSigLep are different."<<endl;
+            if(NlepSig != int(lepCharges->size())) cout<<"nSigLep are different."<<endl;
+            for(unsigned int j=0;j<lepTLV->size();j++)
+            {
+                checkError(lepTLV->at(j).Pt(), evt->leps[j].pt * 1000, "pt", 2e-7);
+                checkError(lepTLV->at(j).Eta(), evt->leps[j].eta, "eta", 2e-7);
+                checkError(lepTLV->at(j).Phi(), evt->leps[j].phi, "phi", 2e-7);
+                int charge1 = lepCharges->at(j);
+                int charge2 = evt->leps[j].ID;
+                if(charge2 > 0) charge2 = 1;
+                else charge2 = -1;
+                if(charge1 != charge2) cout<<"charge are different."<<endl;
+         
+                //lepTruth
+                int lepTruth1 = lepTruth->at(j);
+                int lepTruth2 = evt->leps[j].lepTruth;
+                if(lepTruth1 != lepTruth2) cout<<"lepTruth are different."<<endl;
+            }
         }
 
         //check jets
@@ -275,20 +349,22 @@ int main()
         //check weight
         checkError(EventWeight, evt->evt.weight, "MC weight", 2e-7);
         checkError(PileUpWeight, evt->evt.pwt, "pile up weight", 2e-7);
-        checkError(triggerSF, evt->evt.trigSF, "trigger weight", 2e-7);
+        if(isSR) checkError(triggerSF, evt->evt.trigSF, "trigger weight", 2e-7);
+        if(isCR) checkError(triggerSF_CR, evt->evt.trigSF_BL, "trigger weight", 2e-7);
         checkError(ObjectSF * chargeFlipSF, evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "object weight", 4e-7);
-        checkError(weight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 5e-7);
+        if(isSR) checkError(weight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 5e-7);
+        if(isCR) checkError(weight_CR, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF_BL * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 5e-7);
 
         //MET
         checkError(EtMiss, evt->sig.Met * 1000, "MET", 2e-7);
         checkError(EtMissPhi, evt->sig.MetPhi, "MetPhi", 2e-7);
 
         //HT
-        if(NlepSig == 2)
+        if(NlepSig == 2 || isCR)
         {
             checkError(ht, evt->sig.HT * 1000, "HT", 3e-7);
             checkError(meff, (evt->sig.HT + evt->sig.Met) * 1000, "meff", 3e-7);
-            checkError(minv, evt->l12.m * 1000, "mll", 2e-7);
+            checkError(mll, evt->l12.m * 1000, "mll", 2e-7);
         }
 
         //leading mT
