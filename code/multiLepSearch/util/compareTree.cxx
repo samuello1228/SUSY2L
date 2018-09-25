@@ -329,6 +329,8 @@ int main()
                 if(lepTruth_BL->at(j) != evt->leps[index].lepTruth) cout<<"lepTruth are different."<<endl;
             }
         }
+
+        if(isCR)
         {
             //trigger Matched
             int index = BaseLep[0].index;
@@ -397,7 +399,8 @@ int main()
         checkError(EtMissPhi, evt->sig.MetPhi, "MetPhi", 2e-7);
 
         //HT
-        if(NlepSig == 2 || isCR)
+        if( (isSR && NlepSig == 2) ||
+             isCR                  )
         {
             checkError(ht, evt->sig.HT * 1000, "HT", 3e-7);
             checkError(meff, (evt->sig.HT + evt->sig.Met) * 1000, "meff", 3e-7);
@@ -406,6 +409,22 @@ int main()
 
         //leading mT
         checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-7);
+        if(isCR)
+        {
+            float maxmt2 = evt->leps[0].mT * 1000;
+            if(evt->leps[1].mT > evt->leps[0].mT) maxmt2 = evt->leps[1].mT * 1000;
+            checkError(maxmt, maxmt2, "Max mT", 3e-7);
+        }
+
+        //dEta
+        if(isCR)
+        {
+            float dEtall2 = fabs(evt->leps[0].eta - evt->leps[1].eta);
+            checkError(dEtall, dEtall2, "dEta", 3e-7);
+        }
+
+        //mlj
+        if(isCR && Njet20 > 0) checkError(mlj, evt->sig.mlj * 1000, "mlj", 3e-7);
     }
 
     //delete objects
