@@ -113,6 +113,7 @@ enum EFLAGS{
 
 enum MFLAGS{
   MU_COSMIC = 1<<4, //16
+  TRIGGER_MATCHED = 1<<6,
 };
 
 enum JFALGS{

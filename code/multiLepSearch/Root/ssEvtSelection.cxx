@@ -1269,6 +1269,7 @@ EL::StatusCode ssEvtSelection :: histFinalize ()
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsigned int index)
 {
   l.ID = 11000;
+  l.lFlag = 0;
 
   // Info("fillLepton(el)", "Before trigger matching");
   // Save single lepton trigger matching info for fakes
@@ -1411,6 +1412,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Electron* el, L_PAR& l, unsign
 EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned int index)
 {
   l.ID = 13000;
+  l.lFlag = 0;
 
   // Save trigger information for fakes study
   if (study=="fakes")
@@ -1429,6 +1431,44 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       if (m_objTool->IsTrigMatched(mu, "HLT_mu25_imedium")
         || m_objTool->IsTrigMatched(mu, "HLT_mu50")) l.ID +=2;
     }
+  }
+  else if (study=="ss" || study=="fakes_Peter")
+  {
+    std::string Mu1Item, Mu2Item, MuMuItem, ElMu1Item, ElMu2Item;
+    float ptCutMu1(0), ptCutMu2(0), ptCutMuMu(0), ptCutElMu1(0), ptCutElMu2(0);
+    if (m_objTool->treatAsYear() == 2015)
+    {
+      Mu1Item    = "HLT_mu20_iloose_L1MU15";
+      Mu2Item    = "HLT_mu40";
+      MuMuItem   = "HLT_mu18_mu8noL1";
+      ElMu1Item  = "HLT_e17_lhloose_mu14";
+      ElMu2Item  = "HLT_e7_lhmedium_mu24";
+      ptCutMu1   = 21000.;
+      ptCutMu2   = 41000.;
+      ptCutMuMu  = 20000.;
+      ptCutElMu1 = 20000.;
+      ptCutElMu2 = 25000.;
+    }
+    else if (m_objTool->treatAsYear() == 2016)
+    {
+      Mu1Item    = "HLT_mu26_imedium";
+      Mu2Item    = "HLT_mu50";
+      MuMuItem   = "HLT_mu22_mu8noL1"; 
+      ElMu1Item  = "HLT_e17_lhloose_nod0_mu14"; 
+      ElMu2Item  = "HLT_e7_lhmedium_nod0_mu24"; 
+      ptCutMu1   = 27000.;
+      ptCutMu2   = 51000.;
+      ptCutMuMu  = 23000.;
+      ptCutElMu1 = 20000.;
+      ptCutElMu2 = 25000.;
+    }
+
+    if( (mu->pt() > ptCutMu1   && m_objTool->IsTrigPassed(Mu1Item)   && m_objTool->IsTrigMatched(mu, Mu1Item))   ||
+        (mu->pt() > ptCutMu2   && m_objTool->IsTrigPassed(Mu2Item)   && m_objTool->IsTrigMatched(mu, Mu2Item))   ||
+        (mu->pt() > ptCutMuMu  && m_objTool->IsTrigPassed(MuMuItem)  && m_objTool->IsTrigMatched(mu, MuMuItem))  ||
+        (mu->pt() > ptCutElMu1 && m_objTool->IsTrigPassed(ElMu1Item) && m_objTool->IsTrigMatched(mu, ElMu1Item)) ||
+        (mu->pt() > ptCutElMu2 && m_objTool->IsTrigPassed(ElMu2Item) && m_objTool->IsTrigMatched(mu, ElMu2Item)) )
+      l.lFlag |= TRIGGER_MATCHED;
   }
   
   //trigMuon.push_back(mu);
@@ -1561,7 +1601,6 @@ void ssEvtSelection :: fillLeptonCommon(xAOD::IParticle* p, L_PAR& l)
   l.phi = p->phi(); 
 
   //flag 
-  l.lFlag = 0;
   unsigned int& flag = l.lFlag;
   if(dec_baseline(*p)) flag |= IS_BASELINE;
   if(dec_signal(*p)) flag |= IS_SIGNAL;
