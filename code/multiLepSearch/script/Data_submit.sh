@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v13.0
+tag=v13.4
 
 #My GRL
 #grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
@@ -20,7 +20,13 @@ mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root
 SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
 
 #study=ss
-study=fakes
+study=fakes_Peter
+#study=fakes
+
+if [ "$study" = "fakes_Peter" ]
+then
+    dataPRW=multiLepSearch/prw_Data/ilumicalc_histograms_None_297730-311481_OflLumi-13TeV-009.root
+fi
 
 file=../multiLepSearch/script/Data_sample_list.txt
 k=${tag}.data 

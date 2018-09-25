@@ -1156,6 +1156,8 @@ EL::StatusCode ssEvtSelection :: execute ()
         sEvt.MuSF = 1;
         sEvt.BtagSF = 1;
         sEvt.JvtSF = 1;
+        sEvt.trigSF = 1;
+        sEvt.trigSF_BL = 1;
       }
 
       if(nBaseLep >= 2) m_hCutFlow->Fill(">=2BaseLep,w", TotalWeight);
