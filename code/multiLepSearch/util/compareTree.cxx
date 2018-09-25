@@ -306,6 +306,42 @@ int main()
             checkError(lepTLV_BL->at(j).Pt(), evt->leps[index].pt * 1000, "pt", 2e-7);
             checkError(lepTLV_BL->at(j).Eta(), evt->leps[index].eta, "eta", 2e-7);
             checkError(lepTLV_BL->at(j).Phi(), evt->leps[index].phi, "phi", 2e-7);
+
+            if(isCR)
+            {
+                //lepQualities_BL
+                if(lepQualities_BL->at(j) == 0) cout<<"lepton is not baseline"<<endl;
+                bool isSignal1 = (lepQualities_BL->at(j) == 2) && lepTLV_BL->at(j).Pt()>25000;
+                bool isSignal2 = evt->leps[index].lFlag & IS_SIGNAL;
+                if(isSignal1 != isSignal2) cout<<"isSignal are different."<<endl;
+
+                //lepCharges_BL
+                int charge1 = lepCharges_BL->at(j);
+                int charge2 = evt->leps[index].ID;
+                if(charge2 > 0) charge2 = 1;
+                else charge2 = -1;
+                if(charge1 != charge2) cout<<"charge are different."<<endl;
+
+                //lepton truth
+                if(lepType_BL->at(j) != evt->leps[index].truthType) cout<<"lepType are different."<<endl;
+                if(lepOrigin_BL->at(j) != evt->leps[index].truthOrig) cout<<"lepOrigin are different."<<endl;
+                if(lepMotherPdg_BL->at(j) != evt->leps[index].firstEgMotherPdgId) cout<<"firstEgMotherPdgId are different."<<endl;
+                if(lepTruth_BL->at(j) != evt->leps[index].lepTruth) cout<<"lepTruth are different."<<endl;
+            }
+        }
+        {
+            //trigger Matched
+            int index = BaseLep[0].index;
+            bool isLeadTrigMatched2 = (abs(int(evt->leps[index].ID/1000)) == 13);
+            isLeadTrigMatched2 &= bool(evt->leps[index].lFlag & IS_SIGNAL);
+            isLeadTrigMatched2 &= bool(evt->leps[index].lFlag & TRIGGER_MATCHED);
+            if(isLeadTrigMatched != isLeadTrigMatched2) cout<<"isLeadTrigMatched are different."<<endl;
+
+            index = BaseLep[1].index;
+            bool isSubleadTrigMatched2 = (abs(int(evt->leps[index].ID/1000)) == 13);
+            isSubleadTrigMatched2 &= bool(evt->leps[index].lFlag & IS_SIGNAL);
+            isSubleadTrigMatched2 &= bool(evt->leps[index].lFlag & TRIGGER_MATCHED);
+            if(isSubleadTrigMatched != isSubleadTrigMatched2) cout<<"isSubleadTrigMatched are different."<<endl;
         }
 
         if(NlepSig != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
@@ -333,6 +369,7 @@ int main()
         }
 
         //check jets
+        if(isCR) { if(Njet20 != evt->sig.nJet) cout<<"nJet are different."<<endl; }
         if(int(jetTLV->size()) != evt->sig.nJet) cout<<"nJet are different."<<endl;
         if(jetTLV->size() != evt->jets.size()) cout<<"nJet are different."<<endl;
         if(Nbjet != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
