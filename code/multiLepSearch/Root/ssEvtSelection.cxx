@@ -803,6 +803,8 @@ EL::StatusCode ssEvtSelection :: execute ()
     //at least 2 baseline leptons
     if(nBaseLep < 2) continue;
     m_hCutFlow->Fill(">=2BaseLep", 1);
+    //if(nSigLep < 2) continue; //For DiLeptonTree_SRall of Dani official ntuples
+    //if(nBaseLep != 2 || nSigLep == 0 || nBaseMu == 0) continue; //For DiLeptonTree_CR for measuring fake eff
 
     /// sort leptons
     sort(sel_Ls.begin(), sel_Ls.end(), [](xAOD::IParticle* a, xAOD::IParticle* b)->bool{return a->pt()>b->pt();});
@@ -1436,6 +1438,7 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
   {
     std::string Mu1Item, Mu2Item, MuMuItem, ElMu1Item, ElMu2Item;
     float ptCutMu1(0), ptCutMu2(0), ptCutMuMu(0), ptCutElMu1(0), ptCutElMu2(0);
+    bool DoElMu2 = true;
     if (m_objTool->treatAsYear() == 2015)
     {
       Mu1Item    = "HLT_mu20_iloose_L1MU15";
@@ -1461,14 +1464,22 @@ EL::StatusCode ssEvtSelection :: fillLepton(xAOD::Muon* mu, L_PAR& l, unsigned i
       ptCutMuMu  = 23000.;
       ptCutElMu1 = 20000.;
       ptCutElMu2 = 25000.;
+      if (study=="fakes_Peter") DoElMu2 = false;
     }
 
-    if( (mu->pt() > ptCutMu1   && m_objTool->IsTrigPassed(Mu1Item)   && m_objTool->IsTrigMatched(mu, Mu1Item))   ||
-        (mu->pt() > ptCutMu2   && m_objTool->IsTrigPassed(Mu2Item)   && m_objTool->IsTrigMatched(mu, Mu2Item))   ||
-        (mu->pt() > ptCutMuMu  && m_objTool->IsTrigPassed(MuMuItem)  && m_objTool->IsTrigMatched(mu, MuMuItem))  ||
-        (mu->pt() > ptCutElMu1 && m_objTool->IsTrigPassed(ElMu1Item) && m_objTool->IsTrigMatched(mu, ElMu1Item)) ||
-        (mu->pt() > ptCutElMu2 && m_objTool->IsTrigPassed(ElMu2Item) && m_objTool->IsTrigMatched(mu, ElMu2Item)) )
-      l.lFlag |= TRIGGER_MATCHED;
+    if( (m_objTool->IsTrigPassed(Mu1Item)             ) ||
+        (m_objTool->IsTrigPassed(Mu2Item)             ) ||
+        (m_objTool->IsTrigPassed(MuMuItem)            ) ||
+        (m_objTool->IsTrigPassed(ElMu1Item)           ) ||
+        (m_objTool->IsTrigPassed(ElMu2Item) && DoElMu2) )
+    {
+      if( (mu->pt() > ptCutMu1   && m_objTool->IsTrigMatched(mu, Mu1Item)   ) ||
+          (mu->pt() > ptCutMu2   && m_objTool->IsTrigMatched(mu, Mu2Item)   ) ||
+          (mu->pt() > ptCutMuMu  && m_objTool->IsTrigMatched(mu, MuMuItem)  ) ||
+          (mu->pt() > ptCutElMu1 && m_objTool->IsTrigMatched(mu, ElMu1Item) ) ||
+          (mu->pt() > ptCutElMu2 && m_objTool->IsTrigMatched(mu, ElMu2Item) ) )
+        l.lFlag |= TRIGGER_MATCHED;
+    }
   }
   
   //trigMuon.push_back(mu);
