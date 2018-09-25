@@ -125,7 +125,8 @@ int main()
     }
     else if(isCR)
     {
-        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_normal/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_normal/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_fakes/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
         treeName1 = "DiLeptonTree_CR";
     }
 
@@ -257,7 +258,8 @@ int main()
     }
     else if(isCR)
     {
-        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR/data-myOutput/test.root";
+        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR_normal/data-myOutput/test.root";
+        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR_fakes/data-myOutput/test.root";
     }
     tree2->Add(path2.Data());
     susyEvts* evt = new susyEvts(tree2);
