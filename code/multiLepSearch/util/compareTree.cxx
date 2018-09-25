@@ -115,18 +115,24 @@ int main()
     bool isCR = false;
     //isSR = false; isCR = true;
 
+    bool isMC = true;
+    //isMC = false;
+
     //Peter ntuple
     TString path1 = "";
     TString treeName1 = "";
     if(isSR)
     {
-        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter1/Output_s2/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter1/Output_mc_s2/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter1/Output_data_s2/data-output/data16_13TeV.00300279.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2950.root";
         treeName1 = "DiLeptonTree_SRall";
     }
     else if(isCR)
     {
-        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_normal/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
-        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_fakes/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_mc_normal/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_mc_fakes/data-output/mc15_13TeV.361071.Sherpa_CT10_lllvjj_EW6.merge.DAOD_SUSY2.e3836_s2726_r7772_r7676_p2949.root";
+        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_data_normal/data-output/data16_13TeV.00300279.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2950.root";
+        //path1 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-Peter2/Output_data_fakes/data-output/data16_13TeV.00300279.physics_Main.merge.DAOD_SUSY2.f705_m1606_p2950.root";
         treeName1 = "DiLeptonTree_CR";
     }
 
@@ -254,12 +260,15 @@ int main()
     TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1/data-myOutput/test.root";
     if(isSR)
     {
-        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_s2/data-myOutput/test.root";
+        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_mc_s2/data-myOutput/test.root";
+        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_data_s2/data-myOutput/test.root";
     }
     else if(isCR)
     {
-        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR_normal/data-myOutput/test.root";
-        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_CR_fakes/data-myOutput/test.root";
+        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_mc_CR_normal/data-myOutput/test.root";
+        path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_mc_CR_fakes/data-myOutput/test.root";
+        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_data_CR_normal/data-myOutput/test.root";
+        //path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1_data_CR_fakes/data-myOutput/test.root";
     }
     tree2->Add(path2.Data());
     susyEvts* evt = new susyEvts(tree2);
@@ -325,10 +334,13 @@ int main()
                 if(charge1 != charge2) cout<<"charge are different."<<endl;
 
                 //lepton truth
-                if(lepType_BL->at(j) != evt->leps[index].truthType) cout<<"lepType are different."<<endl;
-                if(lepOrigin_BL->at(j) != evt->leps[index].truthOrig) cout<<"lepOrigin are different."<<endl;
-                if(lepMotherPdg_BL->at(j) != evt->leps[index].firstEgMotherPdgId) cout<<"firstEgMotherPdgId are different."<<endl;
-                if(lepTruth_BL->at(j) != evt->leps[index].lepTruth) cout<<"lepTruth are different."<<endl;
+                if(isMC)
+                {
+                    if(lepType_BL->at(j) != evt->leps[index].truthType) cout<<"lepType are different."<<endl;
+                    if(lepOrigin_BL->at(j) != evt->leps[index].truthOrig) cout<<"lepOrigin are different."<<endl;
+                    if(lepMotherPdg_BL->at(j) != evt->leps[index].firstEgMotherPdgId) cout<<"firstEgMotherPdgId are different."<<endl;
+                    if(lepTruth_BL->at(j) != evt->leps[index].lepTruth) cout<<"lepTruth are different."<<endl;
+                }
             }
         }
 
@@ -365,10 +377,13 @@ int main()
                 else charge2 = -1;
                 if(charge1 != charge2) cout<<"charge are different."<<endl;
          
-                //lepTruth
-                int lepTruth1 = lepTruth->at(j);
-                int lepTruth2 = evt->leps[j].lepTruth;
-                if(lepTruth1 != lepTruth2) cout<<"lepTruth are different."<<endl;
+                if(isMC)
+                {
+                    //lepTruth
+                    int lepTruth1 = lepTruth->at(j);
+                    int lepTruth2 = evt->leps[j].lepTruth;
+                    if(lepTruth1 != lepTruth2) cout<<"lepTruth are different."<<endl;
+                }
             }
         }
 
