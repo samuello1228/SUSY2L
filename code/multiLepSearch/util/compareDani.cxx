@@ -270,10 +270,9 @@ int main()
     TChain* tree2 = new TChain("evt2l");
     //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
     //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
-    //TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-c1d5464d/user.clo.v13.0.";
-    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-new/user.clo.v13.2.";
+    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-1d0fe32c/user.clo.v13.3.";
     tree2->Add(path2 + "VV_CT10_myOutput.root/user.clo.mc15_13TeV.361071.*.myOutput.root*"); int sampleID = 361071; double XS = 0.042287*0.91;
-    //tree2->Add(path2 + "VV_221_myOutput.root/user.clo.mc15_13TeV.363491.*.myOutput.root*"); int sampleID = 363491;
+    //tree2->Add(path2 + "VV_221_myOutput.root/user.clo.mc15_13TeV.363491.*.myOutput.root*"); int sampleID = 363491; double XS = 4.5877;
     susyEvts* evt = new susyEvts(tree2);
     cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
@@ -412,12 +411,12 @@ int main()
         checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
         checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
         checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
-        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 4e-7);
+        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
         checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
         checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
         checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
         //checkError(wttV_nom, evt->evt.ttVSF, "ttV weight", 2e-7);
-        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 4e-7);
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 6e-7);
 
         //number of leptons
         if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
@@ -437,7 +436,7 @@ int main()
         checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
         checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
         checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
-        checkError(mt, evt->leps[0].mT * 1000, "mT", 4e-7);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-6);
 
         //meff
         float pt_sum = 0;
