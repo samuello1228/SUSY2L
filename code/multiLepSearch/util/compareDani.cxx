@@ -52,9 +52,12 @@ void checkError(float x, float y, TString name, float limit)
 
 void FillHist_Dani(TH1D* hCutflow_Dani)
 {
+    double weight = totweight*lumiScaling;
+    hCutflow_Dani->Fill("Z veto",1);
+    hCutflow_Dani->Fill("Z veto,w",weight);
+
     if(NlepBL !=2) return;
     if(nSigLep !=2) return;
-    double weight = totweight*lumiScaling;
     hCutflow_Dani->Fill("=2BaseLep && =2SigLep",1);
     hCutflow_Dani->Fill("=2BaseLep && =2SigLep,w",weight);
 
@@ -139,9 +142,11 @@ void FillHist_Dani(TH1D* hCutflow_Dani)
 
 void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, double commonWeight)
 {
+    double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
+    hCutflow_Samuel->Fill("Z veto,w",weight);
+
     if(evt->sig.nBaseLep !=2) return;
     if(evt->sig.nSigLep !=2) return;
-    double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
     hCutflow_Samuel->Fill("=2BaseLep && =2SigLep",1);
     hCutflow_Samuel->Fill("=2BaseLep && =2SigLep,w",weight);
 
@@ -277,6 +282,23 @@ int main()
     cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
     std::vector<TString> cutflowList;
+    cutflowList.push_back("AOD");
+    cutflowList.push_back("SUSY2");
+    cutflowList.push_back("GRL");
+    cutflowList.push_back("Trigger");
+    cutflowList.push_back("LAr+Tile+SCT+CoreFlag");
+    cutflowList.push_back("PV");
+    cutflowList.push_back("cosMuon");
+    cutflowList.push_back("BadMuon");
+    cutflowList.push_back("BadJet");
+    cutflowList.push_back(">=2BaseLep");
+    cutflowList.push_back(">=2SigLep");
+    cutflowList.push_back("SS leptons");
+    cutflowList.push_back(">=1 passOR jet");
+    cutflowList.push_back(">=1 signal jet");
+    cutflowList.push_back("Z veto");
+    cutflowList.push_back("Z veto,w");
+
     cutflowList.push_back("=2BaseLep && =2SigLep");
     cutflowList.push_back("=2BaseLep && =2SigLep,w");
     cutflowList.push_back("pt1");
@@ -346,8 +368,24 @@ int main()
         cout<<fileList->At(i)->GetTitle()<<endl;
         TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
         TH1D *h1 = (TH1D*) f1->Get("hCutFlow");
-        //for(unsigned int j=1;j<30;j++) icout<<j<<" "<<h1->GetBinContent(j)<<endl;;
+        //for(unsigned int j=1;j<80;j++) cout<<j<<": "<<h1->GetXaxis()->GetBinLabel(j)<<": "<<h1->GetBinContent(j)<<endl;;
         nwAOD += h1->GetBinContent(2);
+
+        hCutflow_Samuel->Fill("AOD", h1->GetBinContent(1));
+        hCutflow_Samuel->Fill("SUSY2", h1->GetBinContent(4));
+        hCutflow_Samuel->Fill("GRL", h1->GetBinContent(8));
+        hCutflow_Samuel->Fill("Trigger", h1->GetBinContent(9));
+        hCutflow_Samuel->Fill("LAr+Tile+SCT+CoreFlag", h1->GetBinContent(10));
+        hCutflow_Samuel->Fill("PV", h1->GetBinContent(11));
+        hCutflow_Samuel->Fill("cosMuon", h1->GetBinContent(12));
+        hCutflow_Samuel->Fill("BadMuon", h1->GetBinContent(13));
+        hCutflow_Samuel->Fill("BadJet", h1->GetBinContent(14));
+        hCutflow_Samuel->Fill(">=2BaseLep", h1->GetBinContent(70));
+        hCutflow_Samuel->Fill(">=2SigLep", h1->GetBinContent(72));
+        hCutflow_Samuel->Fill("SS leptons", h1->GetBinContent(74));
+        hCutflow_Samuel->Fill(">=1 passOR jet", h1->GetBinContent(75));
+        hCutflow_Samuel->Fill(">=1 signal jet", h1->GetBinContent(76));
+        hCutflow_Samuel->Fill("Z veto", h1->GetBinContent(77));
         
         delete f1;
     }
@@ -465,18 +503,22 @@ int main()
     }
     cout<<"Total number of event in Dani selection: "<<count<<endl;
 
-    for(unsigned int j=1;j<=cutflowList.size();j++)
+    cout<<"Dani Cutflow:"<<endl;
+    for(unsigned int j=15;j<=cutflowList.size();j++)
     {
         cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
         if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
-        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
+        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
     }
+    cout<<endl;
 
+    cout<<"Samuel Cutflow:"<<endl;
     for(unsigned int j=1;j<=cutflowList.size();j++)
     {
         cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
+        if(j<=14) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+        else if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
     }
 
     delete hCutflow_Dani;
