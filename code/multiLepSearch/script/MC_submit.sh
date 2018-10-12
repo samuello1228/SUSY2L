@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v13.4
+tag=v13.5
 
 #My Data PRW
 #dataPRW=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-009.root,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.lumicalc.OflLumi-13TeV-005.root
@@ -19,8 +19,8 @@ SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
 #MC type
 isMC=1
 
-#study=ss
-study=fakes_Peter
+study=ss
+#study=fakes_Peter
 #study=fakes
 
 if [ "$study" = "fakes_Peter" ]

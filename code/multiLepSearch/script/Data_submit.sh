@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v13.4
+tag=v13.5
 
 #My GRL
 #grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
@@ -19,8 +19,8 @@ mcPRW=multiLepSearch/prw_MC/merged_prw_mc15c_Sep19.root
 #SUSYTools Config File
 SUSYconf=multiLepSearch/sel_conf/WHSS_0910.conf
 
-#study=ss
-study=fakes_Peter
+study=ss
+#study=fakes_Peter
 #study=fakes
 
 if [ "$study" = "fakes_Peter" ]
