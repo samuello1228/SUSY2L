@@ -469,22 +469,21 @@ void RunProcess(Process& process, vector<TString>& cutflowList)
         RunSample(tree1, process.samples[i], hCutflow_Dani, hCutflow_Samuel);
     }
 
-    cout<<"Dani Cutflow:"<<endl;
-    for(unsigned int j=15;j<=cutflowList.size();j++)
-    {
-        cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
-        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
-    }
-    cout<<endl;
-
-    cout<<"Samuel Cutflow:"<<endl;
+    cout<<"Cutflow: Dani, Samuel"<<endl;
     for(unsigned int j=1;j<=cutflowList.size();j++)
     {
         cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
         if(j<=14) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        else if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
+        else if(j%2 == 1)
+        {
+            cout<<int(hCutflow_Dani->GetBinContent(j))<<", "<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+            if(int(hCutflow_Dani->GetBinContent(j)) != int(hCutflow_Samuel->GetBinContent(j))) cout<<"Error: unweighed yield is different."<<endl;
+        }
+        else if(j%2 == 0)
+        {
+            cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<", "<<hCutflow_Samuel->GetBinContent(j)<<endl;
+            checkError(hCutflow_Dani->GetBinContent(j), hCutflow_Samuel->GetBinContent(j), "yield", 1e-6);
+        }
     }
 
     delete hCutflow_Dani;
@@ -561,6 +560,7 @@ int main()
 
     //WZ
     process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "WZ_nom";
+    process.samples.clear();
     sample.tag = "VV_CT10"; sample.ID = 361071; sample.XS = 0.042287*0.91; process.samples.push_back(sample);
     sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        process.samples.push_back(sample);
     processes.push_back(process);
