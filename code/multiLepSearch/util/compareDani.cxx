@@ -140,7 +140,7 @@ void FillHist_Dani(TH1D* hCutflow_Dani)
     }
 }
 
-void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, double commonWeight)
+void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonWeight)
 {
     double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
     hCutflow_Samuel->Fill("Z veto,w",weight);
@@ -229,14 +229,206 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, double commonWeight)
     }
 }
 
+void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel)
+{
+    ///*
+    //cutflow for Dani ntuple
+    for (long i = 0; i < tree1->GetEntries(); i++)
+    {
+        tree1->GetEntry(i);
+
+        if(MCId != sampleID) continue;
+        FillHist_Dani(hCutflow_Dani);
+    }
+    //*/
+
+    //Our ntuple
+    //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root";
+    //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root";
+    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
+    path2 += tag;
+    path2 += "_myOutput.root/user.clo.mc15_13TeV.";
+    path2 += TString::Format("%i",sampleID);
+    path2 += ".*.myOutput.root*";
+    cout<<path2<<endl;
+
+    TChain* tree2 = new TChain("evt2l");
+    tree2->Add(path2);
+    susyEvts* evt = new susyEvts(tree2);
+    cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
+
+    double nwAOD = 0;
+    TObjArray* fileList = tree2->GetListOfFiles();
+    for(int i=0;i<fileList->GetEntries();i++)
+    {
+        cout<<fileList->At(i)->GetTitle()<<endl;
+        TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
+        TH1D *h1 = (TH1D*) f1->Get("hCutFlow");
+        //for(unsigned int j=1;j<80;j++) cout<<j<<": "<<h1->GetXaxis()->GetBinLabel(j)<<": "<<h1->GetBinContent(j)<<endl;;
+        nwAOD += h1->GetBinContent(2);
+
+        hCutflow_Samuel->Fill("AOD", h1->GetBinContent(1));
+        hCutflow_Samuel->Fill("SUSY2", h1->GetBinContent(4));
+        hCutflow_Samuel->Fill("GRL", h1->GetBinContent(8));
+        hCutflow_Samuel->Fill("Trigger", h1->GetBinContent(9));
+        hCutflow_Samuel->Fill("LAr+Tile+SCT+CoreFlag", h1->GetBinContent(10));
+        hCutflow_Samuel->Fill("PV", h1->GetBinContent(11));
+        hCutflow_Samuel->Fill("cosMuon", h1->GetBinContent(12));
+        hCutflow_Samuel->Fill("BadMuon", h1->GetBinContent(13));
+        hCutflow_Samuel->Fill("BadJet", h1->GetBinContent(14));
+        hCutflow_Samuel->Fill(">=2BaseLep", h1->GetBinContent(70));
+        hCutflow_Samuel->Fill(">=2SigLep", h1->GetBinContent(72));
+        hCutflow_Samuel->Fill("SS leptons", h1->GetBinContent(74));
+        hCutflow_Samuel->Fill(">=1 passOR jet", h1->GetBinContent(75));
+        hCutflow_Samuel->Fill(">=1 signal jet", h1->GetBinContent(76));
+        hCutflow_Samuel->Fill("Z veto", h1->GetBinContent(77));
+        
+        delete f1;
+    }
+
+    const double lumi = 36100;
+    const double commonWeight = XS *lumi /nwAOD;
+    ///*
+    //cutflow for My ntuple
+    for (long i = 0; i < tree2->GetEntries(); i++)
+    {
+        tree2->GetEntry(i);
+
+        if(evt->sig.nSigLep < 2) continue;
+        if(!evt->sig.isSS) continue;
+        if(!evt->sig.JetCut) continue;
+        if(evt->sig.isZ) continue;
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
+    }
+    //*/
+
+    //check all variables
+    int j = 0;
+    for (long i = 0; i < tree2->GetEntries(); i++)
+    {
+        tree2->GetEntry(i);
+
+        if(evt->sig.nSigLep < 2) continue;
+        if(!evt->sig.isSS) continue;
+        if(!evt->sig.JetCut) continue;
+        if(evt->sig.isZ) continue;
+
+        tree1->GetEntry(j);
+
+        //check event number
+        if(MCId != sampleID || evn != long(evt->evt.event) )
+        {
+            //search for event number
+            bool isFound = false;
+            //cout<<"Searching event number: "<<evt->evt.event<<endl;
+            for (long k = 0; k < tree1->GetEntries(); k++)
+            {
+                tree1->GetEntry(k);
+                if(MCId == sampleID && evn == long(evt->evt.event))
+                {
+                    isFound = true;
+                    j=k;
+                    //cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
+                    break;
+                }
+            }
+
+            if(!isFound)
+            {
+                cout<<"Event number: "<<evt->evt.event<<" cannot be found. End. "<<endl;
+                return;
+            }
+        }
+        //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
+
+        //wight
+        checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
+        checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
+        checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
+        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
+        checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
+        checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
+        checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
+        //checkError(wttV_nom, evt->evt.ttVSF, "ttV weight", 2e-7);
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 6e-7);
+
+        //number of leptons
+        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
+        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
+        if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
+
+        //lepTruth
+        if(isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
+        if(isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
+
+        //number of jets
+        if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
+        if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
+
+        //variables
+        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 2e-7);
+        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
+        checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
+        checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-6);
+
+        //meff
+        float pt_sum = 0;
+        for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
+        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 4e-7);
+
+        //mlj
+        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
+
+        //MT2
+        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
+
+        /*
+        //cutflow for Dani ntuple
+        if(MCId == sampleID)
+        {
+            FillHist_Dani(hCutflow_Dani);
+        }
+
+        //cutflow for My ntuple
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
+        */
+
+        j++;
+    }
+
+    delete evt;
+    delete tree2;
+}
+
+struct Sample
+{
+    TString tag;
+    int ID;
+    double XS;
+};
+
+struct Process
+{
+    TString path_Dani;
+    TString CHAIN_NAME;
+    vector<Sample> Samples;
+};
+
 int main()
 {
-    const TString CHAIN_NAME = "WZ_nom";
-    
-    //read old tree
-    TString path = "/eos/user/c/clo/ntuple/Dani_tree/IncludingLepTruth/Backgrounds_inclTruth_tWZ_tH.36100.root";
+    vector<Sample> samples;
+    Sample sample;
+
+    TString path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; TString CHAIN_NAME = "WZ_nom";
+    sample.tag = "VV_CT10"; sample.ID = 361071; sample.XS = 0.042287*0.91; samples.push_back(sample);
+    sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        samples.push_back(sample);
+
+    //read Dani ntuple
+    TString path1 = "/eos/user/c/clo/ntuple/Dani_tree/IncludingLepTruth/";
+    path1 += path_Dani;
     TChain* tree1 = new TChain(CHAIN_NAME);
-    tree1->Add(path.Data());
+    tree1->Add(path1.Data());
     cout << "Dani ntuple has events: " <<tree1->GetEntries()<<endl;
 
     tree1->SetBranchAddress("mcweight", &mcweight);
@@ -339,181 +531,12 @@ int main()
         hCutflow_Dani->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
         hCutflow_Samuel->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
     }
-    int count = 0;
 
-    //Our ntuple
-    TChain* tree2 = new TChain("evt2l");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
-    //TString tag = "VV_CT10"; int sampleID = 361071; double XS = 0.042287*0.91;
-    TString tag = "VV_221"; int sampleID = 363491; double XS = 4.5877;
-
-    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
-    path2 += tag;
-    path2 += "_myOutput.root/user.clo.mc15_13TeV.";
-    path2 += TString::Format("%i",sampleID);
-    path2 += ".*.myOutput.root*";
-    cout<<path2<<endl;
-
-    tree2->Add(path2);
-    susyEvts* evt = new susyEvts(tree2);
-    cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
-
-    ///*
-    //cutflow for Dani ntuple
-    for (long i = 0; i < tree1->GetEntries(); i++)
+    for(unsigned int i=0;i<samples.size();i++)    
     {
-        tree1->GetEntry(i);
-
-        if(MCId != sampleID) continue;
-        FillHist_Dani(hCutflow_Dani);
-    }
-    //*/
-
-    double nwAOD = 0;
-    TObjArray* fileList = tree2->GetListOfFiles();
-    for(int i=0;i<fileList->GetEntries();i++)
-    {
-        cout<<fileList->At(i)->GetTitle()<<endl;
-        TFile *f1 = TFile::Open(fileList->At(i)->GetTitle());
-        TH1D *h1 = (TH1D*) f1->Get("hCutFlow");
-        //for(unsigned int j=1;j<80;j++) cout<<j<<": "<<h1->GetXaxis()->GetBinLabel(j)<<": "<<h1->GetBinContent(j)<<endl;;
-        nwAOD += h1->GetBinContent(2);
-
-        hCutflow_Samuel->Fill("AOD", h1->GetBinContent(1));
-        hCutflow_Samuel->Fill("SUSY2", h1->GetBinContent(4));
-        hCutflow_Samuel->Fill("GRL", h1->GetBinContent(8));
-        hCutflow_Samuel->Fill("Trigger", h1->GetBinContent(9));
-        hCutflow_Samuel->Fill("LAr+Tile+SCT+CoreFlag", h1->GetBinContent(10));
-        hCutflow_Samuel->Fill("PV", h1->GetBinContent(11));
-        hCutflow_Samuel->Fill("cosMuon", h1->GetBinContent(12));
-        hCutflow_Samuel->Fill("BadMuon", h1->GetBinContent(13));
-        hCutflow_Samuel->Fill("BadJet", h1->GetBinContent(14));
-        hCutflow_Samuel->Fill(">=2BaseLep", h1->GetBinContent(70));
-        hCutflow_Samuel->Fill(">=2SigLep", h1->GetBinContent(72));
-        hCutflow_Samuel->Fill("SS leptons", h1->GetBinContent(74));
-        hCutflow_Samuel->Fill(">=1 passOR jet", h1->GetBinContent(75));
-        hCutflow_Samuel->Fill(">=1 signal jet", h1->GetBinContent(76));
-        hCutflow_Samuel->Fill("Z veto", h1->GetBinContent(77));
-        
-        delete f1;
+        RunSample(tree1, samples[i].tag, samples[i].ID, samples[i].XS, hCutflow_Dani, hCutflow_Samuel);
     }
 
-    double lumi = 36100;
-    double commonWeight = XS *lumi /nwAOD;
-    ///*
-    //cutflow for My ntuple
-    for (long i = 0; i < tree2->GetEntries(); i++)
-    {
-        tree2->GetEntry(i);
-
-        if(evt->sig.nSigLep < 2) continue;
-        if(!evt->sig.isSS) continue;
-        if(!evt->sig.JetCut) continue;
-        if(evt->sig.isZ) continue;
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
-    }
-    //*/
-
-    int j = 0;
-    for (long i = 0; i < tree2->GetEntries(); i++)
-    {
-        tree2->GetEntry(i);
-
-        if(evt->sig.nSigLep < 2) continue;
-        if(!evt->sig.isSS) continue;
-        if(!evt->sig.JetCut) continue;
-        if(evt->sig.isZ) continue;
-
-        tree1->GetEntry(j);
-
-        //check event number
-        if(MCId != sampleID || evn != long(evt->evt.event) )
-        {
-            //search for event number
-            bool isFound = false;
-            //cout<<"Searching event number: "<<evt->evt.event<<endl;
-            for (long k = 0; k < tree1->GetEntries(); k++)
-            {
-                tree1->GetEntry(k);
-                if(MCId == sampleID && evn == long(evt->evt.event))
-                {
-                    isFound = true;
-                    j=k;
-                    //cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
-                    break;
-                }
-            }
-
-            if(!isFound)
-            {
-                cout<<"Event number: "<<evt->evt.event<<" cannot be found. End. "<<endl;
-                return 0;
-            }
-        }
-        //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
-
-        //wight
-        checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
-        checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
-        checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
-        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
-        checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
-        checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
-        checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
-        //checkError(wttV_nom, evt->evt.ttVSF, "ttV weight", 2e-7);
-        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 6e-7);
-
-        //number of leptons
-        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
-        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
-        if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
-
-        //lepTruth
-        if(isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
-        if(isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
-
-        //number of jets
-        if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
-        if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
-
-        //variables
-        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 2e-7);
-        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
-        checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
-        checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
-        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-6);
-
-        //meff
-        float pt_sum = 0;
-        for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
-        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 4e-7);
-
-        //mlj
-        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
-
-        //MT2
-        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
-
-        /*
-        //cutflow for Dani ntuple
-        if(MCId == sampleID)
-        {
-            FillHist_Dani(hCutflow_Dani);
-        }
-
-        //cutflow for My ntuple
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
-        */
-
-        j++;
-        count++;
-    }
-
-    delete evt;
-    delete tree2;
-
-    cout<<"Total number of event in Dani selection: "<<count<<endl;
     cout<<"Dani Cutflow:"<<endl;
     for(unsigned int j=15;j<=cutflowList.size();j++)
     {
