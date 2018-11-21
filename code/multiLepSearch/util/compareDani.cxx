@@ -234,7 +234,7 @@ int main()
     const TString CHAIN_NAME = "WZ_nom";
     
     //read old tree
-    TString path = "/eos/user/d/dkoeck/WHSS/HistFitterTrees/Trees/IncludingLepTruth/Backgrounds_inclTruth_tWZ_tH.36100.root";
+    TString path = "/eos/user/c/clo/ntuple/Dani_tree/IncludingLepTruth/Backgrounds_inclTruth_tWZ_tH.36100.root";
     TChain* tree1 = new TChain(CHAIN_NAME);
     tree1->Add(path.Data());
     cout << "Dani ntuple has events: " <<tree1->GetEntries()<<endl;
@@ -270,16 +270,6 @@ int main()
     tree1->SetBranchAddress("mljj_comb", &mljj_comb);
     tree1->SetBranchAddress("MT2", &MT2);
     //tree1->SetBranchAddress("", &);
-
-    //Our ntuple
-    TChain* tree2 = new TChain("evt2l");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
-    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
-    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-1d0fe32c/user.clo.v13.3.";
-    tree2->Add(path2 + "VV_CT10_myOutput.root/user.clo.mc15_13TeV.361071.*.myOutput.root*"); int sampleID = 361071; double XS = 0.042287*0.91;
-    //tree2->Add(path2 + "VV_221_myOutput.root/user.clo.mc15_13TeV.363491.*.myOutput.root*"); int sampleID = 363491; double XS = 4.5877;
-    susyEvts* evt = new susyEvts(tree2);
-    cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
     std::vector<TString> cutflowList;
     cutflowList.push_back("AOD");
@@ -349,6 +339,25 @@ int main()
         hCutflow_Dani->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
         hCutflow_Samuel->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
     }
+    int count = 0;
+
+    //Our ntuple
+    TChain* tree2 = new TChain("evt2l");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root");
+    //tree2->Add("/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root");
+    //TString tag = "VV_CT10"; int sampleID = 361071; double XS = 0.042287*0.91;
+    TString tag = "VV_221"; int sampleID = 363491; double XS = 4.5877;
+
+    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
+    path2 += tag;
+    path2 += "_myOutput.root/user.clo.mc15_13TeV.";
+    path2 += TString::Format("%i",sampleID);
+    path2 += ".*.myOutput.root*";
+    cout<<path2<<endl;
+
+    tree2->Add(path2);
+    susyEvts* evt = new susyEvts(tree2);
+    cout<<"Our ntuple has events: "<<tree2->GetEntries()<<endl;
 
     ///*
     //cutflow for Dani ntuple
@@ -407,7 +416,6 @@ int main()
     //*/
 
     int j = 0;
-    int count = 0;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
@@ -420,7 +428,7 @@ int main()
         tree1->GetEntry(j);
 
         //check event number
-        if(evn != long(evt->evt.event) )
+        if(MCId != sampleID || evn != long(evt->evt.event) )
         {
             //search for event number
             bool isFound = false;
@@ -428,7 +436,7 @@ int main()
             for (long k = 0; k < tree1->GetEntries(); k++)
             {
                 tree1->GetEntry(k);
-                if(evn == long(evt->evt.event))
+                if(MCId == sampleID && evn == long(evt->evt.event))
                 {
                     isFound = true;
                     j=k;
@@ -501,8 +509,11 @@ int main()
         j++;
         count++;
     }
-    cout<<"Total number of event in Dani selection: "<<count<<endl;
 
+    delete evt;
+    delete tree2;
+
+    cout<<"Total number of event in Dani selection: "<<count<<endl;
     cout<<"Dani Cutflow:"<<endl;
     for(unsigned int j=15;j<=cutflowList.size();j++)
     {
