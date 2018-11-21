@@ -342,6 +342,12 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
             if(!isFound)
             {
+                if(sample.ID == 361072 && evt->evt.event == 56511)
+                {
+                    cout<<"Event number: "<<evt->evt.event<<" cannot be found. Known missing event. Continue."<<endl;
+                    continue;
+                }
+
                 cout<<"Event number: "<<evt->evt.event<<" cannot be found. End. "<<endl;
                 return;
             }
@@ -388,7 +394,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
 
         //MT2
-        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 3e-6);
+        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 5e-6);
 
         /*
         //cutflow for Dani ntuple
@@ -565,9 +571,27 @@ int main()
     sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        process.samples.push_back(sample);
     processes.push_back(process);
 
+    //WW
+    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "WW_nom";
+    process.samples.clear();
+    sample.tag = "VV_CT10"; sample.ID = 361069; sample.XS = 0.025765*0.91; process.samples.push_back(sample);
+    sample.tag = "VV_CT10"; sample.ID = 361070; sample.XS = 0.043375*0.91; process.samples.push_back(sample);
+    sample.tag = "VV_CT10"; sample.ID = 361077; sample.XS = 0.85492 *0.91; process.samples.push_back(sample);
+    processes.push_back(process);
+
+    //ZZ
+    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "ZZ_nom";
+    process.samples.clear();
+    sample.tag = "VV_CT10"; sample.ID = 361072; sample.XS = 0.031496*0.91; process.samples.push_back(sample);
+    sample.tag = "VV_CT10"; sample.ID = 361073; sample.XS = 0.02095 *0.91; process.samples.push_back(sample);
+    sample.tag = "VV_221";  sample.ID = 363490; sample.XS = 1.2557;        process.samples.push_back(sample);
+    processes.push_back(process);
+
     for(unsigned int i=0;i<processes.size();i++)    
     {
-        if(processes[i].CHAIN_NAME != "WZ_nom") continue;
+        //if(processes[i].CHAIN_NAME != "WZ_nom") continue;
+        //if(processes[i].CHAIN_NAME != "WW_nom") continue;
+        if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
 
         RunProcess(processes[i], cutflowList);
     }
