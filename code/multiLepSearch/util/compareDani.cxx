@@ -229,7 +229,14 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
     }
 }
 
-void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel)
+struct Sample
+{
+    TString tag;
+    int ID;
+    double XS;
+};
+
+void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel)
 {
     ///*
     //cutflow for Dani ntuple
@@ -237,7 +244,7 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
     {
         tree1->GetEntry(i);
 
-        if(MCId != sampleID) continue;
+        if(MCId != sample.ID) continue;
         FillHist_Dani(hCutflow_Dani);
     }
     //*/
@@ -246,9 +253,9 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
     //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root";
     //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root";
     TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
-    path2 += tag;
+    path2 += sample.tag;
     path2 += "_myOutput.root/user.clo.mc15_13TeV.";
-    path2 += TString::Format("%i",sampleID);
+    path2 += TString::Format("%i",sample.ID);
     path2 += ".*.myOutput.root*";
     cout<<path2<<endl;
 
@@ -287,7 +294,7 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
     }
 
     const double lumi = 36100;
-    const double commonWeight = XS *lumi /nwAOD;
+    const double commonWeight = sample.XS *lumi /nwAOD;
     ///*
     //cutflow for My ntuple
     for (long i = 0; i < tree2->GetEntries(); i++)
@@ -316,7 +323,7 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
         tree1->GetEntry(j);
 
         //check event number
-        if(MCId != sampleID || evn != long(evt->evt.event) )
+        if(MCId != sample.ID || evn != long(evt->evt.event) )
         {
             //search for event number
             bool isFound = false;
@@ -324,7 +331,7 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
             for (long k = 0; k < tree1->GetEntries(); k++)
             {
                 tree1->GetEntry(k);
-                if(MCId == sampleID && evn == long(evt->evt.event))
+                if(MCId == sample.ID && evn == long(evt->evt.event))
                 {
                     isFound = true;
                     j=k;
@@ -385,7 +392,7 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
 
         /*
         //cutflow for Dani ntuple
-        if(MCId == sampleID)
+        if(MCId == sample.ID)
         {
             FillHist_Dani(hCutflow_Dani);
         }
@@ -400,13 +407,6 @@ void RunSample(TChain* tree1, TString tag, int sampleID, double XS, TH1D* hCutfl
     delete evt;
     delete tree2;
 }
-
-struct Sample
-{
-    TString tag;
-    int ID;
-    double XS;
-};
 
 struct Process
 {
@@ -534,7 +534,7 @@ int main()
 
     for(unsigned int i=0;i<samples.size();i++)    
     {
-        RunSample(tree1, samples[i].tag, samples[i].ID, samples[i].XS, hCutflow_Dani, hCutflow_Samuel);
+        RunSample(tree1, samples[i], hCutflow_Dani, hCutflow_Samuel);
     }
 
     cout<<"Dani Cutflow:"<<endl;
