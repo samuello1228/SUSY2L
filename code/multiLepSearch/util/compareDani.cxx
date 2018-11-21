@@ -412,22 +412,15 @@ struct Process
 {
     TString path_Dani;
     TString CHAIN_NAME;
-    vector<Sample> Samples;
+    vector<Sample> samples;
 };
 
-int main()
+void RunProcess(Process& process, vector<TString>& cutflowList)
 {
-    vector<Sample> samples;
-    Sample sample;
-
-    TString path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; TString CHAIN_NAME = "WZ_nom";
-    sample.tag = "VV_CT10"; sample.ID = 361071; sample.XS = 0.042287*0.91; samples.push_back(sample);
-    sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        samples.push_back(sample);
-
     //read Dani ntuple
     TString path1 = "/eos/user/c/clo/ntuple/Dani_tree/IncludingLepTruth/";
-    path1 += path_Dani;
-    TChain* tree1 = new TChain(CHAIN_NAME);
+    path1 += process.path_Dani;
+    TChain* tree1 = new TChain(process.CHAIN_NAME);
     tree1->Add(path1.Data());
     cout << "Dani ntuple has events: " <<tree1->GetEntries()<<endl;
 
@@ -463,6 +456,44 @@ int main()
     tree1->SetBranchAddress("MT2", &MT2);
     //tree1->SetBranchAddress("", &);
 
+    TH1D* hCutflow_Dani = new TH1D("cutflow_Dani", "cutflow_Dani", cutflowList.size(), 0, cutflowList.size());
+    TH1D* hCutflow_Samuel = new TH1D("cutflow_Samuel", "cutflow_Samuel", cutflowList.size(), 0, cutflowList.size());
+    for(unsigned int i=0;i<cutflowList.size();i++)    
+    {
+        hCutflow_Dani->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
+        hCutflow_Samuel->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
+    }
+
+    for(unsigned int i=0;i<process.samples.size();i++)    
+    {
+        RunSample(tree1, process.samples[i], hCutflow_Dani, hCutflow_Samuel);
+    }
+
+    cout<<"Dani Cutflow:"<<endl;
+    for(unsigned int j=15;j<=cutflowList.size();j++)
+    {
+        cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
+        if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
+        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
+    }
+    cout<<endl;
+
+    cout<<"Samuel Cutflow:"<<endl;
+    for(unsigned int j=1;j<=cutflowList.size();j++)
+    {
+        cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
+        if(j<=14) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+        else if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
+        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
+    }
+
+    delete hCutflow_Dani;
+    delete hCutflow_Samuel;
+    delete tree1;
+}
+
+int main()
+{
     std::vector<TString> cutflowList;
     cutflowList.push_back("AOD");
     cutflowList.push_back("SUSY2");
@@ -524,39 +555,21 @@ int main()
     cutflowList.push_back("SR2:MT2");
     cutflowList.push_back("SR2:MT2,w");
 
-    TH1D* hCutflow_Dani = new TH1D("cutflow_Dani", "cutflow_Dani", cutflowList.size(), 0, cutflowList.size());
-    TH1D* hCutflow_Samuel = new TH1D("cutflow_Samuel", "cutflow_Samuel", cutflowList.size(), 0, cutflowList.size());
-    for(unsigned int i=0;i<cutflowList.size();i++)    
-    {
-        hCutflow_Dani->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
-        hCutflow_Samuel->GetXaxis()->SetBinLabel(i+1,cutflowList[i].Data());
-    }
+    vector<Process> processes;
+    Process process;
+    Sample sample;
 
-    for(unsigned int i=0;i<samples.size();i++)    
-    {
-        RunSample(tree1, samples[i], hCutflow_Dani, hCutflow_Samuel);
-    }
+    //WZ
+    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "WZ_nom";
+    sample.tag = "VV_CT10"; sample.ID = 361071; sample.XS = 0.042287*0.91; process.samples.push_back(sample);
+    sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        process.samples.push_back(sample);
+    processes.push_back(process);
 
-    cout<<"Dani Cutflow:"<<endl;
-    for(unsigned int j=15;j<=cutflowList.size();j++)
+    for(unsigned int i=0;i<processes.size();i++)    
     {
-        cout<<hCutflow_Dani->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j%2 == 1) cout<<int(hCutflow_Dani->GetBinContent(j))<<endl;
-        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<endl;
-    }
-    cout<<endl;
+        if(processes[i].CHAIN_NAME != "WZ_nom") continue;
 
-    cout<<"Samuel Cutflow:"<<endl;
-    for(unsigned int j=1;j<=cutflowList.size();j++)
-    {
-        cout<<hCutflow_Samuel->GetXaxis()->GetBinLabel(j)<<": ";
-        if(j<=14) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        else if(j%2 == 1) cout<<int(hCutflow_Samuel->GetBinContent(j))<<endl;
-        else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hCutflow_Samuel->GetBinContent(j)<<endl;
+        RunProcess(processes[i], cutflowList);
     }
-
-    delete hCutflow_Dani;
-    delete hCutflow_Samuel;
-    delete tree1;
 }
 
