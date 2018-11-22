@@ -109,6 +109,8 @@ void FillHist_Dani(TH1D* hCutflow_Dani)
         if(MT2<80000) return;
         hCutflow_Dani->Fill("SR1:MT2",1);
         hCutflow_Dani->Fill("SR1:MT2,w",weight);
+
+        //cout<<"Event number in SRjet1 in Dani: "<<evn<<endl;
     }
     else if(nJets20 ==2 || nJets20 ==3)
     {
@@ -137,12 +139,14 @@ void FillHist_Dani(TH1D* hCutflow_Dani)
         if(MT2<70000) return;
         hCutflow_Dani->Fill("SR2:MT2",1);
         hCutflow_Dani->Fill("SR2:MT2,w",weight);
+
+        //cout<<"Event number in SRjet2 in Dani: "<<evn<<endl;
     }
 }
 
-void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonWeight)
+void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonWeight, double& ttV_SF)
 {
-    double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * commonWeight;
+    double weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF * commonWeight;
     hCutflow_Samuel->Fill("Z veto,w",weight);
 
     if(evt->sig.nBaseLep !=2) return;
@@ -198,6 +202,8 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
         if(evt->sig.mT2<80) return;
         hCutflow_Samuel->Fill("SR1:MT2",1);
         hCutflow_Samuel->Fill("SR1:MT2,w",weight);
+
+        //cout<<"Event number in SRjet1 in Samuel: "<<evt->evt.event<<endl;
     }
     else if(evt->sig.nJet ==2 || evt->sig.nJet ==3)
     {
@@ -226,6 +232,8 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
         if(evt->sig.mT2<70) return;
         hCutflow_Samuel->Fill("SR2:MT2",1);
         hCutflow_Samuel->Fill("SR2:MT2,w",weight);
+
+        //cout<<"Event number in SRjet2 in Samuel: "<<evt->evt.event<<endl;
     }
 }
 
@@ -305,7 +313,10 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(!evt->sig.isSS) continue;
         if(!evt->sig.JetCut) continue;
         if(evt->sig.isZ) continue;
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
+        double ttV_SF = 1;
+        if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
+        else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF);
     }
     //*/
 
@@ -362,8 +373,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
         checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
         checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
-        //checkError(wttV_nom, evt->evt.ttVSF, "ttV weight", 2e-7);
-        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF, "Total weight", 6e-7);
+        double ttV_SF = 1;
+        if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
+        else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
+        checkError(wttV_nom, ttV_SF, "ttV weight", 2e-7);
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF, "Total weight", 6e-7);
 
         //number of leptons
         if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
@@ -379,19 +393,19 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
 
         //variables
-        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 2e-7);
-        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 2e-7);
+        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 3e-6);
+        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 4e-6);
         checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
-        checkError(met, evt->sig.Met * 1000, "MET", 2e-7);
-        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-6);
+        checkError(met, evt->sig.Met * 1000, "MET", 7e-6);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-5);
 
         //meff
         float pt_sum = 0;
         for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
-        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 4e-7);
+        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 2e-6);
 
         //mlj
-        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-7);
+        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-6);
 
         //MT2
         if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 5e-6);
@@ -404,7 +418,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         }
 
         //cutflow for My ntuple
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF);
         */
 
         j++;
@@ -587,11 +601,40 @@ int main()
     sample.tag = "VV_221";  sample.ID = 363490; sample.XS = 1.2557;        process.samples.push_back(sample);
     processes.push_back(process);
 
+    //ttV
+    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "ttV_nom";
+    process.samples.clear();
+    sample.tag = "ttV"; sample.ID = 407321; sample.XS = 0.000266 *1.34;   process.samples.push_back(sample);
+    sample.tag = "ttV"; sample.ID = 410081; sample.XS = 0.0080975*1.2231; process.samples.push_back(sample);
+    sample.tag = "ttV"; sample.ID = 410155; sample.XS = 0.54830  *1.10;   process.samples.push_back(sample);
+    sample.tag = "ttV"; sample.ID = 410218; sample.XS = 0.036888 *1.12;   process.samples.push_back(sample);
+    sample.tag = "ttV"; sample.ID = 410219; sample.XS = 0.036895 *1.12;   process.samples.push_back(sample);
+    sample.tag = "ttV"; sample.ID = 410220; sample.XS = 0.036599 *1.12;   process.samples.push_back(sample);
+    processes.push_back(process);
+
+    //Rare
+    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "Rare_nom";
+    process.samples.clear();
+    sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341177; sample.XS = 0.5085 * 0.10554;        process.samples.push_back(sample);
+    sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341270; sample.XS = 0.5085 * 0.43929;        process.samples.push_back(sample);
+    sample.tag = "higgs_Pythia8EvtGen";  sample.ID = 342284; sample.XS = 1.1021 * 1.25215497686;  process.samples.push_back(sample);
+    sample.tag = "higgs_Pythia8EvtGen";  sample.ID = 342285; sample.XS = 0.60072 * 1.44759621787; process.samples.push_back(sample);
+    sample.tag = "VVV";  sample.ID = 407311; sample.XS = 0.00010235; process.samples.push_back(sample);
+    sample.tag = "VVV";  sample.ID = 407312; sample.XS = 0.00056766; process.samples.push_back(sample);
+    sample.tag = "VVV";  sample.ID = 407313; sample.XS = 0.0043684;  process.samples.push_back(sample);
+    sample.tag = "VVV";  sample.ID = 407314; sample.XS = 0.015846;   process.samples.push_back(sample);
+    sample.tag = "VVV";  sample.ID = 407315; sample.XS = 0.0058366;  process.samples.push_back(sample);
+    sample.tag = "multitop_fast";  sample.ID = 304014; sample.XS = 0.00164;            process.samples.push_back(sample);
+    sample.tag = "multitop";       sample.ID = 410080; sample.XS = 0.0091622 * 1.0042; process.samples.push_back(sample);
+    processes.push_back(process);
+
     for(unsigned int i=0;i<processes.size();i++)    
     {
         //if(processes[i].CHAIN_NAME != "WZ_nom") continue;
         //if(processes[i].CHAIN_NAME != "WW_nom") continue;
-        if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
+        //if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
+        //if(processes[i].CHAIN_NAME != "ttV_nom") continue;
+        if(processes[i].CHAIN_NAME != "Rare_nom") continue;
 
         RunProcess(processes[i], cutflowList);
     }
