@@ -50,6 +50,61 @@ void checkError(float x, float y, TString name, float limit)
     }
 }
 
+struct Sample
+{
+    TString tag;
+    int ID;
+    double XS;
+};
+
+void checkAllVariables(susyEvts* evt, Sample& sample)
+{
+        //wight
+        checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
+        checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
+        checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
+        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
+        checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
+        checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
+        checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
+        double ttV_SF = 1;
+        if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
+        else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
+        checkError(wttV_nom, ttV_SF, "ttV weight", 2e-7);
+        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF, "Total weight", 6e-7);
+
+        //number of leptons
+        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
+        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
+        if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
+
+        //lepTruth
+        if(isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
+        if(isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
+
+        //number of jets
+        if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
+        if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
+
+        //variables
+        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 3e-6);
+        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 4e-6);
+        checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
+        checkError(met, evt->sig.Met * 1000, "MET", 7e-6);
+        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-5);
+
+        //meff
+        float pt_sum = 0;
+        for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
+        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 2e-6);
+
+        //mlj
+        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-6);
+
+        //MT2
+        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 5e-6);
+}
+
 void FillHist_Dani(TH1D* hCutflow_Dani)
 {
     double weight = totweight*lumiScaling;
@@ -237,13 +292,6 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
     }
 }
 
-struct Sample
-{
-    TString tag;
-    int ID;
-    double XS;
-};
-
 void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel)
 {
     ///*
@@ -365,50 +413,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         }
         //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
 
-        //wight
-        checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
-        checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
-        checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
-        checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
-        checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
-        checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
-        checkError(wtrig_nom, evt->evt.trigSF, "trigger weight", 2e-7);
-        double ttV_SF = 1;
-        if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
-        else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
-        checkError(wttV_nom, ttV_SF, "ttV weight", 2e-7);
-        checkError(totweight, evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF, "Total weight", 6e-7);
-
-        //number of leptons
-        if(NlepBL != evt->sig.nBaseLep) cout<<"nBaseLep are different."<<endl;
-        if(NlepBL != int(evt->leps.size())) cout<<"nBaseLep are different."<<endl;
-        if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
-
-        //lepTruth
-        if(isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
-        if(isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
-
-        //number of jets
-        if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
-        if(nBJets20 != evt->sig.nBJet) cout<<"nBJet are different."<<endl;
-
-        //variables
-        checkError(Pt_l, evt->leps[0].pt * 1000, "pt1", 3e-6);
-        checkError(Pt_subl, evt->leps[1].pt * 1000, "pt2", 4e-6);
-        checkError(DeltaEtaLep, fabs(evt->leps[0].eta - evt->leps[1].eta), "dEta", 2e-7);
-        checkError(met, evt->sig.Met * 1000, "MET", 7e-6);
-        checkError(mt, evt->leps[0].mT * 1000, "mT", 3e-5);
-
-        //meff
-        float pt_sum = 0;
-        for(int k=2;k<nSigLep;k++) pt_sum += evt->leps[k].pt;
-        checkError(meff, (evt->sig.HT + evt->sig.Met + pt_sum) * 1000, "meff", 2e-6);
-
-        //mlj
-        if(nSigLep == 2 && nJets20 > 0) checkError(mljj_comb, evt->sig.mlj * 1000, "mlj", 2e-6);
-
-        //MT2
-        if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 5e-6);
+        checkAllVariables(evt, sample);
 
         /*
         //cutflow for Dani ntuple
@@ -614,6 +619,7 @@ int main()
 
     //Rare
     process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "Rare_nom";
+    //process.path_Dani = "background_updatedTruthVVV_36100.root"; process.CHAIN_NAME = "Rare_nom";
     process.samples.clear();
     sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341177; sample.XS = 0.5085 * 0.10554;        process.samples.push_back(sample);
     sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341270; sample.XS = 0.5085 * 0.43929;        process.samples.push_back(sample);
