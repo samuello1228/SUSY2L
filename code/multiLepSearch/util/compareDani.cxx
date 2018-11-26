@@ -626,6 +626,8 @@ int main()
     sample.tag = "VVV";  sample.ID = 407315; sample.XS = 0.0058366;  process.samples.push_back(sample);
     sample.tag = "multitop_fast";  sample.ID = 304014; sample.XS = 0.00164;            process.samples.push_back(sample);
     sample.tag = "multitop";       sample.ID = 410080; sample.XS = 0.0091622 * 1.0042; process.samples.push_back(sample);
+    sample.tag = "Rare";       sample.ID = 343272; sample.XS = 0.7317;   process.samples.push_back(sample);
+    sample.tag = "Rare";       sample.ID = 410215; sample.XS = 0.015558; process.samples.push_back(sample);
     processes.push_back(process);
 
     for(unsigned int i=0;i<processes.size();i++)    

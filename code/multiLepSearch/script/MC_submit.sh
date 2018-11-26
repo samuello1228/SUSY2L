@@ -49,6 +49,7 @@ file=../multiLepSearch/script/MCBGVVSherpa_CT10_sample_list.txt k=${tag}.VV_CT10
 #file=../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt k=${tag}.VVV #ShowerType = SHERPA
 #file=../multiLepSearch/script/MCBGhiggs_Pythia8EvtGen_sample_list.txt k=${tag}.higgs_Pythia8EvtGen #ShowerType = Pythia8EvtGen
 #file=../multiLepSearch/script/MCBGhiggs_HerwigppEvtGen_sample_list.txt k=${tag}.higgs_HerwigppEvtGen #ShowerType = HerwigppEvtGen
+#file=../multiLepSearch/script/MCBGRare_sample_list.txt k=${tag}.Rare #ShowerType = PYTHIA8EVTGEN
 #file=../multiLepSearch/script/MCBGZeeSherpaSelected.txt k=${tag}.Zee_NOchfSF #ShowerType = SHERPA
 
 #For fast simulation
