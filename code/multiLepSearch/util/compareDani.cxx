@@ -554,6 +554,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
         i++;
     }
+    cout<<endl;
 
     vector<evn_info> missing_Dani;
     cout<<"The missing event in Dani ntuple: "<<endl;
@@ -565,7 +566,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
             missing_Dani.push_back(evn_data[k]);
         }
     }
-    cout<<"Total missing event in Dani ntuple: "<<missing_Dani.size()<<endl;
+    cout<<endl;
 
     cout<<"Total missing event in Samuel ntuple: "<<missing_Samuel.size()<<endl;
     for (unsigned int k = 0; k < missing_Samuel.size(); k++)
@@ -581,6 +582,23 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         }
         cout<<endl;
     }
+    cout<<endl;
+
+    cout<<"Total missing event in Dani ntuple: "<<missing_Dani.size()<<endl;
+    for (unsigned int k = 0; k < missing_Dani.size(); k++)
+    {
+        tree2->GetEntry(missing_Dani[k].Samuel_index);
+        cout<<missing_Dani[k].evn<<": ";
+        if(!evt->sig.isZ) cout<<"isZ = 0 (Samuel), isZ = 1 (Dani), ";
+        cout<<"nBaseLep = "<<evt->sig.nBaseLep;
+        cout<<": ";
+        for(unsigned int m=0;m < evt->leps.size();m++)
+        {
+            cout<<int(evt->leps[m].ID/1000)<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
 
     delete evt;
     delete tree2;
