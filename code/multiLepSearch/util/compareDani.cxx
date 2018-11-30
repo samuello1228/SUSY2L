@@ -312,6 +312,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     vector<evn_info> selected_Dani;
     for (long i = 0; i < tree1->GetEntries(); i++)
     {
+        if(i%100000==0) cout<<"number of event: " <<i<<endl;
         tree1->GetEntry(i);
 
         if(isMC && MCId != sample.ID) continue;
@@ -386,6 +387,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     vector<evn_info> selected_Samuel;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
+        if(i%100000==0) cout<<"number of event: " <<i<<endl;
         tree2->GetEntry(i);
 
         if(evt->sig.nSigLep < 2) continue;
@@ -413,53 +415,42 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     vector<evn_info> missing_Samuel;
 
     //use Samuel event to find Dani event
-    long j = 0;
-    for (long i = 0; i < 0; i++)
-    //for (long i = 0; i < tree2->GetEntries(); i++)
+    unsigned int j = 0;
+    //for (unsigned int i = 0; i < 0; i++)
+    for (unsigned int i = 0; i < selected_Samuel.size(); i++)
     {
-        tree2->GetEntry(i);
-
-        if(evt->sig.nSigLep < 2) continue;
-        if(!evt->sig.isSS) continue;
-        if(!evt->sig.JetCut) continue;
-        if(evt->sig.isZ) continue;
-
-        tree1->GetEntry(selected_Dani[j].Dani_index);
-
         //check event number
-        if(evn != long(evt->evt.event) )
+        if(selected_Dani[j].evn != selected_Samuel[i].evn )
         {
             //search for event number
             bool isFound = false;
-            if(sample.ID == 361073 && evt->evt.event == 1588)
+            if(sample.ID == 361073 && selected_Samuel[i].evn == 1588)
             {
                 //Known issue: Two events have the same event number: 1588
-                cout<<"Searching event number (special case for known issue): "<<evt->evt.event<<endl;
+                cout<<"Searching event number (special case for known issue): "<<selected_Samuel[i].evn<<endl;
                 for (unsigned int k = 0; k < selected_Dani.size(); k++)
                 {
-                    if(long(evt->evt.event) == selected_Dani[k].evn && evt->sig.nJet == selected_Dani[k].nJet)
+                    if(selected_Samuel[i].evn == selected_Dani[k].evn && selected_Samuel[i].nJet == selected_Dani[k].nJet)
                     {
-                        tree1->GetEntry(selected_Dani[k].Dani_index);
                         isFound = true;
                         j=k;
-                        cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
-                        selected_Dani[j].Samuel_index = i;
+                        cout<<"Event number: "<<selected_Samuel[i].evn<<" is found. Dani index is "<<selected_Dani[j].Dani_index<<endl;
+                        selected_Dani[j].Samuel_index = selected_Samuel[i].Samuel_index;
                         break;
                     }
                 }
             }
             else
             {
-                //cout<<"Searching event number: "<<evt->evt.event<<endl;
+                //cout<<"Searching event number: "<<selected_Samuel[i].evn<<endl;
                 for (unsigned int k = 0; k < selected_Dani.size(); k++)
                 {
-                    if(long(evt->evt.event) == selected_Dani[k].evn)
+                    if(selected_Samuel[i].evn == selected_Dani[k].evn)
                     {
-                        tree1->GetEntry(selected_Dani[k].Dani_index);
                         isFound = true;
                         j=k;
-                        cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
-                        selected_Dani[j].Samuel_index = i;
+                        //cout<<"Event number: "<<selected_Samuel[i].evn<<" is found. Dani index is "<<selected_Dani[j].Dani_index<<endl;
+                        selected_Dani[j].Samuel_index = selected_Samuel[i].Samuel_index;
                         break;
                     }
                 }
@@ -467,20 +458,18 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
             if(!isFound)
             {
-                cout<<"Event number: "<<evt->evt.event<<" cannot be found. It will be further searched later."<<endl;
-                evn_info evn_temp;
-                evn_temp.evn = long(evt->evt.event);
-                evn_temp.Samuel_index = i;
-                evn_temp.Dani_index = -1;
-                missing_Dani.push_back(evn_temp);
+                //cout<<"Event number: "<<selected_Samuel[i].evn<<" cannot be found. It will be further searched later."<<endl;
+                missing_Dani.push_back(selected_Samuel[i]);
                 continue;
             }
         }
         else
         {
-            selected_Dani[j].Samuel_index = i;
+            selected_Dani[j].Samuel_index = selected_Samuel[i].Samuel_index;
         }
 
+        tree1->GetEntry(selected_Dani[j].Dani_index);
+        tree2->GetEntry(selected_Samuel[i].Samuel_index);
         checkAllVariables(evt, sample, isMC);
 
         /*
@@ -494,8 +483,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //Only for the method that use Samuel event to find Dani event
     cout<<"The missing event in Samuel ntuple: "<<endl;
-    for (unsigned int k = 0; k < 0; k++)
-    //for (unsigned int k = 0; k < selected_Dani.size(); k++)
+    //for (unsigned int k = 0; k < 0; k++)
+    for (unsigned int k = 0; k < selected_Dani.size(); k++)
     {
         if(selected_Dani[k].Samuel_index == -1)
         {
@@ -506,9 +495,9 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     cout<<endl;
 
     //use Dani event to find Samuel event
-    long i = 0;
-    //for (unsigned int j = 0; j < 0; j++)
-    for (unsigned int j = 0; j < selected_Dani.size(); j++)
+    unsigned int i = 0;
+    for (unsigned int j = 0; j < 0; j++)
+    //for (unsigned int j = 0; j < selected_Dani.size(); j++)
     {
         //check event number
         if(selected_Dani[j].evn != selected_Samuel[i].evn )
@@ -574,8 +563,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //Only for the method that use Dani event to find Samuel event
     cout<<"The missing event in Dani ntuple: "<<endl;
-    //for (unsigned int k = 0; k < 0; k++)
-    for (unsigned int k = 0; k < selected_Samuel.size(); k++)
+    for (unsigned int k = 0; k < 0; k++)
+    //for (unsigned int k = 0; k < selected_Samuel.size(); k++)
     {
         if(selected_Samuel[k].Dani_index == -1)
         {
