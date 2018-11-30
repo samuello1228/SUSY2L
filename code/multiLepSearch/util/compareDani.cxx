@@ -523,31 +523,13 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
             if(!isFound)
             {
-                //search for all event numbers in Samuel ntuple
-                //cout<<"Searching all event number: "<<evn<<endl;
-                for (unsigned int k = 0; k < tree2->GetEntries(); k++)
-                {
-                    tree2->GetEntry(k);
-                    if(evn == long(evt->evt.event))
-                    {
-                        isFound = true;
-                        //cout<<"Event number: "<<evn<<" is found, but not in Samuel expected selection. Samuel index is "<<k<<endl;
-
-                        evn_info evn_temp;
-                        evn_temp.evn = long(evt->evt.event);
-                        evn_temp.Samuel_index = k;
-                        evn_temp.Dani_index = j;
-                        missing_Samuel.push_back(evn_temp);
-                        break;
-                    }
-                }
-            }
-
-            if(!isFound)
-            {
-                cout<<"Event number: "<<evn<<" cannot be found. End. "<<endl;
+                //cout<<"Event number: "<<evn<<" cannot be found. It will be further searched later."<<endl;
+                evn_info evn_temp;
+                evn_temp.evn = evn;
+                evn_temp.Samuel_index = -1;
+                evn_temp.Dani_index = j;
+                missing_Samuel.push_back(evn_temp);
                 continue;
-                //return;
             }
         }
         else
@@ -584,21 +566,61 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
     cout<<endl;
 
-    cout<<"Total missing event in Samuel ntuple: "<<missing_Samuel.size()<<endl;
-    for (unsigned int k = 0; k < missing_Samuel.size(); k++)
+    //search for all event numbers in Samuel ntuple
+    cout<<"Further searching all event number: "<<endl;
+    cout<<"Total missing event in Samuel ntuple (all): "<<missing_Samuel.size()<<endl;
+    if(missing_Samuel.size() != 0)
     {
-        tree2->GetEntry(missing_Samuel[k].Samuel_index);
-        cout<<missing_Samuel[k].evn<<": ";
-        if(evt->sig.isZ) cout<<"isZ = 1 (Samuel), isZ = 0 (Dani), ";
-        cout<<"nBaseLep = "<<evt->sig.nBaseLep;
-        cout<<": ";
-        for(unsigned int m=0;m < evt->leps.size();m++)
+        vector<evn_info> missing_Samuel_inclusive;
+        vector<evn_info> missing_Samuel_exclusive;
+        for (unsigned int k = 0; k < tree2->GetEntries(); k++)
         {
-            cout<<int(evt->leps[m].ID/1000)<<" ";
+            tree2->GetEntry(k);
+            
+            for (unsigned int m = 0; m < missing_Samuel.size(); m++)
+            {
+                if(missing_Samuel[m].evn == long(evt->evt.event))
+                {
+                    cout<<"Event number: "<<missing_Samuel[m].evn<<" is found, but not in Samuel expected selection. Samuel index is "<<k<<endl;
+                    missing_Samuel[m].Samuel_index = k;
+                    missing_Samuel_inclusive.push_back(missing_Samuel[m]);
+ 
+                    tree1->GetEntry(missing_Samuel[m].Dani_index);
+                    checkAllVariables(evt, sample, isMC);
+                    break;
+                }
+            }
+        }
+        cout<<endl;
+
+        cout<<"The missing event in Samuel ntuple (exclusive): "<<endl;
+        for (unsigned int k = 0; k < missing_Samuel.size(); k++)
+        {
+            if(missing_Samuel[k].Samuel_index == -1)
+            {
+                cout<<missing_Samuel[k].Dani_index<<", "<<missing_Samuel[k].evn<<endl;
+                missing_Samuel_exclusive.push_back(missing_Samuel[k]);
+            }
+        }
+        cout<<"Total missing event in Samuel ntuple (exclusive): "<<missing_Samuel_exclusive.size()<<endl;
+        cout<<endl;
+ 
+        cout<<"Total missing event in Samuel ntuple (inclusive): "<<missing_Samuel_inclusive.size()<<endl;
+        for (unsigned int k = 0; k < missing_Samuel_inclusive.size(); k++)
+        {
+            tree2->GetEntry(missing_Samuel_inclusive[k].Samuel_index);
+            cout<<missing_Samuel_inclusive[k].evn<<": ";
+            if(evt->sig.isZ) cout<<"isZ = 1 (Samuel), isZ = 0 (Dani), ";
+            cout<<"nBaseLep = "<<evt->sig.nBaseLep;
+            cout<<": ";
+            for(unsigned int m=0;m < evt->leps.size();m++)
+            {
+                cout<<int(evt->leps[m].ID/1000)<<" ";
+            }
+            cout<<endl;
         }
         cout<<endl;
     }
-    cout<<endl;
 
     cout<<"Total missing event in Dani ntuple: "<<missing_Dani.size()<<endl;
     for (unsigned int k = 0; k < missing_Dani.size(); k++)
