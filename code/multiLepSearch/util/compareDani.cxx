@@ -301,16 +301,36 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     bool isMC = true;
     if(sample.tag == "data") isMC = false;
 
-    ///*
-    //cutflow for Dani ntuple
+    struct evn_info
+    {
+        long evn;
+        long Dani_index;
+        long Samuel_index;
+        int nJet; //For 361073
+    };
+
+    vector<evn_info> selected_Dani;
     for (long i = 0; i < tree1->GetEntries(); i++)
     {
         tree1->GetEntry(i);
 
         if(isMC && MCId != sample.ID) continue;
+
+        ///*
+        //cutflow for Dani ntuple
         FillHist_Dani(hCutflow_Dani, isMC);
+        //*/
+
+        /*
+        //Fill selected_Dani, for the method that use Samuel event to find Dani event
+        evn_info evn_temp;
+        evn_temp.evn = evn;
+        evn_temp.Samuel_index = -1;
+        evn_temp.Dani_index = i;
+        evn_temp.nJet = nJets20;
+        selected_Dani.push_back(evn_temp);
+        */
     }
-    //*/
 
     //Our ntuple
     //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root";
@@ -367,8 +387,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     const double lumi = 36100;
     double commonWeight = 1;
     if(isMC) commonWeight = sample.XS *lumi /nwAOD;
-    ///*
-    //cutflow for My ntuple
+    vector<evn_info> selected_Samuel;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
@@ -377,35 +396,24 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(!evt->sig.isSS) continue;
         if(!evt->sig.JetCut) continue;
         if(evt->sig.isZ) continue;
+
+        ///*
+        //cutflow for My ntuple
         double ttV_SF = 1;
         if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
         else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
         FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
-    }
-    //*/
+        //*/
 
-    struct evn_info
-    {
-        long evn;
-        long Dani_index;
-        long Samuel_index;
-        int nJet; //For 361073
-    };
-
-    vector<evn_info> selected_Dani;
-    //for (long i = 0; i < 0; i++)
-    for (long i = 0; i < tree1->GetEntries(); i++)
-    {
-        tree1->GetEntry(i);
-
-        if(isMC && MCId != sample.ID) continue;
-
+        ///*
+        //Fill selected_Samuel, for the method that use Dani event to find Samuel event
         evn_info evn_temp;
-        evn_temp.evn = evn;
-        evn_temp.Samuel_index = -1;
-        evn_temp.Dani_index = i;
-        evn_temp.nJet = nJets20;
-        selected_Dani.push_back(evn_temp);
+        evn_temp.evn = long(evt->evt.event);
+        evn_temp.Samuel_index = i;
+        evn_temp.Dani_index = -1;
+        evn_temp.nJet = evt->sig.nJet;
+        selected_Samuel.push_back(evn_temp);
+        //*/
     }
 
     //check all variables
@@ -414,8 +422,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //use Samuel event to find Dani event
     long j = 0;
-    //for (long i = 0; i < 0; i++)
-    for (long i = 0; i < tree2->GetEntries(); i++)
+    for (long i = 0; i < 0; i++)
+    //for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
 
@@ -503,29 +511,10 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
     cout<<endl;
 
-    vector<evn_info> selected_Samuel;
-    for (long i = 0; i < 0; i++)
-    //for (long i = 0; i < tree2->GetEntries(); i++)
-    {
-        tree2->GetEntry(i);
-
-        if(evt->sig.nSigLep < 2) continue;
-        if(!evt->sig.isSS) continue;
-        if(!evt->sig.JetCut) continue;
-        if(evt->sig.isZ) continue;
-
-        evn_info evn_temp;
-        evn_temp.evn = long(evt->evt.event);
-        evn_temp.Samuel_index = i;
-        evn_temp.Dani_index = -1;
-        evn_temp.nJet = evt->sig.nJet;
-        selected_Samuel.push_back(evn_temp);
-    }
-
     //use Dani event to find Samuel event
     long i = 0;
-    for (long j = 0; j < 0; j++)
-    //for (long j = 0; j < tree1->GetEntries(); j++)
+    //for (long j = 0; j < 0; j++)
+    for (long j = 0; j < tree1->GetEntries(); j++)
     {
         tree1->GetEntry(j);
         if(isMC && MCId != sample.ID) continue;
