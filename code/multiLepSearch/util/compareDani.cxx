@@ -384,11 +384,38 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
     //*/
 
+    struct evn_info
+    {
+        long evn;
+        long Dani_index;
+        long Samuel_index;
+        int nJet; //For 361073
+    };
+
+    vector<evn_info> selected_Dani;
+    //for (long i = 0; i < 0; i++)
+    for (long i = 0; i < tree1->GetEntries(); i++)
+    {
+        tree1->GetEntry(i);
+
+        if(isMC && MCId != sample.ID) continue;
+
+        evn_info evn_temp;
+        evn_temp.evn = evn;
+        evn_temp.Samuel_index = -1;
+        evn_temp.Dani_index = i;
+        evn_temp.nJet = nJets20;
+        selected_Dani.push_back(evn_temp);
+    }
+
     //check all variables
+    vector<evn_info> missing_Dani;
+    vector<evn_info> missing_Samuel;
+
     //use Samuel event to find Dani event
     long j = 0;
-    for (long i = 0; i < 0; i++)
-    //for (long i = 0; i < tree2->GetEntries(); i++)
+    //for (long i = 0; i < 0; i++)
+    for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
 
@@ -397,65 +424,88 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(!evt->sig.JetCut) continue;
         if(evt->sig.isZ) continue;
 
-        tree1->GetEntry(j);
+        tree1->GetEntry(selected_Dani[j].Dani_index);
 
         //check event number
-        if(MCId != sample.ID || evn != long(evt->evt.event) )
+        if(evn != long(evt->evt.event) )
         {
             //search for event number
             bool isFound = false;
-            //cout<<"Searching event number: "<<evt->evt.event<<endl;
-            for (long k = 0; k < tree1->GetEntries(); k++)
+            if(sample.ID == 361073 && evt->evt.event == 1588)
             {
-                tree1->GetEntry(k);
-                if(MCId == sample.ID && evn == long(evt->evt.event))
+                //Known issue: Two events have the same event number: 1588
+                cout<<"Searching event number (special case for known issue): "<<evt->evt.event<<endl;
+                for (unsigned int k = 0; k < selected_Dani.size(); k++)
                 {
-                    isFound = true;
-                    j=k;
-                    //cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
-                    break;
+                    if(long(evt->evt.event) == selected_Dani[k].evn && evt->sig.nJet == selected_Dani[k].nJet)
+                    {
+                        tree1->GetEntry(selected_Dani[k].Dani_index);
+                        isFound = true;
+                        j=k;
+                        cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
+                        selected_Dani[j].Samuel_index = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //cout<<"Searching event number: "<<evt->evt.event<<endl;
+                for (unsigned int k = 0; k < selected_Dani.size(); k++)
+                {
+                    if(long(evt->evt.event) == selected_Dani[k].evn)
+                    {
+                        tree1->GetEntry(selected_Dani[k].Dani_index);
+                        isFound = true;
+                        j=k;
+                        cout<<"Event number: "<<evt->evt.event<<" is found. Dani index is "<<k<<endl;
+                        selected_Dani[j].Samuel_index = i;
+                        break;
+                    }
                 }
             }
 
             if(!isFound)
             {
-                if(sample.ID == 361072 && evt->evt.event == 56511)
-                {
-                    cout<<"Event number: "<<evt->evt.event<<" cannot be found. Known missing event. Continue."<<endl;
-                    continue;
-                }
-
-                cout<<"Event number: "<<evt->evt.event<<" cannot be found. End. "<<endl;
-                return;
+                cout<<"Event number: "<<evt->evt.event<<" cannot be found. It will be further searched later."<<endl;
+                evn_info evn_temp;
+                evn_temp.evn = long(evt->evt.event);
+                evn_temp.Samuel_index = i;
+                evn_temp.Dani_index = -1;
+                missing_Dani.push_back(evn_temp);
+                continue;
             }
         }
-        //cout<<"Event number: "<<evn<<", index: "<<j<<endl;
+        else
+        {
+            selected_Dani[j].Samuel_index = i;
+        }
 
         checkAllVariables(evt, sample, isMC);
 
         /*
-        //cutflow for Dani ntuple
-        if(MCId == sample.ID)
-        {
-            FillHist_Dani(hCutflow_Dani);
-        }
-
-        //cutflow for My ntuple
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF);
+        FillHist_Dani(hCutflow_Dani, isMC);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
         */
 
         j++;
     }
+    cout<<endl;
 
-    struct evn_info
+    cout<<"The missing event in Samuel ntuple: "<<endl;
+    for (unsigned int k = 0; k < selected_Dani.size(); k++)
     {
-        long evn;
-        long Dani_index;
-        long Samuel_index;
-        int nJet; //For 361073
-    };
+        if(selected_Dani[k].Samuel_index == -1)
+        {
+            cout<<k<<", "<<selected_Dani[k].Dani_index<<", "<<selected_Dani[k].evn<<endl;
+            missing_Samuel.push_back(selected_Dani[k]);
+        }
+    }
+    cout<<endl;
+
     vector<evn_info> selected_Samuel;
-    for (long i = 0; i < tree2->GetEntries(); i++)
+    for (long i = 0; i < 0; i++)
+    //for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
 
@@ -473,12 +523,12 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
 
     //use Dani event to find Samuel event
-    vector<evn_info> missing_Samuel;
     long i = 0;
-    for (long j = 0; j < tree1->GetEntries(); j++)
+    for (long j = 0; j < 0; j++)
+    //for (long j = 0; j < tree1->GetEntries(); j++)
     {
         tree1->GetEntry(j);
-        if(MCId != sample.ID) continue;
+        if(isMC && MCId != sample.ID) continue;
 
         tree2->GetEntry(selected_Samuel[i].Samuel_index);
 
@@ -540,21 +590,14 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         checkAllVariables(evt, sample, isMC);
 
         /*
-        //cutflow for Dani ntuple
-        if(MCId == sample.ID)
-        {
-            FillHist_Dani(hCutflow_Dani);
-        }
-
-        //cutflow for My ntuple
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF);
+        FillHist_Dani(hCutflow_Dani, isMC);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
         */
 
         i++;
     }
     cout<<endl;
 
-    vector<evn_info> missing_Dani;
     cout<<"The missing event in Dani ntuple: "<<endl;
     for (unsigned int k = 0; k < selected_Samuel.size(); k++)
     {
