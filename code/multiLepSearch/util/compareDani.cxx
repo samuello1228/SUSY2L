@@ -454,7 +454,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         long Samuel_index;
         int nJet; //For 361073
     };
-    vector<evn_info> evn_data;
+    vector<evn_info> selected_Samuel;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
         tree2->GetEntry(i);
@@ -469,7 +469,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         evn_temp.Samuel_index = i;
         evn_temp.Dani_index = -1;
         evn_temp.nJet = evt->sig.nJet;
-        evn_data.push_back(evn_temp);
+        selected_Samuel.push_back(evn_temp);
     }
 
     //use Dani event to find Samuel event
@@ -480,7 +480,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         tree1->GetEntry(j);
         if(MCId != sample.ID) continue;
 
-        tree2->GetEntry(evn_data[i].Samuel_index);
+        tree2->GetEntry(selected_Samuel[i].Samuel_index);
 
         //check event number
         if(evn != long(evt->evt.event) )
@@ -491,15 +491,15 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
             {
                 //Known issue: Two events have the same event number: 1588
                 cout<<"Searching event number (special case for known issue): "<<evn<<endl;
-                for (unsigned int k = 0; k < evn_data.size(); k++)
+                for (unsigned int k = 0; k < selected_Samuel.size(); k++)
                 {
-                    if(evn == evn_data[k].evn && nJets20 == evn_data[k].nJet)
+                    if(evn == selected_Samuel[k].evn && nJets20 == selected_Samuel[k].nJet)
                     {
-                        tree2->GetEntry(evn_data[k].Samuel_index);
+                        tree2->GetEntry(selected_Samuel[k].Samuel_index);
                         isFound = true;
                         i=k;
                         cout<<"Event number: "<<evn<<" is found. Samuel index is "<<k<<endl;
-                        evn_data[i].Dani_index = j;
+                        selected_Samuel[i].Dani_index = j;
                         break;
                     }
                 }
@@ -507,15 +507,15 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
             else
             {
                 //cout<<"Searching event number: "<<evn<<endl;
-                for (unsigned int k = 0; k < evn_data.size(); k++)
+                for (unsigned int k = 0; k < selected_Samuel.size(); k++)
                 {
-                    if(evn == evn_data[k].evn)
+                    if(evn == selected_Samuel[k].evn)
                     {
-                        tree2->GetEntry(evn_data[k].Samuel_index);
+                        tree2->GetEntry(selected_Samuel[k].Samuel_index);
                         isFound = true;
                         i=k;
                         //cout<<"Event number: "<<evn<<" is found. Samuel index is "<<k<<endl;
-                        evn_data[i].Dani_index = j;
+                        selected_Samuel[i].Dani_index = j;
                         break;
                     }
                 }
@@ -552,7 +552,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         }
         else
         {
-            evn_data[i].Dani_index = j;
+            selected_Samuel[i].Dani_index = j;
         }
 
         checkAllVariables(evt, sample, isMC);
@@ -574,12 +574,12 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     vector<evn_info> missing_Dani;
     cout<<"The missing event in Dani ntuple: "<<endl;
-    for (unsigned int k = 0; k < evn_data.size(); k++)
+    for (unsigned int k = 0; k < selected_Samuel.size(); k++)
     {
-        if(evn_data[k].Dani_index == -1)
+        if(selected_Samuel[k].Dani_index == -1)
         {
-            cout<<k<<", "<<evn_data[k].Samuel_index<<", "<<evn_data[k].evn<<endl;
-            missing_Dani.push_back(evn_data[k]);
+            cout<<k<<", "<<selected_Samuel[k].Samuel_index<<", "<<selected_Samuel[k].evn<<endl;
+            missing_Dani.push_back(selected_Samuel[k]);
         }
     }
     cout<<endl;
