@@ -325,7 +325,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
     else
     {
-        path2 += "data16_13TeV";
+        path2 += "data*";
     }
     path2 += ".*.myOutput.root*";
     cout<<path2<<endl;
@@ -696,6 +696,10 @@ void RunProcess(Process& process, vector<TString>& cutflowList)
         {
             cout<<std::fixed<<std::setprecision(10)<<hCutflow_Dani->GetBinContent(j)<<", "<<hCutflow_Samuel->GetBinContent(j)<<endl;
             checkError(hCutflow_Dani->GetBinContent(j), hCutflow_Samuel->GetBinContent(j), "yield", 1e-6);
+        }
+        else
+        {
+            cout<<endl;
         }
     }
 
