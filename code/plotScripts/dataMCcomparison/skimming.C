@@ -344,8 +344,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         int sigIndex[2];
         sigIndex[0] = 0;
         sigIndex[1] = 1;
-        pt1 = leps[sigIndex[0]].pt;
-        pt2 = leps[sigIndex[1]].pt;
         if(!isCF && !evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -359,8 +357,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(leps.size()!=2) continue;
             if(!(leps[0].lFlag & 1<<1)) continue;
             if(!(leps[1].lFlag & 1<<1)) continue;
-            if(cutflow && pt1<=25) continue;
-            if(cutflow && pt2<=25) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -379,22 +375,40 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         ID1 = leps[sigIndex[0]].ID;
         ID2 = leps[sigIndex[1]].ID;
+        pt1 = leps[sigIndex[0]].pt;
+        pt2 = leps[sigIndex[1]].pt;
         eta1 = leps[sigIndex[0]].eta;
         eta2 = leps[sigIndex[1]].eta;
         //pt of leading lepton
-        //if(int(abs(ID1)/1000) == 11 && !(pt1>25 && fabs(eta1)<2.47)) continue;
-        //if(int(abs(ID1)/1000) == 13 && !(pt1>20 && fabs(eta1)<2.4)) continue;
+        if(pt1<25) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt1",1);
         }
         
+        if(cutflow)
+        {
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("pt1",1);
+                hSRCutflow[m]->Fill("pt1,w",TotalWeight);
+            }
+        }
+        
         //pt of subleading lepton
-        //if(int(abs(ID2)/1000) == 11 && !(pt2>15 && fabs(eta2)<2.47)) continue;
-        //if(int(abs(ID2)/1000) == 13 && !(pt2>10 && fabs(eta2)<2.4)) continue;
+        if(pt2<25) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("pt2",1);
+        }
+        
+        if(cutflow)
+        {
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("pt2",1);
+                hSRCutflow[m]->Fill("pt2,w",TotalWeight);
+            }
         }
         
         //OS or SS
@@ -561,27 +575,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(cutflow)
         {
-            if(true)
-            {
-                hSRCutflow[SRIndex]->Fill("Zmass",1);
-                hSRCutflow[SRIndex]->Fill("Zmass,w",TotalWeight);
-            }
-            else continue;
-            
-            if(pt1>=25)
-            {
-                hSRCutflow[SRIndex]->Fill("pt1",1);
-                hSRCutflow[SRIndex]->Fill("pt1,w",TotalWeight);
-            }
-            else continue;
-            
-            if(pt2>=25)
-            {
-                hSRCutflow[SRIndex]->Fill("pt2",1);
-                hSRCutflow[SRIndex]->Fill("pt2,w",TotalWeight);
-            }
-            else continue;
-            
             if(fabs(eta1-eta2)<2)
             {
                 hSRCutflow[SRIndex]->Fill("dEta",1);
@@ -803,6 +796,34 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             }
         }
         
+        //pt1 cut
+        if(pt1>=25000)
+        {
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("pt1",1);
+                    hSRCutflow[m]->Fill("pt1,w",TotalWeight);
+                }
+            }
+        }
+        else continue;
+        
+        //pt2 cut
+        if(pt2>=25000)
+        {
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("pt2",1);
+                    hSRCutflow[m]->Fill("pt2,w",TotalWeight);
+                }
+            }
+        }
+        else continue;
+
         //OS or SS
         int channelIndex = 0;
         channelIndex += 3;
@@ -895,27 +916,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         if(cutflow)
         {
-            if(true)
-            {
-                hSRCutflow[SRIndex]->Fill("Zmass",1);
-                hSRCutflow[SRIndex]->Fill("Zmass,w",TotalWeight);
-            }
-            else continue;
-            
-            if(pt1>=25)
-            {
-                hSRCutflow[SRIndex]->Fill("pt1",1);
-                hSRCutflow[SRIndex]->Fill("pt1,w",TotalWeight);
-            }
-            else continue;
-            
-            if(pt2>=25)
-            {
-                hSRCutflow[SRIndex]->Fill("pt2",1);
-                hSRCutflow[SRIndex]->Fill("pt2,w",TotalWeight);
-            }
-            else continue;
-            
             if(fabs(eta1-eta2)<1.5)
             {
                 hSRCutflow[SRIndex]->Fill("dEta",1);
@@ -1179,18 +1179,16 @@ void skimming()
         cutflowList.push_back("trigger,w");
         cutflowList.push_back("=2BaseLep and =2SigLep");
         cutflowList.push_back("=2BaseLep and =2SigLep,w");
+        cutflowList.push_back("pt1");
+        cutflowList.push_back("pt1,w");
+        cutflowList.push_back("pt2");
+        cutflowList.push_back("pt2,w");
         cutflowList.push_back("SS");
         cutflowList.push_back("SS,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
         cutflowList.push_back("jet");
         cutflowList.push_back("jet,w");
-        cutflowList.push_back("Zmass");
-        cutflowList.push_back("Zmass,w");
-        cutflowList.push_back("pt1");
-        cutflowList.push_back("pt1,w");
-        cutflowList.push_back("pt2");
-        cutflowList.push_back("pt2,w");
         cutflowList.push_back("dEta");
         cutflowList.push_back("dEta,w");
         cutflowList.push_back("METRel");
