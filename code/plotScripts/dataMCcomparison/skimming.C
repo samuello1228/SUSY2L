@@ -33,21 +33,7 @@ float jet0_MET_dPhi;
 float l12_jet0_dPhi;
 
 Int_t nJet;
-float jetpt;
-float jeteta;
-float jetphi;
 Int_t nBJet;
-float bjetpt;
-float bjeteta;
-float bjetphi;
-Int_t nCJet;
-float cjetpt;
-float cjeteta;
-float cjetphi;
-Int_t nFJet;
-float fjetpt;
-float fjeteta;
-float fjetphi;
 
 float weight;
 float qFwt;
@@ -255,11 +241,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/F");
         
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
-        tree2[j]->Branch("jetpt",&jetpt,"jetpt/F");
-        tree2[j]->Branch("jeteta",&jeteta,"jeteta/F");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
-        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
-        tree2[j]->Branch("nFJet",&nFJet,"nFJet/I");
         
         tree2[j]->Branch("weight",&weight,"weight/F");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
@@ -472,6 +454,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
+        //b-jet veto 
         nBJet = 0;
         for(unsigned int k=0;k<jets.size();k++)
         {
@@ -516,88 +499,14 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
         }
         
-        //jets
-        vector<TLorentzVector> cjet_Ls;
-        nCJet = 0;
-        nFJet = 0;
-        int nISR = 0;
-        int leadingJetIndex = 0;
-        //int leadingBJetIndex = 0;
-        //int leadingCJetIndex = 0;
-        //int leadingFJetIndex = 0;
+        //recalculate mlj
+        vector<TLorentzVector> jet_Ls;
         for(unsigned int k=0;k<jets.size();k++)
         {
-            //signal jets
-            if(fabs(jets[k].eta) < 2.8)
-            {
-                //ISR
-                if(jets[k].pt > 40) nISR++;
-                
-                
-                //Central jets
-                if(!(jets[k].jFlag & 1<<5))
-                {
-                    //no b-tagged
-                    if(jets[k].pt > 20)
-                    {
-                        //Central light jets
-                        nCJet++;
-                        //if(nCJet==1) leadingCJetIndex = k;
-                        TLorentzVector cjet;
-                        if(recalculate_mlj) cjet.SetPtEtaPhiM(jets[k].pt,jets[k].eta,jets[k].phi,jets[k].m);
-                        if(recalculate_mlj) cjet_Ls.push_back(cjet);
-                    }
-                }
-                
-            }
-            else
-            {
-                //Forward jets
-                nFJet++;
-                //if(nFJet==1) leadingFJetIndex = k;
-            }
+            TLorentzVector jet;
+            if(recalculate_mlj) jet.SetPtEtaPhiM(jets[k].pt,jets[k].eta,jets[k].phi,jets[k].m);
+            if(recalculate_mlj) jet_Ls.push_back(jet);
         }
-        
-        if(nJet>0)
-        {
-            jetpt = jets[leadingJetIndex].pt;
-            jeteta = jets[leadingJetIndex].eta;
-            //jetphi = jets[leadingJetIndex].phi;
-        }
-        else
-        {
-            jetpt = 0;
-            jeteta = 0;
-            //jetphi = 0;
-        }
-        
-        /*
-        if(nCJet>0)
-        {
-            cjetpt = jets[leadingCJetIndex].pt;
-            cjeteta = jets[leadingCJetIndex].eta;
-            cjetphi = jets[leadingCJetIndex].phi;
-        }
-        else
-        {
-            cjetpt = 0;
-            cjeteta = 0;
-            cjetphi = 0;
-        }
-        
-        if(nFJet>0)
-        {
-            fjetpt = jets[leadingFJetIndex].pt;
-            fjeteta = jets[leadingFJetIndex].eta;
-            fjetphi = jets[leadingFJetIndex].phi;
-        }
-        else
-        {
-            fjetpt = 0;
-            fjeteta = 0;
-            fjetphi = 0;
-        }
-        */
         
         phi1 = leps[sigIndex[0]].phi;
         mll = l12.m;
@@ -626,16 +535,16 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         if(recalculate_mlj)
         {
             mlj = -1;
-            if(cjet_Ls.size()>=1 && cjet_Ls.size()<=3)
+            if(jet_Ls.size()>=1 && jet_Ls.size()<=3)
             {
                 TLorentzVector JetSystem;
-                if(cjet_Ls.size()==1)
+                if(jet_Ls.size()==1)
                 {
-                    JetSystem = cjet_Ls[0];
+                    JetSystem = jet_Ls[0];
                 }
-                else if(cjet_Ls.size()==2 || cjet_Ls.size()==3)
+                else if(jet_Ls.size()==2 || jet_Ls.size()==3)
                 {
-                    JetSystem = cjet_Ls[0]+cjet_Ls[1];
+                    JetSystem = jet_Ls[0]+jet_Ls[1];
                 }
                 
                 double dR1 = JetSystem.DeltaR(l1);
@@ -716,11 +625,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             else continue;
         }
         
-        //separate the sample into channels
-        if(nISR==0) {}
-        else if(nISR>=1) channelIndex += 6;
-        //else continue;
-        
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
     }
@@ -777,7 +681,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     {
         tree1->SetBranchAddress("NlepS", &NlepS);
         tree1->SetBranchAddress("NlepBL", &NlepBL);
-        tree1->SetBranchAddress("Njet20", &nCJet);
+        tree1->SetBranchAddress("Njet20", &nJet);
         tree1->SetBranchAddress("Nbjet", &nBJet);
         tree1->SetBranchAddress("FakeWeight", &weight);
         tree1->SetBranchAddress("RelMET", &METRel);
@@ -837,7 +741,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree2[j]->Branch("meff",&meff,"meff/F");
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         
-        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
+        tree2[j]->Branch("nJet",&nJet,"nJet/I");
         tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("weight",&weight,"weight/F");
     }
@@ -938,6 +842,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             channelIndex += 2;
         }
 
+        //b-jet veto
         if(nBJet>0)
         {
             continue;
@@ -959,11 +864,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         {
             if(channelIndex>=3 && channelIndex<=5)
             {
-                if(nCJet == 1)
+                if(nJet == 1)
                 {
                     SRIndex = 0;
                 }
-                else if(nCJet == 2 || nCJet == 3)
+                else if(nJet == 2 || nJet == 3)
                 {
                     SRIndex = 1;
                 }
