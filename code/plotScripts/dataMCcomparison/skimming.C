@@ -105,8 +105,9 @@ void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
         for(unsigned int j=1;j<=cutflowList.size();j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
-            if(j%2 == 0) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
-            else if(j%2 == 1) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
+            if(j<=2) cout<<long(hSRCutflow[i]->GetBinContent(j))<<endl;
+            else if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
+            else if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
         }
         cout<<endl;
     }
@@ -291,7 +292,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
                 hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
-                hSRCutflow[m]->Fill("nwAOD",h1->GetBinContent(2));
                 hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
             }
             
@@ -1180,10 +1180,8 @@ void skimming()
     std::vector<TString> cutflowList;
     {
         cutflowList.push_back("nAOD");
-        cutflowList.push_back("nwAOD");
         cutflowList.push_back("nSUSY");
-        cutflowList.push_back("trigger");
-        cutflowList.push_back("trigger,w");
+
         cutflowList.push_back("=2BaseLep and =2SigLep");
         cutflowList.push_back("=2BaseLep and =2SigLep,w");
         cutflowList.push_back("pt1");
@@ -1268,7 +1266,7 @@ void skimming()
                 skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel);
                 
                 nAOD[j] = int(hSRCutflow[0]->GetBinContent(1));
-                nSUSY[j] = int(hSRCutflow[0]->GetBinContent(3));
+                nSUSY[j] = int(hSRCutflow[0]->GetBinContent(2));
                 
                 //check whether nAOD is the same as ami number
                 if(int(hSRCutflow[0]->GetBinContent(1)) != amiAOD[j])
@@ -1281,9 +1279,9 @@ void skimming()
                 }
                 
                 //check whether nSUSY is the same as ami number
-                if(int(hSRCutflow[0]->GetBinContent(3)) != amiSUSY[j])
+                if(int(hSRCutflow[0]->GetBinContent(2)) != amiSUSY[j])
                 {
-                    cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[j]<<", nSUSY in ntuple: "<<int(hSRCutflow[0]->GetBinContent(3))<<endl;
+                    cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[j]<<", nSUSY in ntuple: "<<int(hSRCutflow[0]->GetBinContent(2))<<endl;
                 }
                 else
                 {
