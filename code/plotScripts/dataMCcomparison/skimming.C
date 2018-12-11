@@ -575,7 +575,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(cutflow)
         {
-            if(fabs(eta1-eta2)<2)
+            if(fabs(eta1-eta2)<=1.5)
             {
                 hSRCutflow[SRIndex]->Fill("dEta",1);
                 hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
@@ -584,33 +584,33 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             
             if(MET>=100)
             {
-                hSRCutflow[SRIndex]->Fill("METRel",1);
-                hSRCutflow[SRIndex]->Fill("METRel,w",TotalWeight);
+                hSRCutflow[SRIndex]->Fill("MET",1);
+                hSRCutflow[SRIndex]->Fill("MET,w",TotalWeight);
             }
             else continue;
             
-            if(meff>=100)
+            if(mt1>=140)
+            {
+                hSRCutflow[SRIndex]->Fill("mt1",1);
+                hSRCutflow[SRIndex]->Fill("mt1,w",TotalWeight);
+            }
+            else continue;
+            
+            if(meff>=260)
             {
                 hSRCutflow[SRIndex]->Fill("meff",1);
                 hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
             }
             else continue;
             
-            if(mtm>=130)
-            {
-                hSRCutflow[SRIndex]->Fill("maxmt",1);
-                hSRCutflow[SRIndex]->Fill("maxmt,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mlj<140)
+            if(mlj<180)
             {
                 hSRCutflow[SRIndex]->Fill("mlj",1);
                 hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
             }
             else continue;
             
-            if(mTtwo>=65)
+            if(mTtwo>=80)
             {
                 hSRCutflow[SRIndex]->Fill("mTtwo",1);
                 hSRCutflow[SRIndex]->Fill("mTtwo,w",TotalWeight);
@@ -916,38 +916,45 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         if(cutflow)
         {
-            if(fabs(eta1-eta2)<1.5)
+            if(fabs(eta1-eta2)<=1.5)
             {
                 hSRCutflow[SRIndex]->Fill("dEta",1);
                 hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
             }
             else continue;
             
-            if(METRel>=110)
+            if(MET>=100)
             {
-                hSRCutflow[SRIndex]->Fill("METRel",1);
-                hSRCutflow[SRIndex]->Fill("METRel,w",TotalWeight);
+                hSRCutflow[SRIndex]->Fill("MET",1);
+                hSRCutflow[SRIndex]->Fill("MET,w",TotalWeight);
             }
             else continue;
             
-            if(meff>=200)
+            if(mt1>=140)
+            {
+                hSRCutflow[SRIndex]->Fill("mt1",1);
+                hSRCutflow[SRIndex]->Fill("mt1,w",TotalWeight);
+            }
+            else continue;
+            
+            if(meff>=260)
             {
                 hSRCutflow[SRIndex]->Fill("meff",1);
                 hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
             }
             else continue;
             
-            if(true)
-            {
-                hSRCutflow[SRIndex]->Fill("maxmt",1);
-                hSRCutflow[SRIndex]->Fill("maxmt,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mlj<90)
+            if(mlj<180)
             {
                 hSRCutflow[SRIndex]->Fill("mlj",1);
                 hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
+            }
+            else continue;
+            
+            if(mTtwo>=80)
+            {
+                hSRCutflow[SRIndex]->Fill("mTtwo",1);
+                hSRCutflow[SRIndex]->Fill("mTtwo,w",TotalWeight);
             }
             else continue;
         }
@@ -1187,16 +1194,17 @@ void skimming()
         cutflowList.push_back("SS,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
+
         cutflowList.push_back("jet");
         cutflowList.push_back("jet,w");
         cutflowList.push_back("dEta");
         cutflowList.push_back("dEta,w");
-        cutflowList.push_back("METRel");
-        cutflowList.push_back("METRel,w");
+        cutflowList.push_back("MET");
+        cutflowList.push_back("MET,w");
+        cutflowList.push_back("mt1");
+        cutflowList.push_back("mt1,w");
         cutflowList.push_back("meff");
         cutflowList.push_back("meff,w");
-        cutflowList.push_back("maxmt");
-        cutflowList.push_back("maxmt,w");
         cutflowList.push_back("mlj");
         cutflowList.push_back("mlj,w");
         cutflowList.push_back("mTtwo");
