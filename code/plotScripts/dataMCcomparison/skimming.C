@@ -87,14 +87,14 @@ const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
-const bool cutflow = false;
+const bool cutflow = true;
 void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
-    for(unsigned int j=0;j<6;j++)
+    for(unsigned int j=0;j<2;j++)
     {
         TString hName = "cutflow_";
         hName += TString::Itoa(j,10);
-        TH1D* hTemp = new TH1D(hName.Data(), "cutflow", 100, 0, 100);
+        TH1D* hTemp = new TH1D(hName.Data(), "cutflow", cutflowList.size(), 0, cutflowList.size());
         hSRCutflow.push_back(hTemp);
         
         for(unsigned int k=0;k<cutflowList.size();k++)    
@@ -106,7 +106,7 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflow
 
 void deletehCutflow(vector<TH1D*>& hSRCutflow)
 {
-    for(unsigned int j=0;j<6;j++)
+    for(unsigned int j=0;j<hSRCutflow.size();j++)
     {
         delete hSRCutflow[j];
     }
@@ -114,13 +114,13 @@ void deletehCutflow(vector<TH1D*>& hSRCutflow)
 
 void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
-    for(unsigned int i=0;i<2;i++)
+    for(unsigned int i=0;i<hSRCutflow.size();i++)
     {
         for(unsigned int j=1;j<=cutflowList.size();j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
             if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
-            if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
+            else if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
         }
         cout<<endl;
     }
@@ -306,7 +306,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 h2[j]->Fill("ntuple",tree1->GetEntries());
             }
             
-            for(unsigned int m=0;m<6;m++)
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
                 hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
                 hSRCutflow[m]->Fill("nwAOD",h1->GetBinContent(2));
@@ -387,7 +387,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             
             if(cutflow)
             {
-                for(unsigned int m=0;m<6;m++)
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
                     hSRCutflow[m]->Fill("=2BaseLep and =2SigLep",1);
                     hSRCutflow[m]->Fill("=2BaseLep and =2SigLep,w",TotalWeight);
@@ -433,7 +433,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(cutflow && channelIndex == 3)
         {
-            for(unsigned int m=0;m<6;m++)
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
                 hSRCutflow[m]->Fill("SS",1);
                 hSRCutflow[m]->Fill("SS,w",TotalWeight);
@@ -900,7 +900,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             
             if(cutflow)
             {
-                for(unsigned int m=0;m<6;m++)
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
                     hSRCutflow[m]->Fill("=2BaseLep and =2SigLep",1);
                     hSRCutflow[m]->Fill("=2BaseLep and =2SigLep,w",TotalWeight);
@@ -913,7 +913,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         channelIndex += 3;
         if(cutflow)
         {
-            for(unsigned int m=0;m<6;m++)
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
                 hSRCutflow[m]->Fill("SS",1);
                 hSRCutflow[m]->Fill("SS,w",TotalWeight);
