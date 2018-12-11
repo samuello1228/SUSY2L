@@ -119,8 +119,8 @@ void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
         for(unsigned int j=1;j<=cutflowList.size();j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
-            if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
-            else if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
+            if(j%2 == 0) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
+            else if(j%2 == 1) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
         }
         cout<<endl;
     }
@@ -472,16 +472,35 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
+        nBJet = 0;
+        for(unsigned int k=0;k<jets.size();k++)
+        {
+            //B-jets
+            if(jets[k].jFlag & 1<<5) nBJet++;
+        }
+        
+        if(nBJet>0)
+        {
+            continue;
+        }
+        else
+        {
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("bjet",1);
+                    hSRCutflow[m]->Fill("bjet,w",TotalWeight);
+                }
+            }
+        }
+
         int SRIndex = -1;
         nJet = jets.size();
         if(cutflow)
         {
             if(channelIndex>=3 && channelIndex<=5)
             {
-                hSRCutflow[0]->Fill("flavour",1);
-                hSRCutflow[0]->Fill("flavour,w",TotalWeight);
-                hSRCutflow[1]->Fill("flavour",1);
-                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
                 if(nJet == 1)
                 {
                     SRIndex = 0;
@@ -498,7 +517,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //jets
-        nBJet = 0;
         vector<TLorentzVector> cjet_Ls;
         nCJet = 0;
         nFJet = 0;
@@ -510,14 +528,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         for(unsigned int k=0;k<jets.size();k++)
         {
             //signal jets
-            
-            //B-jets
-            if(jets[k].jFlag & 1<<5)
-            {
-                nBJet++;
-                //if(nBJet==1) leadingBJetIndex = k;
-            }
-            
             if(fabs(jets[k].eta) < 2.8)
             {
                 //ISR
@@ -559,25 +569,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             jetpt = 0;
             jeteta = 0;
             //jetphi = 0;
-        }
-        
-        if(nBJet>0)
-        {
-            //bjetpt = jets[leadingBJetIndex].pt;
-            //bjeteta = jets[leadingBJetIndex].eta;
-            //bjetphi = jets[leadingBJetIndex].phi;
-            continue;
-        }
-        else
-        {
-            //bjetpt = 0;
-            //bjeteta = 0;
-            //bjetphi = 0;
-            if(cutflow)
-            {
-                hSRCutflow[SRIndex]->Fill("bjet",1);
-                hSRCutflow[SRIndex]->Fill("bjet,w",TotalWeight);
-            }
         }
         
         /*
@@ -946,16 +937,28 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             }
             channelIndex += 2;
         }
+
+        if(nBJet>0)
+        {
+            continue;
+        }
+        else
+        {
+            if(cutflow)
+            {
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("bjet",1);
+                    hSRCutflow[m]->Fill("bjet,w",TotalWeight);
+                }
+            }
+        }
         
         int SRIndex = -1;
         if(cutflow)
         {
             if(channelIndex>=3 && channelIndex<=5)
             {
-                hSRCutflow[0]->Fill("flavour",1);
-                hSRCutflow[0]->Fill("flavour,w",TotalWeight);
-                hSRCutflow[1]->Fill("flavour",1);
-                hSRCutflow[1]->Fill("flavour,w",TotalWeight);
                 if(nCJet == 1)
                 {
                     SRIndex = 0;
@@ -969,21 +972,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             
             hSRCutflow[SRIndex]->Fill("jet",1);
             hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
-        }
-        
-        //jets
-        int nISR = 0;
-        if(nBJet>0)
-        {
-            continue;
-        }
-        else
-        {
-            if(cutflow)
-            {
-                hSRCutflow[SRIndex]->Fill("bjet",1);
-                hSRCutflow[SRIndex]->Fill("bjet,w",TotalWeight);
-            }
         }
         
         pt1 /= 1000;
@@ -1288,12 +1276,10 @@ void skimming()
         cutflowList.push_back("=2BaseLep and =2SigLep,w");
         cutflowList.push_back("SS");
         cutflowList.push_back("SS,w");
-        cutflowList.push_back("flavour");
-        cutflowList.push_back("flavour,w");
-        cutflowList.push_back("jet");
-        cutflowList.push_back("jet,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
+        cutflowList.push_back("jet");
+        cutflowList.push_back("jet,w");
         cutflowList.push_back("Zmass");
         cutflowList.push_back("Zmass,w");
         cutflowList.push_back("pt1");
