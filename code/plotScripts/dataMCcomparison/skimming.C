@@ -90,6 +90,105 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflow
     }
 }
 
+void DoCutflow(vector<TH1D*>& hSRCutflow, double TotalWeight)
+{
+     if(nJet == 1)
+     {
+        hSRCutflow[0]->Fill("jet",1);
+        hSRCutflow[0]->Fill("jet,w",TotalWeight);
+        
+        if(fabs(eta1-eta2)<=1.5)
+        {
+            hSRCutflow[0]->Fill("dEta",1);
+            hSRCutflow[0]->Fill("dEta,w",TotalWeight);
+        }
+        else return;
+        
+        if(MET>=100)
+        {
+            hSRCutflow[0]->Fill("MET",1);
+            hSRCutflow[0]->Fill("MET,w",TotalWeight);
+        }
+        else return;
+        
+        if(mt1>=140)
+        {
+            hSRCutflow[0]->Fill("mt1",1);
+            hSRCutflow[0]->Fill("mt1,w",TotalWeight);
+        }
+        else return;
+        
+        if(meff>=260)
+        {
+            hSRCutflow[0]->Fill("meff",1);
+            hSRCutflow[0]->Fill("meff,w",TotalWeight);
+        }
+        else return;
+        
+        if(mlj<180)
+        {
+            hSRCutflow[0]->Fill("mlj",1);
+            hSRCutflow[0]->Fill("mlj,w",TotalWeight);
+        }
+        else return;
+        
+        if(mTtwo>=80)
+        {
+            hSRCutflow[0]->Fill("mTtwo",1);
+            hSRCutflow[0]->Fill("mTtwo,w",TotalWeight);
+        }
+        else return;
+     }
+     else if(nJet == 2 || nJet == 3)
+     {
+        hSRCutflow[1]->Fill("jet",1);
+        hSRCutflow[1]->Fill("jet,w",TotalWeight);
+        
+        if(true)
+        {
+            hSRCutflow[1]->Fill("dEta",1);
+            hSRCutflow[1]->Fill("dEta,w",TotalWeight);
+        }
+        else return;
+        
+        if(MET>=100)
+        {
+            hSRCutflow[1]->Fill("MET",1);
+            hSRCutflow[1]->Fill("MET,w",TotalWeight);
+        }
+        else return;
+        
+        if(mt1>=120)
+        {
+            hSRCutflow[1]->Fill("mt1",1);
+            hSRCutflow[1]->Fill("mt1,w",TotalWeight);
+        }
+        else return;
+        
+        if(meff>=240)
+        {
+            hSRCutflow[1]->Fill("meff",1);
+            hSRCutflow[1]->Fill("meff,w",TotalWeight);
+        }
+        else return;
+        
+        if(mlj<130)
+        {
+            hSRCutflow[1]->Fill("mlj",1);
+            hSRCutflow[1]->Fill("mlj,w",TotalWeight);
+        }
+        else return;
+        
+        if(mTtwo>=70)
+        {
+            hSRCutflow[1]->Fill("mTtwo",1);
+            hSRCutflow[1]->Fill("mTtwo,w",TotalWeight);
+        }
+        else return;
+     }
+     else return;
+}
+
 void deletehCutflow(vector<TH1D*>& hSRCutflow)
 {
     for(unsigned int j=0;j<hSRCutflow.size();j++)
@@ -469,6 +568,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         
         //b-jet veto 
+        nJet = jets.size();
         nBJet = 0;
         for(unsigned int k=0;k<jets.size();k++)
         {
@@ -490,27 +590,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                     hSRCutflow[m]->Fill("bjet,w",TotalWeight);
                 }
             }
-        }
-
-        int SRIndex = -1;
-        nJet = jets.size();
-        if(cutflow)
-        {
-            if(channelIndex>=3 && channelIndex<=5)
-            {
-                if(nJet == 1)
-                {
-                    SRIndex = 0;
-                }
-                else if(nJet == 2 || nJet == 3)
-                {
-                    SRIndex = 1;
-                }
-                else continue;
-            }
-            
-            hSRCutflow[SRIndex]->Fill("jet",1);
-            hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
         }
         
         //recalculate mlj
@@ -571,50 +650,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         else mlj = sig.mlj;
         
-        if(cutflow)
-        {
-            if(fabs(eta1-eta2)<=1.5)
-            {
-                hSRCutflow[SRIndex]->Fill("dEta",1);
-                hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
-            }
-            else continue;
-            
-            if(MET>=100)
-            {
-                hSRCutflow[SRIndex]->Fill("MET",1);
-                hSRCutflow[SRIndex]->Fill("MET,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mt1>=140)
-            {
-                hSRCutflow[SRIndex]->Fill("mt1",1);
-                hSRCutflow[SRIndex]->Fill("mt1,w",TotalWeight);
-            }
-            else continue;
-            
-            if(meff>=260)
-            {
-                hSRCutflow[SRIndex]->Fill("meff",1);
-                hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mlj<180)
-            {
-                hSRCutflow[SRIndex]->Fill("mlj",1);
-                hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mTtwo>=80)
-            {
-                hSRCutflow[SRIndex]->Fill("mTtwo",1);
-                hSRCutflow[SRIndex]->Fill("mTtwo,w",TotalWeight);
-            }
-            else continue;
-        }
+        if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -878,25 +914,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             }
         }
         
-        int SRIndex = -1;
-        if(cutflow)
-        {
-            {
-                if(nJet == 1)
-                {
-                    SRIndex = 0;
-                }
-                else if(nJet == 2 || nJet == 3)
-                {
-                    SRIndex = 1;
-                }
-                else continue;
-            }
-            
-            hSRCutflow[SRIndex]->Fill("jet",1);
-            hSRCutflow[SRIndex]->Fill("jet,w",TotalWeight);
-        }
-        
         pt1 /= 1000;
         pt2 /= 1000;
         mll /= 1000;
@@ -911,50 +928,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         phi1 = 1;
         
-        if(cutflow)
-        {
-            if(fabs(eta1-eta2)<=1.5)
-            {
-                hSRCutflow[SRIndex]->Fill("dEta",1);
-                hSRCutflow[SRIndex]->Fill("dEta,w",TotalWeight);
-            }
-            else continue;
-            
-            if(MET>=100)
-            {
-                hSRCutflow[SRIndex]->Fill("MET",1);
-                hSRCutflow[SRIndex]->Fill("MET,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mt1>=140)
-            {
-                hSRCutflow[SRIndex]->Fill("mt1",1);
-                hSRCutflow[SRIndex]->Fill("mt1,w",TotalWeight);
-            }
-            else continue;
-            
-            if(meff>=260)
-            {
-                hSRCutflow[SRIndex]->Fill("meff",1);
-                hSRCutflow[SRIndex]->Fill("meff,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mlj<180)
-            {
-                hSRCutflow[SRIndex]->Fill("mlj",1);
-                hSRCutflow[SRIndex]->Fill("mlj,w",TotalWeight);
-            }
-            else continue;
-            
-            if(mTtwo>=80)
-            {
-                hSRCutflow[SRIndex]->Fill("mTtwo",1);
-                hSRCutflow[SRIndex]->Fill("mTtwo,w",TotalWeight);
-            }
-            else continue;
-        }
+        if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -1084,7 +1058,8 @@ void skimming()
     gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector");
     //gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector");
     
-    TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    //TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
+    TString SamplePath = "/eos/user/c/clo/ntuple/";
     //TString SamplePath = "/eos/atlas/user/d/dzhang/susy_ntuples/";
     //TString SamplePath = "/srv/SUSY/ntuple/";
     //TString SamplePath = "/Users/samuel/Atlas/ntuple/";
@@ -1105,7 +1080,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
     
     //channels
     std::vector<TString> channel;
