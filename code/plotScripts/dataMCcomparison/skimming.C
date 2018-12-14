@@ -324,29 +324,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("eta2",&eta2,"eta2/F");
         tree2[j]->Branch("phi1",&phi1,"phi1/F");
         tree2[j]->Branch("mll",&mll,"mll/F");
-        tree2[j]->Branch("ptll",&ptll,"ptll/F");
         tree2[j]->Branch("MET",&MET,"MET/F");
-        tree2[j]->Branch("METRel",&METRel,"METRel/F");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/F");
         tree2[j]->Branch("mt1",&mt1,"mt1/F");
-        tree2[j]->Branch("mt2",&mt2,"mt2/F");
-        tree2[j]->Branch("mtm",&mtm,"mtm/F");
         tree2[j]->Branch("meff",&meff,"meff/F");
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
-        tree2[j]->Branch("mjj",&mjj,"mjj/F");
-        
-        tree2[j]->Branch("l12_dPhi",&l12_dPhi,"l12_dPhi/F");
-        tree2[j]->Branch("l12_MET_dPhi",&l12_MET_dPhi,"l12_MET_dPhi/F");
-        tree2[j]->Branch("jet0_MET_dPhi",&jet0_MET_dPhi,"jet0_MET_dPhi/F");
-        tree2[j]->Branch("l12_jet0_dPhi",&l12_jet0_dPhi,"l12_jet0_dPhi/F");
         
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
-        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         
         tree2[j]->Branch("weight",&weight,"weight/F");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
         tree2[j]->Branch("fLwt",&fLwt,"fLwt/F");
-        tree2[j]->Branch("averageMu",&averageMu,"averageMu/F");
     }
     
     //histograms
@@ -427,7 +415,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(!isCF)
         {
-            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF;
             weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
         }
         else
@@ -439,9 +426,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
-        int sigIndex[2];
-        sigIndex[0] = 0;
-        sigIndex[1] = 1;
         if(!isCF && !evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -471,12 +455,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
-        ID1 = leps[sigIndex[0]].ID;
-        ID2 = leps[sigIndex[1]].ID;
-        pt1 = leps[sigIndex[0]].pt;
-        pt2 = leps[sigIndex[1]].pt;
-        eta1 = leps[sigIndex[0]].eta;
-        eta2 = leps[sigIndex[1]].eta;
+        ID1 = leps[0].ID;
+        ID2 = leps[1].ID;
+        pt1 = leps[0].pt;
+        pt2 = leps[1].pt;
+        eta1 = leps[0].eta;
+        eta2 = leps[1].eta;
         //pt of leading lepton
         if(pt1<25) continue;
         for(unsigned int m=0;m<channel.size();m++)
@@ -563,29 +547,29 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         TLorentzVector l2;
         if(int(abs(ID1)/1000) == 11)
         {
-            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_el);
+            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[0].pt,leps[0].eta,leps[0].phi,mass_el);
             if(int(abs(ID2)/1000) == 11)
             {
-                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_el);
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[1].pt,leps[1].eta,leps[1].phi,mass_el);
             }
             else if(int(abs(ID2)/1000) == 13)
             {
-                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[1].pt,leps[1].eta,leps[1].phi,mass_mu);
                 channelIndex += 2;
             }
         }
         else if(int(abs(ID1)/1000) == 13)
         {
-            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[sigIndex[0]].pt,leps[sigIndex[0]].eta,leps[sigIndex[0]].phi,mass_mu);
+            if(recalculate_mlj) l1.SetPtEtaPhiM(leps[0].pt,leps[0].eta,leps[0].phi,mass_mu);
             if(int(abs(ID2)/1000) == 11)
             {
-                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_el);
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[1].pt,leps[1].eta,leps[1].phi,mass_el);
                 channelIndex += 2;
             }
             else if(int(abs(ID2)/1000) == 13)
             {
                 if(isCF) continue;
-                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
+                if(recalculate_mlj) l2.SetPtEtaPhiM(leps[1].pt,leps[1].eta,leps[1].phi,mass_mu);
                 channelIndex += 1;
             }
         }
@@ -599,24 +583,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(recalculate_mlj) jet_Ls.push_back(jet);
         }
         
-        phi1 = leps[sigIndex[0]].phi;
+        phi1 = leps[0].phi;
         mll = l12.m;
-        ptll = l12.pt;
         MET = sig.Met;
-        METRel = sig.MetRel;
         mTtwo = sig.mT2;
-        mt1 = leps[sigIndex[0]].mT;
-        mt2 = leps[sigIndex[1]].mT;
-        if(mt1>mt2) mtm = mt1;
-        else mtm = mt2;
+        mt1 = leps[0].mT;
         meff = sig.HT + sig.Met;
-        mjj = sig.mjj;
-        //R2 = MET/(MET + pt1 + pt2);
-        l12_dPhi = l12.dPhi;
-        l12_MET_dPhi = l12.MET_dPhi;
-        if(jets.size()>=1) jet0_MET_dPhi = jets[0].MET_dPhi;
-        else jet0_MET_dPhi = -999;
-        l12_jet0_dPhi = l12.jet0_dPhi;
         
         qFwt = evt.qFwt;
         averageMu = evt.averageMu;
@@ -763,17 +735,13 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree2[j]->Branch("eta2",&eta2,"eta2/F");
         tree2[j]->Branch("phi1",&phi1,"phi1/F");
         tree2[j]->Branch("mll",&mll,"mll/F");
-        tree2[j]->Branch("ptll",&ptll,"ptll/F");
         tree2[j]->Branch("MET",&MET,"MET/F");
-        tree2[j]->Branch("METRel",&METRel,"METRel/F");
         tree2[j]->Branch("mTtwo",&mTtwo,"mTtwo/F");
         tree2[j]->Branch("mt1",&mt1,"mt1/F");
-        tree2[j]->Branch("mtm",&mtm,"mtm/F");
         tree2[j]->Branch("meff",&meff,"meff/F");
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
-        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
         tree2[j]->Branch("weight",&weight,"weight/F");
     }
     
@@ -930,13 +898,10 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         pt1 /= 1000;
         pt2 /= 1000;
         mll /= 1000;
-        ptll /= 1000;
-        METRel /= 1000;
         MET /= 1000;
         meff /= 1000;
         mlj /= 1000;
         mt1 /= 1000;
-        mtm /= 1000;
         mTtwo /= 1000;
         
         phi1 = 1;
