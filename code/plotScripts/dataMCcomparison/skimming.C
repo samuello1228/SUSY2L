@@ -361,11 +361,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"trigger");
-        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(8,"bjet_veto");
         h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
     }
     
@@ -424,12 +424,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree1->GetEntry(j);
         
         bool passCutflow = true;
-        
-        //trigger
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("trigger",1);
-        }
         
         if(!isCF)
         {
@@ -515,6 +509,30 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
+        //b-jet veto 
+        nJet = jets.size();
+        nBJet = 0;
+        for(unsigned int k=0;k<jets.size();k++)
+        {
+            //B-jets
+            if(jets[k].jFlag & 1<<5) nBJet++;
+        }
+        
+        if(nBJet>0) continue;
+        for(unsigned int m=0;m<channel.size();m++)
+        {
+            h2[m]->Fill("bjet_veto",1);
+        }
+        
+        if(cutflow)
+        {
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("bjet",1);
+                hSRCutflow[m]->Fill("bjet,w",TotalWeight);
+            }
+        }
+        
         //OS or SS
         int channelIndex = 0;
         if( (ID1>0 && ID2>0) || (ID1<0 && ID2<0) )
@@ -569,31 +587,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 if(isCF) continue;
                 if(recalculate_mlj) l2.SetPtEtaPhiM(leps[sigIndex[1]].pt,leps[sigIndex[1]].eta,leps[sigIndex[1]].phi,mass_mu);
                 channelIndex += 1;
-            }
-        }
-        
-        //b-jet veto 
-        nJet = jets.size();
-        nBJet = 0;
-        for(unsigned int k=0;k<jets.size();k++)
-        {
-            //B-jets
-            if(jets[k].jFlag & 1<<5) nBJet++;
-        }
-        
-        if(nBJet>0)
-        {
-            continue;
-        }
-        else
-        {
-            if(cutflow && passCutflow)
-            {
-                for(unsigned int m=0;m<hSRCutflow.size();m++)
-                {
-                    hSRCutflow[m]->Fill("bjet",1);
-                    hSRCutflow[m]->Fill("bjet,w",TotalWeight);
-                }
             }
         }
         
@@ -796,11 +789,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"trigger");
-        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(8,"bjet_veto");
         h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
         
         h2[j]->Fill("nAOD",1);
@@ -844,6 +837,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         //pt1 cut
         if(pt1>=25000)
         {
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("pt1",1);
+            }
+            
             if(cutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
@@ -858,6 +856,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         //pt2 cut
         if(pt2>=25000)
         {
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("pt2",1);
+            }
+            
             if(cutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
@@ -869,6 +872,22 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         }
         else continue;
 
+        //b-jet veto
+        if(nBJet>0) continue;
+        if(cutflow)
+        {
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("bjet_veto",1);
+            }
+            
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("bjet",1);
+                hSRCutflow[m]->Fill("bjet,w",TotalWeight);
+            }
+        }
+        
         //OS or SS
         int channelIndex = 0;
         channelIndex += 3;
@@ -908,23 +927,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             channelIndex += 2;
         }
 
-        //b-jet veto
-        if(nBJet>0)
-        {
-            continue;
-        }
-        else
-        {
-            if(cutflow)
-            {
-                for(unsigned int m=0;m<hSRCutflow.size();m++)
-                {
-                    hSRCutflow[m]->Fill("bjet",1);
-                    hSRCutflow[m]->Fill("bjet,w",TotalWeight);
-                }
-            }
-        }
-        
         pt1 /= 1000;
         pt2 /= 1000;
         mll /= 1000;
@@ -1194,10 +1196,10 @@ void skimming()
         cutflowList.push_back("pt1,w");
         cutflowList.push_back("pt2");
         cutflowList.push_back("pt2,w");
-        cutflowList.push_back("SS");
-        cutflowList.push_back("SS,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
+        cutflowList.push_back("SS");
+        cutflowList.push_back("SS,w");
 
         cutflowList.push_back("jet");
         cutflowList.push_back("jet,w");
