@@ -1000,9 +1000,17 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
         if(type == "Data")
         {
             double lumi;
+            long AOD;
+            long SUSY;
             fin>>lumi;
             XS.push_back(lumi);
             cout<<lumi<<endl;
+            
+            fin>>AOD;
+            amiAOD.push_back(AOD);
+            
+            fin>>SUSY;
+            amiSUSY.push_back(SUSY);
         }
         else if(type == "BG")
         {
@@ -1205,16 +1213,43 @@ void skimming()
             nSUSY.push_back(-1);
         }
         
+        vector<TH1D*> hSRCutflow;
+        initializehCutflow(hSRCutflow,cutflowList);
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
             long nAOD2 = 0;
             long nSUSY2 = 0;
             
-            vector<TH1D*> hSRCutflow;
-            initializehCutflow(hSRCutflow,cutflowList);
             skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow,channel,nAOD2,nSUSY2);
-            deletehCutflow(hSRCutflow);
+            
+            nAOD[i] = nAOD2;
+            nSUSY[i] = nSUSY2;
+        }
+        
+        if(cutflow)
+        {
+            cout<<"cutflow for data: "<<endl;
+            printhCutflow(hSRCutflow,cutflowList);
+        }
+        
+        deletehCutflow(hSRCutflow);
+        
+        for(unsigned int i=0;i<DataSampleName.size();i++)
+        {
+            cout<<DataSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
+            
+            //check whether nAOD is the same as ami number
+            if(nAOD[i] != -1 && nAOD[i] != amiAOD[i])
+            {
+                cout<<"nAOD are different: nAOD in ami: "<<amiAOD[i]<<", nAOD in ntuple: "<<nAOD[i]<<endl;
+            }
+            
+            //check whether nSUSY is the same as ami number
+            if(nSUSY[i] != -1 && nSUSY[i] != amiSUSY[i])
+            {
+                cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[i]<<", nSUSY in ntuple: "<<nSUSY[i]<<endl;
+            }
         }
     }
     
@@ -1267,7 +1302,7 @@ void skimming()
             }
             deletehCutflow(hSRCutflow);
         }
-            
+        
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             cout<<BGSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
