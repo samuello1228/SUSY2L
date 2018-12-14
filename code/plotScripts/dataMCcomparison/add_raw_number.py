@@ -19,9 +19,12 @@ MCSample.append("../../multiLepSearch/script/MCBGVVVSherpa_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGsingletop_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGttbar_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGttV_sample_list.txt")
-MCSample.append("../../multiLepSearch/script/MCBGVVSherpa_sample_list.txt")
+MCSample.append("../../multiLepSearch/script/MCBGVVSherpa_CT10_sample_list.txt")
+MCSample.append("../../multiLepSearch/script/MCBGVVSherpa_221_sample_list.txt")
 MCSample.append("../../multiLepSearch/script/MCBGVgammaSherpa_sample_list.txt")
-MCSample.append("../../multiLepSearch/script/MCBGhiggs_sample_list.txt")
+MCSample.append("../../multiLepSearch/script/MCBGhiggs_Pythia8EvtGen_sample_list.txt")
+MCSample.append("../../multiLepSearch/script/MCBGhiggs_HerwigppEvtGen_sample_list.txt")
+MCSample.append("../../multiLepSearch/script/MCBGRare_sample_list.txt")
 
 #fill dictionary: sample name for each sample id
 dict_sampleName={}
