@@ -1042,6 +1042,8 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
         {
             double XS1;
             double XS2;
+            long AOD;
+            long SUSY;
             
             fin>>XS1;
             fin>>XS1;
@@ -1056,6 +1058,12 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
             
             XS.push_back(XS2);
             cout<<XS2<<endl;
+            
+            fin>>AOD;
+            amiAOD.push_back(AOD);
+            
+            fin>>SUSY;
+            amiSUSY.push_back(SUSY);
         }
     }
     fin.close();
@@ -1091,8 +1099,8 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
-    //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1351,8 +1359,29 @@ void skimming()
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow,cutflowList);
             skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow,channel,nAOD2,nSUSY2);
+            
+            nAOD[i] = nAOD2;
+            nSUSY[i] = nSUSY2;
+            
             if(cutflow) printhCutflow(hSRCutflow,cutflowList);
             deletehCutflow(hSRCutflow);
+        }
+        
+        for(unsigned int i=0;i<SigSampleName.size();i++)
+        {
+            cout<<SigSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
+            
+            //check whether nAOD is the same as ami number
+            if(nAOD[i] != -1 && nAOD[i] != amiAOD[i])
+            {
+                cout<<"nAOD are different: nAOD in ami: "<<amiAOD[i]<<", nAOD in ntuple: "<<nAOD[i]<<endl;
+            }
+            
+            //check whether nSUSY is the same as ami number
+            if(nSUSY[i] != -1 && nSUSY[i] != amiSUSY[i])
+            {
+                cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[i]<<", nSUSY in ntuple: "<<nSUSY[i]<<endl;
+            }
         }
     }
     
