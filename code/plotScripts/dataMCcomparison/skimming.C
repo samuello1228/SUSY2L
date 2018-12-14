@@ -212,7 +212,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
     }
 }
 
-void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow, std::vector<TString>& channel)
+void skimming2(TString const& SamplePath,TString const& tag,TString const& SampleName, double XS,vector<TH1D*>& hSRCutflow, std::vector<TString>& channel, long& nAOD, long& nSUSY)
 {
     bool isCF = false;
     if(SampleName == "CF") isCF = true;
@@ -393,6 +393,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
                 hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
             }
+            
+            nAOD += long(h1->GetBinContent(1));
+            nSUSY += long(h1->GetBinContent(4));
             
             delete f1;
         }
@@ -970,7 +973,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     }
 }
 
-void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, std::vector<int>& amiAOD, std::vector<int>& amiSUSY, TString const type)
+void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, std::vector<long>& amiAOD, std::vector<long>& amiSUSY, TString const type)
 {
     ifstream fin;
     {
@@ -1005,8 +1008,8 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
         {
             double XS1;
             double XS2;
-            int AOD;
-            int SUSY;
+            long AOD;
+            long SUSY;
             
             fin>>XS2;
             
@@ -1081,7 +1084,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
-    //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1189,16 +1192,28 @@ void skimming()
         //tag += "b.Data";
         std::vector<TString> DataSampleName;
         std::vector<double> XSTemp;
-        std::vector<int> amiAOD;
-        std::vector<int> amiSUSY;
+        std::vector<long> amiAOD;
+        std::vector<long> amiSUSY;
         DataSampleName.reserve(20);
         GetSampleName(DataSampleName,XSTemp,amiAOD,amiSUSY,"Data");
+        
+        std::vector<long> nAOD;
+        std::vector<long> nSUSY;
+        for(unsigned int i=0;i<DataSampleName.size();i++)
+        {
+            nAOD.push_back(-1);
+            nSUSY.push_back(-1);
+        }
+        
         //for(unsigned int i=0;i<=0;i++)
         for(unsigned int i=0;i<DataSampleName.size();i++)
         {
+            long nAOD2 = 0;
+            long nSUSY2 = 0;
+            
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow,cutflowList);
-            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow,channel);
+            skimming2(SamplePath,tag,DataSampleName[i],0,hSRCutflow,channel,nAOD2,nSUSY2);
             deletehCutflow(hSRCutflow);
         }
     }
@@ -1210,13 +1225,13 @@ void skimming()
         //tag += ".MCBkg";
         std::vector<TString> BGSampleName;
         std::vector<double> BGXS;
-        std::vector<int> amiAOD;
-        std::vector<int> amiSUSY;
+        std::vector<long> amiAOD;
+        std::vector<long> amiSUSY;
         BGSampleName.reserve(20);
         GetSampleName(BGSampleName,BGXS,amiAOD,amiSUSY,"BG");
         
-        std::vector<int> nAOD;
-        std::vector<int> nSUSY;
+        std::vector<long> nAOD;
+        std::vector<long> nSUSY;
         for(unsigned int i=0;i<BGSampleName.size();i++)
         {
             nAOD.push_back(-1);
@@ -1235,36 +1250,14 @@ void skimming()
             //for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].lower;j++)
             for(unsigned int j=BGMCGroupData[i].lower;j<=BGMCGroupData[i].upper;j++)
             {
+                long nAOD2 = 0;
+                long nSUSY2 = 0;
+                
                 BGSampleName[j] = "mc15_13TeV." + BGSampleName[j];
-                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel);
+                skimming2(SamplePath,tag,BGSampleName[j],BGXS[j],hSRCutflow,channel,nAOD2,nSUSY2);
                 
-                nAOD[j] = int(hSRCutflow[0]->GetBinContent(1));
-                nSUSY[j] = int(hSRCutflow[0]->GetBinContent(2));
-                
-                //check whether nAOD is the same as ami number
-                if(int(hSRCutflow[0]->GetBinContent(1)) != amiAOD[j])
-                {
-                    cout<<"nAOD are different: nAOD in ami: "<<amiAOD[j]<<", nAOD in ntuple: "<<int(hSRCutflow[0]->GetBinContent(1))<<endl;
-                }
-                else
-                {
-                    cout<<"nAOD are the same."<<endl;
-                }
-                
-                //check whether nSUSY is the same as ami number
-                if(int(hSRCutflow[0]->GetBinContent(2)) != amiSUSY[j])
-                {
-                    cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[j]<<", nSUSY in ntuple: "<<int(hSRCutflow[0]->GetBinContent(2))<<endl;
-                }
-                else
-                {
-                    cout<<"nSUSY are the same."<<endl;
-                }
-            }
-            
-            for(unsigned int i=0;i<BGSampleName.size();i++)
-            {
-                cout<<BGSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
+                nAOD[j] = nAOD2;
+                nSUSY[j] = nSUSY2;
             }
             
             if(cutflow)
@@ -1273,6 +1266,23 @@ void skimming()
                 printhCutflow(hSRCutflow,cutflowList);
             }
             deletehCutflow(hSRCutflow);
+        }
+            
+        for(unsigned int i=0;i<BGSampleName.size();i++)
+        {
+            cout<<BGSampleName[i].Data()<<" "<<amiAOD[i]<<" "<<nAOD[i]<<" "<<amiSUSY[i]<<" "<<nSUSY[i]<<endl;
+            
+            //check whether nAOD is the same as ami number
+            if(nAOD[i] != -1 && nAOD[i] != amiAOD[i])
+            {
+                cout<<"nAOD are different: nAOD in ami: "<<amiAOD[i]<<", nAOD in ntuple: "<<nAOD[i]<<endl;
+            }
+            
+            //check whether nSUSY is the same as ami number
+            if(nSUSY[i] != -1 && nSUSY[i] != amiSUSY[i])
+            {
+                cout<<"nSUSY are different: nSUSY in ami: "<<amiSUSY[i]<<", nSUSY in ntuple: "<<nSUSY[i]<<endl;
+            }
         }
     }
     
@@ -1283,17 +1293,29 @@ void skimming()
         //tag += ".MCSig";
         std::vector<TString> SigSampleName;
         std::vector<double> SigXS;
-        std::vector<int> amiAOD;
-        std::vector<int> amiSUSY;
+        std::vector<long> amiAOD;
+        std::vector<long> amiSUSY;
         SigSampleName.reserve(20);
         GetSampleName(SigSampleName,SigXS,amiAOD,amiSUSY,"Sig");
+        
+        std::vector<long> nAOD;
+        std::vector<long> nSUSY;
+        for(unsigned int i=0;i<SigSampleName.size();i++)
+        {
+            nAOD.push_back(-1);
+            nSUSY.push_back(-1);
+        }
+        
         for(unsigned int i=0;i<=0;i++)
         //for(unsigned int i=0;i<SigSampleName.size();i++)
         {
+            long nAOD2 = 0;
+            long nSUSY2 = 0;
+            
             SigSampleName[i] = "mc15_13TeV." + SigSampleName[i];
             vector<TH1D*> hSRCutflow;
             initializehCutflow(hSRCutflow,cutflowList);
-            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow,channel);
+            skimming2(SamplePath,tag,SigSampleName[i],SigXS[i],hSRCutflow,channel,nAOD2,nSUSY2);
             if(cutflow) printhCutflow(hSRCutflow,cutflowList);
             deletehCutflow(hSRCutflow);
         }
@@ -1317,10 +1339,13 @@ void skimming()
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
         vector<TH1D*> hSRCutflow;
-        std::vector<int> amiAOD;
-        std::vector<int> amiSUSY;
+        std::vector<long> amiAOD;
+        std::vector<long> amiSUSY;
+        long nAOD2 = 0;
+        long nSUSY2 = 0;
+        
         initializehCutflow(hSRCutflow,cutflowList);
-        skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel);
+        skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel,nAOD2,nSUSY2);
         if(cutflow) printhCutflow(hSRCutflow,cutflowList);
         deletehCutflow(hSRCutflow);
     }
