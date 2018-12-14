@@ -423,6 +423,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         tree1->GetEntry(j);
         
+        bool passCutflow = true;
+        
         //trigger
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -524,12 +526,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             if(!isCF)
             {
-                if(cutflow) continue;
+                if(cutflow) passCutflow = false;
             }
             else channelIndex += 3;
         }
         
-        if(cutflow && channelIndex == 3)
+        if(cutflow && passCutflow)
         {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
@@ -585,7 +587,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         else
         {
-            if(cutflow)
+            if(cutflow && passCutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
@@ -653,7 +655,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         else mlj = sig.mlj;
         
-        if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
+        if(cutflow && passCutflow) DoCutflow(hSRCutflow, TotalWeight);
+        
+        //separate the sample into channels
+        if(nJet == 0) continue;
+        else if(nJet == 1) {}
+        else if(nJet == 2 || nJet == 3) channelIndex += 6;
+        else channelIndex += 12;
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -933,6 +941,12 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
         
+        //separate the sample into channels
+        if(nJet == 0) continue;
+        else if(nJet == 1) {}
+        else if(nJet == 2 || nJet == 3) channelIndex += 6;
+        else channelIndex += 12;
+        
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
     }
@@ -1105,17 +1119,17 @@ void skimming()
     //channels
     std::vector<TString> channel;
     {
-        TString ISR[2] = {"nonISR","ISR"};
+        TString JET[3] = {"jet1","jet23","jet4"};
         TString sign[2] = {"OS","SS"};
         TString lepton[3] = {"ee","mumu","emu"};
-        for(int i=0;i<2;i++)
+        for(int i=0;i<3;i++)
         {
             for(int j=0;j<2;j++)
             {
                 for(int k=0;k<3;k++)
                 {
                     TString element = "";
-                    element += ISR[i];
+                    element += JET[i];
                     element += "_";
                     element += sign[j];
                     element += "_";
