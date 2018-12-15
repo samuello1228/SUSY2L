@@ -456,6 +456,10 @@ void analysis1()
             double DataLTemp;
             fin>>DataLTemp;
             sumDataL += DataLTemp;
+            
+            long nAOD;
+            fin>>nAOD;
+            fin>>nAOD;
         }
         fin.close();
     }
@@ -497,6 +501,10 @@ void analysis1()
             
             fin>>BGMCXSTemp;
             BGMCSampleInfo.push_back(element);
+            
+            long nAOD;
+            fin>>nAOD;
+            fin>>nAOD;
         }
         fin.close();
     }
@@ -622,6 +630,10 @@ void analysis1()
             //cout<<SigXSTemp2<<endl;
             element.XS = SigXSTemp2;
             SigSampleInfo.push_back(element);
+            
+            long nAOD;
+            fin>>nAOD;
+            fin>>nAOD;
         }
         fin.close();
     }
