@@ -45,7 +45,7 @@ const unsigned int SigOptimizingIndex = 0;
 
 const bool useDani = 0;
 
-TString setupTag = "v6_s2_MET";
+TString setupTag = "v7";
 
 // Cutflow Attention
 const bool doVVCount = 0;
@@ -2255,6 +2255,8 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
+            element.Cut += " && pt1 >= 25";
+            element.Cut += " && pt2 >= 25";
             element.Cut += " && nCJet == 1";
             element.Cut += " && nBJet == 0";
             
@@ -2278,6 +2280,8 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
+            element.Cut += " && pt1 >= 25";
+            element.Cut += " && pt2 >= 25";
             element.Cut += " && (nCJet == 2 || nCJet == 3)";
             element.Cut += " && nBJet == 0";
             
