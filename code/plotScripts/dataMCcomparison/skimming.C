@@ -25,13 +25,9 @@ float MET;
 float METRel;
 float mTtwo;
 float mt1;
-float mt2;
 float mtm;
-
-float l12_dPhi;
-float l12_MET_dPhi;
-float jet0_MET_dPhi;
-float l12_jet0_dPhi;
+float meff;
+float mlj;
 
 Int_t nJet;
 Int_t nBJet;
@@ -40,12 +36,6 @@ Int_t nCJet;
 float weight;
 float qFwt;
 float fLwt;
-float averageMu;
-
-float meff;
-float mlj;
-float R2;
-float mjj;
 
 Int_t NlepS;
 Int_t NlepBL;
@@ -620,7 +610,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         meff = sig.HT + sig.Met;
         
         qFwt = evt.qFwt;
-        averageMu = evt.averageMu;
         
         if(recalculate_mlj)
         {
