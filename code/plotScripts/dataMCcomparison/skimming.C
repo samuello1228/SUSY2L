@@ -3,7 +3,8 @@
 #include <fstream>
 #include <vector>
 
-#include "obj_def.h"
+#include "obj_def_ebcb0e23.h"
+//#include "obj_def_cb01dad9.h"
 #include <TInterpreter.h>
 
 #include <TFile.h>
@@ -34,6 +35,7 @@ float l12_jet0_dPhi;
 
 Int_t nJet;
 Int_t nBJet;
+Int_t nCJet;
 
 float weight;
 float qFwt;
@@ -331,6 +333,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
+        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+        tree2[j]->Branch("nCJet",&nCJet,"nCJet/I");
         
         tree2[j]->Branch("weight",&weight,"weight/F");
         tree2[j]->Branch("qFwt",&qFwt,"qFwt/F");
@@ -413,9 +417,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         bool passCutflow = true;
         
+        ///*
+        //trigger selection for ebcb0e23
+        if((sig.trigCode & sig.trigMask)==0)
+        {
+            if(!isCF) continue;
+        }
+        //*/
+       
         if(!isCF)
         {
-            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
+            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF; //For ebcb0e23
+            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
         }
         else
         {
@@ -574,20 +587,36 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
-        //recalculate mlj
+        //c-jets
+        nCJet = 0;
         vector<TLorentzVector> jet_Ls;
         for(unsigned int k=0;k<jets.size();k++)
         {
-            TLorentzVector jet;
-            if(recalculate_mlj) jet.SetPtEtaPhiM(jets[k].pt,jets[k].eta,jets[k].phi,jets[k].m);
-            if(recalculate_mlj) jet_Ls.push_back(jet);
+            //signal jets
+            if(fabs(jets[k].eta) < 2.8)
+            {
+                //Central jets
+                if(!(jets[k].jFlag & 1<<5))
+                {
+                    //no b-tagged
+                    if(jets[k].pt > 20)
+                    {
+                        //Central light jets
+                        nCJet++;
+                        TLorentzVector jet;
+                        if(recalculate_mlj) jet.SetPtEtaPhiM(jets[k].pt,jets[k].eta,jets[k].phi,jets[k].m);
+                        if(recalculate_mlj) jet_Ls.push_back(jet);
+                    }
+                }
+            }
         }
         
         phi1 = leps[0].phi;
         mll = l12.m;
         MET = sig.Met;
         mTtwo = sig.mT2;
-        mt1 = leps[0].mT;
+        //mt1 = leps[0].mT;
+        mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi))); //for ebcb0e23 and Gabriel's CF
         meff = sig.HT + sig.Met;
         
         qFwt = evt.qFwt;
@@ -622,11 +651,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(cutflow && passCutflow) DoCutflow(hSRCutflow, TotalWeight);
         
+        /*
         //separate the sample into channels
         if(nJet == 0) continue;
         else if(nJet == 1) {}
         else if(nJet == 2 || nJet == 3) channelIndex += 6;
         else channelIndex += 12;
+        */
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -742,6 +773,8 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree2[j]->Branch("mlj",&mlj,"mlj/F");
         
         tree2[j]->Branch("nJet",&nJet,"nJet/I");
+        tree2[j]->Branch("nBJet",&nBJet,"nBJet/I");
+        tree2[j]->Branch("nCJet",&nJet,"nCJet/I");
         tree2[j]->Branch("weight",&weight,"weight/F");
     }
     
@@ -903,16 +936,19 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         mlj /= 1000;
         mt1 /= 1000;
         mTtwo /= 1000;
+        nCJet = nJet;
         
         phi1 = 1;
         
         if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
         
+        /*
         //separate the sample into channels
         if(nJet == 0) continue;
         else if(nJet == 1) {}
         else if(nJet == 2 || nJet == 3) channelIndex += 6;
         else channelIndex += 12;
+        */
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -1052,11 +1088,13 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
 
 void skimming()
 {
-    gInterpreter->GenerateDictionary("PAR0","obj_def.h");
-    gInterpreter->GenerateDictionary("PAR","obj_def.h");
-    gInterpreter->GenerateDictionary("vector<L_PAR>","obj_def.h;vector");
-    gInterpreter->GenerateDictionary("vector<J_PAR>","obj_def.h;vector");
-    //gInterpreter->GenerateDictionary("vector<TR_PAR>","obj_def.h;vector");
+    TString obj_def_version = "obj_def_ebcb0e23.h";
+    //TString obj_def_version = "obj_def_cb01dad9.h";
+    gInterpreter->GenerateDictionary("PAR0",obj_def_version.Data());
+    gInterpreter->GenerateDictionary("PAR",obj_def_version.Data());
+    gInterpreter->GenerateDictionary("vector<L_PAR>",(obj_def_version+";vector").Data());
+    gInterpreter->GenerateDictionary("vector<J_PAR>",(obj_def_version+";vector").Data());
+    //gInterpreter->GenerateDictionary("vector<TR_PAR>",(obj_def_version+";vector").Data());
     
     //TString SamplePath = "/eos/atlas/user/c/clo/ntuple/";
     TString SamplePath = "/eos/user/c/clo/ntuple/";
@@ -1078,25 +1116,28 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
     
     //channels
     std::vector<TString> channel;
     {
-        TString JET[3] = {"jet1","jet23","jet4"};
+        TString ISR[2] = {"nonISR","ISR"};
+        //TString JET[3] = {"jet1","jet23","jet4"};
         TString sign[2] = {"OS","SS"};
         TString lepton[3] = {"ee","mumu","emu"};
-        for(int i=0;i<3;i++)
+        for(int i=0;i<2;i++)
+        //for(int i=0;i<3;i++)
         {
             for(int j=0;j<2;j++)
             {
                 for(int k=0;k<3;k++)
                 {
                     TString element = "";
-                    element += JET[i];
+                    element += ISR[i];
+                    //element += JET[i];
                     element += "_";
                     element += sign[j];
                     element += "_";
@@ -1379,6 +1420,7 @@ void skimming()
     }
     
     //charge flip from Gabriel
+    //need obj_def_cb01dad9.h
     if(false)
     {
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
