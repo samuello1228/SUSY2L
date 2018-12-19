@@ -463,7 +463,7 @@ void analysis1()
         }
         fin.close();
     }
-    //DataSampleName.clear(); sumDataL = 32861.6+3212.96; //Cutflow Attention
+    //DataSampleName.clear(); sumDataL = 36100; //Cutflow Attention
     cout<<"Total Luminosity: "<<sumDataL<<endl;
     
     //For BGMC

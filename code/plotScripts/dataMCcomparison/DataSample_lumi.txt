@@ -1,2 +1,2 @@
-data15_13TeV 3212.96
-data16_13TeV 32861.6
+data15_13TeV 3200
+data16_13TeV 32900

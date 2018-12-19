@@ -65,8 +65,8 @@ const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
-const double Lumi = 32861.6+3212.96;
-//const double Lumi = 36100;
+//const double Lumi = 32861.6+3212.96;
+const double Lumi = 36100;
 
 void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
