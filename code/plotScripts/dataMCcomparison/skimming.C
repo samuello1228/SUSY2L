@@ -65,7 +65,6 @@ const bool recalculate_mlj = false;
 const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
-const bool cutflow = true;
 const double Lumi = 32861.6+3212.96;
 //const double Lumi = 36100;
 
@@ -408,8 +407,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         tree1->GetEntry(j);
         
-        bool passCutflow = true;
-        
         ///*
         //trigger selection for ebcb0e23
         if((sig.trigCode & sig.trigMask)==0)
@@ -432,6 +429,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
+        bool passCutflow = true;
+        
         if(!isCF && !evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -451,7 +450,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 h2[m]->Fill("=2BaseLep and =2SigLep",1);
             }
             
-            if(cutflow)
+            if(passCutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
@@ -474,7 +473,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt1",1);
         }
         
-        if(cutflow)
+        if(passCutflow)
         {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
@@ -490,7 +489,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("pt2",1);
         }
         
-        if(cutflow)
+        if(passCutflow)
         {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
@@ -514,7 +513,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("bjet_veto",1);
         }
         
-        if(cutflow)
+        if(passCutflow)
         {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
@@ -631,7 +630,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         else mlj = sig.mlj;
         
-        if(cutflow && passCutflow) DoCutflow(hSRCutflow, TotalWeight);
+        if(passCutflow) DoCutflow(hSRCutflow, TotalWeight);
         
         /*
         //separate the sample into channels
@@ -795,6 +794,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree1->GetEntry(j);
         
         const double TotalWeight = weight * commonWeight;
+        bool passCutflow = true;
         
         {
             //exact 2 signal leptons
@@ -806,7 +806,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
                 h2[m]->Fill("=2BaseLep and =2SigLep",1);
             }
             
-            if(cutflow)
+            if(passCutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
@@ -824,7 +824,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
                 h2[m]->Fill("pt1",1);
             }
             
-            if(cutflow)
+            if(passCutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
@@ -843,7 +843,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
                 h2[m]->Fill("pt2",1);
             }
             
-            if(cutflow)
+            if(passCutflow)
             {
                 for(unsigned int m=0;m<hSRCutflow.size();m++)
                 {
@@ -856,13 +856,13 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
 
         //b-jet veto
         if(nBJet>0) continue;
-        if(cutflow)
+        for(unsigned int m=0;m<channel.size();m++)
         {
-            for(unsigned int m=0;m<channel.size();m++)
-            {
-                h2[m]->Fill("bjet_veto",1);
-            }
+            h2[m]->Fill("bjet_veto",1);
+        }
             
+        if(passCutflow)
+        {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
             {
                 hSRCutflow[m]->Fill("bjet",1);
@@ -913,7 +913,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         phi1 = 1;
         
-        if(cutflow) DoCutflow(hSRCutflow, TotalWeight);
+        if(passCutflow) DoCutflow(hSRCutflow, TotalWeight);
         
         /*
         //separate the sample into channels
@@ -1228,11 +1228,8 @@ void skimming()
             nSUSY[i] = nSUSY2;
         }
         
-        if(cutflow)
-        {
-            cout<<"cutflow for data: "<<endl;
-            printhCutflow(hSRCutflow,cutflowList);
-        }
+        cout<<"cutflow for data: "<<endl;
+        printhCutflow(hSRCutflow,cutflowList);
         
         deletehCutflow(hSRCutflow);
         
@@ -1296,11 +1293,8 @@ void skimming()
                 nSUSY[j] = nSUSY2;
             }
             
-            if(cutflow)
-            {
-                cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
-                printhCutflow(hSRCutflow,cutflowList);
-            }
+            cout<<"cutflow for "<<BGMCGroupData[i].GroupName.Data()<<endl;
+            printhCutflow(hSRCutflow,cutflowList);
             deletehCutflow(hSRCutflow);
         }
         
@@ -1356,7 +1350,7 @@ void skimming()
             nAOD[i] = nAOD2;
             nSUSY[i] = nSUSY2;
             
-            if(cutflow) printhCutflow(hSRCutflow,cutflowList);
+            printhCutflow(hSRCutflow,cutflowList);
             deletehCutflow(hSRCutflow);
         }
         
@@ -1386,7 +1380,7 @@ void skimming()
         vector<TH1D*> hSRCutflow;
         initializehCutflow(hSRCutflow,cutflowList);
         skimmingForFakes(SamplePath,SampleName,hSRCutflow,channel);
-        if(cutflow) printhCutflow(hSRCutflow,cutflowList);
+        printhCutflow(hSRCutflow,cutflowList);
         deletehCutflow(hSRCutflow);
     }
     
@@ -1404,7 +1398,7 @@ void skimming()
         
         initializehCutflow(hSRCutflow,cutflowList);
         skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel,nAOD2,nSUSY2);
-        if(cutflow) printhCutflow(hSRCutflow,cutflowList);
+        printhCutflow(hSRCutflow,cutflowList);
         deletehCutflow(hSRCutflow);
     }
 }
