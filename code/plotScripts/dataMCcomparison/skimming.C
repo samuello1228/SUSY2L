@@ -66,6 +66,9 @@ const float mass_el = 0.000510998;
 const float mass_mu = 0.105658;
 
 const bool cutflow = true;
+const double Lumi = 32861.6+3212.96;
+//const double Lumi = 36100;
+
 void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
 {
     for(unsigned int j=0;j<2;j++)
@@ -388,12 +391,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         for(unsigned int j=0;j<channel.size();j++)
         {
             h2[j]->SetBinContent(1,1);
-            h2[j]->SetBinContent(2,32861.6+3212.96);
+            h2[j]->SetBinContent(2,Lumi);
         }
     }
     
     if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
-    const double commonWeight = XS /h2[0]->GetBinContent(2) *(32861.6+3212.96);
+    const double commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -787,7 +790,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
         
         h2[j]->Fill("nAOD",1);
-        h2[j]->Fill("nwAOD",32861.6+3212.96);
+        h2[j]->Fill("nwAOD",Lumi);
         h2[j]->Fill("ntuple",tree1->GetEntries());
     }
     
