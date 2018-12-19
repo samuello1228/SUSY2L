@@ -3,8 +3,9 @@
 #include <fstream>
 #include <vector>
 
-#include "obj_def_ebcb0e23.h"
+//#include "obj_def_ebcb0e23.h"
 //#include "obj_def_cb01dad9.h"
+#include "obj_def_6ecc6eb7.h"
 #include <TInterpreter.h>
 
 #include <TFile.h>
@@ -198,7 +199,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
         for(unsigned int j=1;j<=cutflowList.size();j++)
         {
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
-            if(j<=2) cout<<long(hSRCutflow[i]->GetBinContent(j))<<endl;
+            if(j<=14) cout<<long(hSRCutflow[i]->GetBinContent(j))<<endl;
             else if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
             else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hSRCutflow[i]->GetBinContent(j)<<endl;
         }
@@ -349,8 +350,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(5,"fake");
         h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
         h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"bjet_veto");
-        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(8,"isTruthLep1");
+        h2[j]->GetXaxis()->SetBinLabel(9,"isTruthLep2");
+        h2[j]->GetXaxis()->SetBinLabel(10,"bjet_veto");
+        h2[j]->GetXaxis()->SetBinLabel(11,channel[j].Data());
     }
     
     //fill histograms
@@ -376,6 +379,21 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
                 hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
+
+                //Cutflow for 6ecc6eb7 ntuple
+                hSRCutflow[m]->Fill("GRL",h1->GetBinContent(4));
+                hSRCutflow[m]->Fill("Trigger", h1->GetBinContent(9));
+                hSRCutflow[m]->Fill("LAr+Tile+SCT+CoreFlag", h1->GetBinContent(10));
+                hSRCutflow[m]->Fill("PV", h1->GetBinContent(11));
+                hSRCutflow[m]->Fill("cosMuon", h1->GetBinContent(12));
+                hSRCutflow[m]->Fill("BadMuon", h1->GetBinContent(13));
+                hSRCutflow[m]->Fill("BadJet", h1->GetBinContent(14));
+                hSRCutflow[m]->Fill(">=2BaseLep", h1->GetBinContent(70));
+                hSRCutflow[m]->Fill(">=2SigLep", h1->GetBinContent(72));
+                hSRCutflow[m]->Fill("SS leptons", h1->GetBinContent(74));
+                hSRCutflow[m]->Fill(">=1 passOR jet", h1->GetBinContent(75));
+                hSRCutflow[m]->Fill(">=1 signal jet", h1->GetBinContent(76));
+                hSRCutflow[m]->Fill("Z veto", h1->GetBinContent(77));
             }
             
             nAOD += long(h1->GetBinContent(1));
@@ -407,18 +425,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         tree1->GetEntry(j);
         
-        ///*
+        /*
         //trigger selection for ebcb0e23
         if((sig.trigCode & sig.trigMask)==0)
         {
             if(!isCF) continue;
         }
-        //*/
+        */
        
         if(!isCF)
         {
-            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF; //For ebcb0e23
-            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
+            //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF; //For ebcb0e23
+            weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
         }
         else
         {
@@ -430,6 +448,20 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         const double TotalWeight = weight * commonWeight;
         
         bool passCutflow = true;
+        //Cutflow for 6ecc6eb7 ntuple
+        {
+            if(sig.nSigLep >= 2 && sig.isSS && sig.JetCut && !sig.isZ) 
+            {
+                if(passCutflow)
+                {
+                    for(unsigned int m=0;m<hSRCutflow.size();m++)
+                    {
+                        hSRCutflow[m]->Fill("Z veto,w",TotalWeight);
+                    }
+                }
+            }
+            else passCutflow = false;
+        }
         
         if(!isCF && !evt.isMC && fLwt!=0)
         {
@@ -495,6 +527,37 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 hSRCutflow[m]->Fill("pt2",1);
                 hSRCutflow[m]->Fill("pt2,w",TotalWeight);
+            }
+        }
+        
+        //Truth lepton (for 6ecc6eb7 ntuple)
+        if(leps[0].lepTruth != 1) continue;
+        for(unsigned int m=0;m<channel.size();m++)
+        {
+            h2[m]->Fill("isTruthLep1",1);
+        }
+        
+        if(passCutflow)
+        {
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("isTruthLep1",1);
+                hSRCutflow[m]->Fill("isTruthLep1,w",TotalWeight);
+            }
+        }
+        
+        if(leps[1].lepTruth != 1) continue;
+        for(unsigned int m=0;m<channel.size();m++)
+        {
+            h2[m]->Fill("isTruthLep2",1);
+        }
+        
+        if(passCutflow)
+        {
+            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            {
+                hSRCutflow[m]->Fill("isTruthLep2",1);
+                hSRCutflow[m]->Fill("isTruthLep2,w",TotalWeight);
             }
         }
         
@@ -597,8 +660,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mll = l12.m;
         MET = sig.Met;
         mTtwo = sig.mT2;
-        //mt1 = leps[0].mT;
-        mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi))); //for ebcb0e23 and Gabriel's CF
+        mt1 = leps[0].mT;
+        //mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi))); //for ebcb0e23 and Gabriel's CF
         meff = sig.HT + sig.Met;
         
         qFwt = evt.qFwt;
@@ -652,7 +715,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=8;k++)
+    for(int k=1;k<=10;k++)
     {
         cout<<h2[0]->GetXaxis()->GetBinLabel(k)<<": ";
         cout<<long(h2[0]->GetBinContent(k))<<endl;
@@ -661,7 +724,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     for(unsigned int j=0;j<channel.size();j++)
     {
         cout<<channel[j].Data()<<": ";
-        cout<<int(h2[j]->GetBinContent(9))<<endl;
+        cout<<int(h2[j]->GetBinContent(11))<<endl;
     }
     cout<<endl;
     
@@ -1065,8 +1128,9 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
 
 void skimming()
 {
-    TString obj_def_version = "obj_def_ebcb0e23.h";
+    //TString obj_def_version = "obj_def_ebcb0e23.h";
     //TString obj_def_version = "obj_def_cb01dad9.h";
+    TString obj_def_version = "obj_def_6ecc6eb7.h";
     gInterpreter->GenerateDictionary("PAR0",obj_def_version.Data());
     gInterpreter->GenerateDictionary("PAR",obj_def_version.Data());
     gInterpreter->GenerateDictionary("vector<L_PAR>",(obj_def_version+";vector").Data());
@@ -1093,10 +1157,11 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-35a76aa2/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-ccd99030/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-8bc21113/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-ebcb0e23/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1172,6 +1237,20 @@ void skimming()
     {
         cutflowList.push_back("nAOD");
         cutflowList.push_back("nSUSY");
+        cutflowList.push_back("GRL");
+        cutflowList.push_back("Trigger");
+        cutflowList.push_back("LAr+Tile+SCT+CoreFlag");
+        cutflowList.push_back("PV");
+        cutflowList.push_back("cosMuon");
+        cutflowList.push_back("BadMuon");
+        cutflowList.push_back("BadJet");
+        cutflowList.push_back(">=2BaseLep");
+        cutflowList.push_back(">=2SigLep");
+        cutflowList.push_back("SS leptons");
+        cutflowList.push_back(">=1 passOR jet");
+        cutflowList.push_back(">=1 signal jet");
+        cutflowList.push_back("Z veto");
+        cutflowList.push_back("Z veto,w");
 
         cutflowList.push_back("=2BaseLep and =2SigLep");
         cutflowList.push_back("=2BaseLep and =2SigLep,w");
@@ -1179,6 +1258,10 @@ void skimming()
         cutflowList.push_back("pt1,w");
         cutflowList.push_back("pt2");
         cutflowList.push_back("pt2,w");
+        cutflowList.push_back("isTruthLep1");
+        cutflowList.push_back("isTruthLep1,w");
+        cutflowList.push_back("isTruthLep2");
+        cutflowList.push_back("isTruthLep2,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
 
