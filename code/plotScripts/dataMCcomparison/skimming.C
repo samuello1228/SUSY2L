@@ -200,7 +200,7 @@ void printhCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflowList)
             cout<<hSRCutflow[i]->GetXaxis()->GetBinLabel(j)<<": ";
             if(j<=2) cout<<long(hSRCutflow[i]->GetBinContent(j))<<endl;
             else if(j%2 == 1) cout<<int(hSRCutflow[i]->GetBinContent(j))<<endl;
-            else if(j%2 == 0) cout<<std::fixed<<std::setprecision(6)<<hSRCutflow[i]->GetBinContent(j)<<endl;
+            else if(j%2 == 0) cout<<std::fixed<<std::setprecision(10)<<hSRCutflow[i]->GetBinContent(j)<<endl;
         }
         cout<<endl;
     }
@@ -654,11 +654,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     
     for(int k=1;k<=8;k++)
     {
-        cout<<long(h2[1]->GetBinContent(k))<<endl;
+        cout<<h2[0]->GetXaxis()->GetBinLabel(k)<<": ";
+        cout<<long(h2[0]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
+        cout<<channel[j].Data()<<": ";
         cout<<int(h2[j]->GetBinContent(9))<<endl;
     }
     cout<<endl;
@@ -937,11 +939,13 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     
     for(int k=1;k<=7;k++)
     {
-        cout<<long(h2[1]->GetBinContent(k))<<endl;
+        cout<<h2[0]->GetXaxis()->GetBinLabel(k)<<": ";
+        cout<<long(h2[0]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
+        cout<<channel[j].Data()<<": ";
         cout<<int(h2[j]->GetBinContent(8))<<endl;
     }
     cout<<endl;
