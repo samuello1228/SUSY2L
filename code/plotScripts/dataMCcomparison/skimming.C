@@ -346,7 +346,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep and =2SigLep");
         h2[j]->GetXaxis()->SetBinLabel(5,"fake");
         h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
         h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
@@ -448,7 +448,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             
             for(unsigned int m=0;m<channel.size();m++)
             {
-                h2[m]->Fill("=2SigLep",1);
+                h2[m]->Fill("=2BaseLep and =2SigLep",1);
             }
             
             if(cutflow)
@@ -772,12 +772,11 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"bjet_veto");
-        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep and =2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(5,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(6,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(7,"bjet_veto");
+        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
         
         h2[j]->Fill("nAOD",1);
         h2[j]->Fill("nwAOD",Lumi);
@@ -804,7 +803,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             
             for(unsigned int m=0;m<channel.size();m++)
             {
-                h2[m]->Fill("=2SigLep",1);
+                h2[m]->Fill("=2BaseLep and =2SigLep",1);
             }
             
             if(cutflow)
@@ -936,14 +935,14 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=8;k++)
+    for(int k=1;k<=7;k++)
     {
         cout<<long(h2[1]->GetBinContent(k))<<endl;
     }
     cout<<endl;
     for(unsigned int j=0;j<channel.size();j++)
     {
-        cout<<int(h2[j]->GetBinContent(9))<<endl;
+        cout<<int(h2[j]->GetBinContent(8))<<endl;
     }
     cout<<endl;
     
