@@ -534,18 +534,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             if(!isCF)
             {
-                if(cutflow) passCutflow = false;
             }
             else channelIndex += 3;
-        }
-        
-        if(cutflow && passCutflow)
-        {
-            for(unsigned int m=0;m<hSRCutflow.size();m++)
-            {
-                hSRCutflow[m]->Fill("SS",1);
-                hSRCutflow[m]->Fill("SS,w",TotalWeight);
-            }
         }
         
         //SF or DF
@@ -884,14 +874,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         //OS or SS
         int channelIndex = 0;
         channelIndex += 3;
-        if(cutflow)
-        {
-            for(unsigned int m=0;m<hSRCutflow.size();m++)
-            {
-                hSRCutflow[m]->Fill("SS",1);
-                hSRCutflow[m]->Fill("SS,w",TotalWeight);
-            }
-        }
         
         //SF or DF
         if(el_1stPt > 0 && el_2ndPt > 0)
@@ -1196,8 +1178,6 @@ void skimming()
         cutflowList.push_back("pt2,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
-        cutflowList.push_back("SS");
-        cutflowList.push_back("SS,w");
 
         cutflowList.push_back("jet");
         cutflowList.push_back("jet,w");
