@@ -548,35 +548,35 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //Truth lepton (for 6ecc6eb7 ntuple)
         if(!isCF)
         {
-        if(leps[0].lepTruth != 1) continue;
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("isTruthLep1",1);
-        }
-        
-        if(passCutflow)
-        {
-            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            if(leps[0].lepTruth != 1) continue;
+            for(unsigned int m=0;m<channel.size();m++)
             {
-                hSRCutflow[m]->Fill("isTruthLep1",1);
-                hSRCutflow[m]->Fill("isTruthLep1,w",TotalWeight);
+                h2[m]->Fill("isTruthLep1",1);
             }
-        }
-        
-        if(leps[1].lepTruth != 1) continue;
-        for(unsigned int m=0;m<channel.size();m++)
-        {
-            h2[m]->Fill("isTruthLep2",1);
-        }
-        
-        if(passCutflow)
-        {
-            for(unsigned int m=0;m<hSRCutflow.size();m++)
+            
+            if(passCutflow)
             {
-                hSRCutflow[m]->Fill("isTruthLep2",1);
-                hSRCutflow[m]->Fill("isTruthLep2,w",TotalWeight);
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("isTruthLep1",1);
+                    hSRCutflow[m]->Fill("isTruthLep1,w",TotalWeight);
+                }
             }
-        }
+            
+            if(leps[1].lepTruth != 1) continue;
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("isTruthLep2",1);
+            }
+            
+            if(passCutflow)
+            {
+                for(unsigned int m=0;m<hSRCutflow.size();m++)
+                {
+                    hSRCutflow[m]->Fill("isTruthLep2",1);
+                    hSRCutflow[m]->Fill("isTruthLep2,w",TotalWeight);
+                }
+            }
         }
         */
         
