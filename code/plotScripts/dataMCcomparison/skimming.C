@@ -346,14 +346,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep and =2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"fake");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(8,"isTruthLep1");
-        h2[j]->GetXaxis()->SetBinLabel(9,"isTruthLep2");
-        h2[j]->GetXaxis()->SetBinLabel(10,"bjet_veto");
-        h2[j]->GetXaxis()->SetBinLabel(11,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep");
+        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(6,"fake");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(8,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(9,"isTruthLep1");
+        h2[j]->GetXaxis()->SetBinLabel(10,"isTruthLep2");
+        h2[j]->GetXaxis()->SetBinLabel(11,"bjet_veto");
+        h2[j]->GetXaxis()->SetBinLabel(12,channel[j].Data());
     }
     
     //fill histograms
@@ -477,6 +478,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         */
         
+        //exact 2 baseline leptons
+        if(leps.size()!=2) continue;
+        for(unsigned int m=0;m<channel.size();m++)
+        {
+            h2[m]->Fill("=2BaseLep",1);
+        }
+        
         if(!isCF && !evt.isMC && fLwt!=0)
         {
             for(unsigned int m=0;m<channel.size();m++)
@@ -487,13 +495,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else
         {
             //exact 2 signal leptons
-            if(leps.size()!=2) continue;
             if(!(leps[0].lFlag & 1<<1)) continue;
             if(!(leps[1].lFlag & 1<<1)) continue;
             
             for(unsigned int m=0;m<channel.size();m++)
             {
-                h2[m]->Fill("=2BaseLep and =2SigLep",1);
+                h2[m]->Fill("=2SigLep",1);
             }
             
             if(passCutflow)
@@ -734,7 +741,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=10;k++)
+    for(int k=1;k<=11;k++)
     {
         cout<<h2[0]->GetXaxis()->GetBinLabel(k)<<": ";
         cout<<long(h2[0]->GetBinContent(k))<<endl;
@@ -743,7 +750,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     for(unsigned int j=0;j<channel.size();j++)
     {
         cout<<channel[j].Data()<<": ";
-        cout<<int(h2[j]->GetBinContent(11))<<endl;
+        cout<<int(h2[j]->GetBinContent(12))<<endl;
     }
     cout<<endl;
     
@@ -855,11 +862,12 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->GetXaxis()->SetBinLabel(1,"nAOD");
         h2[j]->GetXaxis()->SetBinLabel(2,"nwAOD");
         h2[j]->GetXaxis()->SetBinLabel(3,"ntuple");
-        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep and =2SigLep");
-        h2[j]->GetXaxis()->SetBinLabel(5,"pt1");
-        h2[j]->GetXaxis()->SetBinLabel(6,"pt2");
-        h2[j]->GetXaxis()->SetBinLabel(7,"bjet_veto");
-        h2[j]->GetXaxis()->SetBinLabel(8,channel[j].Data());
+        h2[j]->GetXaxis()->SetBinLabel(4,"=2BaseLep");
+        h2[j]->GetXaxis()->SetBinLabel(5,"=2SigLep");
+        h2[j]->GetXaxis()->SetBinLabel(6,"pt1");
+        h2[j]->GetXaxis()->SetBinLabel(7,"pt2");
+        h2[j]->GetXaxis()->SetBinLabel(8,"bjet_veto");
+        h2[j]->GetXaxis()->SetBinLabel(9,channel[j].Data());
         
         h2[j]->Fill("nAOD",1);
         h2[j]->Fill("nwAOD",Lumi);
@@ -881,13 +889,18 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         bool passCutflow = true;
         
         {
-            //exact 2 signal leptons
+            //exact 2 baseline leptons
             if(NlepBL!=2) continue;
-            if(NlepS!=2) continue;
-            
             for(unsigned int m=0;m<channel.size();m++)
             {
-                h2[m]->Fill("=2BaseLep and =2SigLep",1);
+                h2[m]->Fill("=2BaseLep",1);
+            }
+            
+            //exact 2 signal leptons
+            if(NlepS!=2) continue;
+            for(unsigned int m=0;m<channel.size();m++)
+            {
+                h2[m]->Fill("=2SigLep",1);
             }
             
             if(passCutflow)
@@ -1019,7 +1032,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         h2[j]->Write("hist");
     }
     
-    for(int k=1;k<=7;k++)
+    for(int k=1;k<=8;k++)
     {
         cout<<h2[0]->GetXaxis()->GetBinLabel(k)<<": ";
         cout<<long(h2[0]->GetBinContent(k))<<endl;
@@ -1028,7 +1041,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
     for(unsigned int j=0;j<channel.size();j++)
     {
         cout<<channel[j].Data()<<": ";
-        cout<<int(h2[j]->GetBinContent(8))<<endl;
+        cout<<int(h2[j]->GetBinContent(9))<<endl;
     }
     cout<<endl;
     
@@ -1423,7 +1436,7 @@ void skimming()
     }
     
     //Signal
-    //if(false)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
