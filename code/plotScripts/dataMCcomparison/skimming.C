@@ -449,7 +449,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(evt.qFwt == 0) continue;
             weight = evt.qFwt;
         }
-        if(isFake)
+        else if(isFake)
         {
             weight = evt.fLwt;
         }
