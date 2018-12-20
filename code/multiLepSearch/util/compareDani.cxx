@@ -416,8 +416,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //use Samuel event to find Dani event
     unsigned int j = 0;
-    //for (unsigned int i = 0; i < 0; i++)
-    for (unsigned int i = 0; i < selected_Samuel.size(); i++)
+    for (unsigned int i = 0; i < 0; i++)
+    //for (unsigned int i = 0; i < selected_Samuel.size(); i++)
     {
         //check event number
         if(selected_Dani[j].evn != selected_Samuel[i].evn )
@@ -483,8 +483,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //Only for the method that use Samuel event to find Dani event
     cout<<"The missing event in Samuel ntuple: "<<endl;
-    //for (unsigned int k = 0; k < 0; k++)
-    for (unsigned int k = 0; k < selected_Dani.size(); k++)
+    for (unsigned int k = 0; k < 0; k++)
+    //for (unsigned int k = 0; k < selected_Dani.size(); k++)
     {
         if(selected_Dani[k].Samuel_index == -1)
         {
@@ -496,8 +496,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //use Dani event to find Samuel event
     unsigned int i = 0;
-    for (unsigned int j = 0; j < 0; j++)
-    //for (unsigned int j = 0; j < selected_Dani.size(); j++)
+    //for (unsigned int j = 0; j < 0; j++)
+    for (unsigned int j = 0; j < selected_Dani.size(); j++)
     {
         //check event number
         if(selected_Dani[j].evn != selected_Samuel[i].evn )
@@ -563,13 +563,37 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     //Only for the method that use Dani event to find Samuel event
     cout<<"The missing event in Dani ntuple: "<<endl;
-    for (unsigned int k = 0; k < 0; k++)
-    //for (unsigned int k = 0; k < selected_Samuel.size(); k++)
+    int first = -1;
+    int last = -1;
+    int TotalMissing = 0;
+    //for (unsigned int k = 0; k < 0; k++)
+    for (unsigned int k = 0; k < selected_Samuel.size(); k++)
     {
         if(selected_Samuel[k].Dani_index == -1)
         {
-            cout<<k<<", "<<selected_Samuel[k].Samuel_index<<", "<<selected_Samuel[k].evn<<endl;
-            missing_Dani.push_back(selected_Samuel[k]);
+            TotalMissing++;
+            if(first == -1)
+            {
+                first = k;
+                last = k;
+                cout<<k<<", "<<selected_Samuel[k].Samuel_index<<", "<<selected_Samuel[k].evn<<endl;
+                missing_Dani.push_back(selected_Samuel[k]);
+            }
+            else
+            {
+                if(k - last ==1)
+                {
+                    last = k;
+                }
+                else
+                {
+                    if(first < last) cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
+                    first = k;
+                    last = k;
+                    cout<<k<<", "<<selected_Samuel[k].Samuel_index<<", "<<selected_Samuel[k].evn<<endl;
+                    missing_Dani.push_back(selected_Samuel[k]);
+                }
+            }
         }
     }
     cout<<endl;
@@ -630,7 +654,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         cout<<endl;
     }
 
-    cout<<"Total missing event in Dani ntuple: "<<missing_Dani.size()<<endl;
+    cout<<"Total missing event in Dani ntuple: "<<TotalMissing<<endl;
     for (unsigned int k = 0; k < missing_Dani.size(); k++)
     {
         tree2->GetEntry(missing_Dani[k].Samuel_index);
