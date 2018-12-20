@@ -1206,7 +1206,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
-    //SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1276,6 +1276,9 @@ void skimming()
         
         element.GroupName = "Higgs"; element.LegendName = "Higgs"; element.LatexName = "Higgs";
         element.lower = 156;  element.upper = 168; element.colour = 7; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "Rare"; element.LegendName = "Rare"; element.LatexName = "Rare";
+        element.lower = 169;  element.upper = 170; element.colour = 7; BGMCGroupData.push_back(element);
     }
     
     std::vector<TString> cutflowList;
@@ -1449,7 +1452,7 @@ void skimming()
     }
     
     //Signal
-    if(false)
+    //if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
@@ -1537,7 +1540,7 @@ void skimming()
     
     //fake from Samuel
     //need obj_def_6ecc6eb7.h
-    //if(false)
+    if(false)
     {
         SamplePath += "Samuel_Fake/"; tag = "";
         TString SampleName = "Samuel_Fake";
