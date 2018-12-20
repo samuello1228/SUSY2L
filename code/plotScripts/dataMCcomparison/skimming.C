@@ -435,8 +435,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
        
         if(!isCF)
         {
+            float ttV_SF = 1;
+                 if(SampleName.Contains("410155") && sig.nBJet >= 3) ttV_SF = 1.34;
+            else if(SampleName.Contains("410218") && sig.nBJet >= 3) ttV_SF = 1.37;
+            else if(SampleName.Contains("410219") && sig.nBJet >= 3) ttV_SF = 1.37;
+            else if(SampleName.Contains("410220") && sig.nBJet >= 3) ttV_SF = 1.37;
+            
             //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF; //For ebcb0e23
             weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
+            weight *= ttV_SF;
         }
         else
         {
