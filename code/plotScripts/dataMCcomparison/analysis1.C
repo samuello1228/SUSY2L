@@ -2201,8 +2201,7 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
+            element.Cut += " && nJet == 1";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2222,8 +2221,7 @@ void analysis1()
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
+            element.Cut += " && (nJet == 2 || nJet == 3)";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2257,8 +2255,7 @@ void analysis1()
             element.Cut = "";
             element.Cut += " && pt1 >= 25";
             element.Cut += " && pt2 >= 25";
-            element.Cut += " && nCJet == 1";
-            element.Cut += " && nBJet == 0";
+            element.Cut += " && nJet == 1";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2282,8 +2279,7 @@ void analysis1()
             element.Cut = "";
             element.Cut += " && pt1 >= 25";
             element.Cut += " && pt2 >= 25";
-            element.Cut += " && (nCJet == 2 || nCJet == 3)";
-            element.Cut += " && nBJet == 0";
+            element.Cut += " && (nJet == 2 || nJet == 3)";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2371,6 +2367,7 @@ void analysis1()
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
     for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    //for(unsigned int RegionGroupIndex=11;RegionGroupIndex<=11;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
