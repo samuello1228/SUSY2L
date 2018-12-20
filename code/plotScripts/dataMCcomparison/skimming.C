@@ -236,6 +236,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             fileName += SampleName;
             fileName += ".*.myOutput.root*";
         }
+        //*/
         
         /*
         TString fileName = SamplePath;
@@ -383,7 +384,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
 
                 //Cutflow for 6ecc6eb7 ntuple
-                hSRCutflow[m]->Fill("GRL",h1->GetBinContent(4));
+                hSRCutflow[m]->Fill("GRL",h1->GetBinContent(8));
                 hSRCutflow[m]->Fill("Trigger", h1->GetBinContent(9));
                 hSRCutflow[m]->Fill("LAr+Tile+SCT+CoreFlag", h1->GetBinContent(10));
                 hSRCutflow[m]->Fill("PV", h1->GetBinContent(11));
@@ -458,8 +459,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
-        
         bool passCutflow = true;
+        
         /*
         //Cutflow for 6ecc6eb7 ntuple
         if(!isCF)
