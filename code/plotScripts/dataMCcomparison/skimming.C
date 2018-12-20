@@ -212,6 +212,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     bool isCF = false;
     if(SampleName == "CF") isCF = true;
     
+    bool isFake = false;
+    if(SampleName == "Samuel_Fake") isFake = true;
+    
     //get the "evt2l"
     TChain *tree1 = new TChain("evt2l");
     {
@@ -229,6 +232,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             fileName += "data";
             fileName += "*.root";
+        }
+        else if(isFake)
+        {
+            fileName += "fake.root";
         }
         else
         {
@@ -298,6 +305,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //TString fileName = "skimming_signal_old/skimming.";
         //TString fileName = "skimming_signal_new/skimming.";
         if(isCF) fileName += "mc15_13TeV.999998.";
+        else if(isFake) fileName += "mc15_13TeV.999997.";
         fileName += SampleName;
         fileName += "_";
         fileName += channel[j];
@@ -359,7 +367,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     
     //fill histograms
-    if(!isCF)
+    if(!isCF && !isFake)
     {
         TObjArray* fileList = tree1->GetListOfFiles();
         for(int i=0;i<fileList->GetEntries();i++)
@@ -416,7 +424,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     
     if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
     double commonWeight = 1;
-    if(!isCF) commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
+    if(!isCF && !isFake) commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -441,6 +449,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(evt.qFwt == 0) continue;
             weight = evt.qFwt;
         }
+        if(isFake)
+        {
+            weight = evt.fLwt;
+        }
         else
         {
             float ttV_SF = 1;
@@ -457,13 +469,12 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             weight *= ttV_SF;
         }
         
-        fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         bool passCutflow = true;
         
         ///*
         //Cutflow for 6ecc6eb7 ntuple
-        if(!isCF)
+        if(!isCF && !isFake)
         {
             if(sig.nSigLep >= 2 && sig.isSS && sig.JetCut && !sig.isZ) 
             {
@@ -486,7 +497,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             h2[m]->Fill("=2BaseLep",1);
         }
         
-        if(!isCF && !evt.isMC && fLwt!=0)
+        if(isFake)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -554,7 +565,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         ///*
         //Truth lepton (for 6ecc6eb7 ntuple)
-        if(!isCF)
+        if(!isCF && !isFake && evt.isMC)
         {
             if(leps[0].lepTruth != 1) continue;
             for(unsigned int m=0;m<channel.size();m++)
@@ -692,6 +703,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         meff = sig.HT + sig.Met;
         
         qFwt = evt.qFwt;
+        fLwt = evt.fLwt;
         
         if(recalculate_mlj)
         {
@@ -1194,7 +1206,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1437,7 +1449,7 @@ void skimming()
     }
     
     //Signal
-    //if(false)
+    if(false)
     {
         //SamplePath += "sig/";
         //tag += ".MCSig";
@@ -1511,6 +1523,24 @@ void skimming()
     {
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
+        vector<TH1D*> hSRCutflow;
+        std::vector<long> amiAOD;
+        std::vector<long> amiSUSY;
+        long nAOD2 = 0;
+        long nSUSY2 = 0;
+        
+        initializehCutflow(hSRCutflow,cutflowList);
+        skimming2(SamplePath,tag,SampleName,1,hSRCutflow,channel,nAOD2,nSUSY2);
+        printhCutflow(hSRCutflow,cutflowList);
+        deletehCutflow(hSRCutflow);
+    }
+    
+    //fake from Samuel
+    //need obj_def_6ecc6eb7.h
+    //if(false)
+    {
+        SamplePath += "Samuel_Fake/"; tag = "";
+        TString SampleName = "Samuel_Fake";
         vector<TH1D*> hSRCutflow;
         std::vector<long> amiAOD;
         std::vector<long> amiSUSY;
