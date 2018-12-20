@@ -4,8 +4,8 @@
 #include <vector>
 
 //#include "obj_def_ebcb0e23.h"
-//#include "obj_def_cb01dad9.h"
-#include "obj_def_6ecc6eb7.h"
+#include "obj_def_cb01dad9.h"
+//#include "obj_def_6ecc6eb7.h"
 #include <TInterpreter.h>
 
 #include <TFile.h>
@@ -225,16 +225,16 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         ///*
         TString fileName = SamplePath;
-        if(!isCF)
+        if(isCF)
+        {
+            fileName += "data";
+            fileName += "*.root";
+        }
+        else
         {
             fileName += "all/user.*.";
             fileName += SampleName;
             fileName += ".*.myOutput.root*";
-        }
-        else
-        {
-            fileName += "data";
-            fileName += "*.root";
         }
         
         /*
@@ -357,6 +357,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     }
     
     //fill histograms
+    if(!isCF)
     {
         TObjArray* fileList = tree1->GetListOfFiles();
         for(int i=0;i<fileList->GetEntries();i++)
@@ -402,18 +403,18 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             delete f1;
         }
     }
-    
-    if(isCF)
+    else
     {
         for(unsigned int j=0;j<channel.size();j++)
         {
-            h2[j]->SetBinContent(1,1);
-            h2[j]->SetBinContent(2,Lumi);
+            h2[j]->Fill("nAOD",1);
+            h2[j]->Fill("nwAOD",Lumi);
         }
     }
     
     if(h2[0]->GetBinContent(1)==0) cout<<"The sample is missing: "<<SampleName.Data()<<endl;
-    const double commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
+    double commonWeight = 1;
+    if(!isCF) commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
     
     //loop over all entries
     //for(int j=0;j<=10;j++)
@@ -433,29 +434,34 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         */
        
-        if(!isCF)
+        if(isCF)
+        {
+            if(evt.qFwt == 0) continue;
+            weight = evt.qFwt;
+        }
+        else
         {
             float ttV_SF = 1;
+            /*
+            //For 6ecc6eb7
                  if(SampleName.Contains("410155") && sig.nBJet >= 3) ttV_SF = 1.34;
             else if(SampleName.Contains("410218") && sig.nBJet >= 3) ttV_SF = 1.37;
             else if(SampleName.Contains("410219") && sig.nBJet >= 3) ttV_SF = 1.37;
             else if(SampleName.Contains("410220") && sig.nBJet >= 3) ttV_SF = 1.37;
+            */
             
             //weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF; //For ebcb0e23
             weight = evt.weight * evt.pwt * evt.ElSF * evt.MuSF * evt.BtagSF * evt.JvtSF * evt.trigSF;
             weight *= ttV_SF;
-        }
-        else
-        {
-            if(evt.qFwt == 0) continue;
-            weight = evt.qFwt;
         }
         
         fLwt = evt.fLwt;
         const double TotalWeight = weight * commonWeight;
         
         bool passCutflow = true;
+        /*
         //Cutflow for 6ecc6eb7 ntuple
+        if(!isCF)
         {
             if(sig.nSigLep >= 2 && sig.isSS && sig.JetCut && !sig.isZ) 
             {
@@ -469,6 +475,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
             else passCutflow = false;
         }
+        */
         
         if(!isCF && !evt.isMC && fLwt!=0)
         {
@@ -537,7 +544,10 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             }
         }
         
+        /*
         //Truth lepton (for 6ecc6eb7 ntuple)
+        if(!isCF)
+        {
         if(leps[0].lepTruth != 1) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
@@ -567,6 +577,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 hSRCutflow[m]->Fill("isTruthLep2,w",TotalWeight);
             }
         }
+        }
+        */
         
         //b-jet veto 
         nJet = jets.size();
@@ -667,8 +679,8 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         mll = l12.m;
         MET = sig.Met;
         mTtwo = sig.mT2;
-        mt1 = leps[0].mT;
-        //mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi))); //for ebcb0e23 and Gabriel's CF
+        //mt1 = leps[0].mT;
+        mt1 = sqrt(2*pt1*MET*(1-cos(leps[0].MET_dPhi))); //for ebcb0e23 and Gabriel's CF
         meff = sig.HT + sig.Met;
         
         qFwt = evt.qFwt;
@@ -1136,8 +1148,8 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
 void skimming()
 {
     //TString obj_def_version = "obj_def_ebcb0e23.h";
-    //TString obj_def_version = "obj_def_cb01dad9.h";
-    TString obj_def_version = "obj_def_6ecc6eb7.h";
+    TString obj_def_version = "obj_def_cb01dad9.h";
+    //TString obj_def_version = "obj_def_6ecc6eb7.h";
     gInterpreter->GenerateDictionary("PAR0",obj_def_version.Data());
     gInterpreter->GenerateDictionary("PAR",obj_def_version.Data());
     gInterpreter->GenerateDictionary("vector<L_PAR>",(obj_def_version+";vector").Data());
@@ -1168,7 +1180,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
     
     //channels
     std::vector<TString> channel;
@@ -1480,7 +1492,8 @@ void skimming()
     
     //charge flip from Gabriel
     //need obj_def_cb01dad9.h
-    if(false)
+    //need to re-calculate mt1
+    //if(false)
     {
         SamplePath += "Gabriel_CF_Nov/"; tag = "";
         TString SampleName = "CF";
