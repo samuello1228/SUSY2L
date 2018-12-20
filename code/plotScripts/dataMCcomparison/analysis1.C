@@ -349,17 +349,20 @@ void analysis1()
     std::vector<ChannelData> ChannelInfo;
     {
         ChannelData element;
-        TString ISR[2] = {"nonISR","ISR"};
+        //TString ISR[2] = {"nonISR","ISR"};
+        TString JET[3] = {"jet1","jet23","jet4"};
         TString sign[2] = {"OS","SS"};
         TString lepton[3] = {"ee","mumu","emu"};
-        for(int i=0;i<2;i++)
+        //for(int i=0;i<2;i++)
+        for(int i=0;i<3;i++)
         {
             for(int j=0;j<2;j++)
             {
                 for(int k=0;k<3;k++)
                 {
                     element.ChannelName = "";
-                    element.ChannelName += ISR[i];
+                    //element.ChannelName += ISR[i];
+                    element.ChannelName += JET[i];
                     element.ChannelName += "_";
                     element.ChannelName += sign[j];
                     element.ChannelName += "_";
@@ -2196,12 +2199,8 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(9);
-            element.setOfChannel.push_back(10);
-            element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && nJet == 1";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2213,15 +2212,11 @@ void analysis1()
             element.RegionShortName = "SRjet23";
             
             element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(9);
             element.setOfChannel.push_back(10);
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && (nJet == 2 || nJet == 3)";
             
             element.AdditionalCut.clear();
             RegionInfo.push_back(element);
@@ -2248,14 +2243,8 @@ void analysis1()
             element.setOfChannel.push_back(3);
             element.setOfChannel.push_back(4);
             element.setOfChannel.push_back(5);
-            element.setOfChannel.push_back(9);
-            element.setOfChannel.push_back(10);
-            element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && pt1 >= 25";
-            element.Cut += " && pt2 >= 25";
-            element.Cut += " && nJet == 1";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2269,17 +2258,11 @@ void analysis1()
             element.RegionShortName = "SRjet23";
             
             element.setOfChannel.clear();
-            element.setOfChannel.push_back(3);
-            element.setOfChannel.push_back(4);
-            element.setOfChannel.push_back(5);
             element.setOfChannel.push_back(9);
             element.setOfChannel.push_back(10);
             element.setOfChannel.push_back(11);
             
             element.Cut = "";
-            element.Cut += " && pt1 >= 25";
-            element.Cut += " && pt2 >= 25";
-            element.Cut += " && (nJet == 2 || nJet == 3)";
             
             element.AdditionalCut.clear();
             element.OptimizingCut.clear();
@@ -2380,7 +2363,8 @@ void analysis1()
             unsigned int channelRepresentative = 0;
             for(unsigned int ChannelIndex=0;ChannelIndex<ChannelInfo.size();ChannelIndex++)
             {
-                if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") channelRepresentative = ChannelIndex;
+                //if(ChannelInfo[ChannelIndex].ChannelName == "nonISR_SS_ee") channelRepresentative = ChannelIndex;
+                if(ChannelInfo[ChannelIndex].ChannelName == "jet1_SS_ee") channelRepresentative = ChannelIndex;
             }
             
             //Find all BG

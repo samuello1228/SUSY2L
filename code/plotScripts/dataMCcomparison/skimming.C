@@ -734,13 +734,13 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         
         if(passCutflow) DoCutflow(hSRCutflow, TotalWeight);
         
-        /*
+        ///*
         //separate the sample into channels
         if(nJet == 0) continue;
         else if(nJet == 1) {}
         else if(nJet == 2 || nJet == 3) channelIndex += 6;
         else channelIndex += 12;
-        */
+        //*/
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -1025,13 +1025,13 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         
         if(passCutflow) DoCutflow(hSRCutflow, TotalWeight);
         
-        /*
+        ///*
         //separate the sample into channels
         if(nJet == 0) continue;
         else if(nJet == 1) {}
         else if(nJet == 2 || nJet == 3) channelIndex += 6;
         else channelIndex += 12;
-        */
+        //*/
         
         h2[channelIndex]->Fill(channel[channelIndex].Data(),1);
         tree2[channelIndex]->Fill();
@@ -1206,25 +1206,25 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-31-12f0c92d/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
-    SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
+    //SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
     
     //channels
     std::vector<TString> channel;
     {
-        TString ISR[2] = {"nonISR","ISR"};
-        //TString JET[3] = {"jet1","jet23","jet4"};
+        //TString ISR[2] = {"nonISR","ISR"};
+        TString JET[3] = {"jet1","jet23","jet4"};
         TString sign[2] = {"OS","SS"};
         TString lepton[3] = {"ee","mumu","emu"};
-        for(int i=0;i<2;i++)
-        //for(int i=0;i<3;i++)
+        //for(int i=0;i<2;i++)
+        for(int i=0;i<3;i++)
         {
             for(int j=0;j<2;j++)
             {
                 for(int k=0;k<3;k++)
                 {
                     TString element = "";
-                    element += ISR[i];
-                    //element += JET[i];
+                    //element += ISR[i];
+                    element += JET[i];
                     element += "_";
                     element += sign[j];
                     element += "_";
