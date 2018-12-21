@@ -78,7 +78,7 @@ void initializehCutflow(vector<TH1D*>& hSRCutflow, std::vector<TString>& cutflow
         TH1D* hTemp = new TH1D(hName.Data(), "cutflow", cutflowList.size(), 0, cutflowList.size());
         hSRCutflow.push_back(hTemp);
         
-        for(unsigned int k=0;k<cutflowList.size();k++)    
+        for(unsigned int k=0;k<cutflowList.size();k++)
         {
             hSRCutflow[j]->GetXaxis()->SetBinLabel(k+1,cutflowList[k].Data());
         }
@@ -390,7 +390,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 hSRCutflow[m]->Fill("nAOD",h1->GetBinContent(1));
                 hSRCutflow[m]->Fill("nSUSY",h1->GetBinContent(4));
-
+                
                 //Cutflow for 6ecc6eb7 ntuple
                 hSRCutflow[m]->Fill("GRL",h1->GetBinContent(8));
                 hSRCutflow[m]->Fill("Trigger", h1->GetBinContent(9));
@@ -443,7 +443,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             if(!isCF) continue;
         }
         */
-       
+        
         if(isCF)
         {
             if(evt.qFwt == 0) continue;
@@ -476,7 +476,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //Cutflow for 6ecc6eb7 ntuple
         if(!isCF && !isFake)
         {
-            if(sig.nSigLep >= 2 && sig.isSS && sig.JetCut && !sig.isZ) 
+            if(sig.nSigLep >= 2 && sig.isSS && sig.JetCut && !sig.isZ)
             {
                 if(passCutflow)
                 {
@@ -599,7 +599,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         }
         //*/
         
-        //b-jet veto 
+        //b-jet veto
         nJet = jets.size();
         nBJet = 0;
         for(unsigned int k=0;k<jets.size();k++)
@@ -963,14 +963,14 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             }
         }
         else continue;
-
+        
         //b-jet veto
         if(nBJet>0) continue;
         for(unsigned int m=0;m<channel.size();m++)
         {
             h2[m]->Fill("bjet_veto",1);
         }
-            
+        
         if(passCutflow)
         {
             for(unsigned int m=0;m<hSRCutflow.size();m++)
@@ -1010,7 +1010,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             }
             channelIndex += 2;
         }
-
+        
         pt1 /= 1000;
         pt2 /= 1000;
         mll /= 1000;
@@ -1299,7 +1299,7 @@ void skimming()
         cutflowList.push_back(">=1 signal jet");
         cutflowList.push_back("Z veto");
         cutflowList.push_back("Z veto,w");
-
+        
         cutflowList.push_back("=2BaseLep and =2SigLep");
         cutflowList.push_back("=2BaseLep and =2SigLep,w");
         cutflowList.push_back("pt1");
@@ -1312,7 +1312,7 @@ void skimming()
         cutflowList.push_back("isTruthLep2,w");
         cutflowList.push_back("bjet");
         cutflowList.push_back("bjet,w");
-
+        
         cutflowList.push_back("jet");
         cutflowList.push_back("jet,w");
         cutflowList.push_back("dEta");
