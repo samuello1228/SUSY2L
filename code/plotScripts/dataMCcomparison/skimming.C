@@ -89,97 +89,97 @@ void DoCutflow(vector<TH1D*>& hSRCutflow, double TotalWeight)
 {
     if(nJet == 1)
     {
-       hSRCutflow[0]->Fill("jet",1);
-       hSRCutflow[0]->Fill("jet,w",TotalWeight);
-       
-       if(fabs(eta1-eta2)<=1.5)
-       {
-           hSRCutflow[0]->Fill("dEta",1);
-           hSRCutflow[0]->Fill("dEta,w",TotalWeight);
-       }
-       else return;
-       
-       if(MET>=100)
-       {
-           hSRCutflow[0]->Fill("MET",1);
-           hSRCutflow[0]->Fill("MET,w",TotalWeight);
-       }
-       else return;
-       
-       if(mt1>=140)
-       {
-           hSRCutflow[0]->Fill("mt1",1);
-           hSRCutflow[0]->Fill("mt1,w",TotalWeight);
-       }
-       else return;
-       
-       if(meff>=260)
-       {
-           hSRCutflow[0]->Fill("meff",1);
-           hSRCutflow[0]->Fill("meff,w",TotalWeight);
-       }
-       else return;
-       
-       if(mlj<180)
-       {
-           hSRCutflow[0]->Fill("mlj",1);
-           hSRCutflow[0]->Fill("mlj,w",TotalWeight);
-       }
-       else return;
-       
-       if(mTtwo>=80)
-       {
-           hSRCutflow[0]->Fill("mTtwo",1);
-           hSRCutflow[0]->Fill("mTtwo,w",TotalWeight);
-       }
-       else return;
+        hSRCutflow[0]->Fill("jet",1);
+        hSRCutflow[0]->Fill("jet,w",TotalWeight);
+        
+        if(fabs(eta1-eta2)<=1.5)
+        {
+            hSRCutflow[0]->Fill("dEta",1);
+            hSRCutflow[0]->Fill("dEta,w",TotalWeight);
+        }
+        else return;
+        
+        if(MET>=100)
+        {
+            hSRCutflow[0]->Fill("MET",1);
+            hSRCutflow[0]->Fill("MET,w",TotalWeight);
+        }
+        else return;
+        
+        if(mt1>=140)
+        {
+            hSRCutflow[0]->Fill("mt1",1);
+            hSRCutflow[0]->Fill("mt1,w",TotalWeight);
+        }
+        else return;
+        
+        if(meff>=260)
+        {
+            hSRCutflow[0]->Fill("meff",1);
+            hSRCutflow[0]->Fill("meff,w",TotalWeight);
+        }
+        else return;
+        
+        if(mlj<180)
+        {
+            hSRCutflow[0]->Fill("mlj",1);
+            hSRCutflow[0]->Fill("mlj,w",TotalWeight);
+        }
+        else return;
+        
+        if(mTtwo>=80)
+        {
+            hSRCutflow[0]->Fill("mTtwo",1);
+            hSRCutflow[0]->Fill("mTtwo,w",TotalWeight);
+        }
+        else return;
     }
     else if(nJet == 2 || nJet == 3)
     {
-       hSRCutflow[1]->Fill("jet",1);
-       hSRCutflow[1]->Fill("jet,w",TotalWeight);
-       
-       if(true)
-       {
-           hSRCutflow[1]->Fill("dEta",1);
-           hSRCutflow[1]->Fill("dEta,w",TotalWeight);
-       }
-       else return;
-       
-       if(MET>=100)
-       {
-           hSRCutflow[1]->Fill("MET",1);
-           hSRCutflow[1]->Fill("MET,w",TotalWeight);
-       }
-       else return;
-       
-       if(mt1>=120)
-       {
-           hSRCutflow[1]->Fill("mt1",1);
-           hSRCutflow[1]->Fill("mt1,w",TotalWeight);
-       }
-       else return;
-       
-       if(meff>=240)
-       {
-           hSRCutflow[1]->Fill("meff",1);
-           hSRCutflow[1]->Fill("meff,w",TotalWeight);
-       }
-       else return;
-       
-       if(mlj<130)
-       {
-           hSRCutflow[1]->Fill("mlj",1);
-           hSRCutflow[1]->Fill("mlj,w",TotalWeight);
-       }
-       else return;
-       
-       if(mTtwo>=70)
-       {
-           hSRCutflow[1]->Fill("mTtwo",1);
-           hSRCutflow[1]->Fill("mTtwo,w",TotalWeight);
-       }
-       else return;
+        hSRCutflow[1]->Fill("jet",1);
+        hSRCutflow[1]->Fill("jet,w",TotalWeight);
+        
+        if(true)
+        {
+            hSRCutflow[1]->Fill("dEta",1);
+            hSRCutflow[1]->Fill("dEta,w",TotalWeight);
+        }
+        else return;
+        
+        if(MET>=100)
+        {
+            hSRCutflow[1]->Fill("MET",1);
+            hSRCutflow[1]->Fill("MET,w",TotalWeight);
+        }
+        else return;
+        
+        if(mt1>=120)
+        {
+            hSRCutflow[1]->Fill("mt1",1);
+            hSRCutflow[1]->Fill("mt1,w",TotalWeight);
+        }
+        else return;
+        
+        if(meff>=240)
+        {
+            hSRCutflow[1]->Fill("meff",1);
+            hSRCutflow[1]->Fill("meff,w",TotalWeight);
+        }
+        else return;
+        
+        if(mlj<130)
+        {
+            hSRCutflow[1]->Fill("mlj",1);
+            hSRCutflow[1]->Fill("mlj,w",TotalWeight);
+        }
+        else return;
+        
+        if(mTtwo>=70)
+        {
+            hSRCutflow[1]->Fill("mTtwo",1);
+            hSRCutflow[1]->Fill("mTtwo,w",TotalWeight);
+        }
+        else return;
     }
     else return;
 }
