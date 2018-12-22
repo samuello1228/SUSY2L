@@ -980,6 +980,37 @@ EL::StatusCode ssEvtSelection :: execute ()
     }
     // Info("execute()", "After fillLepton");
 
+    //correct lepTruth for TriBoson
+    if(SampleName.find("407311") != std::string::npos ||
+       SampleName.find("407312") != std::string::npos ||
+       SampleName.find("407313") != std::string::npos ||
+       SampleName.find("407314") != std::string::npos ||
+       SampleName.find("407315") != std::string::npos )
+    {
+      const xAOD::TruthParticleContainer* tContainer = 0;
+      CHECK(wk()->xaodEvent()->retrieve( tContainer, "TruthParticles" ));
+
+      int nTruth = 0;
+      int lepIndex = 0;
+      for(auto particle : *tContainer)
+      {
+        int status = particle->status();
+        int pdgId = particle->pdgId();
+        if(status == 3) continue;
+
+        if(TMath::Abs(pdgId)==11 || TMath::Abs(pdgId)==13)
+        {
+          nTruth++;
+          if(nTruth <= nSigLep)
+          {
+            if(status==11) m_susyEvt->leps[lepIndex].lepTruth = 1;
+            else m_susyEvt->leps[lepIndex].lepTruth = 0;
+            lepIndex++;
+          }
+        }
+      }
+    }
+
     /*
     ///MetRel correction factor (See Eq6, 2LSS note: https://cds.cern.ch/record/1747285/files/ATL-COM-PHYS-2014-954.pdf)
     float minMetdPhi = FLT_MAX; //Met's dPhi from nearest obj (e/mu/jet)
