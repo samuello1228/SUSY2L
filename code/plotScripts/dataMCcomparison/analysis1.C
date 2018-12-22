@@ -400,7 +400,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Higgs");
                         */
                         
-                        ///*
+                        /*
                         element.setOfBGMC.push_back("VVReal");
                         element.setOfBGMC.push_back("ttV");
                         element.setOfBGMC.push_back("multitop");
@@ -408,7 +408,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Higgs");
                         element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("charge flip");
-                        //*/
+                        */
                         
                         /*
                         //Dani
@@ -420,6 +420,19 @@ void analysis1()
                         element.setOfBGMC.push_back("multitop");
                         element.setOfBGMC.push_back("DY");
                         */
+                        
+                        ///*
+                        //VR_Fake
+                        element.setOfBGMC.push_back("WZ");
+                        element.setOfBGMC.push_back("WW");
+                        element.setOfBGMC.push_back("ZZ");
+                        element.setOfBGMC.push_back("ttV");
+                        element.setOfBGMC.push_back("Rare");
+                        
+                        //element.setOfBGMC.push_back("Fakes");
+                        element.setOfBGMC.push_back("Samuel_Fake");
+                        element.setOfBGMC.push_back("charge flip");
+                        //*/
                     }
                     else
                     {
@@ -543,11 +556,11 @@ void analysis1()
         element.MassDiff = 450;   element.ID = 75; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         */
         
-        ///*
+        /*
         //Dani
         element.MassDiff = 150;   element.ID = 20; element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 150;   element.ID = 7;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        //*/
+        */
     }
     
     struct SigInfo
@@ -783,6 +796,46 @@ void analysis1()
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363492);
         element.colour = 801; BGMCGroupData.push_back(element);
         
+        element.GroupName = "WZ"; element.LegendName = "WZ"; element.LatexName = "WZ";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361071,361071);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363491,363491);
+        element.colour = 881; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "WW"; element.LegendName = "WW"; element.LatexName = "WW";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361070);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
+        element.colour = 635; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "ZZ"; element.LegendName = "ZZ"; element.LatexName = "ZZ";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361072,361073);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363490);
+        element.colour = 30; BGMCGroupData.push_back(element);
+        
+        {
+            element.GroupName = "Rare"; element.LegendName = "Rare"; element.LatexName = "Rare";
+            element.BGMCIndex.clear();
+            
+            //higgs
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341177,341177);
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,341270,341270);
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,342284,342285);
+            
+            //VVV
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,407311,407315);
+            
+            //multi top
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,304014,304014);
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410080,410080);
+            
+            //Two Rare
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,343272,343272);
+            fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410215,410215);
+            element.colour = 801; BGMCGroupData.push_back(element);
+        }
+        
         //Vgamma
         element.GroupName = "Vgamma"; element.LegendName = "V + #gamma"; element.LatexName = "V$+\\gamma$";
         element.BGMCIndex.clear();
@@ -835,6 +888,12 @@ void analysis1()
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999998,999998);
         element.colour = 2; BGMCGroupData.push_back(element);
+        
+        //Samuel Fake
+        element.GroupName = "Samuel_Fake"; element.LegendName = "Fakes"; element.LatexName = "Fakes";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999997,999997);
+        element.colour = 3; BGMCGroupData.push_back(element);
         
         /*
         //charge flip
@@ -2270,6 +2329,79 @@ void analysis1()
         
         GroupElement.upper = RegionInfo.size() -1;
         RegionGroup.push_back(GroupElement);
+        
+        
+        //Validation region for Fake
+        GroupElement.GroupName = "VR_Fake";
+        GroupElement.lower = RegionInfo.size();
+        GroupElement.showData = true;
+        GroupElement.showSignificance = false;
+        
+        //ee
+        {
+            element.RegionName = "VR_Fake_ee";
+            element.RegionShortName = "ee";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(15);
+            
+            element.Cut = "";
+            element.Cut += " && meff > 200";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && MET > 30";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //mumu
+        {
+            element.RegionName = "VR_Fake_mumu";
+            element.RegionShortName = "mumu";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(16);
+            
+            element.Cut = "";
+            element.Cut += " && meff > 200";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && MET > 30";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //emu
+        {
+            element.RegionName = "VR_Fake_emu";
+            element.RegionShortName = "emu";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(5);
+            element.setOfChannel.push_back(11);
+            element.setOfChannel.push_back(17);
+            
+            element.Cut = "";
+            element.Cut += " && meff > 200";
+            //element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && MET > 30";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        GroupElement.upper = RegionInfo.size() -1;
+        RegionGroup.push_back(GroupElement);
     }
     
     struct SampleData
@@ -2346,8 +2478,9 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    //for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=11;RegionGroupIndex<=11;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=12;RegionGroupIndex<=12;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -3421,26 +3554,21 @@ void analysis1()
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-            //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 //if(Var[VarIndex].VarName!="pt1") continue;
                 
                 if(Var[VarIndex].VarName!="pt1"    &&
                    Var[VarIndex].VarName!="pt2"    &&
-                   Var[VarIndex].VarName!="eta1"   &&
-                   Var[VarIndex].VarName!="eta2"   &&
                    Var[VarIndex].VarName!="mll"    &&
-                   Var[VarIndex].VarName!="ptll"   &&
                    Var[VarIndex].VarName!="dEta"   &&
                    Var[VarIndex].VarName!="MET"    &&
-                   Var[VarIndex].VarName!="METRel" &&
                    Var[VarIndex].VarName!="mTtwo"  &&
-                   Var[VarIndex].VarName!="mtm"    &&
                    Var[VarIndex].VarName!="meff"   &&
+                   Var[VarIndex].VarName!="mt1"    &&
                    Var[VarIndex].VarName!="mlj"    &&
-                   Var[VarIndex].VarName!="nBJet"  &&
-                   Var[VarIndex].VarName!="nCJet"  &&
+                   Var[VarIndex].VarName!="nJet"   &&
                    Var[VarIndex].VarName!="phi1"   )
                 {
                     continue;
