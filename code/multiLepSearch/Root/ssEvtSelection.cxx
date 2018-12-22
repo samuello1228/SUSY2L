@@ -822,6 +822,43 @@ EL::StatusCode ssEvtSelection :: execute ()
     xAOD::IParticle* l1 = sel_Ls[0];
     xAOD::IParticle* l2 = sel_Ls[1];
 
+    //sort base_el and base_mu
+    for(unsigned int i = 0; i < base_el.size();i++)
+    {
+      double pt_max = 0;
+      unsigned int index_max = i;
+      for(unsigned int j = i; j < base_el.size();j++)
+      {
+        if(base_el[j]->pt() > pt_max)
+        {
+          pt_max = base_el[j]->pt();
+          index_max = j;
+        }
+      }
+      
+      const xAOD::Electron* temp = base_el[i];
+      base_el[i] = base_el[index_max];
+      base_el[index_max] = temp;
+    }
+
+    for(unsigned int i = 0; i < base_mu.size();i++)
+    {
+      double pt_max = 0;
+      unsigned int index_max = i;
+      for(unsigned int j = i; j < base_mu.size();j++)
+      {
+        if(base_mu[j]->pt() > pt_max)
+        {
+          pt_max = base_mu[j]->pt();
+          index_max = j;
+        }
+      }
+      
+      const xAOD::Muon* temp = base_mu[i];
+      base_mu[i] = base_mu[index_max];
+      base_mu[index_max] = temp;
+    }
+
     /////////////////////////
     // Save informations
     ////////////////////////
