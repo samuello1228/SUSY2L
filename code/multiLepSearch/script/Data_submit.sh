@@ -1,5 +1,5 @@
 #!/bin/bash
-tag=v13.5
+tag=v13.6
 
 #My GRL
 #grl=GoodRunsLists/data16_13TeV/20170720/physics_25ns_20.7.xml,GoodRunsLists/data15_13TeV/20160720/physics_25ns_20.7.xml
