@@ -2183,10 +2183,7 @@ void analysis1()
                 }
             }
             
-            for(unsigned int i=0;i<SigMassSplitting.size();i++)
-            {
-                element.OptimizingCut.push_back(OptimizingCutElement1);
-            }
+            element.OptimizingCut.push_back(OptimizingCutElement1);
         }
         
         ///*
