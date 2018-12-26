@@ -330,9 +330,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     }
 
     //Our ntuple
-    //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1_old/data-myOutput/test.root";
-    //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31-test/SUSY2L/code/run/t1/data-myOutput/test.root";
-    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
+    //TString path2 = "/afs/cern.ch/user/c/clo/AnalysisBase-02-04-31/SUSY2L/code/run/t1/data-myOutput/test.root";
+    
+    ///*
+    //TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-6ecc6eb7/user.clo.v13.5.";
+    TString path2 = "/eos/user/c/clo/ntuple/AnalysisBase-02-04-31-f05df733/user.clo.v13.6.";
     path2 += sample.tag;
     path2 += "_myOutput.root/user.clo.";
     if(isMC)
@@ -345,6 +347,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         path2 += "data*";
     }
     path2 += ".*.myOutput.root*";
+    //*/
     cout<<path2<<endl;
 
     TChain* tree2 = new TChain("evt2l");
@@ -596,6 +599,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
             }
         }
     }
+    if(first < last) cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
     cout<<endl;
 
     //search for all event numbers in Samuel ntuple
@@ -830,14 +834,14 @@ int main()
     Sample sample;
 
     //WZ
-    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "WZ_nom";
+    process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "WZ_nom";
     process.samples.clear();
     sample.tag = "VV_CT10"; sample.ID = 361071; sample.XS = 0.042287*0.91; process.samples.push_back(sample);
     sample.tag = "VV_221";  sample.ID = 363491; sample.XS = 4.5877;        process.samples.push_back(sample);
     processes.push_back(process);
 
     //WW
-    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "WW_nom";
+    process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "WW_nom";
     process.samples.clear();
     sample.tag = "VV_CT10"; sample.ID = 361069; sample.XS = 0.025765*0.91; process.samples.push_back(sample);
     sample.tag = "VV_CT10"; sample.ID = 361070; sample.XS = 0.043375*0.91; process.samples.push_back(sample);
@@ -845,7 +849,7 @@ int main()
     processes.push_back(process);
 
     //ZZ
-    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "ZZ_nom";
+    process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "ZZ_nom";
     process.samples.clear();
     sample.tag = "VV_CT10"; sample.ID = 361072; sample.XS = 0.031496*0.91; process.samples.push_back(sample);
     sample.tag = "VV_CT10"; sample.ID = 361073; sample.XS = 0.02095 *0.91; process.samples.push_back(sample);
@@ -853,7 +857,7 @@ int main()
     processes.push_back(process);
 
     //ttV
-    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "ttV_nom";
+    process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "ttV_nom";
     process.samples.clear();
     sample.tag = "ttV"; sample.ID = 407321; sample.XS = 0.000266 *1.34;   process.samples.push_back(sample);
     sample.tag = "ttV"; sample.ID = 410081; sample.XS = 0.0080975*1.2231; process.samples.push_back(sample);
@@ -864,8 +868,7 @@ int main()
     processes.push_back(process);
 
     //Rare
-    process.path_Dani = "Backgrounds_inclTruth_tWZ_tH.36100.root"; process.CHAIN_NAME = "Rare_nom";
-    //process.path_Dani = "background_updatedTruthVVV_36100.root"; process.CHAIN_NAME = "Rare_nom";
+    process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "Rare_nom";
     process.samples.clear();
     sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341177; sample.XS = 0.5085 * 0.10554;        process.samples.push_back(sample);
     sample.tag = "higgs_HerwigppEvtGen"; sample.ID = 341270; sample.XS = 0.5085 * 0.43929;        process.samples.push_back(sample);
