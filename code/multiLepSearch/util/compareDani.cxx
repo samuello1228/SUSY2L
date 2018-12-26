@@ -55,6 +55,8 @@ struct Sample
     TString tag;
     int ID;
     double XS;
+    vector<int> filter_first;
+    vector<int> filter_last;
 };
 
 void checkAllVariables(susyEvts* evt, Sample& sample, bool isMC)
@@ -206,6 +208,7 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
 {
     double weight = 1;
     if(isMC) weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF * commonWeight;
+    hCutflow_Samuel->Fill("Z veto",1);
     hCutflow_Samuel->Fill("Z veto,w",weight);
 
     if(evt->sig.nBaseLep !=2) return;
@@ -309,6 +312,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         int nJet; //For 361073
     };
 
+    double lumiScaling_Dani = -1;
     vector<evn_info> selected_Dani;
     for (long i = 0; i < tree1->GetEntries(); i++)
     {
@@ -327,6 +331,8 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         evn_temp.Dani_index = i;
         evn_temp.nJet = nJets20;
         selected_Dani.push_back(evn_temp);
+
+        if(lumiScaling_Dani == -1) lumiScaling_Dani = lumiScaling;
     }
 
     //Our ntuple
@@ -379,14 +385,16 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         hCutflow_Samuel->Fill("SS leptons", h1->GetBinContent(74));
         hCutflow_Samuel->Fill(">=1 passOR jet", h1->GetBinContent(75));
         hCutflow_Samuel->Fill(">=1 signal jet", h1->GetBinContent(76));
-        hCutflow_Samuel->Fill("Z veto", h1->GetBinContent(77));
         
         delete f1;
     }
 
+    bool DoFilter = true;
+    //DoFilter = false;
     const double lumi = 36100;
     double commonWeight = 1;
     if(isMC) commonWeight = sample.XS *lumi /nwAOD;
+    if(isMC && DoFilter) commonWeight = lumiScaling_Dani;
     vector<evn_info> selected_Samuel;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
@@ -397,6 +405,16 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(!evt->sig.isSS) continue;
         if(!evt->sig.JetCut) continue;
         if(evt->sig.isZ) continue;
+
+        if(DoFilter)
+        {
+            bool DoContinue = false;
+            for (unsigned int j = 0; j < sample.filter_first.size(); j++)
+            {
+                if(i >= sample.filter_first[j] && i <= sample.filter_last[j]) DoContinue = true;
+            }
+            if(DoContinue) continue;
+        }
 
         //cutflow for My ntuple
         double ttV_SF = 1;
@@ -590,7 +608,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
                 }
                 else
                 {
-                    if(first < last) cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
+                    if(first < last)
+                    {
+                        cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
+                        cout<<"index: "<<selected_Samuel[first].Samuel_index<<" - "<<selected_Samuel[last].Samuel_index<<endl;
+                    }
                     first = k;
                     last = k;
                     cout<<k<<", "<<selected_Samuel[k].Samuel_index<<", "<<selected_Samuel[k].evn<<endl;
@@ -599,7 +621,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
             }
         }
     }
-    if(first < last) cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
+    if(first < last)
+    {
+        cout<<"continuous events: "<<first<<" - "<<last<<" (Total: "<<(last - first + 1)<<")"<<endl;
+        cout<<"index: "<<selected_Samuel[first].Samuel_index<<" - "<<selected_Samuel[last].Samuel_index<<endl;
+    }
     cout<<endl;
 
     //search for all event numbers in Samuel ntuple
@@ -832,6 +858,8 @@ int main()
     vector<Process> processes;
     Process process;
     Sample sample;
+    sample.filter_first.clear();
+    sample.filter_last.clear();
 
     //WZ
     process.path_Dani = "background.36100.updatedVVVMcTruth_incltHtWZ.root"; process.CHAIN_NAME = "WZ_nom";
@@ -853,7 +881,16 @@ int main()
     process.samples.clear();
     sample.tag = "VV_CT10"; sample.ID = 361072; sample.XS = 0.031496*0.91; process.samples.push_back(sample);
     sample.tag = "VV_CT10"; sample.ID = 361073; sample.XS = 0.02095 *0.91; process.samples.push_back(sample);
-    sample.tag = "VV_221";  sample.ID = 363490; sample.XS = 1.2557;        process.samples.push_back(sample);
+
+    ///*
+    sample.tag = "VV_221";  sample.ID = 363490; sample.XS = 1.2557;
+    sample.filter_first.push_back(1529811); sample.filter_last.push_back(1967630);
+    sample.filter_first.push_back(3939243); sample.filter_last.push_back(4601130);
+    process.samples.push_back(sample);
+    sample.filter_first.clear();
+    sample.filter_last.clear();
+    //*/
+
     processes.push_back(process);
 
     //ttV
@@ -863,7 +900,15 @@ int main()
     sample.tag = "ttV"; sample.ID = 410081; sample.XS = 0.0080975*1.2231; process.samples.push_back(sample);
     sample.tag = "ttV"; sample.ID = 410155; sample.XS = 0.54830  *1.10;   process.samples.push_back(sample);
     sample.tag = "ttV"; sample.ID = 410218; sample.XS = 0.036888 *1.12;   process.samples.push_back(sample);
-    sample.tag = "ttV"; sample.ID = 410219; sample.XS = 0.036895 *1.12;   process.samples.push_back(sample);
+
+    ///*
+    sample.tag = "ttV"; sample.ID = 410219; sample.XS = 0.036895 *1.12;
+    sample.filter_first.push_back(7); sample.filter_last.push_back(538779);
+    process.samples.push_back(sample);
+    sample.filter_first.clear();
+    sample.filter_last.clear();
+    //*/
+
     sample.tag = "ttV"; sample.ID = 410220; sample.XS = 0.036599 *1.12;   process.samples.push_back(sample);
     processes.push_back(process);
 
