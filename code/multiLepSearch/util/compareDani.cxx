@@ -1,5 +1,6 @@
 // C++
 #include <iostream>
+#include <fstream>
 using namespace std;
 // ROOT
 #include "TChain.h"
@@ -59,14 +60,14 @@ struct Sample
     vector<int> filter_last;
 };
 
-void checkAllVariables(susyEvts* evt, Sample& sample, bool isMC)
+void checkAllVariables(susyEvts* evt, Sample& sample, bool isBG, bool isSig)
 {
         //wight
-        if(isMC)
+        if(isBG || isSig)
         {
             checkError(mcweight, evt->evt.weight, "mc gen weight", 2e-7);
             checkError(puweight, evt->evt.pwt, "pileup weight", 2e-7);
-            checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
+            if(isBG) checkError(puweight, wpu_nom_bkg, "pileup weight", 2e-7);
             checkError(wel_nom * wchflip_nom, evt->evt.ElSF, "electron weight", 5e-7);
             checkError(wmu_nom, evt->evt.MuSF, "muon weight", 2e-7);
             checkError(wjet_nom, evt->evt.BtagSF * evt->evt.JvtSF, "jet weight", 2e-7);
@@ -84,8 +85,8 @@ void checkAllVariables(susyEvts* evt, Sample& sample, bool isMC)
         if(nSigLep != evt->sig.nSigLep) cout<<"nSigLep are different."<<endl;
 
         //lepTruth
-        if(isMC && isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
-        if(isMC && isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
+        if(isBG && isTruthLep1 != evt->leps[0].lepTruth) cout<<"lepTruth1 are different."<<endl;
+        if(isBG && isTruthLep2 != evt->leps[1].lepTruth) cout<<"lepTruth2 are different."<<endl;
 
         //number of jets
         if(nJets20 != evt->sig.nJet) cout<<"nJet are different."<<endl;
@@ -110,7 +111,7 @@ void checkAllVariables(susyEvts* evt, Sample& sample, bool isMC)
         if(MT2>10000) checkError(MT2, evt->sig.mT2 * 1000, "MT2", 5e-6);
 }
 
-void FillHist_Dani(TH1D* hCutflow_Dani, bool isMC)
+void FillHist_Dani(TH1D* hCutflow_Dani, bool isBG)
 {
     double weight = totweight*lumiScaling;
     hCutflow_Dani->Fill("Z veto",1);
@@ -129,11 +130,11 @@ void FillHist_Dani(TH1D* hCutflow_Dani, bool isMC)
     hCutflow_Dani->Fill("pt2",1);
     hCutflow_Dani->Fill("pt2,w",weight);
 
-    if(isMC && isTruthLep1 != 1) return;
+    if(isBG && isTruthLep1 != 1) return;
     hCutflow_Dani->Fill("isTruthLep1",1);
     hCutflow_Dani->Fill("isTruthLep1,w",weight);
 
-    if(isMC && isTruthLep2 != 1) return;
+    if(isBG && isTruthLep2 != 1) return;
     hCutflow_Dani->Fill("isTruthLep2",1);
     hCutflow_Dani->Fill("isTruthLep2,w",weight);
 
@@ -204,10 +205,10 @@ void FillHist_Dani(TH1D* hCutflow_Dani, bool isMC)
     }
 }
 
-void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonWeight, double& ttV_SF, bool isMC)
+void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonWeight, double& ttV_SF, bool isBG, bool isSig)
 {
     double weight = 1;
-    if(isMC) weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF * commonWeight;
+    if(isBG || isSig) weight = evt->evt.weight * evt->evt.pwt * evt->evt.trigSF * evt->evt.ElSF * evt->evt.MuSF * evt->evt.BtagSF * evt->evt.JvtSF * ttV_SF * commonWeight;
     hCutflow_Samuel->Fill("Z veto",1);
     hCutflow_Samuel->Fill("Z veto,w",weight);
 
@@ -224,11 +225,11 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
     hCutflow_Samuel->Fill("pt2",1);
     hCutflow_Samuel->Fill("pt2,w",weight);
 
-    if(isMC && evt->leps[0].lepTruth != 1) return;
+    if(isBG && evt->leps[0].lepTruth != 1) return;
     hCutflow_Samuel->Fill("isTruthLep1",1);
     hCutflow_Samuel->Fill("isTruthLep1,w",weight);
 
-    if(isMC && evt->leps[1].lepTruth != 1) return;
+    if(isBG && evt->leps[1].lepTruth != 1) return;
     hCutflow_Samuel->Fill("isTruthLep2",1);
     hCutflow_Samuel->Fill("isTruthLep2,w",weight);
 
@@ -299,10 +300,9 @@ void FillHist_Samuel(TH1D* hCutflow_Samuel, susyEvts* evt, const double& commonW
     }
 }
 
-void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel)
+void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflow_Samuel, bool isBG, bool isSig)
 {
-    bool isMC = true;
-    if(sample.tag == "data") isMC = false;
+    bool isMC = (isBG || isSig);
 
     struct evn_info
     {
@@ -322,7 +322,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         if(isMC && MCId != sample.ID) continue;
 
         //cutflow for Dani ntuple
-        FillHist_Dani(hCutflow_Dani, isMC);
+        FillHist_Dani(hCutflow_Dani, isBG);
 
         //Fill selected_Dani
         evn_info evn_temp;
@@ -420,7 +420,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
         double ttV_SF = 1;
         if(sample.ID == 410155 && evt->sig.nBJet>=3) ttV_SF = 1.34;
         else if(sample.ID >= 410218 && sample.ID <= 410220 && evt->sig.nBJet>=3) ttV_SF = 1.37;
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isBG, isSig);
 
         //Fill selected_Samuel
         evn_info evn_temp;
@@ -491,11 +491,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
         tree1->GetEntry(selected_Dani[j].Dani_index);
         tree2->GetEntry(selected_Samuel[i].Samuel_index);
-        checkAllVariables(evt, sample, isMC);
+        checkAllVariables(evt, sample, isBG, isSig);
 
         /*
-        FillHist_Dani(hCutflow_Dani, isMC);
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
+        FillHist_Dani(hCutflow_Dani, isBG);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isBG, isSig);
         */
 
         j++;
@@ -571,11 +571,11 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
         tree1->GetEntry(selected_Dani[j].Dani_index);
         tree2->GetEntry(selected_Samuel[i].Samuel_index);
-        checkAllVariables(evt, sample, isMC);
+        checkAllVariables(evt, sample, isBG, isSig);
 
         /*
-        FillHist_Dani(hCutflow_Dani, isMC);
-        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isMC);
+        FillHist_Dani(hCutflow_Dani, isBG);
+        FillHist_Samuel(hCutflow_Samuel, evt, commonWeight, ttV_SF, isBG, isSig);
         */
 
         i++;
@@ -648,7 +648,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
                     missing_Samuel_inclusive.push_back(missing_Samuel[m]);
  
                     tree1->GetEntry(missing_Samuel[m].Dani_index);
-                    checkAllVariables(evt, sample, isMC);
+                    checkAllVariables(evt, sample, isBG, isSig);
                     break;
                 }
             }
@@ -713,7 +713,21 @@ struct Process
 
 void RunProcess(Process& process, vector<TString>& cutflowList)
 {
-    bool isMC = (process.CHAIN_NAME != "data_nom");
+    bool isMC = false;
+    bool isBG = false;
+    bool isSig = false;
+    if(process.CHAIN_NAME == "data_nom") {}
+    else if(process.CHAIN_NAME.Contains("C1N2")) 
+    {
+        isMC = true;
+        isSig = true;
+    }
+    else 
+    {
+        isMC = true;
+        isBG = true;
+    }
+
     //read Dani ntuple
     TString path1 = "/eos/user/c/clo/ntuple/Dani_tree/Trees/IncludingLepTruth/";
     path1 += process.path_Dani;
@@ -739,8 +753,8 @@ void RunProcess(Process& process, vector<TString>& cutflowList)
 
     tree1->SetBranchAddress("NlepBL", &NlepBL);
     tree1->SetBranchAddress("nSigLep", &nSigLep);
-    if(isMC) tree1->SetBranchAddress("isTruthLep1", &isTruthLep1);
-    if(isMC) tree1->SetBranchAddress("isTruthLep2", &isTruthLep2);
+    if(isBG) tree1->SetBranchAddress("isTruthLep1", &isTruthLep1);
+    if(isBG) tree1->SetBranchAddress("isTruthLep2", &isTruthLep2);
     tree1->SetBranchAddress("nJets20", &nJets20);
     tree1->SetBranchAddress("nBJets20", &nBJets20);
     tree1->SetBranchAddress("Pt_l", &Pt_l);
@@ -763,7 +777,7 @@ void RunProcess(Process& process, vector<TString>& cutflowList)
 
     for(unsigned int i=0;i<process.samples.size();i++)    
     {
-        RunSample(tree1, process.samples[i], hCutflow_Dani, hCutflow_Samuel);
+        RunSample(tree1, process.samples[i], hCutflow_Dani, hCutflow_Samuel, isBG, isSig);
     }
 
     cout<<"Cutflow: Dani, Samuel"<<endl;
@@ -936,6 +950,52 @@ int main()
     sample.tag = "data"; sample.ID = 0; sample.XS = 1; process.samples.push_back(sample);
     processes.push_back(process);
 
+    //signal
+    process.path_Dani = "../C1N2_Wh_hall_36100.root";
+    sample.tag = "MCSig";
+    {
+        ifstream fin;
+        fin.open("../plotScripts/dataMCcomparison/SigSample.txt");
+        while(!fin.eof())
+        {
+            fin>>sample.ID;
+            //cout<<sample.ID<<endl;
+            if(fin.eof()) break;
+
+            TString SampleNameTemp;
+            fin>>SampleNameTemp;
+            SampleNameTemp.ReplaceAll("MGPy8EG_A14N23LO_","");
+            SampleNameTemp.ReplaceAll("_2L7","");
+            //cout<<SampleNameTemp<<endl;
+            process.CHAIN_NAME = SampleNameTemp + "_nom";
+
+            double skip;
+            fin>>skip;
+            fin>>skip;
+
+            double XS1;
+            double XS2;
+            fin>>XS2;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            fin>>XS1;
+            XS2 *= XS1;
+
+            sample.XS = XS2;
+            //cout<<sample.XS<<endl;
+
+            fin>>skip;
+            fin>>skip;
+
+            process.samples.clear();
+            process.samples.push_back(sample);
+            processes.push_back(process);
+        }
+        fin.close();
+    }
+
     for(unsigned int i=0;i<processes.size();i++)    
     {
         //if(processes[i].CHAIN_NAME != "WZ_nom") continue;
@@ -943,7 +1003,10 @@ int main()
         //if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
         //if(processes[i].CHAIN_NAME != "ttV_nom") continue;
         //if(processes[i].CHAIN_NAME != "Rare_nom") continue;
-        if(processes[i].CHAIN_NAME != "data_nom") continue;
+        //if(processes[i].CHAIN_NAME != "data_nom") continue;
+
+        //if(processes[i].CHAIN_NAME != "C1N2_Wh_hall_150p0_0p0_nom") continue;
+        if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
 
         RunProcess(processes[i], cutflowList);
     }
