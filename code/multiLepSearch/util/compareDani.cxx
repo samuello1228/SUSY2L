@@ -806,6 +806,17 @@ void RunProcess(Process& process, vector<TString>& cutflowList)
     delete tree1;
 }
 
+void add_filter_sig(vector<Process>& processes, int sampleID, int first, int last)
+{
+    for(unsigned int i=0;i<processes.size();i++)    
+    {
+        if(!processes[i].CHAIN_NAME.Contains("C1N2") || processes[i].samples[0].ID != sampleID) continue;
+
+        processes[i].samples[0].filter_first.push_back(first);
+        processes[i].samples[0].filter_last.push_back(last);
+    }
+}
+
 int main()
 {
     std::vector<TString> cutflowList;
@@ -995,6 +1006,24 @@ int main()
         }
         fin.close();
     }
+
+    add_filter_sig(processes, 393832, 10507, 24750);
+    add_filter_sig(processes, 393833, 10051, 23940);
+    add_filter_sig(processes, 393834,  9864, 23738);
+    add_filter_sig(processes, 393835,     9, 14170);
+    add_filter_sig(processes, 393836, 10292, 24604);
+    add_filter_sig(processes, 393837,  5794, 19242);
+    add_filter_sig(processes, 393838,  6013, 19893);
+    add_filter_sig(processes, 393839,  6101, 18302);
+    add_filter_sig(processes, 393840,     0, 12343);
+    add_filter_sig(processes, 393841,  6254, 18856);
+    add_filter_sig(processes, 393842,  6090, 17802);
+    add_filter_sig(processes, 393843,    11, 11805);
+    add_filter_sig(processes, 393844,  6073, 18112);
+    add_filter_sig(processes, 393845,  6223, 18662);
+    add_filter_sig(processes, 393847,  3948, 15587);
+    add_filter_sig(processes, 393848,     4, 11623);
+    add_filter_sig(processes, 393849,     4, 11983);
 
     for(unsigned int i=0;i<processes.size();i++)    
     {
