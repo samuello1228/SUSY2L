@@ -394,7 +394,12 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
     const double lumi = 36100;
     double commonWeight = 1;
     if(isMC) commonWeight = sample.XS *lumi /nwAOD;
-    if(isMC && DoFilter) commonWeight = lumiScaling_Dani;
+    if(isMC && DoFilter)
+    {
+        commonWeight = lumiScaling_Dani;
+        cout<<"Dani lumiScaling: "<<std::setprecision(20)<<lumiScaling_Dani<<endl;
+        cout<<std::setprecision(6);
+    }
     vector<evn_info> selected_Samuel;
     for (long i = 0; i < tree2->GetEntries(); i++)
     {
