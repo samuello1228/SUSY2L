@@ -400,7 +400,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Higgs");
                         */
                         
-                        /*
+                        ///*
                         element.setOfBGMC.push_back("VVReal");
                         element.setOfBGMC.push_back("ttV");
                         element.setOfBGMC.push_back("multitop");
@@ -408,7 +408,7 @@ void analysis1()
                         element.setOfBGMC.push_back("Higgs");
                         element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("charge flip");
-                        */
+                        //*/
                         
                         /*
                         //Dani
@@ -421,7 +421,7 @@ void analysis1()
                         element.setOfBGMC.push_back("DY");
                         */
                         
-                        ///*
+                        /*
                         //VR_Fake
                         element.setOfBGMC.push_back("WZ");
                         element.setOfBGMC.push_back("WW");
@@ -432,7 +432,7 @@ void analysis1()
                         //element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("Samuel_Fake");
                         element.setOfBGMC.push_back("charge flip");
-                        //*/
+                        */
                     }
                     else
                     {
@@ -556,11 +556,11 @@ void analysis1()
         element.MassDiff = 450;   element.ID = 75; element.colour = 922; element.linestyle = 9; element.scale = 10; SigMassSplitting.push_back(element);
         */
         
-        /*
+        ///*
         //Dani
         element.MassDiff = 150;   element.ID = 20; element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
         element.MassDiff = 150;   element.ID = 7;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        */
+        //*/
     }
     
     struct SigInfo
@@ -2478,9 +2478,9 @@ void analysis1()
     
     TFile* fout_plot = new TFile("plot/fout.root","recreate");
     
-    //for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
+    for(unsigned int RegionGroupIndex=10;RegionGroupIndex<=10;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=11;RegionGroupIndex<=11;RegionGroupIndex++)
-    for(unsigned int RegionGroupIndex=12;RegionGroupIndex<=12;RegionGroupIndex++)
+    //for(unsigned int RegionGroupIndex=12;RegionGroupIndex<=12;RegionGroupIndex++)
     //for(unsigned int RegionGroupIndex=0;RegionGroupIndex<RegionGroup.size();RegionGroupIndex++)
     {
         //For SR
@@ -3554,8 +3554,8 @@ void analysis1()
             
             //for(unsigned int VarIndex=5;VarIndex<=5;VarIndex++) //mll
             //for(unsigned int VarIndex=6;VarIndex<=6;VarIndex++) //ptll
-            //for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
-            for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
+            for(unsigned int VarIndex=countVariable;VarIndex<=countVariable;VarIndex++)
+            //for(unsigned int VarIndex=0;VarIndex<Var.size();VarIndex++)
             {
                 //if(Var[VarIndex].VarName!="pt1") continue;
                 
