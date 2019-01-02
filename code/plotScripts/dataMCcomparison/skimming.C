@@ -404,7 +404,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 hSRCutflow[m]->Fill("SS leptons", h1->GetBinContent(74));
                 hSRCutflow[m]->Fill(">=1 passOR jet", h1->GetBinContent(75));
                 hSRCutflow[m]->Fill(">=1 signal jet", h1->GetBinContent(76));
-                hSRCutflow[m]->Fill("Z veto", h1->GetBinContent(77));
             }
             
             nAOD += long(h1->GetBinContent(1));
@@ -426,6 +425,32 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     double commonWeight = 1;
     if(!isCF && !isFake) commonWeight = XS /h2[0]->GetBinContent(2) *Lumi;
     
+    //Set filter
+    bool DoFilter = false;
+    //DoFilter = true;
+    struct FilterInfo
+    {
+        int first;
+        int last;
+    };
+    vector<FilterInfo> filter;
+    
+    if(DoFilter)
+    {
+        FilterInfo filterTemp;
+             if(SampleName.Contains("363490"))
+        {
+            filterTemp.first = 1529811; filterTemp.last = 1967630; filter.push_back(filterTemp);
+            filterTemp.first = 3939243; filterTemp.last = 4601130; filter.push_back(filterTemp);
+            commonWeight = 7.4160695075988769531e-3;
+        }
+        else if(SampleName.Contains("410219"))
+        {
+            filterTemp.first = 7;       filterTemp.last = 538779;  filter.push_back(filterTemp);
+            commonWeight = 7.3706716299057006836e-2;
+        }
+    }
+    
     //loop over all entries
     //for(int j=0;j<=10;j++)
     for(int j=0;j<tree1->GetEntries();j++)
@@ -434,6 +459,17 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         {
             cout<<"number of event: " <<j<<endl;
         }
+        
+        if(filter.size() != 0)
+        {
+            bool DoContinue = false;
+            for (unsigned int k = 0; k < filter.size(); k++)
+            {
+                if(j >= filter[k].first && j <= filter[k].last) DoContinue = true;
+            }
+            if(DoContinue) continue;
+        }
+        
         tree1->GetEntry(j);
         
         /*
@@ -482,6 +518,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 {
                     for(unsigned int m=0;m<hSRCutflow.size();m++)
                     {
+                        hSRCutflow[m]->Fill("Z veto",1);
                         hSRCutflow[m]->Fill("Z veto,w",TotalWeight);
                     }
                 }
@@ -1207,6 +1244,7 @@ void skimming()
     //SamplePath += "AnalysisBase-02-04-39-cb01dad9/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-39-4171b36f/"; tag = "";
     //SamplePath += "AnalysisBase-02-04-31-6ecc6eb7/"; tag = "";
+    SamplePath += "AnalysisBase-02-04-31-f05df733/"; tag = "";
     
     //channels
     std::vector<TString> channel;
