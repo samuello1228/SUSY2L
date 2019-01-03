@@ -617,7 +617,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         //Truth lepton (for 6ecc6eb7 ntuple)
         if(!isCF && !isFake && evt.isMC)
         {
-            if(leps[0].lepTruth != 1) continue;
+            if(!SampleName.Contains("C1N2") && leps[0].lepTruth != 1) continue;
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("isTruthLep1",1);
@@ -632,7 +632,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
                 }
             }
             
-            if(leps[1].lepTruth != 1) continue;
+            if(!SampleName.Contains("C1N2") && leps[1].lepTruth != 1) continue;
             for(unsigned int m=0;m<channel.size();m++)
             {
                 h2[m]->Fill("isTruthLep2",1);
