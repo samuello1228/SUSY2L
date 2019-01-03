@@ -391,6 +391,7 @@ void RunSample(TChain* tree1, Sample& sample, TH1D* hCutflow_Dani, TH1D* hCutflo
 
     bool DoFilter = true;
     //DoFilter = false;
+    DoFilter = DoFilter && (sample.filter_first.size()!=0);
     const double lumi = 36100;
     double commonWeight = 1;
     if(isMC) commonWeight = sample.XS *lumi /nwAOD;
@@ -992,6 +993,9 @@ int main()
             double XS1;
             double XS2;
             fin>>XS2;
+
+            fin>>XS1;
+            //XS2 *= XS1;
 
             fin>>XS1;
             XS2 *= XS1;
