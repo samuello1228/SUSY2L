@@ -615,34 +615,10 @@ void analysis1()
             
             fin>>SigXSTemp;
             SigXSTemp2 *= SigXSTemp;
+            
+            fin>>SigXSTemp;
+            SigXSTemp2 *= SigXSTemp;
 
-            /*
-            fin>>SigXSTemp2;
-            fin>>SigXSTemp;
-            SigXSTemp2 *= SigXSTemp;
-            fin>>SigXSTemp;
-            SigXSTemp2 *= SigXSTemp;
-            
-            fin>>SigXSTemp;
-            fin>>SigXSTemp;
-            
-            //next line for 127
-            fin>>SigXSTemp;
-            
-            double SigXSTemp3;
-            fin>>SigXSTemp3;
-            fin>>SigXSTemp;
-            SigXSTemp3 *= SigXSTemp;
-            fin>>SigXSTemp;
-            SigXSTemp3 *= SigXSTemp;
-            
-            fin>>SigXSTemp;
-            fin>>SigXSTemp;
-            
-            //125 + 127
-            SigXSTemp2 += SigXSTemp3;
-            */
-            
             //cout<<SigXSTemp2<<endl;
             element.XS = SigXSTemp2;
             SigSampleInfo.push_back(element);

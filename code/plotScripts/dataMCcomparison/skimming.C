@@ -1203,6 +1203,9 @@ void GetSampleName(std::vector<TString>& SampleName, std::vector<double>& XS, st
             fin>>XS2;
             
             fin>>XS1;
+            //XS2 *= XS1;
+            
+            fin>>XS1;
             XS2 *= XS1;
             
             fin>>XS1;
