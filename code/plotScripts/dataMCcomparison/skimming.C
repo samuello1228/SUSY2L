@@ -383,7 +383,6 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             {
                 h2[j]->Fill("nAOD",h1->GetBinContent(1));
                 h2[j]->Fill("nwAOD",h1->GetBinContent(2));
-                h2[j]->Fill("ntuple",tree1->GetEntries());
             }
             
             for(unsigned int m=0;m<hSRCutflow.size();m++)
@@ -410,6 +409,11 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             nSUSY += long(h1->GetBinContent(4));
             
             delete f1;
+        }
+        
+        for(unsigned int j=0;j<channel.size();j++)
+        {
+            h2[j]->Fill("ntuple",tree1->GetEntries());
         }
     }
     else
