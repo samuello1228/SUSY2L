@@ -453,6 +453,15 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             filterTemp.first = 7;       filterTemp.last = 538779;  filter.push_back(filterTemp);
             commonWeight = 7.3706716299057006836e-2;
         }
+        
+        //reset nwAOD to Dani value
+        if(filter.size() != 0)
+        {
+            for(unsigned int j=0;j<channel.size();j++)
+            {
+                h2[j]->SetBinContent(2,XS*Lumi/commonWeight);
+            }
+        }
     }
     
     //loop over all entries
