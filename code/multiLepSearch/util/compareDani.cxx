@@ -1024,23 +1024,20 @@ int main()
         fin.close();
     }
 
-    add_filter_sig(processes, 393832, 10507, 24750);
-    add_filter_sig(processes, 393833, 10051, 23940);
-    add_filter_sig(processes, 393834,  9864, 23738);
-    add_filter_sig(processes, 393835,     9, 14170);
-    add_filter_sig(processes, 393836, 10292, 24604);
-    add_filter_sig(processes, 393837,  5794, 19242);
-    add_filter_sig(processes, 393838,  6013, 19893);
-    add_filter_sig(processes, 393839,  6101, 18302);
-    add_filter_sig(processes, 393840,     0, 12343);
+    //use C1N2_Wh_hall_ext36100.root
+    for(unsigned int i=0;i<processes.size();i++)    
+    {
+        if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
+        if( (processes[i].samples[0].ID >= 393832 && processes[i].samples[0].ID <= 393840) ||
+            (processes[i].samples[0].ID >= 393842 && processes[i].samples[0].ID <= 393845) ||
+            (processes[i].samples[0].ID >= 393847 && processes[i].samples[0].ID <= 393849) )
+        {
+            processes[i].path_Dani = "../C1N2_Wh_hall_ext36100.root";
+        }
+    }
+
+    //add filter
     add_filter_sig(processes, 393841,  6254, 18856);
-    add_filter_sig(processes, 393842,  6090, 17802);
-    add_filter_sig(processes, 393843,    11, 11805);
-    add_filter_sig(processes, 393844,  6073, 18112);
-    add_filter_sig(processes, 393845,  6223, 18662);
-    add_filter_sig(processes, 393847,  3948, 15587);
-    add_filter_sig(processes, 393848,     4, 11623);
-    add_filter_sig(processes, 393849,     4, 11983);
 
     for(unsigned int i=0;i<processes.size();i++)    
     {
@@ -1049,10 +1046,10 @@ int main()
         //if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
         //if(processes[i].CHAIN_NAME != "ttV_nom") continue;
         //if(processes[i].CHAIN_NAME != "Rare_nom") continue;
-        if(processes[i].CHAIN_NAME != "data_nom") continue;
+        //if(processes[i].CHAIN_NAME != "data_nom") continue;
 
         //if(processes[i].CHAIN_NAME != "C1N2_Wh_hall_150p0_0p0_nom") continue;
-        //if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
+        if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
 
         RunProcess(processes[i], cutflowList);
     }
