@@ -964,7 +964,15 @@ int main()
     //Data
     process.path_Dani = "data.36100.root"; process.CHAIN_NAME = "data_nom";
     process.samples.clear();
-    sample.tag = "data"; sample.ID = 0; sample.XS = 1; process.samples.push_back(sample);
+    sample.tag = "data"; sample.ID = 0; sample.XS = 1;
+    sample.filter_first.push_back(16092378); sample.filter_last.push_back(24160509);
+    sample.filter_first.push_back(45674365); sample.filter_last.push_back(45674365); //evn: 636665874
+    sample.filter_first.push_back(45855936); sample.filter_last.push_back(45855936); //evn: 1993066247
+    sample.filter_first.push_back(46054256); sample.filter_last.push_back(46054676);
+    sample.filter_first.push_back(46075865); sample.filter_last.push_back(46075865); //evn: 576063822
+    process.samples.push_back(sample);
+    sample.filter_first.clear();
+    sample.filter_last.clear();
     processes.push_back(process);
 
     //signal
@@ -1041,10 +1049,10 @@ int main()
         //if(processes[i].CHAIN_NAME != "ZZ_nom") continue;
         //if(processes[i].CHAIN_NAME != "ttV_nom") continue;
         //if(processes[i].CHAIN_NAME != "Rare_nom") continue;
-        //if(processes[i].CHAIN_NAME != "data_nom") continue;
+        if(processes[i].CHAIN_NAME != "data_nom") continue;
 
         //if(processes[i].CHAIN_NAME != "C1N2_Wh_hall_150p0_0p0_nom") continue;
-        if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
+        //if(!processes[i].CHAIN_NAME.Contains("C1N2")) continue;
 
         RunProcess(processes[i], cutflowList);
     }
