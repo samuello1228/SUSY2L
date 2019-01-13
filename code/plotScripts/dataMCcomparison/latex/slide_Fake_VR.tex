@@ -1,0 +1,179 @@
+\documentclass[mathserif,serif]{beamer}
+\usepackage{tabularx}
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
+\usepackage{slidesphysics}
+\graphicspath{{../plot/}}
+
+\title{Fake VR}
+\author[]
+{
+Samuel Lo \inst{1}
+}
+\institute[]
+{
+\inst{1}
+The University of Hong Kong
+}
+\date[]{\today}
+
+\newcommand\Wider[2][2em]{%
+\makebox[\linewidth][c]{%
+\begin{minipage}{\dimexpr\textwidth+#1\relax}
+\raggedright
+\centering#2
+\end{minipage}%
+}%
+}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{compare with Peter's result (fake eff)}
+\begin{table}[htbp]
+\centering
+\tiny
+\include{6fc00add_2/fake_El}
+\caption{electron fake eff for me(orange) and Peter(blue) }
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\tiny
+\include{6fc00add_2/fake_Mu}
+\caption{Muon fake eff for me(orange) and Peter(blue) }
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Plots for Samuel's result}
+\Wider{
+\includegraphics[width=0.49\textwidth]{6fc00add_2/El_hEff}
+\includegraphics[width=0.49\textwidth]{6fc00add_2/Mu_hEff}
+}
+\end{frame}
+
+\begin{frame}{compare with Peter's result (electron fake eff)}
+\Wider{
+\includegraphics[width=0.4\textwidth]{6fc00add_2/El_hEff_pt}
+\includegraphics[width=0.3\textwidth]{../FakeEff/ElFakeRatesPt} \\
+\includegraphics[width=0.4\textwidth]{6fc00add_2/El_hEff_eta}
+\includegraphics[width=0.3\textwidth]{../FakeEff/ElFakeRatesEta} \\
+}
+\end{frame}
+
+\begin{frame}{compare with Peter's result (muon fake eff)}
+\Wider{
+\includegraphics[width=0.4\textwidth]{6fc00add_2/Mu_hEff_pt}
+\includegraphics[width=0.3\textwidth]{../FakeEff/MuFakeRatesPt} \\
+\includegraphics[width=0.4\textwidth]{6fc00add_2/Mu_hEff_eta}
+\includegraphics[width=0.3\textwidth]{../FakeEff/MuFakeRatesEta} \\
+}
+\end{frame}
+
+\begin{frame}{ee channel}
+\vspace{5mm}
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & \\
+\hline
+\input{data/expN/VR_Fake_ee.tex}
+\end{tabular}
+\end{frame}
+
+\begin{frame}{ee channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{pt1_VR_Fake_ee}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_pTlead_ee} \\
+\includegraphics[width=0.4\textwidth]{mt1_VR_Fake_ee}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_mT_ee} \\
+}
+\end{frame}
+
+\begin{frame}{ee channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{meff_VR_Fake_ee}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_meff_ee} \\
+\includegraphics[width=0.4\textwidth]{MET_VR_Fake_ee}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_met_ee} \\
+}
+\end{frame}
+
+\begin{frame}{ee channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{nJet_VR_Fake_ee}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_nJets_ee}
+}
+\end{frame}
+
+\begin{frame}{mumu channel}
+\vspace{5mm}
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & \\
+\hline
+\input{data/expN/VR_Fake_mumu.tex}
+\end{tabular}
+\end{frame}
+
+\begin{frame}{mumu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{pt1_VR_Fake_mumu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_pTlead_mumu} \\
+\includegraphics[width=0.4\textwidth]{mt1_VR_Fake_mumu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_mT_mumu} \\
+}
+\end{frame}
+
+\begin{frame}{mumu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{meff_VR_Fake_mumu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_meff_mumu} \\
+\includegraphics[width=0.4\textwidth]{MET_VR_Fake_mumu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_met_mumu} \\
+}
+\end{frame}
+
+\begin{frame}{mumu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{nJet_VR_Fake_mumu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_nJets_mumu}
+}
+\end{frame}
+
+\begin{frame}{emu channel}
+\vspace{5mm}
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & \\
+\hline
+\input{data/expN/VR_Fake_emu.tex}
+\end{tabular}
+\end{frame}
+
+\begin{frame}{emu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{pt1_VR_Fake_emu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_pTlead_emu} \\
+\includegraphics[width=0.4\textwidth]{mt1_VR_Fake_emu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_mT_emu} \\
+}
+\end{frame}
+
+\begin{frame}{emu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{meff_VR_Fake_emu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_meff_emu} \\
+\includegraphics[width=0.4\textwidth]{MET_VR_Fake_emu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_met_emu} \\
+}
+\end{frame}
+
+\begin{frame}{emu channel}
+\Wider{
+\includegraphics[width=0.4\textwidth]{nJet_VR_Fake_emu}
+\includegraphics[width=0.4\textwidth]{../FakeEff/IntNote_nJets_emu}
+}
+\end{frame}
+
+\end{document}
