@@ -739,7 +739,7 @@ void analysis1()
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410155,410155);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410081,410081);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,407321,407321);
-        element.colour = 600; BGMCGroupData.push_back(element);
+        element.colour = kOrange-2; BGMCGroupData.push_back(element);
         
         element.GroupName = "multitop"; element.LegendName = "multi top"; element.LatexName = "multi top";
         element.BGMCIndex.clear();
@@ -776,19 +776,19 @@ void analysis1()
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361071,361071);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363491,363491);
-        element.colour = 881; BGMCGroupData.push_back(element);
+        element.colour = kRed+1; BGMCGroupData.push_back(element);
         
         element.GroupName = "WW"; element.LegendName = "WW"; element.LatexName = "WW";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361070);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
-        element.colour = 635; BGMCGroupData.push_back(element);
+        element.colour = kRed-9; BGMCGroupData.push_back(element);
         
         element.GroupName = "ZZ"; element.LegendName = "ZZ"; element.LatexName = "ZZ";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361072,361073);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363490);
-        element.colour = 30; BGMCGroupData.push_back(element);
+        element.colour = kOrange-3; BGMCGroupData.push_back(element);
         
         {
             element.GroupName = "Rare"; element.LegendName = "Rare"; element.LatexName = "Rare";
@@ -809,7 +809,7 @@ void analysis1()
             //Two Rare
             fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,343272,343272);
             fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410215,410215);
-            element.colour = 801; BGMCGroupData.push_back(element);
+            element.colour = kViolet-8; BGMCGroupData.push_back(element);
         }
         
         //Vgamma
@@ -863,13 +863,13 @@ void analysis1()
         element.GroupName = "charge flip"; element.LegendName = "charge flip"; element.LatexName = "charge flip";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999998,999998);
-        element.colour = 2; BGMCGroupData.push_back(element);
+        element.colour = kOrange-5; BGMCGroupData.push_back(element);
         
         //Samuel Fake
         element.GroupName = "Samuel_Fake"; element.LegendName = "Fakes"; element.LatexName = "Fakes";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999997,999997);
-        element.colour = 3; BGMCGroupData.push_back(element);
+        element.colour = kGray; BGMCGroupData.push_back(element);
         
         /*
         //charge flip
@@ -913,7 +913,7 @@ void analysis1()
         
         element.VarName = "pt1";           element.VarTitle = "p_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=20;         element.xmin=0;                 element.xmax=250;
+        element.bin=5;          element.xmin=25;                element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt^{l1}$";
         element.CutDirection=1;
@@ -969,7 +969,7 @@ void analysis1()
         
         element.VarName = "MET";           element.VarTitle = "E_{T}^{miss}";                   element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=20;         element.xmin=0;                 element.xmax=200;
+        element.bin=5;          element.xmin=0;                 element.xmax=500;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$E_{\\text{T}}^{\\text{miss}}$";
         element.CutDirection=1;
@@ -985,7 +985,7 @@ void analysis1()
         
         element.VarName = "mt1";           element.VarTitle = "m_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=20;         element.xmin=0;                 element.xmax=250;
+        element.bin=5;          element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}^{l1}$";
         element.CutDirection=1;
@@ -1025,7 +1025,7 @@ void analysis1()
         
         element.VarName = "nJet";          element.VarTitle = "Number of jets";                 element.unit = "";
         element.VarFormula = element.VarName;
-        element.bin=15;         element.xmin=0;                 element.xmax=15;
+        element.bin=6;          element.xmin=0;                 element.xmax=6;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
         element.CutDirection=0;
@@ -1089,7 +1089,7 @@ void analysis1()
         
         element.VarName = "meff";          element.VarTitle = "m_{eff}";                        element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=20;         element.xmin=0;                 element.xmax=600;
+        element.bin=5;          element.xmin=200;               element.xmax=900;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{eff}}$";
         element.CutDirection=1;
@@ -4427,9 +4427,15 @@ void analysis1()
                         if(h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin()) > max) max = h2SigSum[i]->GetBinContent(h2SigSum[i]->GetMaximumBin());
                     }
                     
+                    if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                    {
+                        min = h2BGSum->GetBinContent(h2BGSum->GetMinimumBin());
+                        max = h2BGSum->GetBinContent(h2BGSum->GetMaximumBin());
+                    }
+                    
                     if(Var[VarIndex].log)
                     {
-                        h2DataSum->SetMaximum(max*100);
+                        h2DataSum->SetMaximum(max*2);
                         
                         //if(doOptimize) Var[VarIndex].ymin /= 100;
                         if(min<0.1)
@@ -4458,9 +4464,9 @@ void analysis1()
                     Double_t xl1, yl1, xl2, yl2;
                     if(RegionGroup[RegionGroupIndex].showData)
                     {
-                        xl2=0.82;
+                        xl2=0.92;
                         yl2=0.95;
-                        xl1=xl2-0.3;
+                        xl1=xl2-0.1;
                         yl1=yl2-0.3;
                     }
                     else
@@ -4471,7 +4477,7 @@ void analysis1()
                         yl1=yl2-0.2;
                     }
                     leg = new TLegend(xl1,yl1,xl2,yl2);
-                    leg->SetNColumns(2);
+                    leg->SetNColumns(1);
                     leg->SetFillStyle(0);
                     leg->SetTextFont(42);
                     leg->SetBorderSize(0);
@@ -4594,17 +4600,17 @@ void analysis1()
                 
                 {
                     //text
-                    ATLASLabel(0.2,0.88,"Internal");
+                    ATLASLabel(0.6,0.88,"Internal");
                     
                     TLatex lt2;
                     TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
                     NameTemp += TString::Format("%.1f",sumDataL/1000);
                     NameTemp += " fb^{-1}";
-                    lt2.DrawLatexNDC(0.2,0.83, NameTemp.Data());
+                    lt2.DrawLatexNDC(0.6,0.83, NameTemp.Data());
                     lt2.SetTextSize(lt2.GetTextSize());
                     
                     TLatex lt1;
-                    lt1.DrawLatexNDC(0.2,0.78,RegionInfo[RegionIndex].RegionName.Data());
+                    lt1.DrawLatexNDC(0.6,0.78,RegionInfo[RegionIndex].RegionName.Data());
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
@@ -4726,7 +4732,7 @@ void analysis1()
                 
                 {
                     TLatex lt1;
-                    lt1.DrawLatexNDC(0.2,0.73,setupTag.Data());
+                    lt1.DrawLatexNDC(0.6,0.73,setupTag.Data());
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
