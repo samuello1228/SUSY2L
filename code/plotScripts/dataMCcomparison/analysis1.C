@@ -17,6 +17,7 @@
 #include <TLine.h>
 #include <TStyle.h>
 #include <TString.h>
+#include <TGraphAsymmErrors.h>
 #include "AtlasLabels.C"
 #include "AtlasStyle.C"
 
@@ -4031,6 +4032,63 @@ void analysis1()
                     averageSignificance /= OptimizingSignal.size();
                 }
                 
+                //Asymmetric errors for Fake VR
+                TGraphAsymmErrors* g_mc = nullptr;
+                TGraphAsymmErrors* g_ratio = nullptr;
+                if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                {
+                    int nbin = Var[VarIndex].bin;
+                    g_mc = new TGraphAsymmErrors(nbin);
+                    g_ratio = new TGraphAsymmErrors(nbin);
+                    
+                    const double fake_sys_error = TMath::Sqrt(1.12*1.12 + 0.64*0.64) /1.76;
+                    for (int j = 0; j < nbin; j++)
+                    {
+                        double x = BGGroup2[0].h2->GetBinCenter(j+1);
+                        double xerr_down = BGGroup2[0].h2->GetBinWidth(j+1) /2;
+                        double xerr_up = BGGroup2[0].h2->GetBinWidth(j+1) /2;
+                        
+                        double y = 0;
+                        double error2 = 0;
+                        double fake_yield = 0;
+                        for(unsigned int k = 0; k < BGGroup2.size(); k++)
+                        {
+                            double yield = 0;
+                            double error = 0;
+                            yield = BGGroup2[k].h2->IntegralAndError(j+1,j+1,error);
+                            if(yield > 0)
+                            {
+                                y += yield;
+                            }
+                            error2 += error * error;
+                            
+                            if(BGGroup2[k].info->GroupName == "Samuel_Fake") fake_yield = yield;
+                        }
+                        
+                        double fake_error = fake_yield * fake_sys_error;
+                        error2 += fake_error * fake_error;
+                        
+                        double total_error = TMath::Sqrt(error2);
+                        
+                        double yerr_down = total_error;
+                        double yerr_up = total_error;
+                        
+                        g_mc->SetPoint(j,x,y);
+                        g_mc->SetPointError(j,xerr_down,xerr_up,yerr_down,yerr_up);
+                        //cout<<xerr_down<<", "<<x<<", "<<xerr_up<<"; "<<yerr_down<<", "<<y<<", "<<yerr_up<<endl;
+                        
+                        g_ratio->SetPoint(j,x,1);
+                        yerr_down = total_error/y;
+                        yerr_up = total_error/y;
+                        g_ratio->SetPointError(j,xerr_down,xerr_up,yerr_down,yerr_up);
+                    }
+                    
+                    g_mc->SetFillColor(kBlack);
+                    g_mc->SetFillStyle(3005);
+                    
+                    g_ratio->SetFillColor(kYellow);
+                }
+                
                 if(VarIndex==countVariable)
                 {
                     //output file
@@ -4587,6 +4645,7 @@ void analysis1()
                 pad1->cd();
                 h2DataSum->Draw("axis");
                 stack.Draw("histsame"); //Cutflow Attention
+                if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake") g_mc->Draw("e2, SAME");
                 for(unsigned int i=0;i<SigMassSplitting.size();i++)
                 {
                     h2SigSum[i]->Draw("histsame");
@@ -4747,10 +4806,14 @@ void analysis1()
                     {
                         h2Ratio->Draw();
                         
+                        if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake") g_ratio->Draw("e2, SAME");
+                        
                         TLine l;
                         TLine* l1 = l.DrawLine(h2Ratio->GetXaxis()->GetXmin(), 1., h2Ratio->GetXaxis()->GetXmax(), 1.);
                         l1->SetLineStyle(2);
                         l1->SetLineWidth(2);
+                        
+                        h2Ratio->Draw("same");
                     }
                     else if(RegionGroup[RegionGroupIndex].showSignificance)
                     {
@@ -4773,8 +4836,17 @@ void analysis1()
                         NameTemp += "_";
                         NameTemp += TString::Itoa(SigOptimizingIndex,10);
                     }
-                    NameTemp += ".eps";
-                    c2->Print(NameTemp,"eps");
+                    
+                    if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                    {
+                        NameTemp += ".pdf";
+                        c2->Print(NameTemp,"pdf");
+                    }
+                    else
+                    {
+                        NameTemp += ".eps";
+                        c2->Print(NameTemp,"eps");
+                    }
                     
                     NameTemp = Var[VarIndex].VarName;
                     NameTemp += "_";
@@ -4828,6 +4900,13 @@ void analysis1()
                     {
                         delete hSignificance[i];
                     }
+                }
+                
+                //Asymmetric errors
+                if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                {
+                    delete g_mc;
+                    delete g_ratio;
                 }
                 
                 //pad1
