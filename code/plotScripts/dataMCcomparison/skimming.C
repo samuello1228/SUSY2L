@@ -874,12 +874,38 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         tree1->SetBranchAddress("lep_2ndPt", &pt2);
     }
     
+    /*
+    tree1->GetEntry(0);
+    cout<<"NlepS: "<<NlepS<<endl;
+    cout<<"NlepBL: "<<NlepBL<<endl;
+    cout<<"Njet20: "<<nJet<<endl;
+    cout<<"Nbjet: "<<nBJet<<endl;
+    cout<<"FakeWeight: "<<weight<<endl;
+    cout<<"RelMET: "<<METRel<<endl;
+    cout<<"MET: "<<MET<<endl;
+    cout<<"Meff: "<<meff<<endl;
+    cout<<"Mlj: "<<mlj<<endl;
+    cout<<"Mll: "<<mll<<endl;
+    cout<<"Mt: "<<mt1<<endl;
+    cout<<"Mt2: "<<mTtwo<<endl;
+    cout<<"mu_1stPt: "<<mu_1stPt<<endl;
+    cout<<"mu_2ndPt: "<<mu_2ndPt<<endl;
+    cout<<"mu_1stEta: "<<mu_1stEta<<endl;
+    cout<<"mu_2ndEta: "<<mu_2ndEta<<endl;
+    cout<<"el_1stPt: "<<el_1stPt<<endl;
+    cout<<"el_2ndPt: "<<el_2ndPt<<endl;
+    cout<<"el_1stEta: "<<el_1stEta<<endl;
+    cout<<"el_2ndEta: "<<el_2ndEta<<endl;
+    cout<<"lep_1stPt: "<<pt1<<endl;
+    cout<<"lep_2ndPt: "<<pt2<<endl;
+    */
+    
     //create files for storing the resulting trees and histograms
     TFile *f2[channel.size()];
     for(unsigned int j=0;j<channel.size();j++)
     {
         TString fileName = "skimming/skimming.mc15_13TeV.999999.";
-        fileName += SampleName;
+        fileName += "Fakes";
         fileName += "_";
         fileName += channel[j];
         fileName += ".root";
@@ -977,7 +1003,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         }
         
         //pt1 cut
-        if(pt1>=25000)
+        if(pt1>=25)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -996,7 +1022,7 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
         else continue;
         
         //pt2 cut
-        if(pt2>=25000)
+        if(pt2>=25)
         {
             for(unsigned int m=0;m<channel.size();m++)
             {
@@ -1061,14 +1087,6 @@ void skimmingForFakes(TString const& SamplePath,TString const& SampleName,vector
             channelIndex += 2;
         }
         
-        pt1 /= 1000;
-        pt2 /= 1000;
-        mll /= 1000;
-        MET /= 1000;
-        meff /= 1000;
-        mlj /= 1000;
-        mt1 /= 1000;
-        mTtwo /= 1000;
         nCJet = nJet;
         
         phi1 = 1;
@@ -1565,7 +1583,7 @@ void skimming()
     if(false)
     {
         SamplePath += "Peter_Fake_Nov/"; tag = "";
-        TString SampleName = "Fakes";
+        TString SampleName = "Fakes_Standard";
         vector<TH1D*> hSRCutflow;
         initializehCutflow(hSRCutflow,cutflowList);
         skimmingForFakes(SamplePath,SampleName,hSRCutflow,channel);
