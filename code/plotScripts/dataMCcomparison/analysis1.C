@@ -2403,30 +2403,10 @@ void analysis1()
     ///*
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
-        /*
         if(
-           (SigSampleInfo[i].Mass1 == 150   && SigSampleInfo[i].Mass2 == 0     ) ||
-           (SigSampleInfo[i].Mass1 == 152.5 && SigSampleInfo[i].Mass2 == 22.5  ) ||
-           (SigSampleInfo[i].Mass1 == 175   && SigSampleInfo[i].Mass2 == 25    ) ||
-           (SigSampleInfo[i].Mass1 == 177.5 && SigSampleInfo[i].Mass2 == 47.5  ) ||
-           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5  ) ||
-           (SigSampleInfo[i].Mass1 == 190   && SigSampleInfo[i].Mass2 == 60    ) ||
-           (SigSampleInfo[i].Mass1 == 202.5 && SigSampleInfo[i].Mass2 == 72.5  ) ||
-           (SigSampleInfo[i].Mass1 == 215   && SigSampleInfo[i].Mass2 == 85    ) ||
-           (SigSampleInfo[i].Mass1 == 227.5 && SigSampleInfo[i].Mass2 == 97.5  ) ||
-           (SigSampleInfo[i].Mass1 == 237.5 && SigSampleInfo[i].Mass2 == 87.5  ) ||
-           (SigSampleInfo[i].Mass1 == 240   && SigSampleInfo[i].Mass2 == 110   ) ||
-           (SigSampleInfo[i].Mass1 == 250   && SigSampleInfo[i].Mass2 == 100   ) ||
-           (SigSampleInfo[i].Mass1 == 300   && SigSampleInfo[i].Mass2 == 100   ) )
-        */
-        
-        ///*
-        //Dani
-        if(
-           (SigSampleInfo[i].Mass1 == 225   && SigSampleInfo[i].Mass2 == 75   ) ||
-           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5 ) ||
+           (SigSampleInfo[i].Mass1 == 225   && SigSampleInfo[i].Mass2 == 75   ) || //For SRjet1
+           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5 ) || //For SRjet23
            false )
-        //*/
         {
             cout<<SigSampleInfo[i].SampleName.Data()<<endl;
             OptimizingSignal.push_back(i);
