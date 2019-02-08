@@ -3969,6 +3969,8 @@ void analysis1()
                 double total_BG_error2 = 0 ;
                 int total_BG_unweighted = 0;
                 double averageSignificance = 0;
+                const double fake_sys_relative_error = TMath::Sqrt(1.12*1.12 + 0.64*0.64) /1.76;
+                double fake_sys_error = 0;
                 if(VarIndex==countVariable || RegionGroup[RegionGroupIndex].GroupName == "SR_SS_opt")
                 {
                     //expected number of events for Data
@@ -3989,6 +3991,11 @@ void analysis1()
                         total_BG_error2 += BGGroup2[j].info->error*BGGroup2[j].info->error;
                         
                         total_BG_unweighted += BGGroup2[j].info->unweighted;
+                        
+                        if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake" && BGGroup2[j].info->GroupName == "Samuel_Fake")
+                        {
+                            fake_sys_error = BGGroup2[j].info->weighted * fake_sys_relative_error;
+                        }
                     }
                     cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
                     
@@ -4041,7 +4048,6 @@ void analysis1()
                     g_mc = new TGraphAsymmErrors(nbin);
                     g_ratio = new TGraphAsymmErrors(nbin);
                     
-                    const double fake_sys_error = TMath::Sqrt(1.12*1.12 + 0.64*0.64) /1.76;
                     for (int j = 0; j < nbin; j++)
                     {
                         double x = BGGroup2[0].h2->GetBinCenter(j+1);
@@ -4065,7 +4071,7 @@ void analysis1()
                             if(BGGroup2[k].info->GroupName == "Samuel_Fake") fake_yield = yield;
                         }
                         
-                        double fake_error = fake_yield * fake_sys_error;
+                        double fake_error = fake_yield * fake_sys_relative_error;
                         error2 += fake_error * fake_error;
                         
                         double total_error = TMath::Sqrt(error2);
@@ -4112,6 +4118,13 @@ void analysis1()
                         fout<<BGGroup2[j].info->weighted;
                         fout<<"\\pm";
                         fout<<BGGroup2[j].info->error;
+                        
+                        if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake" && BGGroup2[j].info->GroupName == "Samuel_Fake")
+                        {
+                            fout<<"\\pm";
+                            fout<<fake_sys_error;
+                        }
+                        
                         fout<<"$ (";
                         fout<<BGGroup2[j].info->unweighted;
                         fout<<") & \\\\"<<endl<<"\\hline"<<endl;
@@ -4122,6 +4135,13 @@ void analysis1()
                     fout<<total_BG_weighted;
                     fout<<"\\pm";
                     fout<<TMath::Sqrt(total_BG_error2);
+                    
+                    if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                    {
+                        fout<<"\\pm";
+                        fout<<fake_sys_error;
+                    }
+                    
                     fout<<"$ (";
                     fout<<total_BG_unweighted;
                     fout<<") & \\\\"<<endl<<"\\hline"<<endl;
