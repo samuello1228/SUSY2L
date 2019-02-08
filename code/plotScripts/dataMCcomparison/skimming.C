@@ -431,7 +431,7 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
     
     //Set filter
     bool DoFilter = false;
-    //DoFilter = true;
+    DoFilter = true;
     struct FilterInfo
     {
         int first;
@@ -453,9 +453,23 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
             filterTemp.first = 7;       filterTemp.last = 538779;  filter.push_back(filterTemp);
             commonWeight = 7.3706716299057006836e-2;
         }
+        else if(SampleName.Contains("393841"))
+        {
+            filterTemp.first = 6254;    filterTemp.last = 18856;   filter.push_back(filterTemp);
+            commonWeight = 1.3372491300106048584e-1;
+        }
+        else if(SampleName.Contains("data16"))
+        {
+            filterTemp.first = 9467334;     filterTemp.last = 17535465;   filter.push_back(filterTemp);
+            filterTemp.first = 39049321;    filterTemp.last = 39049321;   filter.push_back(filterTemp);
+            filterTemp.first = 39230892;    filterTemp.last = 39230892;   filter.push_back(filterTemp);
+            filterTemp.first = 39429212;    filterTemp.last = 39429632;   filter.push_back(filterTemp);
+            filterTemp.first = 39450821;    filterTemp.last = 39450821;   filter.push_back(filterTemp);
+            commonWeight = 0;
+        }
         
         //reset nwAOD to Dani value
-        if(filter.size() != 0)
+        if(filter.size() != 0 && !SampleName.Contains("data16"))
         {
             for(unsigned int j=0;j<channel.size();j++)
             {
@@ -783,6 +797,9 @@ void skimming2(TString const& SamplePath,TString const& tag,TString const& Sampl
         else mlj = sig.mlj;
         
         if(passCutflow) DoCutflow(hSRCutflow, TotalWeight);
+        
+        //not save OS events
+        if(channelIndex >= 0 && channelIndex <= 2) continue;
         
         ///*
         //separate the sample into channels
