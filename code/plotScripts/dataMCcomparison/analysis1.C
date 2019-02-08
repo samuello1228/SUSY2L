@@ -402,11 +402,12 @@ void analysis1()
                         */
                         
                         ///*
-                        element.setOfBGMC.push_back("VVReal");
+                        //SR
+                        element.setOfBGMC.push_back("WZ");
+                        element.setOfBGMC.push_back("WW");
+                        element.setOfBGMC.push_back("ZZ");
                         element.setOfBGMC.push_back("ttV");
-                        element.setOfBGMC.push_back("multitop");
-                        element.setOfBGMC.push_back("VVV");
-                        element.setOfBGMC.push_back("Higgs");
+                        element.setOfBGMC.push_back("Rare");
                         element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("charge flip");
                         //*/
@@ -429,8 +430,6 @@ void analysis1()
                         element.setOfBGMC.push_back("ZZ");
                         element.setOfBGMC.push_back("ttV");
                         element.setOfBGMC.push_back("Rare");
-                        
-                        //element.setOfBGMC.push_back("Fakes");
                         element.setOfBGMC.push_back("Samuel_Fake");
                         element.setOfBGMC.push_back("charge flip");
                         */
@@ -612,7 +611,7 @@ void analysis1()
             
             double SigXSTemp;
             fin>>SigXSTemp;
-            SigXSTemp2 *= SigXSTemp;
+            //SigXSTemp2 *= SigXSTemp;
             
             fin>>SigXSTemp;
             SigXSTemp2 *= SigXSTemp;
