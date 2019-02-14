@@ -722,6 +722,11 @@ void analysis1()
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410015,410016);
         element.colour = 30; BGMCGroupData.push_back(element);
         
+        element.GroupName = "Wt"; element.LegendName = "Wt"; element.LatexName = "Wt";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410015,410016);
+        element.colour = 30; BGMCGroupData.push_back(element);
+        
         element.GroupName = "ttV"; element.LegendName = "t#bar{t}+V"; element.LatexName = "$t\\bar{t}+V$";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,410218,410220);
@@ -750,6 +755,14 @@ void analysis1()
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361069,361073);
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363490,363491);
+        element.colour = 801; BGMCGroupData.push_back(element);
+        
+        element.GroupName = "VV_qF"; element.LegendName = "VV_qF"; element.LatexName = "VV\\_qF";
+        element.BGMCIndex.clear();
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,361077,361077);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363356,363356);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363358,363358);
+        fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,363492,363492);
         element.colour = 801; BGMCGroupData.push_back(element);
         
         element.GroupName = "VV_DL"; element.LegendName = "VV_DL"; element.LatexName = "VV\\_DL";
@@ -902,7 +915,8 @@ void analysis1()
         
         element.VarName = "pt1";           element.VarTitle = "p_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=5;          element.xmin=25;                element.xmax=300;
+        //element.bin=5;          element.xmin=25;                element.xmax=300;
+        element.bin=20;         element.xmin=25;                element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt^{l1}$";
         element.CutDirection=1;
@@ -910,7 +924,7 @@ void analysis1()
         
         element.VarName = "pt2";           element.VarTitle = "p_{T}^{l2}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=20;         element.xmin=0;                 element.xmax=250;
+        element.bin=20;         element.xmin=25;                element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$\\pt^{l2}$";
         element.CutDirection=1;
@@ -958,7 +972,8 @@ void analysis1()
         
         element.VarName = "MET";           element.VarTitle = "E_{T}^{miss}";                   element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=5;          element.xmin=0;                 element.xmax=500;
+        //element.bin=5;          element.xmin=0;                 element.xmax=500;
+        element.bin=20;         element.xmin=0;                 element.xmax=200;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$E_{\\text{T}}^{\\text{miss}}$";
         element.CutDirection=1;
@@ -974,7 +989,8 @@ void analysis1()
         
         element.VarName = "mt1";           element.VarTitle = "m_{T}^{l1}";                     element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=5;          element.xmin=0;                 element.xmax=300;
+        //element.bin=5;          element.xmin=0;                 element.xmax=300;
+        element.bin=20;         element.xmin=0;                 element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{T}}^{l1}$";
         element.CutDirection=1;
@@ -1014,7 +1030,8 @@ void analysis1()
         
         element.VarName = "nJet";          element.VarTitle = "Number of jets";                 element.unit = "";
         element.VarFormula = element.VarName;
-        element.bin=6;          element.xmin=0;                 element.xmax=6;
+        //element.bin=6;          element.xmin=0;                 element.xmax=6;
+        element.bin=15;         element.xmin=0;                 element.xmax=15;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = element.VarTitle;
         element.CutDirection=0;
@@ -1078,7 +1095,8 @@ void analysis1()
         
         element.VarName = "meff";          element.VarTitle = "m_{eff}";                        element.unit = "[GeV]";
         element.VarFormula = element.VarName;
-        element.bin=5;          element.xmin=200;               element.xmax=900;
+        //element.bin=5;          element.xmin=200;               element.xmax=900;
+        element.bin=20;         element.xmin=0;                 element.xmax=600;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
         element.latexName = "$m_{\\text{eff}}$";
         element.CutDirection=1;
@@ -2134,10 +2152,10 @@ void analysis1()
             
             OptimizingCutElement2.clear();
             OptimizingCutElement3.RelatedVariable = "meff";
-            OptimizingCutElement3.min = 100;
+            OptimizingCutElement3.min = 0;
             OptimizingCutElement3.max = 600;
-            OptimizingCutElement3.nBin = 50;
-            OptimizingCutElement3.lower = 100;
+            OptimizingCutElement3.nBin = 60;
+            OptimizingCutElement3.lower = 0;
             //OptimizingCutElement3.lower = 200;
             OptimizingCutElement3.upper = -1;
             OptimizingCutElement2.push_back(OptimizingCutElement3);
@@ -2403,10 +2421,30 @@ void analysis1()
     ///*
     for(unsigned int i=0;i<SigSampleInfo.size();i++)
     {
+        /*
         if(
-           (SigSampleInfo[i].Mass1 == 225   && SigSampleInfo[i].Mass2 == 75   ) || //For SRjet1
-           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5 ) || //For SRjet23
+           (SigSampleInfo[i].Mass1 == 150   && SigSampleInfo[i].Mass2 == 0     ) ||
+           (SigSampleInfo[i].Mass1 == 152.5 && SigSampleInfo[i].Mass2 == 22.5  ) ||
+           (SigSampleInfo[i].Mass1 == 175   && SigSampleInfo[i].Mass2 == 25    ) ||
+           (SigSampleInfo[i].Mass1 == 177.5 && SigSampleInfo[i].Mass2 == 47.5  ) ||
+           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5  ) ||
+           (SigSampleInfo[i].Mass1 == 190   && SigSampleInfo[i].Mass2 == 60    ) ||
+           (SigSampleInfo[i].Mass1 == 202.5 && SigSampleInfo[i].Mass2 == 72.5  ) ||
+           (SigSampleInfo[i].Mass1 == 215   && SigSampleInfo[i].Mass2 == 85    ) ||
+           (SigSampleInfo[i].Mass1 == 227.5 && SigSampleInfo[i].Mass2 == 97.5  ) ||
+           (SigSampleInfo[i].Mass1 == 237.5 && SigSampleInfo[i].Mass2 == 87.5  ) ||
+           (SigSampleInfo[i].Mass1 == 240   && SigSampleInfo[i].Mass2 == 110   ) ||
+           (SigSampleInfo[i].Mass1 == 250   && SigSampleInfo[i].Mass2 == 100   ) ||
+           (SigSampleInfo[i].Mass1 == 300   && SigSampleInfo[i].Mass2 == 100   ) )
+        */
+        
+        ///*
+        //Dani
+        if(
+           //(SigSampleInfo[i].Mass1 == 225   && SigSampleInfo[i].Mass2 == 75   ) || //SRjet1
+           (SigSampleInfo[i].Mass1 == 187.5 && SigSampleInfo[i].Mass2 == 37.5 ) || //SRjet23
            false )
+        //*/
         {
             cout<<SigSampleInfo[i].SampleName.Data()<<endl;
             OptimizingSignal.push_back(i);
@@ -4481,7 +4519,8 @@ void analysis1()
                     
                     if(Var[VarIndex].log)
                     {
-                        h2DataSum->SetMaximum(max*2);
+                        //h2DataSum->SetMaximum(max*2);
+                        h2DataSum->SetMaximum(max*100);
                         
                         //if(doOptimize) Var[VarIndex].ymin /= 100;
                         if(min<0.1)
@@ -4517,7 +4556,7 @@ void analysis1()
                     }
                     else
                     {
-                        xl2=0.82;
+                        xl2=0.75;
                         yl2=0.95;
                         xl1=xl2-0.3;
                         yl1=yl2-0.2;
@@ -4753,7 +4792,7 @@ void analysis1()
                                 }
                                 
                                 TLatex lt2;
-                                lt2.DrawLatexNDC(0.2,0.63, NameTemp.Data());
+                                lt2.DrawLatexNDC(0.6,0.63, NameTemp.Data());
                                 lt2.SetTextSize(lt2.GetTextSize());
                                 
                                 break;
@@ -4772,7 +4811,7 @@ void analysis1()
                     {
                         TString NameTemp = TString::Format("Z_{n} = %.2f",averageSignificance);
                         TLatex lt2;
-                        lt2.DrawLatexNDC(0.2,0.68, NameTemp.Data());
+                        lt2.DrawLatexNDC(0.6,0.68, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
                 }
@@ -5646,22 +5685,21 @@ void analysis1()
             //N-1 plot
             VarPlot.push_back("pt1");
             VarPlot.push_back("pt2");
-            VarPlot.push_back("mll");
             VarPlot.push_back("dEta");
-            VarPlot.push_back("METRel");
-            VarPlot.push_back("meff");
-            VarPlot.push_back("mtm");
-            VarPlot.push_back("mlj");
-            VarPlot.push_back("ptll");
-            VarPlot.push_back("mTtwo");
-            Nminus1 = 10;
-            
-            //N plot
             VarPlot.push_back("MET");
+            VarPlot.push_back("meff");
+            VarPlot.push_back("mt1");
+            VarPlot.push_back("mlj");
+            VarPlot.push_back("mTtwo");
+            Nminus1 = 8;
+            
+            /*
+            //N plot
             VarPlot.push_back("nBJet");
             VarPlot.push_back("nCJet");
             VarPlot.push_back("eta1");
             VarPlot.push_back("eta2");
+            */
             
             /*
             VarPlot.push_back("mt1");

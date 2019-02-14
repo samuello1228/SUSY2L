@@ -1,0 +1,206 @@
+\documentclass[mathserif,serif]{beamer}
+\usepackage{tabularx}
+% \setbeamertemplate{footline}[frame number]
+\useoutertheme{infolines}
+\usepackage{slidesphysics}
+\graphicspath{{../plot/}}
+
+\title{SS Analysis}
+\author[]
+{
+Samuel Lo \inst{1}
+\and
+Yanjun Tu  \inst{1}
+\and
+Daniela Paredes \inst{1}
+\and
+Dongliang Zhang  \inst{2}
+}
+\institute[]
+{
+\inst{1}
+The University of Hong Kong
+\and
+\inst{2}
+University of Michigan
+}
+\date[]{\today}
+
+\newcommand\Wider[2][2em]{%
+\makebox[\linewidth][c]{%
+\begin{minipage}{\dimexpr\textwidth+#1\relax}
+\raggedright
+\centering#2
+\end{minipage}%
+}%
+}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{selection in SR}
+\begin{table}[htbp]
+\centering
+\tiny
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\scalebox{1}{
+\input{data/optimization/cut_table_SR_SS_opt_0_Dani.tex}
+\end{tabular}
+}
+\caption{\tiny Dani SR}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\scalebox{1}{
+\input{data/optimization/cut_table_SR_SS_opt_0_my.tex}
+\end{tabular}
+}
+\caption{\tiny My SR}
+\end{column}
+
+\end{columns}
+\end{table}
+\end{frame}
+
+\begin{frame}{yield in SRjet1}
+\begin{table}[htbp]
+\centering
+\tiny
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\input{data/optimization/cut_latex/cut_SR_SS_jet1_opt_0_Dani.tex}
+\scalebox{0.8}{
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & Significance \\
+\hline
+\input{data/expN/SR_SS_jet1_opt_0_Dani.tex}
+\end{tabular}
+}
+\caption{\tiny Dani's optimization}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\input{data/optimization/cut_latex/cut_SR_SS_jet1_opt_0_my.tex}
+\scalebox{0.8}{
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & Significance \\
+\hline
+\input{data/expN/SR_SS_jet1_opt_0_my.tex}
+\end{tabular}
+}
+\caption{\tiny My optimization}
+\end{column}
+
+\end{columns}
+\end{table}
+\end{frame}
+
+\begin{frame}{yield in SRjet23}
+\begin{table}[htbp]
+\centering
+\tiny
+
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\input{data/optimization/cut_latex/cut_SR_SS_jet23_opt_0_Dani.tex}
+\scalebox{0.8}{
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & Significance \\
+\hline
+\input{data/expN/SR_SS_jet23_opt_0_Dani.tex}
+\end{tabular}
+}
+\caption{\tiny Dani's optimization}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\input{data/optimization/cut_latex/cut_SR_SS_jet23_opt_0_my.tex}
+\scalebox{0.8}{
+\begin{tabular}{|c|c|c|}
+\hline
+& Number of events & Significance \\
+\hline
+\input{data/expN/SR_SS_jet23_opt_0_my.tex}
+\end{tabular}
+}
+\caption{\tiny My optimization}
+\end{column}
+
+\end{columns}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge
+Pre-selection plots
+\end{center}
+\end{frame}
+
+\input{data/plot_SR_SS_pre.tex}
+
+\begin{frame}
+\begin{center}
+\huge
+N-1 plots
+\end{center}
+\end{frame}
+
+\input{data/plot_SR_SS_opt_0.tex}
+
+\section{Backup}
+
+\begin{frame}
+\begin{center}
+\huge
+Backup
+\end{center}
+\end{frame}
+
+\begin{frame}
+\small
+SUSY scenario:\\
+\begin{figure}
+\includegraphics[width=0.6\textwidth]{data/photo/Wh.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{significance calculation}
+\begin{itemize}
+\item RooStats::NumberCountingUtils::BinomialExpZ(S,B,$\delta$B)
+\item $\delta$B = sqrt((0.25)\^{}2 + (nBGError/nBG)\^{}2)
+\begin{itemize}
+\item use the same definition from Dani.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{optimization constraints}
+\small
+The following constraints are applied to reduce the bias from low statistics:
+\begin{itemize}
+\small
+\item The yields of groups of BG need to be positive, except multi-top, V+gamma and Z+jets.
+\begin{itemize}
+\item To have a reasonable/stable modeling of the background shape.
+\item In practice, the HistFitter will include the background only when it has positive yield.
+\end{itemize}
+\item At least 10 unweighted events in VV and ttV background.
+\item If the yield for one group of BG is negative, 0 yield is used. But the statistical error still keep unchanged to calculate the statistical error of total BG.
+\item nSig$>$1 and nSig/nSigError $>$ 2 for both (162.5,12.5) and (175,0).
+\item For $\pt^{l1}$, $\pt^{l1}$, $\pt^{ll}$, $m_{T2}$, $E_{\text{T}}^{\text{miss,rel}}$, $m_{\text{eff}}$ and $m_{\text{T}}^{\text{max}}$, there is no upper cut.
+\item For $|\Delta\eta_{ll}|$ and $m_{lj}$/$m_{ljj}$, there is no lower cut.
+\end{itemize}
+\end{frame}
+
+\end{document}
