@@ -4686,7 +4686,8 @@ void analysis1()
                 
                 {
                     //text
-                    ATLASLabel(0.6,0.88,"Internal");
+                    //ATLASLabel(0.6,0.88,"Internal");
+                    ATLASLabel(0.6,0.88,"Work in progress");
                     
                     TLatex lt2;
                     TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
@@ -4792,7 +4793,7 @@ void analysis1()
                                 }
                                 
                                 TLatex lt2;
-                                lt2.DrawLatexNDC(0.6,0.63, NameTemp.Data());
+                                lt2.DrawLatexNDC(0.6,0.68, NameTemp.Data());
                                 lt2.SetTextSize(lt2.GetTextSize());
                                 
                                 break;
@@ -4811,15 +4812,15 @@ void analysis1()
                     {
                         TString NameTemp = TString::Format("Z_{n} = %.2f",averageSignificance);
                         TLatex lt2;
-                        lt2.DrawLatexNDC(0.6,0.68, NameTemp.Data());
+                        lt2.DrawLatexNDC(0.6,0.73, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
                 }
                 
                 {
-                    TLatex lt1;
-                    lt1.DrawLatexNDC(0.6,0.73,setupTag.Data());
-                    lt1.SetTextSize(lt1.GetTextSize());
+                    //TLatex lt1;
+                    //lt1.DrawLatexNDC(0.6,0.73,setupTag.Data());
+                    //lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
                 if(RegionGroup[RegionGroupIndex].showData || DoSignificancePlot)
@@ -5755,7 +5756,7 @@ void analysis1()
                 
                 fout<<"\\includegraphics[width=";
                 if(RegionN == 3 || RegionN == 4) fout<<"0.4";
-                else fout<<"0.33";
+                else fout<<"0.49";
                 fout<<"\\textwidth]{";
                 fout<<Var[VarIndex].VarName.Data();
                 fout<<"_";
