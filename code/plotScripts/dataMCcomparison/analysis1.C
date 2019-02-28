@@ -918,7 +918,7 @@ void analysis1()
         //element.bin=5;          element.xmin=25;                element.xmax=300;
         element.bin=20;         element.xmin=25;                element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt^{l1}$";
+        element.latexName = "$p_T^{l1}$";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -926,7 +926,7 @@ void analysis1()
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=25;                element.xmax=250;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt^{l2}$";
+        element.latexName = "$p_T^{l2}$";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -966,7 +966,7 @@ void analysis1()
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=400;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt^{ll}$";
+        element.latexName = "$p_T^{ll}$";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -1016,7 +1016,7 @@ void analysis1()
         element.VarFormula = element.VarName;
         element.bin=20;         element.xmin=0;                 element.xmax=300;
         element.log=1;          element.ymin=1.0/element.bin;   element.ymax=1;
-        element.latexName = "$\\pt$ of the leading jet";
+        element.latexName = "$p_T$ of the leading jet";
         element.CutDirection=1;
         Var.push_back(element);
         
@@ -6070,8 +6070,8 @@ void analysis1()
             {
                 unsigned int VarIndex = findVarIndex(RegionInfo[ RegionGroup[optRegionGroupIndex].lower ].OptimizingCut[SigOptimizingIndex][i][j].RelatedVariable,Var);
                 
-                if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton \\pt";
-                else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton \\pt";
+                if(Var[VarIndex].VarName == "pt1") fout<<"Leading lepton $p_T$";
+                else if(Var[VarIndex].VarName == "pt2") fout<<"Sub-leading lepton $p_T$";
                 else fout<<Var[VarIndex].latexName.Data();
                 
                 fout<<" ";
