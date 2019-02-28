@@ -6033,7 +6033,7 @@ void analysis1()
             fout<<"\\hline"<<endl;
             fout<<"Lepton flavours & $ee$ & $ee$ & $\\mu\\mu$ & $\\mu\\mu$ & $e\\mu$ & $e\\mu$ \\\\"<<endl;
             fout<<"\\hline"<<endl;
-            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"$n_{jets}$ & 1 & 2 or 3 & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
         else if(RegionN == 2)
@@ -6042,7 +6042,7 @@ void analysis1()
             fout<<"\\hline"<<endl;
             fout<<"& SRjet1 & SRjet23 \\\\"<<endl;
             fout<<"\\hline"<<endl;
-            fout<<"$n_{cjets}$ & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"$n_{jets}$ & 1 & 2 or 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
         else if(RegionN == 1)
@@ -6051,7 +6051,7 @@ void analysis1()
             fout<<"\\hline"<<endl;
             fout<<"& SRjet123 \\\\"<<endl;
             fout<<"\\hline"<<endl;
-            fout<<"$n_{cjets}$ & 1 to 3 \\\\"<<endl;
+            fout<<"$n_{jets}$ & 1 to 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
         else if(RegionN == 4)
@@ -6060,7 +6060,7 @@ void analysis1()
             fout<<"\\hline"<<endl;
             fout<<"& SRjet1\\_off & SRjet23\\_off & SRjet1\\_on & SRjet23\\_on \\\\"<<endl;
             fout<<"\\hline"<<endl;
-            fout<<"$n_{cjets}$ & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
+            fout<<"$n_{jets}$ & 1 & 2 or 3 & 1 & 2 or 3 \\\\"<<endl;
             fout<<"\\hline"<<endl;
         }
         
@@ -6141,28 +6141,6 @@ void analysis1()
                 
                 fout<<"\\\\"<<endl;
                 fout<<"\\hline"<<endl;
-                
-                if(Var[VarIndex].VarName == "pt2")
-                {
-                    if(RegionN == 6)
-                    {
-                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & - & - & - & - \\\\"<<endl;
-                    }
-                    else if(RegionN == 4)
-                    {
-                        fout<<"$|m_{ll}-m_Z|$ [GeV] & $>10$ & $>10$ & $\\leq 10$ & $\\leq 10$ \\\\"<<endl;
-                    }
-                    else
-                    {
-                        fout<<"$|m_{ll}-m_Z|$ [GeV] ";
-                        for(unsigned int k=0;k<RegionN;k++)
-                        {
-                            fout<<"& - ";
-                        }
-                        fout<<"\\\\"<<endl;
-                    }
-                    fout<<"\\hline"<<endl;
-                }
             }
         }
         
