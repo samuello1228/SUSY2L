@@ -5390,18 +5390,20 @@ void analysis1()
             h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
             h2->GetZaxis()->SetTitle("Z_{n}");
             
-            h2->GetXaxis()->SetRangeUser(0,350);
-            h2->GetZaxis()->SetRangeUser(0,4);
+            h2->GetXaxis()->SetRangeUser(0,600);
+            h2->GetYaxis()->SetRangeUser(0,120);
+            h2->GetZaxis()->SetRangeUser(0,2.5);
             
             gStyle->SetNumberContours(255);
             {
-                gStyle->SetPalette(1);
+                gStyle->SetPalette(57);
                 
                 TCanvas* c2 = new TCanvas();
                 c2->cd();
                 c2->SetRightMargin(0.16);
                 g_significance->Draw("colz");
                 
+                /*
                 {
                     TList* grL = g_significance->GetContourList(1);
                     TIter next1(grL);
@@ -5459,17 +5461,16 @@ void analysis1()
                     leg->AddEntry(xt2, "Z_{n}=3", "l");
                 }
                 leg->Draw();
+                */
                 
                 {
-                    TLatex lt1;
-                    lt1.DrawLatexNDC(0.05,0.05,"combined");
-                    lt1.SetTextSize(lt1.GetTextSize());
-                }
-                
-                {
-                    TLatex lt1;
-                    lt1.DrawLatexNDC(0.4,0.05,setupTag.Data());
-                    lt1.SetTextSize(lt1.GetTextSize());
+                    ATLASLabel(0.48,0.88,"Work in progress");
+                    
+                    TLatex lt2;
+                    TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
+                    NameTemp += TString::Format("%.1f",sumDataL/1000);
+                    NameTemp += " fb^{-1}";
+                    lt2.DrawLatexNDC(0.48,0.83, NameTemp.Data());
                 }
                 
                 TString NameTemp = "plot/";
@@ -5478,7 +5479,7 @@ void analysis1()
                 NameTemp += ".eps";
                 c2->Print(NameTemp,"eps");
                 
-                delete leg;
+                //delete leg;
                 delete c2;
             }
             
