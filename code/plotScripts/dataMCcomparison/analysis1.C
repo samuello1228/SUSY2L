@@ -564,6 +564,7 @@ void analysis1()
         double error;
         double significance;
         double significance2; //for combined significance
+        double signal_contamination; //for fake VR
     };
     
     std::vector<SigInfo> SigSampleInfo;
@@ -4039,6 +4040,12 @@ void analysis1()
                         {
                             SigSampleInfo[i].significance2 += SigSampleInfo[i].significance * SigSampleInfo[i].significance;
                         }
+                        
+                        //signal contamination for fake VR
+                        if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                        {
+                            SigSampleInfo[i].signal_contamination = SigSampleInfo[i].weighted / total_BG_weighted;
+                        }
                     }
                     cout<<endl;
                     
@@ -5484,6 +5491,48 @@ void analysis1()
             }
             
             delete g_significance;
+        }
+        
+        //signal contamination for fake VR
+        if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+        {
+            TH2D* h2 = new TH2D("temp", "temp", 100, 0, 500, 30, 0, 150);
+            for(unsigned int j=0;j<SigSampleInfo.size();j++)
+            {
+                int binx = h2->GetXaxis()->FindBin(SigSampleInfo[j].Mass1);
+                int biny = h2->GetYaxis()->FindBin(SigSampleInfo[j].Mass2);
+                h2->SetBinContent(binx,biny,SigSampleInfo[j].signal_contamination);
+                //cout<<setprecision(3)<<SigSampleInfo[j].Mass1<<", "<<SigSampleInfo[j].Mass2<<", "<<SigSampleInfo[j].signal_contamination<<endl;
+            }
+            
+            h2->GetXaxis()->SetTitle("m_{#tilde{#chi}^{#pm}_{1}/#tilde{#chi}^{0}_{2}} [GeV]");
+            h2->GetYaxis()->SetTitle("m_{#tilde{#chi}^{0}_{1}} [GeV]");
+            h2->GetZaxis()->SetTitle("");
+            
+            TCanvas* c2 = new TCanvas();
+            c2->cd();
+            c2->SetRightMargin(0.16);
+            gStyle->SetPalette(57);
+            gStyle->SetPaintTextFormat(".2f");
+            h2->Draw("colz text");
+            
+            {
+                ATLASLabel(0.48,0.88,"Work in progress");
+                
+                TLatex lt2;
+                TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
+                NameTemp += TString::Format("%.1f",sumDataL/1000);
+                NameTemp += " fb^{-1}";
+                lt2.DrawLatexNDC(0.48,0.83, NameTemp.Data());
+            }
+            
+            TString NameTemp = "plot/";
+            NameTemp += "signal_contamination";
+            NameTemp += ".eps";
+            c2->Print(NameTemp,"eps");
+            
+            delete h2;
+            delete c2;
         }
     }
     
