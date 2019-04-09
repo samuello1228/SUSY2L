@@ -862,7 +862,7 @@ void analysis1()
         element.colour = 3; BGMCGroupData.push_back(element);
         
         //charge flip
-        element.GroupName = "charge flip"; element.LegendName = "charge flip"; element.LatexName = "charge flip";
+        element.GroupName = "charge flip"; element.LegendName = "Charge Flip"; element.LatexName = "Charge Flip";
         element.BGMCIndex.clear();
         fillBGMCIndex(BGMCSampleInfo,element.BGMCIndex,999998,999998);
         element.colour = kOrange-5; BGMCGroupData.push_back(element);
@@ -4594,10 +4594,10 @@ void analysis1()
                     }
                     else
                     {
-                        xl2=0.75;
-                        yl2=0.95;
-                        xl1=xl2-0.3;
-                        yl1=yl2-0.2;
+                        xl2=0.93;
+                        yl2=0.93;
+                        xl1=xl2-0.1;
+                        yl1=yl2-0.3;
                     }
                     leg = new TLegend(xl1,yl1,xl2,yl2);
                     leg->SetNColumns(1);
@@ -4722,18 +4722,17 @@ void analysis1()
                 
                 {
                     //text
-                    //ATLASLabel(0.6,0.88,"Internal");
-                    ATLASLabel(0.6,0.88,"Work in progress");
+                    ATLASLabel(0.48,0.88,"Work in progress");
                     
                     TLatex lt2;
                     TString NameTemp = "#sqrt{#it{s}} = 13 TeV, ";
                     NameTemp += TString::Format("%.1f",sumDataL/1000);
                     NameTemp += " fb^{-1}";
-                    lt2.DrawLatexNDC(0.6,0.83, NameTemp.Data());
+                    lt2.DrawLatexNDC(0.48,0.83, NameTemp.Data());
                     lt2.SetTextSize(lt2.GetTextSize());
                     
                     TLatex lt1;
-                    lt1.DrawLatexNDC(0.6,0.78,RegionInfo[RegionIndex].RegionName.Data());
+                    lt1.DrawLatexNDC(0.48,0.78,RegionInfo[RegionIndex].RegionName.Data());
                     lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
@@ -4829,7 +4828,7 @@ void analysis1()
                                 }
                                 
                                 TLatex lt2;
-                                lt2.DrawLatexNDC(0.6,0.68, NameTemp.Data());
+                                lt2.DrawLatexNDC(0.48,0.68, NameTemp.Data());
                                 lt2.SetTextSize(lt2.GetTextSize());
                                 
                                 break;
@@ -4848,14 +4847,14 @@ void analysis1()
                     {
                         TString NameTemp = TString::Format("Z_{n} = %.2f",averageSignificance);
                         TLatex lt2;
-                        lt2.DrawLatexNDC(0.6,0.73, NameTemp.Data());
+                        lt2.DrawLatexNDC(0.48,0.73, NameTemp.Data());
                         lt2.SetTextSize(lt2.GetTextSize());
                     }
                 }
                 
                 {
                     //TLatex lt1;
-                    //lt1.DrawLatexNDC(0.6,0.73,setupTag.Data());
+                    //lt1.DrawLatexNDC(0.48,0.73,setupTag.Data());
                     //lt1.SetTextSize(lt1.GetTextSize());
                 }
                 
