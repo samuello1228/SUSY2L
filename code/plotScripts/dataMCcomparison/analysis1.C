@@ -2375,7 +2375,36 @@ void analysis1()
             
             element.Cut = "";
             element.Cut += " && meff > 200";
-            //element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && fabs(mll - 91.2) > 10";
+            element.Cut += " && MET > 30";
+            
+            element.AdditionalCut.clear();
+            element.OptimizingCut.clear();
+            
+            RegionInfo.push_back(element);
+        }
+        
+        //combined
+        {
+            element.RegionName = "VR_Fake_combined";
+            element.RegionShortName = "combined";
+            
+            element.setOfChannel.clear();
+            element.setOfChannel.push_back(3);
+            element.setOfChannel.push_back(4);
+            element.setOfChannel.push_back(5);
+
+            element.setOfChannel.push_back(9);
+            element.setOfChannel.push_back(10);
+            element.setOfChannel.push_back(11);
+            
+            element.setOfChannel.push_back(15);
+            element.setOfChannel.push_back(16);
+            element.setOfChannel.push_back(17);
+            
+            element.Cut = "";
+            element.Cut += " && meff > 200";
+            element.Cut += " && fabs(mll - 91.2) > 10";
             element.Cut += " && MET > 30";
             
             element.AdditionalCut.clear();
@@ -4005,6 +4034,15 @@ void analysis1()
                         }
                     }
                     cout<<"Total BG: "<<total_BG_weighted<<" +/- "<<TMath::Sqrt(total_BG_error2)<<" ("<<total_BG_unweighted<<")"<<endl<<endl;
+                    
+                    if(RegionGroup[RegionGroupIndex].GroupName == "VR_Fake")
+                    {
+                        for(unsigned int j=0;j<BGGroup2.size();j++)
+                        {
+                            //For fake VR in thesis
+                            cout<<BGGroup2[j].info->GroupName.Data()<<": "<<setprecision(1)<<std::fixed<<BGGroup2[j].info->weighted/total_BG_weighted * 100<<"% ("<<BGGroup2[j].info->weighted<<")"<<endl;
+                        }
+                    }
                     
                     //expected number of events for signal
                     for(unsigned int i=0;i<SigSampleInfo.size();i++)
