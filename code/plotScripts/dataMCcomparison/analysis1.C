@@ -538,7 +538,6 @@ void analysis1()
         double weighted;
         double error;
         double significance;
-        double scale;
     };
     std::vector<PlotSigInfo> SigMassSplitting;
     {
@@ -546,9 +545,9 @@ void analysis1()
         
         ///*
         //Dani
-        element.MassDiff = 150;   element.ID = 20; element.colour = 1;   element.linestyle = 2; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 150;   element.ID = 7;  element.colour = 920; element.linestyle = 5; element.scale = 1;  SigMassSplitting.push_back(element);
-        element.MassDiff = 175;   element.ID = 3;  element.colour = 922; element.linestyle = 9; element.scale = 1;  SigMassSplitting.push_back(element);
+        element.MassDiff = 150;   element.ID = 20; element.colour = 1;   element.linestyle = 2;  SigMassSplitting.push_back(element);
+        element.MassDiff = 150;   element.ID = 7;  element.colour = 920; element.linestyle = 5;  SigMassSplitting.push_back(element);
+        element.MassDiff = 175;   element.ID = 3;  element.colour = 922; element.linestyle = 9;  SigMassSplitting.push_back(element);
         //*/
     }
     
@@ -4468,12 +4467,6 @@ void analysis1()
                     }
                 }
                 
-                //final normalization for h2SigSum for plotting
-                for(unsigned int i=0;i<SigMassSplitting.size();i++)
-                {
-                    h2SigSum[i]->Scale(SigMassSplitting[i].scale);
-                }
-                
                 //scale Z+jets by 1.4 for CR
                 if(RegionGroup[RegionGroupIndex].GroupName == "CR_OS_1B"  ||
                    RegionGroup[RegionGroupIndex].GroupName == "CR_OS_2B"  )
@@ -4627,8 +4620,6 @@ void analysis1()
                         //TString NameTemp = "C1N2#rightarrow slep";
                         TString NameTemp = "";
                         NameTemp += SigMassSplitting[i].IDName;
-                        NameTemp += " x";
-                        NameTemp += TString::Itoa(SigMassSplitting[i].scale,10);
                         leg->AddEntry(h2SigSum[i],NameTemp.Data(),"l");
                     }
                 }
